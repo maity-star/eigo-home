@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>えいごほーむ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; }
+.app { max-width: 390px; margin: 0 auto; padding: 0 0 80px; }
+
+/* ==============================
+   オンボーディング画面
+============================== */
+#onboarding {
+  position: fixed; inset: 0; background: #ffffff; z-index: 100;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 32px 28px;
+  max-width: 390px; margin: 0 auto;
+}
+.ob-logo { font-size: 22px; font-weight: 500; color: #111827; margin-bottom: 6px; }
+.ob-logo span { color: #1D9E75; }
+.ob-sub { font-size: 13px; color: #6B7280; margin-bottom: 36px; text-align: center; line-height: 1.6; }
+.ob-question { font-size: 16px; font-weight: 600; color: #04342C; margin-bottom: 6px; text-align: center; }
+.ob-hint { font-size: 12px; color: #9CA3AF; margin-bottom: 24px; text-align: center; }
+.interest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 28px; }
+.interest-card {
+  background: #F9FAFB; border: 1.5px solid #E5E7EB; border-radius: 14px;
+  padding: 18px 12px; text-align: center; cursor: pointer;
+  transition: all 0.15s;
+}
+.interest-card.selected { background: #E1F5EE; border-color: #1D9E75; }
+.interest-card .ic-emoji { font-size: 30px; display: block; margin-bottom: 8px; }
+.interest-card .ic-label { font-size: 13px; font-weight: 500; color: #374151; }
+.interest-card .ic-sub { font-size: 10px; color: #9CA3AF; margin-top: 2px; }
+.interest-card.selected .ic-label { color: #04342C; }
+.ob-btn {
+  width: 100%; height: 52px; background: #1D9E75; border: none; border-radius: 14px;
+  font-size: 15px; font-weight: 600; color: white; cursor: pointer;
+  opacity: 0.4; transition: opacity 0.2s;
+}
+.ob-btn.ready { opacity: 1; }
+.ob-skip { margin-top: 14px; font-size: 12px; color: #9CA3AF; cursor: pointer; text-decoration: underline; }
+
+/* ヘッダー */
+.header { padding: 24px 20px 16px; border-bottom: 0.5px solid #E5E7EB; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.logo { font-size: 18px; font-weight: 500; color: #111827; letter-spacing: -0.3px; }
+.logo span { color: #1D9E75; }
+.week-badge { font-size: 11px; background: #E1F5EE; color: #085041; padding: 3px 10px; border-radius: 20px; }
+.header-sub { font-size: 12px; color: #6B7280; }
+
+/* タブ */
+.tab-bar { display: flex; border-bottom: 0.5px solid #E5E7EB; margin: 0 20px; }
+.tab { flex: 1; text-align: center; padding: 10px 4px; font-size: 12px; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; }
+.tab.active { color: #1D9E75; border-bottom-color: #1D9E75; font-weight: 500; }
+
+/* セクション */
+.section { padding: 20px 20px 0; }
+.section-label { font-size: 11px; font-weight: 500; color: #6B7280; letter-spacing: 0.8px; margin-bottom: 12px; text-transform: uppercase; }
+
+/* 今週カード */
+.week-card { background: #E1F5EE; border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+.week-theme { font-size: 13px; color: #0F6E56; margin-bottom: 4px; }
+.week-title { font-size: 20px; font-weight: 500; color: #04342C; margin-bottom: 12px; }
+
+/* 絵本プレイヤー */
+.book-player-card { background: white; border-radius: 12px; padding: 16px; }
+.book-player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.book-cover { width: 52px; height: 52px; background: #9FE1CB; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+.book-meta { flex: 1; }
+.book-meta-title { font-size: 14px; font-weight: 500; color: #04342C; }
+.book-meta-sub { font-size: 11px; color: #0F6E56; margin-top: 2px; }
+.native-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; background: #E6F1FB; color: #0C447C; padding: 3px 8px; border-radius: 10px; margin-top: 6px; }
+.big-play-btn { width: 100%; height: 52px; background: #1D9E75; border: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: background 0.15s; }
+.big-play-btn:hover { background: #0F6E56; }
+.big-play-btn.playing { background: #085041; }
+.big-play-label { font-size: 14px; font-weight: 500; color: white; }
+.progress-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.prog-bar { flex: 1; height: 4px; background: #E5E7EB; border-radius: 2px; overflow: hidden; cursor: pointer; }
+.prog-fill { height: 100%; background: #1D9E75; width: 0%; transition: width 0.4s linear; border-radius: 2px; }
+.prog-time { font-size: 11px; color: #6B7280; min-width: 36px; text-align: right; }
+.tip-row { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 0.5px solid #9FE1CB; align-items: flex-start; }
+.tip-text { font-size: 12px; color: #085041; line-height: 1.6; }
+
+/* プレイリスト */
+.playlist-list { display: flex; flex-direction: column; gap: 8px; }
+.playlist-item { display: flex; align-items: center; gap: 12px; background: #ffffff; border: 0.5px solid #E5E7EB; border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: background 0.15s; }
+.playlist-item:hover { background: #F9FAFB; }
+.playlist-item.playing { border-color: #1D9E75; background: #E1F5EE; }
+.pl-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.pl-info { flex: 1; min-width: 0; }
+.pl-title { font-size: 13px; font-weight: 500; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-sub { font-size: 11px; color: #6B7280; margin-top: 2px; }
+.pl-age { font-size: 10px; background: #E6F1FB; color: #0C447C; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.pl-play { width: 32px; height: 32px; border-radius: 50%; border: 0.5px solid #E5E7EB; background: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.playlist-item.playing .pl-play { background: #1D9E75; border-color: #1D9E75; }
+
+/* サブスクバナー */
+.sub-banner { margin: 20px 20px 0; background: linear-gradient(135deg, #04342C, #0F6E56); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sub-text-title { font-size: 13px; font-weight: 500; color: white; margin-bottom: 3px; }
+.sub-text-sub { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+.sub-btn { font-size: 11px; font-weight: 500; background: white; color: #04342C; border: none; border-radius: 8px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
+
+/* ルーティン */
+.routine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.routine-card { background: #F9FAFB; border-radius: 12px; padding: 14px; }
+.routine-card.active { background: #E6F1FB; }
+.routine-time { font-size: 10px; color: #6B7280; margin-bottom: 4px; }
+.routine-title { font-size: 13px; font-weight: 500; color: #111827; margin-bottom: 4px; }
+.routine-card.active .routine-title { color: #0C447C; }
+.routine-desc { font-size: 11px; color: #6B7280; line-height: 1.5; }
+.routine-card.active .routine-desc { color: #185FA5; }
+.hint-box { margin-top: 14px; background: #F9FAFB; border-radius: 12px; padding: 14px; font-size: 12px; color: #6B7280; line-height: 1.7; }
+
+/* ミニプレイヤー */
+.mini-player { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 390px; background: #ffffff; border-top: 0.5px solid #E5E7EB; padding: 10px 20px 14px; display: none; box-shadow: 0 -4px 12px rgba(0,0,0,0.06); }
+.mini-player.visible { display: block; }
+.mini-track { font-size: 13px; font-weight: 500; color: #111827; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-controls { display: flex; align-items: center; gap: 12px; }
+.mini-prog { flex: 1; height: 3px; background: #E5E7EB; border-radius: 2px; overflow: hidden; }
+.mini-fill { height: 100%; background: #1D9E75; width: 0%; transition: width 0.4s linear; border-radius: 2px; }
+.mini-btn { width: 34px; height: 34px; border-radius: 50%; border: 0.5px solid #E5E7EB; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 14px; }
+.mini-btn.primary { background: #1D9E75; border-color: #1D9E75; color: white; }
+.mini-time { font-size: 11px; color: #6B7280; min-width: 32px; text-align: right; }
+
+/* ==============================
+   興味バッジ（ヘッダー内）
+============================== */
+.interest-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; background: #E1F5EE; color: #085041;
+  padding: 3px 10px; border-radius: 20px; cursor: pointer;
+}
+
+/* ==============================
+   YouTubeキュレーションセクション
+============================== */
+.yt-section { padding: 20px 20px 0; }
+.yt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.yt-label { font-size: 11px; font-weight: 500; color: #6B7280; letter-spacing: 0.8px; text-transform: uppercase; }
+.yt-note { font-size: 10px; color: #9CA3AF; }
+.yt-card {
+  background: #F9FAFB; border-radius: 14px; overflow: hidden;
+  border: 0.5px solid #E5E7EB; margin-bottom: 10px;
+  display: flex; align-items: stretch;
+}
+.yt-thumb {
+  width: 88px; flex-shrink: 0;
+  background: #9FE1CB;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; position: relative;
+}
+.yt-thumb .yt-play-icon {
+  position: absolute; width: 28px; height: 28px;
+  background: rgba(0,0,0,0.55); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: white;
+}
+.yt-body { padding: 12px 13px; flex: 1; min-width: 0; }
+.yt-title { font-size: 13px; font-weight: 500; color: #111827; margin-bottom: 3px; line-height: 1.4; }
+.yt-channel { font-size: 11px; color: #6B7280; margin-bottom: 6px; }
+.yt-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.yt-tag { font-size: 10px; padding: 2px 7px; border-radius: 8px; }
+.yt-tag-when { background: #E1F5EE; color: #0F6E56; }
+.yt-tag-age  { background: #E6F1FB; color: #0C447C; }
+.yt-tag-int  { background: #FAEEDA; color: #92400E; }
+.yt-tip {
+  font-size: 11px; color: #085041; margin-top: 8px;
+  padding-top: 8px; border-top: 0.5px solid #E5E7EB;
+  line-height: 1.6;
+}
+.yt-scroll-hint { font-size: 11px; color: #9CA3AF; text-align: center; padding: 6px 0 2px; }
+
+/* ==============================
+   興味切り替えピル
+============================== */
+.interest-filter { display: flex; gap: 7px; padding: 0 20px; margin-bottom: 2px; overflow-x: auto; scrollbar-width: none; }
+.interest-filter::-webkit-scrollbar { display: none; }
+.ifilter-pill {
+  flex-shrink: 0; font-size: 12px; padding: 5px 14px;
+  border-radius: 20px; border: 1px solid #E5E7EB;
+  background: #F9FAFB; color: #6B7280; cursor: pointer; transition: all 0.15s;
+}
+.ifilter-pill.active { background: #04342C; color: white; border-color: #04342C; }
+</style>
+</head>
+<body>
+<!-- ==============================
+     オンボーディング画面
+============================== -->
+<div id="onboarding">
+  <div class="ob-logo">えいご<span>ほーむ</span></div>
+  <div class="ob-sub">まず、お子さんのことを教えてください。<br>好みに合ったコンテンツをご提案します。</div>
+  <div class="ob-question">お子さんが好きなものは？</div>
+  <div class="ob-hint">複数選べます</div>
+  <div class="interest-grid">
+    <div class="interest-card" onclick="toggleInterest(this,'🚗','のりもの')">
+      <span class="ic-emoji">🚗</span>
+      <div class="ic-label">のりもの</div>
+      <div class="ic-sub">車・電車・飛行機</div>
+    </div>
+    <div class="interest-card" onclick="toggleInterest(this,'🧸','おにんぎょう')">
+      <span class="ic-emoji">🧸</span>
+      <div class="ic-label">おにんぎょう</div>
+      <div class="ic-sub">人形・ぬいぐるみ</div>
+    </div>
+    <div class="interest-card" onclick="toggleInterest(this,'🐘','どうぶつ')">
+      <span class="ic-emoji">🐘</span>
+      <div class="ic-label">どうぶつ</div>
+      <div class="ic-sub">いきもの全般</div>
+    </div>
+    <div class="interest-card" onclick="toggleInterest(this,'🎵','おんがく')">
+      <span class="ic-emoji">🎵</span>
+      <div class="ic-label">おんがく・ダンス</div>
+      <div class="ic-sub">歌・リズム好き</div>
+    </div>
+    <div class="interest-card" onclick="toggleInterest(this,'🍳','おままごと')">
+      <span class="ic-emoji">🍳</span>
+      <div class="ic-label">おままごと</div>
+      <div class="ic-sub">料理・食べ物</div>
+    </div>
+    <div class="interest-card" onclick="toggleInterest(this,'🦸','ヒーロー')">
+      <span class="ic-emoji">🦸</span>
+      <div class="ic-label">ヒーロー・冒険</div>
+      <div class="ic-sub">アクション好き</div>
+    </div>
+  </div>
+  <button class="ob-btn" id="obBtn" onclick="finishOnboarding()" disabled>はじめる →</button>
+  <div class="ob-skip" onclick="finishOnboarding(true)">あとで設定する</div>
+</div>
+
+<div class="app" id="mainApp" style="display:none;">
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">えいご<span>ほーむ</span></div>
+      <div class="week-badge">Week 3 · 6月</div>
+    </div>
+    <div class="header-sub" style="display:flex;align-items:center;gap:8px;">
+      <span>今週のテーマ：Colors &amp; Animals 🐻</span>
+      <span class="interest-badge" id="interestBadge" onclick="showOnboarding()" style="display:none;"></span>
+    </div>
+  </div>
+
+  <!-- タブバー -->
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('home',this)">今週</div>
+    <div class="tab" onclick="switchTab('playlist',this)">音楽</div>
+    <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
+  </div>
+
+  <!-- 今週タブ -->
+  <div id="tab-home">
+    <div class="section" style="padding-top:20px;">
+      <div class="section-label">今週のレッスン</div>
+      <div class="week-card">
+        <div class="week-theme">今週のテーマ</div>
+        <div class="week-title">Colors &amp; Animals</div>
+        <div class="book-player-card">
+          <div class="book-player-top">
+            <div class="book-cover">📖</div>
+            <div class="book-meta">
+              <div class="book-meta-title">Brown Bear, Brown Bear</div>
+              <div class="book-meta-sub">Bill Martin Jr.</div>
+              <div class="native-badge">🎙 ネイティブ音読 · Daniel先生</div>
+            </div>
+          </div>
+          <!-- 実装時: <audio id="bookAudio" src="audio/week3_brownbear.mp3"></audio> -->
+          <button class="big-play-btn" id="bookPlayBtn" onclick="toggleBook()">
+            <span style="font-size:18px;color:white;" id="bookIconEmoji">▶</span>
+            <span class="big-play-label" id="bookLabel">音読を再生する</span>
+          </button>
+          <div class="progress-row">
+            <div class="prog-bar" onclick="seekBook(event)">
+              <div class="prog-fill" id="bookFill"></div>
+            </div>
+            <div class="prog-time" id="bookTime">0:00</div>
+          </div>
+          <div class="tip-row">
+            <div style="font-size:16px;">💡</div>
+            <div class="tip-text">画面を消したまま流してOK。寝る前に毎晩同じ音読を聴かせるだけで英語耳が育ちます。訳さなくて大丈夫。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">今週流してほしい曲</div>
+      <div class="playlist-list">
+        <div class="playlist-item" onclick="playMusic(this,'🎵','Brown Bear Song','繰り返しリズムで色・動物を定着','1〜3歳')">
+          <div class="pl-icon" style="background:#E1F5EE;">🎵</div>
+          <div class="pl-info">
+            <div class="pl-title">Brown Bear Song</div>
+            <div class="pl-sub">繰り返しリズムで色・動物を定着</div>
+          </div>
+          <div class="pl-age">1〜3歳</div>
+          <div class="pl-play"><span style="font-size:11px;color:#6B7280;">▶</span></div>
+        </div>
+        <div class="playlist-item" onclick="playMusic(this,'🎶','Rainbow Colors Song','色の名前を歌で自然にインプット','2〜5歳')">
+          <div class="pl-icon" style="background:#E6F1FB;">🎶</div>
+          <div class="pl-info">
+            <div class="pl-title">Rainbow Colors Song</div>
+            <div class="pl-sub">色の名前を歌で自然にインプット</div>
+          </div>
+          <div class="pl-age">2〜5歳</div>
+          <div class="pl-play"><span style="font-size:11px;color:#6B7280;">▶</span></div>
+        </div>
+        <div class="playlist-item" onclick="playMusic(this,'🐘','Old MacDonald Had a Farm','動物の鳴き声・名前を体で覚える','1〜4歳')">
+          <div class="pl-icon" style="background:#FAEEDA;">🐘</div>
+          <div class="pl-info">
+            <div class="pl-title">Old MacDonald Had a Farm</div>
+            <div class="pl-sub">動物の鳴き声・名前を体で覚える</div>
+          </div>
+          <div class="pl-age">1〜4歳</div>
+          <div class="pl-play"><span style="font-size:11px;color:#6B7280;">▶</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YouTube キュレーション -->
+    <div class="yt-section" id="ytSection">
+      <div class="yt-header">
+        <div class="yt-label">YouTube かけ流し おすすめ</div>
+        <div class="yt-note">編集部が厳選 ✅</div>
+      </div>
+      <!-- 興味フィルター -->
+      <div class="interest-filter" id="ytFilter">
+        <div class="ifilter-pill active" onclick="filterYT(this,'all')">すべて</div>
+        <div class="ifilter-pill" onclick="filterYT(this,'のりもの')">🚗 のりもの</div>
+        <div class="ifilter-pill" onclick="filterYT(this,'おにんぎょう')">🧸 おにんぎょう</div>
+        <div class="ifilter-pill" onclick="filterYT(this,'どうぶつ')">🐘 どうぶつ</div>
+        <div class="ifilter-pill" onclick="filterYT(this,'おんがく')">🎵 おんがく</div>
+        <div class="ifilter-pill" onclick="filterYT(this,'おままごと')">🍳 おままごと</div>
+      </div>
+      <div style="height:12px;"></div>
+      <div id="ytCards"></div>
+    </div>
+
+    <!-- サブスクバナー -->
+    <div class="sub-banner">
+      <div>
+        <div class="sub-text-title">週1回の英会話では話せません。</div>
+        <div class="sub-text-sub">毎日5分の家庭英語が子供を変える。<br>月額980円で全コンテンツ使い放題。</div>
+      </div>
+      <button class="sub-btn">無料で始める</button>
+    </div>
+  </div>
+
+  <!-- 音楽タブ -->
+  <div id="tab-playlist" style="display:none;">
+    <div class="section" style="padding-top:20px;">
+      <div class="section-label">シーン別プレイリスト</div>
+      <div class="playlist-list">
+        <div class="playlist-item" onclick="playMusic(this,'🌙','Goodnight Songs','寝かしつけ前の英語タイム','0〜2歳')">
+          <div class="pl-icon" style="background:#EEEDFE;">🌙</div>
+          <div class="pl-info"><div class="pl-title">Goodnight Songs</div><div class="pl-sub">寝かしつけ前の英語タイム</div></div>
+          <div class="pl-age">0〜2歳</div>
+          <div class="pl-play"><span style="font-size:11px;color:#6B7280;">▶</span></div>
+        </div>
+        <div class="playlist-item" onclick="playMusic(this,'☀️','Morning Routine Songs','朝の支度BGMに','2〜5歳')">
+          <div class="pl-icon" style="background:#FAEEDA;">☀️</div>
+          <div class="pl-info"><div class="pl-title">Morning Routine Songs</div><div class="pl-sub">朝の支度BGMに</div></div>
+          <div class="pl-age">2〜5歳</div>
+          <div class="pl-play"><span style="font-size:11px;color:#6B7280;">▶</span></div>
+        </div>
+        <div class="playlist-item" onclick="playMusic(this,'🚗','Car Trip English','お出かけ・車の中で','1〜5歳')">
+          <div class="pl-icon" style="background:#E6F1FB;">🚗</div>
+          <div class="pl-info"><div class="pl-title">Car Trip English</div><div class="pl-sub">お出かけ・車の中で</div></div>
+          <div class="pl-age">1〜5歳</div>
+          <div class="pl-play"><span style="font-size:11px;color:#6B7280;">▶</span></div>
+        </div>
+        <div class="playlist-item" onclick="playMusic(this,'🍽️','Mealtime Phrases','食事中に流す短いフレーズ集','2〜5歳')">
+          <div class="pl-icon" style="background:#E1F5EE;">🍽️</div>
+          <div class="pl-info"><div class="pl-title">Mealtime Phrases</div><div class="pl-sub">食事中に流す短いフレーズ集</div></div>
+          <div class="pl-age">2〜5歳</div>
+          <div class="pl-play"><span style="font-size:11px;color:#6B7280;">▶</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ルーティンタブ -->
+  <div id="tab-routine" style="display:none;">
+    <div class="section" style="padding-top:20px;">
+      <div class="section-label">今日のルーティン</div>
+      <div class="routine-grid">
+        <div class="routine-card active">
+          <div class="routine-time">朝 · 支度中</div>
+          <div class="routine-title">Morning BGM</div>
+          <div class="routine-desc">Morning Songsを流すだけ。親は何もしなくてOK。</div>
+        </div>
+        <div class="routine-card">
+          <div class="routine-time">移動中</div>
+          <div class="routine-title">Car Trip</div>
+          <div class="routine-desc">Car Trip Englishをかけ流し。聴くだけで◎。</div>
+        </div>
+        <div class="routine-card">
+          <div class="routine-time">食事中</div>
+          <div class="routine-title">Mealtime</div>
+          <div class="routine-desc">"More?" "All done!"が自然に耳に入る。</div>
+        </div>
+        <div class="routine-card">
+          <div class="routine-time">寝る前 · 5分</div>
+          <div class="routine-title">絵本音読</div>
+          <div class="routine-desc">Daniel先生の音読を流すだけ。画面オフでOK。</div>
+        </div>
+      </div>
+      <div class="hint-box">💡 全部やらなくて大丈夫。まず「寝る前の音読」だけ1週間続けてみてください。</div>
+    </div>
+  </div>
+</div><!-- /.app / #mainApp -->
+<div class="mini-player" id="miniPlayer">
+  <div class="mini-track" id="miniTrack">—</div>
+  <div class="mini-controls">
+    <div class="mini-btn" onclick="miniSkipBack()">⏮</div>
+    <div class="mini-btn primary" onclick="miniToggle()" id="miniPlayBtn">⏸</div>
+    <div class="mini-btn" onclick="miniSkipNext()">⏭</div>
+    <div class="mini-prog"><div class="mini-fill" id="miniFill"></div></div>
+    <div class="mini-time" id="miniTime">0:00</div>
+  </div>
+</div>
+
+<script>
+let bookPlaying=false,bookProg=0,bookTimer=null;
+let musicProg=0,musicTimer=null,musicPlaying=false;
+let currentMusicItem=null,activeMode=null;
+
+function switchTab(name,el){
+  ['home','playlist','routine'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleBook(){
+  if(activeMode==='music') stopMusic();
+  activeMode='book';
+  bookPlaying=!bookPlaying;
+  const btn=document.getElementById('bookPlayBtn');
+  const emoji=document.getElementById('bookIconEmoji');
+  const label=document.getElementById('bookLabel');
+  const mini=document.getElementById('miniPlayer');
+  if(bookPlaying){
+    btn.classList.add('playing');
+    emoji.textContent='⏸';
+    label.textContent='再生中...';
+    mini.classList.add('visible');
+    document.getElementById('miniTrack').textContent='Brown Bear, Brown Bear — Daniel先生の音読';
+    document.getElementById('miniPlayBtn').textContent='⏸';
+    startBookTimer();
+  } else {
+    btn.classList.remove('playing');
+    emoji.textContent='▶';
+    label.textContent='音読を再生する';
+    document.getElementById('miniPlayBtn').textContent='▶';
+    clearInterval(bookTimer);
+  }
+}
+
+function startBookTimer(){
+  clearInterval(bookTimer);
+  bookTimer=setInterval(()=>{
+    bookProg=Math.min(bookProg+0.4,100);
+    document.getElementById('bookFill').style.width=bookProg.toFixed(1)+'%';
+    document.getElementById('miniFill').style.width=bookProg.toFixed(1)+'%';
+    const sec=Math.round(bookProg*1.5);
+    const t=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+    document.getElementById('bookTime').textContent=t;
+    document.getElementById('miniTime').textContent=t;
+    if(bookProg>=100){
+      clearInterval(bookTimer);bookPlaying=false;
+      document.getElementById('bookIconEmoji').textContent='▶';
+      document.getElementById('bookLabel').textContent='音読を再生する';
+      document.getElementById('bookPlayBtn').classList.remove('playing');
+      document.getElementById('miniPlayBtn').textContent='▶';
+    }
+  },300);
+}
+
+function seekBook(e){
+  const rect=e.currentTarget.getBoundingClientRect();
+  bookProg=Math.round(((e.clientX-rect.left)/rect.width)*100);
+  document.getElementById('bookFill').style.width=bookProg+'%';
+  document.getElementById('miniFill').style.width=bookProg+'%';
+}
+
+function stopMusic(){
+  if(currentMusicItem){
+    currentMusicItem.classList.remove('playing');
+    const pi=currentMusicItem.querySelector('.pl-play span');
+    if(pi){pi.textContent='▶';pi.style.color='#6B7280';}
+  }
+  clearInterval(musicTimer);musicPlaying=false;musicProg=0;
+}
+
+function playMusic(el,icon,title,sub,age){
+  if(activeMode==='book'){
+    bookPlaying=false;clearInterval(bookTimer);
+    document.getElementById('bookIconEmoji').textContent='▶';
+    document.getElementById('bookLabel').textContent='音読を再生する';
+    document.getElementById('bookPlayBtn').classList.remove('playing');
+  }
+  if(currentMusicItem&&currentMusicItem!==el) stopMusic();
+  activeMode='music';currentMusicItem=el;
+  el.classList.add('playing');
+  const pi=el.querySelector('.pl-play span');
+  if(pi){pi.textContent='⏸';pi.style.color='white';}
+  musicPlaying=true;musicProg=0;
+  document.getElementById('miniPlayer').classList.add('visible');
+  document.getElementById('miniTrack').textContent=title;
+  document.getElementById('miniPlayBtn').textContent='⏸';
+  clearInterval(musicTimer);
+  musicTimer=setInterval(()=>{
+    musicProg=Math.min(musicProg+0.5,100);
+    document.getElementById('miniFill').style.width=musicProg.toFixed(1)+'%';
+    const sec=Math.round(musicProg*1.8);
+    document.getElementById('miniTime').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+    if(musicProg>=100){
+      clearInterval(musicTimer);musicPlaying=false;
+      if(pi){pi.textContent='▶';pi.style.color='#6B7280';}
+      el.classList.remove('playing');
+      document.getElementById('miniPlayBtn').textContent='▶';
+    }
+  },300);
+}
+
+function miniToggle(){
+  if(activeMode==='book') toggleBook();
+  else if(activeMode==='music'){
+    musicPlaying=!musicPlaying;
+    document.getElementById('miniPlayBtn').textContent=musicPlaying?'⏸':'▶';
+    if(musicPlaying){clearInterval(musicTimer);startMusicTimer();}
+    else clearInterval(musicTimer);
+  }
+}
+
+function startMusicTimer(){
+  musicTimer=setInterval(()=>{
+    musicProg=Math.min(musicProg+0.5,100);
+    document.getElementById('miniFill').style.width=musicProg.toFixed(1)+'%';
+    const sec=Math.round(musicProg*1.8);
+    document.getElementById('miniTime').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+    if(musicProg>=100) clearInterval(musicTimer);
+  },300);
+}
+
+function miniSkipBack(){
+  if(activeMode==='book'){bookProg=0;document.getElementById('bookFill').style.width='0%';}
+  else musicProg=0;
+  document.getElementById('miniFill').style.width='0%';
+  document.getElementById('miniTime').textContent='0:00';
+}
+function miniSkipNext(){miniSkipBack();}
+
+// ========================
+// YouTubeコンテンツデータ
+// ========================
+const YT_DATA = [
+  { emoji:'🚂', bg:'#FAEEDA', title:'Blippi Trains for Kids', channel:'Blippi', when:'おでかけ・移動中', age:'2〜5歳', interest:'のりもの', tip:'英語のみ・字幕オフ推奨。移動音が好きな子は飽きずに見られます。' },
+  { emoji:'🚒', bg:'#FAEEDA', title:'Fire Trucks for Kids', channel:'Kids Channel', when:'朝の支度BGMに', age:'1〜4歳', interest:'のりもの', tip:'繰り返しが多く単語が定着しやすい。音だけでもOK。' },
+  { emoji:'🧸', bg:'#EEEDFE', title:'Play With Me Sesame', channel:'Sesame Street', when:'食事中・リラックスタイム', age:'2〜5歳', interest:'おにんぎょう', tip:'Elmoが人形を使って会話を展開。表情豊かで感情語が自然に入ります。' },
+  { emoji:'👗', bg:'#EEEDFE', title:'Barbie Dreamhouse Adventures', channel:'Barbie Official', when:'おやつタイム・遊び中', age:'3〜6歳', interest:'おにんぎょう', tip:'日常会話フレーズが豊富。Let\'s go!など使いやすい表現が多い。' },
+  { emoji:'🐘', bg:'#E1F5EE', title:'Animal Songs for Kids', channel:'Super Simple Songs', when:'寝る前・落ち着いた時間', age:'1〜4歳', interest:'どうぶつ', tip:'今週のテーマ「Colors & Animals」に完全マッチ。このタイミングで流すのがベスト。' },
+  { emoji:'🦁', bg:'#E1F5EE', title:'Wild Kratts', channel:'Wild Kratts Official', when:'おでかけ前・夕方', age:'3〜6歳', interest:'どうぶつ', tip:'動物の名前や生態を英語で説明。好奇心旺盛な子に特におすすめ。' },
+  { emoji:'🎵', bg:'#E6F1FB', title:'Super Simple Songs', channel:'Super Simple Songs', when:'いつでも・BGMに', age:'0〜4歳', interest:'おんがく', tip:'シンプルな繰り返しメロディで英語耳を育てる定番チャンネル。' },
+  { emoji:'💃', bg:'#E6F1FB', title:'Cocomelon Nursery Rhymes', channel:'Cocomelon', when:'朝・テンションを上げたい時', age:'1〜4歳', interest:'おんがく', tip:'リズムが良く体を動かしながら英語を体感できる。' },
+  { emoji:'🍳', bg:'#FDE8E8', title:'Play Doh Kitchen', channel:'Play-Doh', when:'食事の前後', age:'2〜5歳', interest:'おままごと', tip:'More? All done!など食卓で使えるフレーズが自然に耳に入ります。' },
+  { emoji:'🧁', bg:'#FDE8E8', title:'Bluey Cooking Episodes', channel:'Bluey Official', when:'夕飯づくりのBGMに', age:'2〜6歳', interest:'おままごと', tip:'家族の日常会話が英語で聴ける。親も一緒に楽しめるクオリティ。' },
+];
+
+let selectedInterests = [];
+
+function renderYT(filter) {
+  const container = document.getElementById('ytCards');
+  if(!container) return;
+  const data = filter === 'all' ? YT_DATA : YT_DATA.filter(d => d.interest === filter);
+  container.innerHTML = data.map(d => `
+    <div class="yt-card">
+      <div class="yt-thumb" style="background:${d.bg};">
+        <span style="font-size:32px;">${d.emoji}</span>
+        <div class="yt-play-icon">▶</div>
+      </div>
+      <div class="yt-body">
+        <div class="yt-title">${d.title}</div>
+        <div class="yt-channel">${d.channel}</div>
+        <div class="yt-tags">
+          <span class="yt-tag yt-tag-when">⏰ ${d.when}</span>
+          <span class="yt-tag yt-tag-age">${d.age}</span>
+          <span class="yt-tag yt-tag-int">${d.interest}</span>
+        </div>
+        <div class="yt-tip">💡 ${d.tip}</div>
+      </div>
+    </div>
+  `).join('');
+  if(data.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;">このカテゴリは準備中です 🙏</div>';
+  }
+}
+
+function filterYT(el, filter) {
+  document.querySelectorAll('.ifilter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderYT(filter);
+}
+
+function toggleInterest(el, emoji, label) {
+  el.classList.toggle('selected');
+  if(el.classList.contains('selected')){
+    selectedInterests.push({ emoji, label });
+  } else {
+    selectedInterests = selectedInterests.filter(i => i.label !== label);
+  }
+  const btn = document.getElementById('obBtn');
+  btn.disabled = selectedInterests.length === 0;
+  btn.classList.toggle('ready', selectedInterests.length > 0);
+}
+
+function finishOnboarding(skip) {
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  renderYT('all');
+  if(!skip && selectedInterests.length > 0){
+    const badge = document.getElementById('interestBadge');
+    const icons = selectedInterests.map(i => i.emoji).join('');
+    badge.textContent = icons + ' ' + selectedInterests.map(i => i.label).join('・');
+    badge.style.display = 'inline-flex';
+    // 最初の興味カテゴリをフィルター
+    const firstLabel = selectedInterests[0].label;
+    const pills = document.querySelectorAll('.ifilter-pill');
+    pills.forEach(p => {
+      if(p.textContent.includes(firstLabel)){ p.click(); }
+    });
+  }
+}
+
+function showOnboarding() {
+  selectedInterests = [];
+  document.querySelectorAll('.interest-card').forEach(c => c.classList.remove('selected'));
+  const btn = document.getElementById('obBtn');
+  btn.disabled = true;
+  btn.classList.remove('ready');
+  document.getElementById('onboarding').style.display = 'flex';
+  document.getElementById('mainApp').style.display = 'none';
+}
+</script>
+
+<!--
+==================================================
+次のチャットへの引き継ぎメモ
+==================================================
+
+【サービスコンセプト】
+「週1回の英会話では子供は英語を話せない」をキャッチコピーに、
+保護者が家で毎日5分だけ英語を流せるアプリ。
+教室なし・アプリのみで完遂するサブスクモデル（月額980〜1,480円）。
+
+【差別化の核心】
+ネイティブ（夫・カナダ人）の絵本音読音声が毎週更新される。
+月1回まとめ収録30分で完結。
+
+【3つのタブ】
+1. 今週：今週のテーマ・絵本・夫の音読・流してほしい曲
+2. 音楽：シーン別プレイリスト（朝/移動/食事/寝る前）
+3. ルーティン：1日の英語タイムガイド
+
+【配布方法】
+PWA化（manifest.json + service worker追加）でホーム画面アプリ化。
+Vercel or GitHub Pagesで無料ホスティング。
+
+【次に詰めること】
+- 実際の音声ファイル（mp3）の組み込み
+- Vercelへのデプロイ・公開
+- サブスク会員管理の仕組み（Stripe等）
+- 集客導線（Instagram・LINEオープンチャット等）
+- 夫への新しい説得シナリオ（教室なし版）
+- 週次コンテンツ更新の運用設計
+==================================================
+-->
+</body>
+</html>
