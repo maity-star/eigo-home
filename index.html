@@ -68,8 +68,12 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .section { padding: 20px 20px 0; }
 .section-label { font-size: 11px; font-weight: 500; color: #6B7280; letter-spacing: 0.8px; margin-bottom: 12px; text-transform: uppercase; }
 .section-header { margin-bottom: 14px; }
-.section-header-en { font-size: 18px; font-weight: 700; color: #111827; letter-spacing: -0.3px; line-height: 1.2; }
-.section-header-ja { font-size: 11px; color: #6B7280; margin-top: 2px; }
+.section-header-en {
+  font-size: 18px; font-weight: 700; color: #111827; letter-spacing: -0.3px; line-height: 1.2;
+  display: inline-block; padding-bottom: 5px;
+  border-bottom: 3px solid #6DB88A;
+}
+.section-header-ja { font-size: 11px; color: #6B7280; margin-top: 6px; }
 
 /* コンテンツブロック */
 .content-block { background: #F9FAFB; border-radius: 16px; border: 1px solid #E5E7EB; overflow: hidden; padding: 16px; }
@@ -147,6 +151,94 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-why-body.open { display: block; }
 
 /* ==============================
+   今週やることパネル（Weekly Pick + Weekly Playlist を包む）
+============================== */
+.weekly-todo-panel {
+  margin: 24px 20px 0;
+  background: #FBF7EE;
+  border: 1px solid #F0E6D2;
+  border-radius: 20px;
+  padding: 20px 18px 22px;
+}
+.weekly-todo-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #B8860B;
+  margin-bottom: 16px;
+}
+.weekly-todo-eyebrow-line { flex: 1; height: 1px; background: #F0E6D2; }
+.weekly-todo-block + .weekly-todo-block { margin-top: 22px; }
+
+/* カード自体の強化（パネル内で使用） */
+.weekly-todo-panel .content-block {
+  box-shadow: 0 4px 14px rgba(120,90,30,0.07);
+  border: 1px solid #F0E6D2;
+}
+.weekly-todo-panel .weekly-book-cover-wrap { height: 190px; }
+
+/* ==============================
+   YouTube ティーザー（今週タブ内・軽量版）
+============================== */
+.yt-teaser-section { padding: 26px 0 0; }
+.yt-teaser-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 0 20px; }
+.yt-teaser-label { font-size: 11px; font-weight: 500; color: #9CA3AF; letter-spacing: 0.6px; }
+.yt-teaser-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 4px; scrollbar-width: none; }
+.yt-teaser-scroll::-webkit-scrollbar { display: none; }
+.yt-teaser-card { flex-shrink: 0; width: 130px; background: #F9FAFB; border-radius: 12px; border: 0.5px solid #E5E7EB; overflow: hidden; }
+.yt-teaser-thumb { width: 100%; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 26px; position: relative; }
+.yt-teaser-thumb .yt-play-icon { position: absolute; width: 22px; height: 22px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; }
+.yt-teaser-title { font-size: 11px; font-weight: 500; color: #374151; padding: 8px 9px 9px; line-height: 1.4; }
+.yt-more-card {
+  flex-shrink: 0; width: 90px; height: 124px;
+  background: #F3F4F6; border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; cursor: pointer; border: 0.5px dashed #D1D5DB;
+}
+.yt-more-card-icon { font-size: 16px; color: #9CA3AF; }
+.yt-more-card-label { font-size: 10px; font-weight: 600; color: #6B7280; text-align: center; line-height: 1.4; }
+
+/* ==============================
+   Weekly Playlist（今月テーマ固定・コンパクト縦カード）
+============================== */
+.mp-list { display: flex; flex-direction: column; gap: 10px; }
+.mp-card {
+  background: #ffffff; border: 0.5px solid #E5E7EB;
+  border-radius: 14px; overflow: hidden;
+  transition: border-color 0.15s;
+}
+.mp-thumb {
+  width: 100%; height: 92px; position: relative;
+  background-size: cover; background-position: center;
+}
+.mp-thumb.mp-thumb-placeholder { background: #EEF0F2; }
+.mp-thumb-play {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.16);
+}
+.mp-thumb-placeholder .mp-thumb-play { background: transparent; }
+.mp-thumb-play span {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0,0,0,0.45); color: white; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mp-thumb-placeholder .mp-thumb-play span { background: #D1D5DB; color: #9CA3AF; }
+.mp-body { padding: 11px 13px 12px; }
+.mp-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.mp-title { font-size: 13px; font-weight: 600; color: #111827; line-height: 1.4; }
+.mp-meta-row { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.mp-age { font-size: 10px; background: #E6F1FB; color: #0C447C; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.mp-sub { font-size: 11px; color: #6B7280; line-height: 1.6; margin-top: 7px; }
+.mp-yt-row { margin-top: 10px; }
+.mp-yt {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #FF0000; color: white;
+  font-size: 10px; font-weight: 600;
+  padding: 5px 11px; border-radius: 8px;
+  text-decoration: none;
+}
+.mp-yt:hover { opacity: 0.85; }
+
+/* ==============================
    プレイリスト（今週 & 音楽タブ共通）
 ============================== */
 .playlist-list { display: flex; flex-direction: column; gap: 8px; }
@@ -158,7 +250,23 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .playlist-item:hover { background: #F9FAFB; }
 .playlist-item.playing { border-color: #6DB88A; background: #EDF6F1; }
-.pl-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.pl-icon {
+  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+  background-size: cover; background-position: center;
+  position: relative; overflow: hidden;
+}
+.pl-icon.pl-icon-placeholder { background: #EEF0F2; }
+.pl-icon-play {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.18);
+}
+.pl-icon-placeholder .pl-icon-play { background: transparent; }
+.pl-icon-play span {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(0,0,0,0.45); color: white; font-size: 9px;
+  display: flex; align-items: center; justify-content: center;
+}
+.pl-icon-placeholder .pl-icon-play span { background: #D1D5DB; color: #9CA3AF; }
 .pl-info { flex: 1; min-width: 0; }
 .pl-title { font-size: 13px; font-weight: 500; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pl-sub { font-size: 11px; color: #6B7280; margin-top: 2px; }
@@ -261,6 +369,123 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ifilter-pill { flex-shrink: 0; font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1px solid #E5E7EB; background: #F9FAFB; color: #6B7280; cursor: pointer; transition: all 0.15s; }
 .ifilter-pill.active { background: #4D7D63; color: white; border-color: #4D7D63; }
 
+/* 「読もう」ボタン（メインカード） */
+.month-read-btn {
+  width: 100%; height: 52px; margin-top: 18px;
+  background: #ffffff; border: none; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  cursor: pointer; transition: background 0.15s;
+  font-size: 15px; font-weight: 600; color: #4D7D63;
+}
+.month-read-btn:hover { background: #EDF6F1; }
+.month-read-btn:active { transform: scale(0.98); }
+
+/* ==============================
+   絵本モーダル（フルスクリーン）
+============================== */
+.book-modal {
+  position: fixed; inset: 0; z-index: 250;
+  background: #0F4A3E;
+  display: none; flex-direction: column;
+  max-width: 390px; margin: 0 auto;
+}
+.book-modal.open { display: flex; }
+.book-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 10px; flex-shrink: 0;
+}
+.book-modal-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+.book-modal-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+.book-modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); border: none; color: #fff;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+
+/* めくれる絵本ビューア */
+.book-viewer { flex: 1; display: flex; flex-direction: column; padding: 6px 20px 0; min-height: 0; }
+.book-stage {
+  position: relative; flex: 1; min-height: 0;
+  perspective: 1400px;
+}
+.book-page {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px; text-align: center; padding: 16px;
+  border-radius: 14px; overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  backface-visibility: hidden;
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(.4,.0,.2,1), box-shadow 0.6s;
+  z-index: 1;
+}
+.book-page img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.book-page-placeholder-emoji { font-size: 56px; position: relative; z-index: 1; }
+.book-page-placeholder-text { font-size: 12px; color: rgba(255,255,255,0.5); position: relative; z-index: 1; }
+.book-page-text {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  padding: 26px 16px 14px; z-index: 2;
+}
+.book-page-en { font-size: 16px; font-weight: 600; color: #fff; line-height: 1.4; }
+.book-page-ja { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+/* ページの重なり・めくり状態 */
+.book-page.behind { z-index: 0; transform: rotateY(0deg); box-shadow: none; }
+.book-page.flipping-out { z-index: 2; transform: rotateY(-150deg); box-shadow: -8px 0 24px rgba(0,0,0,0.35); }
+.book-page.flipping-in { z-index: 1; transform: rotateY(0deg); }
+
+.book-page-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 12px 0 8px; gap: 12px; flex-shrink: 0;
+}
+.book-page-nav-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.12);
+  color: #fff; font-size: 16px; display: flex;
+  align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: opacity 0.15s, background 0.15s, transform 0.1s;
+}
+.book-page-nav-btn:hover { background: rgba(255,255,255,0.2); }
+.book-page-nav-btn:active { transform: scale(0.92); }
+.book-page-nav-btn:disabled { opacity: 0.25; cursor: default; }
+.book-page-dots { display: flex; gap: 6px; flex: 1; justify-content: center; flex-wrap: wrap; }
+.book-page-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: background 0.2s, width 0.2s; }
+.book-page-dot.active { background: #BBDAC8; width: 16px; border-radius: 3px; }
+.book-page-count { font-size: 11px; color: rgba(255,255,255,0.45); min-width: 38px; text-align: right; flex-shrink: 0; }
+
+/* 下部固定プレイヤー（ポップアップ内） */
+.book-modal-player {
+  flex-shrink: 0; padding: 14px 20px 22px;
+  background: rgba(0,0,0,0.18);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.book-modal-player-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.book-modal-native-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; background: rgba(29,158,117,0.35); color: #BBDAC8; padding: 3px 8px; border-radius: 10px; }
+.month-play-btn {
+  width: 100%; height: 50px; background: #ffffff; border: none; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; transition: background 0.15s;
+}
+.month-play-btn:hover { background: #EDF6F1; }
+.month-play-btn.playing { background: #BBDAC8; }
+.month-play-label { font-size: 14px; font-weight: 600; color: #4D7D63; }
+.month-progress-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.month-prog-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; cursor: pointer; }
+.month-prog-fill { height: 100%; background: #BBDAC8; width: 0%; transition: width 0.4s linear; border-radius: 2px; }
+.month-prog-time { font-size: 11px; color: rgba(255,255,255,0.45); min-width: 36px; text-align: right; }
+
+.book-modal-tips-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 0; cursor: pointer; }
+.month-tips-toggle-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.65); }
+.month-tips-chevron { font-size: 11px; color: rgba(255,255,255,0.4); transition: transform 0.25s; }
+.month-tips-chevron.open { transform: rotate(180deg); }
+.month-tips-body { display: none; margin-top: 10px; background: rgba(255,255,255,0.07); border-radius: 12px; padding: 14px 16px; }
+.month-tips-body.open { display: block; }
+.month-tip-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.6; }
+.month-tip-item:last-child { margin-bottom: 0; }
+.month-tip-num { width: 18px; height: 18px; border-radius: 50%; background: rgba(159,225,203,0.25); color: #BBDAC8; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
 /* ミニプレイヤー */
 .mini-player { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 390px; background: #ffffff; border-top: 0.5px solid #E5E7EB; padding: 10px 20px 14px; display: none; box-shadow: 0 -4px 12px rgba(0,0,0,0.06); z-index: 100; }
 .mini-player.visible { display: block; }
@@ -362,108 +587,109 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <div class="month-lesson-card-hero">
           <img src="enverly_img.png" alt="Enverly">
         </div>
-        <div class="month-lesson-top">
+        <div class="month-lesson-top" style="padding-bottom:20px;">
           <div class="month-theme-row">
             <div class="month-theme-dot"></div>
             <div class="month-theme-label">6月のテーマ · Colors &amp; Animals</div>
           </div>
           <div class="month-title">Joel先生と<br>一緒に読もう</div>
           <div class="month-subtitle">Brown Bear, Brown Bear — Bill Martin Jr.</div>
-        </div>
-        <div class="month-player-inner" style="margin-bottom:0;border-radius:14px;">
-          <div class="month-book-row">
-            <div class="month-book-cover">📖</div>
-            <div class="month-book-meta">
-              <div class="month-book-title">Brown Bear, Brown Bear</div>
-              <div class="month-book-sub">Bill Martin Jr.</div>
-              <div class="month-native-badge">🎙 ネイティブ音読 · Joel先生</div>
-            </div>
-          </div>
-          <button class="month-play-btn" id="bookPlayBtn" onclick="toggleBook()">
-            <span style="font-size:18px;color:#4D7D63;" id="bookIconEmoji">▶</span>
-            <span class="month-play-label" id="bookLabel">音読を再生する</span>
+          <button class="month-read-btn" onclick="openBookModal()">
+            <span style="font-size:16px;">📖</span>
+            <span>Let's read（読もう！）</span>
           </button>
-          <div class="month-progress-row">
-            <div class="month-prog-bar" onclick="seekBook(event)">
-              <div class="month-prog-fill" id="bookFill"></div>
-            </div>
-            <div class="month-prog-time" id="bookTime">0:00</div>
-          </div>
-        </div>
-        <div class="month-tips-toggle" onclick="toggleTips()">
-          <div class="month-tips-toggle-label"><span>💡</span><span>親が読む場合のポイント</span></div>
-          <div class="month-tips-chevron" id="tipsChevron">▼</div>
-        </div>
-        <div class="month-tips-body" id="tipsBody">
-          <div class="month-tip-item"><div class="month-tip-num">1</div><div>訳さなくてOK。繰り返しフレーズが自然に耳に残ります。</div></div>
-          <div class="month-tip-item"><div class="month-tip-num">2</div><div>動物が出るたびに絵を指さしながら読むと単語が定着します。</div></div>
-          <div class="month-tip-item"><div class="month-tip-num">3</div><div>毎晩同じ本を繰り返すのがコツ。子どもが一緒に言い始めたら大成功。</div></div>
-          <div class="month-tip-item"><div class="month-tip-num">4</div><div>Joel先生の音読を先に聴かせてから、一緒に読む順番が効果的です。</div></div>
         </div>
       </div>
     </div>
 
-    <!-- 今週の一冊 -->
-    <div class="section" style="padding-top:24px;">
-      <div class="section-header">
-        <div class="section-header-en">Weekly Pick</div>
-        <div class="section-header-ja">今週の一冊</div>
+    <!-- 今週やること（一冊＋曲） -->
+    <div class="weekly-todo-panel">
+      <div class="weekly-todo-eyebrow">
+        <span>📌 今週やること</span>
+        <div class="weekly-todo-eyebrow-line"></div>
       </div>
-      <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">寝る前や日本語の絵本と一緒に取り入れてみてね。毎日読むと英語フレーズが自然に残っていくよ。</p>
-      <div class="content-block" style="padding:0;">
-        <div class="weekly-book-card" style="border:none;border-radius:0;background:transparent;">
-          <div class="weekly-book-cover-wrap">
-            <img src="tale_of_Peter_Rabbit.jpg" alt="The Tale of Peter Rabbit">
-            <div class="weekly-book-overlay">
-              <div>
-                <div class="weekly-book-overlay-title">The Tale of Peter Rabbit</div>
-                <div class="weekly-book-overlay-author">Beatrix Potter · 1〜5歳 · 約5分</div>
+
+      <!-- 今週の一冊 -->
+      <div class="weekly-todo-block">
+        <div class="section-header">
+          <div class="section-header-en">Weekly Pick</div>
+          <div class="section-header-ja">今週の一冊</div>
+        </div>
+        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">寝る前や日本語の絵本と一緒に取り入れてみてね。毎日読むと英語フレーズが自然に残っていくよ。</p>
+        <div class="content-block" style="padding:0;">
+          <div class="weekly-book-card" style="border:none;border-radius:0;background:transparent;">
+            <div class="weekly-book-cover-wrap">
+              <img src="tale_of_Peter_Rabbit.jpg" alt="The Tale of Peter Rabbit">
+              <div class="weekly-book-overlay">
+                <div>
+                  <div class="weekly-book-overlay-title">The Tale of Peter Rabbit</div>
+                  <div class="weekly-book-overlay-author">Beatrix Potter · 1〜5歳 · 約5分</div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="weekly-book-links">
-            <a class="wbl-item featured" href="https://www.gutenberg.org/files/14838/14838-h/14838-h.htm" target="_blank">
-              <div class="wbl-icon green">🌐</div>
-              <div class="wbl-text"><div class="wbl-title">ブラウザで絵と一緒に読む</div><div class="wbl-sub">Project Gutenberg · イラスト付き</div></div>
-              <div class="wbl-tag">おすすめ・無料</div>
-              <div class="wbl-arr">↗</div>
-            </a>
-            <a class="wbl-item" href="https://freekidsbooks.org/peter-rabbit/" target="_blank">
-              <div class="wbl-icon blue">📄</div>
-              <div class="wbl-text"><div class="wbl-title">PDFで見る</div><div class="wbl-sub">Free Kids Books · 絵本レイアウト版</div></div>
-              <div class="wbl-arr">↗</div>
-            </a>
-            <a class="wbl-item" href="https://www.amazon.co.jp/dp/0140542957" target="_blank">
-              <div class="wbl-icon gray">📦</div>
-              <div class="wbl-text"><div class="wbl-title">手元に置く（Amazon）</div><div class="wbl-sub">英語原書ペーパーバック · ¥800〜</div></div>
-              <div class="wbl-arr">↗</div>
-            </a>
-          </div>
-          <div class="weekly-why-toggle" onclick="toggleWhy()">
-            <div class="weekly-why-label"><span>🔍</span><span>なぜこの本が選ばれたの？</span></div>
-            <div class="weekly-why-chevron" id="whyChevron">▼</div>
-          </div>
-          <div class="weekly-why-body" id="whyBody">
-            動物の名前・色・野菜が自然に出てくる名作。rabbit・carrot・garden などが繰り返し登場し、今月のテーマ「Colors &amp; Animals」にぴったりです。
+            <div class="weekly-book-links">
+              <a class="wbl-item featured" href="https://www.gutenberg.org/files/14838/14838-h/14838-h.htm" target="_blank">
+                <div class="wbl-icon green">🌐</div>
+                <div class="wbl-text"><div class="wbl-title">ブラウザで絵と一緒に読む</div><div class="wbl-sub">Project Gutenberg · イラスト付き</div></div>
+                <div class="wbl-tag">おすすめ・無料</div>
+                <div class="wbl-arr">↗</div>
+              </a>
+              <a class="wbl-item" href="https://freekidsbooks.org/peter-rabbit/" target="_blank">
+                <div class="wbl-icon blue">📄</div>
+                <div class="wbl-text"><div class="wbl-title">PDFで見る</div><div class="wbl-sub">Free Kids Books · 絵本レイアウト版</div></div>
+                <div class="wbl-arr">↗</div>
+              </a>
+              <a class="wbl-item" href="https://www.amazon.co.jp/dp/0140542957" target="_blank">
+                <div class="wbl-icon gray">📦</div>
+                <div class="wbl-text"><div class="wbl-title">手元に置く（Amazon）</div><div class="wbl-sub">英語原書ペーパーバック · ¥800〜</div></div>
+                <div class="wbl-arr">↗</div>
+              </a>
+            </div>
+            <div class="weekly-why-toggle" onclick="toggleWhy()">
+              <div class="weekly-why-label"><span>🔍</span><span>なぜこの本が選ばれたの？</span></div>
+              <div class="weekly-why-chevron" id="whyChevron">▼</div>
+            </div>
+            <div class="weekly-why-body" id="whyBody">
+              動物の名前・色・野菜が自然に出てくる名作。rabbit・carrot・garden などが繰り返し登場し、今月のテーマ「Colors &amp; Animals」にぴったりです。
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 今週の曲（興味連動） -->
-    <div class="section" style="padding-top:24px;">
-      <div class="section-header">
-        <div class="section-header-en">Weekly Playlist</div>
-        <div class="section-header-ja" id="playlistSubLabel">今週流してほしい曲</div>
-      </div>
-      <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップでYouTubeが開きます。かけ流しはスピーカーから流すのがおすすめ。</p>
-      <div class="content-block">
-        <div class="playlist-list" id="weeklyPlaylist"></div>
+      <!-- 今月の曲（編集部選定・今月テーマ固定） -->
+      <div class="weekly-todo-block">
+        <div class="section-header">
+          <div class="section-header-en">Weekly Playlist</div>
+          <div class="section-header-ja">今月のテーマに合わせた曲</div>
+        </div>
+        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップでYouTubeが開きます。かけ流しはスピーカーから流すのがおすすめ。</p>
+        <div class="mp-list" id="weeklyPlaylist"></div>
       </div>
     </div>
 
-    <!-- YouTubeかけ流し -->
-    <div class="yt-section" id="ytSection">
+    <!-- YouTubeかけ流し（ティーザー） -->
+    <div class="yt-teaser-section" id="ytSection">
+      <div class="yt-teaser-header">
+        <div class="yt-teaser-label">YOUTUBE かけ流し · 編集部が厳選 ✅</div>
+      </div>
+      <div class="yt-teaser-scroll" id="ytTeaserCards"></div>
+    </div>
+
+    <!-- サブスクバナー -->
+    <div class="sub-banner">
+      <div>
+        <div class="sub-text-title">週1回の英会話では話せません。</div>
+        <div class="sub-text-sub">毎日5分の家庭英語が子供を変える。<br>月額1,500円で全コンテンツ使い放題。</div>
+      </div>
+      <button class="sub-btn">無料で始める</button>
+    </div>
+  </div>
+
+  <!-- 音楽タブ -->
+  <div id="tab-playlist" style="display:none;">
+
+    <!-- YouTubeかけ流し（全件） -->
+    <div class="yt-section" id="ytFullSection" style="padding-top:20px;">
       <div class="yt-header">
         <div class="yt-label">YouTube かけ流し おすすめ</div>
         <div class="yt-note">編集部が厳選 ✅</div>
@@ -479,19 +705,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <div style="height:12px;"></div>
       <div id="ytCards"></div>
     </div>
-
-    <!-- サブスクバナー -->
-    <div class="sub-banner">
-      <div>
-        <div class="sub-text-title">週1回の英会話では話せません。</div>
-        <div class="sub-text-sub">毎日5分の家庭英語が子供を変える。<br>月額1,500円で全コンテンツ使い放題。</div>
-      </div>
-      <button class="sub-btn">無料で始める</button>
-    </div>
-  </div>
-
-  <!-- 音楽タブ -->
-  <div id="tab-playlist" style="display:none;">
 
     <!-- お気に入り -->
     <div class="favorites-section">
@@ -512,7 +725,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="scene-divider"><div class="scene-label">シーン別</div><div class="scene-line"></div></div>
     <div style="padding: 0 20px; display:flex; flex-direction:column; gap:8px;">
       <div class="playlist-item">
-        <div class="pl-icon" style="background:#EEEDFE;">🌙</div>
+        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
         <div class="pl-info"><div class="pl-title">Goodnight Songs</div><div class="pl-sub">寝かしつけ前の英語タイム</div></div>
         <div class="pl-age">0〜2歳</div>
         <a class="pl-yt" href="https://www.youtube.com/results?search_query=goodnight+songs+for+kids" target="_blank">
@@ -520,7 +733,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </a>
       </div>
       <div class="playlist-item">
-        <div class="pl-icon" style="background:#FAEEDA;">☀️</div>
+        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
         <div class="pl-info"><div class="pl-title">Morning Routine Songs</div><div class="pl-sub">朝の支度BGMに</div></div>
         <div class="pl-age">2〜5歳</div>
         <a class="pl-yt" href="https://www.youtube.com/results?search_query=morning+routine+songs+for+kids" target="_blank">
@@ -528,7 +741,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </a>
       </div>
       <div class="playlist-item">
-        <div class="pl-icon" style="background:#E6F1FB;">🚗</div>
+        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
         <div class="pl-info"><div class="pl-title">Car Trip English</div><div class="pl-sub">お出かけ・車の中で</div></div>
         <div class="pl-age">1〜5歳</div>
         <a class="pl-yt" href="https://www.youtube.com/results?search_query=english+songs+for+kids+car" target="_blank">
@@ -536,7 +749,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </a>
       </div>
       <div class="playlist-item">
-        <div class="pl-icon" style="background:#EDF6F1;">🍽️</div>
+        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
         <div class="pl-info"><div class="pl-title">Mealtime Phrases</div><div class="pl-sub">食事中に流す短いフレーズ集</div></div>
         <div class="pl-age">2〜5歳</div>
         <a class="pl-yt" href="https://www.youtube.com/results?search_query=mealtime+english+phrases+kids" target="_blank">
@@ -579,6 +792,53 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 </div><!-- /mainApp -->
 
+<!-- 絵本モーダル -->
+<div class="book-modal" id="bookModal">
+  <div class="book-modal-header">
+    <div>
+      <div class="book-modal-title">Brown Bear, Brown Bear</div>
+      <div class="book-modal-sub">Bill Martin Jr. · Joel先生の音読</div>
+    </div>
+    <button class="book-modal-close" onclick="closeBookModal()">✕</button>
+  </div>
+
+  <div class="book-viewer">
+    <div class="book-stage" id="bookStage"></div>
+    <div class="book-page-nav">
+      <button class="book-page-nav-btn" id="bookPrevBtn" onclick="bookPrevPage()">‹</button>
+      <div class="book-page-dots" id="bookPageDots"></div>
+      <div class="book-page-count" id="bookPageCount">1/5</div>
+      <button class="book-page-nav-btn" id="bookNextBtn" onclick="bookNextPage()">›</button>
+    </div>
+  </div>
+
+  <div class="book-modal-player">
+    <div class="book-modal-player-row">
+      <div class="book-modal-native-badge">🎙 ネイティブ音読 · Joel先生</div>
+    </div>
+    <button class="month-play-btn" id="bookPlayBtn" onclick="toggleBook()">
+      <span style="font-size:18px;color:#4D7D63;" id="bookIconEmoji">▶</span>
+      <span class="month-play-label" id="bookLabel">音読を再生する</span>
+    </button>
+    <div class="month-progress-row">
+      <div class="month-prog-bar" onclick="seekBook(event)">
+        <div class="month-prog-fill" id="bookFill"></div>
+      </div>
+      <div class="month-prog-time" id="bookTime">0:00</div>
+    </div>
+    <div class="book-modal-tips-toggle" onclick="toggleTips()">
+      <div class="month-tips-toggle-label"><span>💡</span><span>親が読む場合のポイント</span></div>
+      <div class="month-tips-chevron" id="tipsChevron">▼</div>
+    </div>
+    <div class="month-tips-body" id="tipsBody">
+      <div class="month-tip-item"><div class="month-tip-num">1</div><div>訳さなくてOK。繰り返しフレーズが自然に耳に残ります。</div></div>
+      <div class="month-tip-item"><div class="month-tip-num">2</div><div>動物が出るたびに絵を指さしながら読むと単語が定着します。</div></div>
+      <div class="month-tip-item"><div class="month-tip-num">3</div><div>毎晩同じ本を繰り返すのがコツ。子どもが一緒に言い始めたら大成功。</div></div>
+      <div class="month-tip-item"><div class="month-tip-num">4</div><div>Joel先生の音読を先に聴かせてから、一緒に読む順番が効果的です。</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- ミニプレイヤー -->
 <div class="mini-player" id="miniPlayer">
   <div class="mini-track" id="miniTrack">—</div>
@@ -599,39 +859,24 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 // データ
 // ========================
 
+// 今月の絵本ページデータ（イラストは後で img: に差し替え可能。今は絵文字プレースホルダー）
+const MONTH_BOOK_PAGES = [
+  { img: null, emoji: '🐻', en: 'Brown bear, brown bear, what do you see?', ja: 'くまさん くまさん なにが みえる？' },
+  { img: null, emoji: '🐦', en: 'I see a red bird looking at me.', ja: 'あかい とりが みえるよ' },
+  { img: null, emoji: '🦆', en: 'I see a yellow duck looking at me.', ja: 'きいろい あひるが みえるよ' },
+  { img: null, emoji: '🐴', en: 'I see a blue horse looking at me.', ja: 'あおい うまが みえるよ' },
+  { img: null, emoji: '🐸', en: 'I see a green frog looking at me.', ja: 'みどりの かえるが みえるよ' },
+];
+
 // 今週の曲データ（興味別）
-const WEEKLY_SONGS = {
-  'のりもの': [
-    { emoji:'🚂', bg:'#FAEEDA', title:'Blippi Train Song', sub:'電車を見ながら英語インプット', age:'2〜5歳', ytUrl:'https://www.youtube.com/results?search_query=blippi+train+song' },
-    { emoji:'🚒', bg:'#FAEEDA', title:'Fire Truck Song', sub:'乗り物の名前を歌で覚える', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=fire+truck+song+for+kids' },
-    { emoji:'🚌', bg:'#FAEEDA', title:'Wheels on the Bus', sub:'定番！繰り返しリズムで定着', age:'0〜3歳', ytUrl:'https://www.youtube.com/results?search_query=wheels+on+the+bus' },
-  ],
-  'おにんぎょう': [
-    { emoji:'🧸', bg:'#EEEDFE', title:'Teddy Bear Song', sub:'ぬいぐるみと一緒に楽しめる', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=teddy+bear+song+for+kids' },
-    { emoji:'👗', bg:'#EEEDFE', title:'My Dolly Song', sub:'お人形遊びしながら英語耳に', age:'2〜5歳', ytUrl:'https://www.youtube.com/results?search_query=dolly+song+for+kids' },
-    { emoji:'🪆', bg:'#EEEDFE', title:'Play With Me Songs', sub:'セサミストリートの定番', age:'2〜5歳', ytUrl:'https://www.youtube.com/results?search_query=sesame+street+play+with+me' },
-  ],
-  'どうぶつ': [
-    { emoji:'🐻', bg:'#EDF6F1', title:'Brown Bear Song', sub:'今週のテーマにぴったり！', age:'1〜3歳', ytUrl:'https://www.youtube.com/results?search_query=brown+bear+brown+bear+song' },
-    { emoji:'🐘', bg:'#EDF6F1', title:'Animal Songs for Kids', sub:'色・動物の名前が自然に入る', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=animal+songs+for+kids+super+simple' },
-    { emoji:'🦁', bg:'#EDF6F1', title:'Old MacDonald Had a Farm', sub:'動物の鳴き声を体で覚える', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=old+macdonald+had+a+farm' },
-  ],
-  'おんがく': [
-    { emoji:'🎵', bg:'#E6F1FB', title:'Super Simple Songs Mix', sub:'英語耳を育てる定番チャンネル', age:'0〜4歳', ytUrl:'https://www.youtube.com/results?search_query=super+simple+songs' },
-    { emoji:'💃', bg:'#E6F1FB', title:'Cocomelon Sing Along', sub:'体を動かしながら英語を体感', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=cocomelon+sing+along' },
-    { emoji:'🎶', bg:'#E6F1FB', title:'Rainbow Colors Song', sub:'色の名前を歌で自然にインプット', age:'2〜5歳', ytUrl:'https://www.youtube.com/results?search_query=rainbow+colors+song+for+kids' },
-  ],
-  'おままごと': [
-    { emoji:'🍳', bg:'#FDE8E8', title:'Play Doh Kitchen Songs', sub:'食べ物の名前が自然に入る', age:'2〜5歳', ytUrl:'https://www.youtube.com/results?search_query=play+doh+kitchen+english' },
-    { emoji:'🧁', bg:'#FDE8E8', title:'Bluey Cooking Episodes', sub:'家族の日常会話が英語で聴ける', age:'2〜6歳', ytUrl:'https://www.youtube.com/results?search_query=bluey+cooking+english' },
-    { emoji:'🥗', bg:'#FDE8E8', title:'Mealtime English Songs', sub:'"More?" "Yummy!"が耳に残る', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=mealtime+english+songs+kids' },
-  ],
-  'default': [
-    { emoji:'🐻', bg:'#EDF6F1', title:'Brown Bear Song', sub:'今週のテーマにぴったり！', age:'1〜3歳', ytUrl:'https://www.youtube.com/results?search_query=brown+bear+brown+bear+song' },
-    { emoji:'🎵', bg:'#E6F1FB', title:'Super Simple Songs Mix', sub:'英語耳を育てる定番チャンネル', age:'0〜4歳', ytUrl:'https://www.youtube.com/results?search_query=super+simple+songs' },
-    { emoji:'🐘', bg:'#EDF6F1', title:'Old MacDonald Had a Farm', sub:'動物の鳴き声を体で覚える', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=old+macdonald+had+a+farm' },
-  ],
-};
+// 今月のテーマ（Colors & Animals）に合わせて編集部が選んだ固定プレイリスト
+// オンボーディングの興味には連動しない（興味別の出し分けはYouTubeかけ流し側で行う）
+const MONTH_PLAYLIST = [
+  { videoId:null, emoji:'🐻', bg:'#EDF6F1', title:'Brown Bear Song', sub:'今月のテーマ「Colors & Animals」にぴったり！動物の名前が自然に入る一曲。', age:'1〜3歳', ytUrl:'https://www.youtube.com/results?search_query=brown+bear+brown+bear+song' },
+  { videoId:null, emoji:'🎶', bg:'#E6F1FB', title:'Rainbow Colors Song', sub:'色の名前を歌で自然にインプット。レインボーが出てくるたびに指差して。', age:'2〜5歳', ytUrl:'https://www.youtube.com/results?search_query=rainbow+colors+song+for+kids' },
+  { videoId:null, emoji:'🦁', bg:'#EDF6F1', title:'Old MacDonald Had a Farm', sub:'動物の鳴き声を体で覚える定番曲。一緒に歌って動物の名前を耳に残す。', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=old+macdonald+had+a+farm' },
+  { videoId:null, emoji:'🎵', bg:'#FAEEDA', title:'Animal Songs for Kids', sub:'色・動物の名前が自然に入るシンプルな繰り返しソング。', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=animal+songs+for+kids+super+simple' },
+];
 
 // YouTubeキュレーションデータ
 const YT_DATA = [
@@ -653,6 +898,7 @@ const YT_DATA = [
 let selectedInterests = [];
 let favorites = {}; // { songTitle: songData }
 let bookPlaying = false, bookProg = 0, bookTimer = null;
+let bookPageIndex = 0;
 let musicProg = 0, musicTimer = null;
 let activeMode = null;
 
@@ -679,15 +925,13 @@ function finishOnboarding(skip) {
     const badge = document.getElementById('interestBadge');
     badge.textContent = selectedInterests.map(i => i.emoji).join('') + ' ' + selectedInterests.map(i => i.label).join('・');
     badge.style.display = 'inline-flex';
-    renderWeeklyPlaylist(selectedInterests[0].label);
-    // YTフィルターも連動
-    document.querySelectorAll('.ifilter-pill').forEach(p => {
-      if (p.textContent.includes(selectedInterests[0].label)) p.click();
-    });
+    applyOnboardingYTFilter(selectedInterests.map(i => i.label));
   } else {
-    renderWeeklyPlaylist('default');
+    renderYT('all');
+    renderYTTeaser('all');
   }
-  renderYT('all');
+  renderWeeklyPlaylist();
+  renderBookPage();
 }
 
 function showOnboarding() {
@@ -700,32 +944,46 @@ function showOnboarding() {
 }
 
 // ========================
-// 今週プレイリスト（興味連動）
+// 今月の曲（編集部選定・テーマ固定）
 // ========================
-function renderWeeklyPlaylist(interest) {
-  const songs = WEEKLY_SONGS[interest] || WEEKLY_SONGS['default'];
-  const container = document.getElementById('weeklyPlaylist');
-  const subLabel = document.getElementById('playlistSubLabel');
-
-  if (interest !== 'default') {
-    const found = selectedInterests.find(i => i.label === interest);
-    if (found) subLabel.textContent = found.emoji + ' ' + interest + ' のおすすめ曲';
-  } else {
-    subLabel.textContent = '今週流してほしい曲';
+// 曲データからアイコン部分のHTMLを生成（videoIdがあればYouTubeサムネ、なければプレースホルダー）
+function plIconMarkup(s) {
+  if (s.videoId) {
+    return `<div class="pl-icon" style="background-image:url('https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg');"><div class="pl-icon-play"><span>▶</span></div></div>`;
   }
+  return `<div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>`;
+}
 
-  container.innerHTML = songs.map(s => {
+// Weekly Playlist用サムネ部分（videoIdがあればYouTubeサムネ、なければプレースホルダー）
+function mpThumbMarkup(s) {
+  if (s.videoId) {
+    return `<div class="mp-thumb" style="background-image:url('https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg');"><div class="mp-thumb-play"><span>▶</span></div></div>`;
+  }
+  return `<div class="mp-thumb mp-thumb-placeholder"><div class="mp-thumb-play"><span>▶</span></div></div>`;
+}
+
+function renderWeeklyPlaylist() {
+  const container = document.getElementById('weeklyPlaylist');
+  if (!container) return;
+
+  container.innerHTML = MONTH_PLAYLIST.map(s => {
     const isLiked = !!favorites[s.title];
     return `
-      <div class="playlist-item" style="flex-wrap:nowrap;">
-        <div class="pl-icon" style="background:${s.bg};">${s.emoji}</div>
-        <div class="pl-info">
-          <div class="pl-title">${s.title}</div>
-          <div class="pl-sub">${s.sub}</div>
+      <div class="mp-card">
+        ${mpThumbMarkup(s)}
+        <div class="mp-body">
+          <div class="mp-title-row">
+            <div class="mp-title">${s.title}</div>
+          </div>
+          <div class="mp-meta-row">
+            <div class="mp-age">${s.age}</div>
+            <div class="pl-heart ${isLiked ? 'liked' : ''}" onclick="toggleFav(this, ${JSON.stringify(s).replace(/"/g, '&quot;')})" title="お気に入り">♡</div>
+          </div>
+          <div class="mp-sub">${s.sub}</div>
+          <div class="mp-yt-row">
+            <a class="mp-yt" href="${s.ytUrl}" target="_blank"><span class="pl-yt-icon">▶</span>YouTubeで見る</a>
+          </div>
         </div>
-        <div class="pl-age">${s.age}</div>
-        <div class="pl-heart ${isLiked ? 'liked' : ''}" onclick="toggleFav(this, ${JSON.stringify(s).replace(/"/g, '&quot;')})" title="お気に入り">♡</div>
-        <a class="pl-yt" href="${s.ytUrl}" target="_blank"><span class="pl-yt-icon">▶</span>YT</a>
       </div>
     `;
   }).join('');
@@ -764,7 +1022,7 @@ function renderFavList() {
     const s = favorites[title];
     return `
       <div class="playlist-item" style="flex-wrap:nowrap;">
-        <div class="pl-icon" style="background:${s.bg};">${s.emoji}</div>
+        ${plIconMarkup(s)}
         <div class="pl-info">
           <div class="pl-title">${s.title}</div>
           <div class="pl-sub">${s.sub}</div>
@@ -778,10 +1036,10 @@ function renderFavList() {
 
 function removeFavFromList(el, title) {
   delete favorites[title];
-  // 今週リストのハートも戻す
+  // 今月のプレイリストのハートも戻す
   document.querySelectorAll('#weeklyPlaylist .pl-heart').forEach(h => {
-    const row = h.closest('.playlist-item');
-    const t = row.querySelector('.pl-title').textContent;
+    const row = h.closest('.mp-card');
+    const t = row.querySelector('.mp-title').textContent;
     if (t === title) { h.classList.remove('liked'); h.textContent = '♡'; }
   });
   showToast('お気に入りから削除しました');
@@ -820,6 +1078,81 @@ function toggleTips() {
 function toggleWhy() {
   const b = document.getElementById('whyBody'); const c = document.getElementById('whyChevron');
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
+}
+
+// ========================
+// 絵本モーダル
+// ========================
+function openBookModal() {
+  document.getElementById('bookModal').classList.add('open');
+  renderBookPage();
+}
+function closeBookModal() {
+  document.getElementById('bookModal').classList.remove('open');
+  // 音読が再生中なら止める
+  if (bookPlaying) toggleBook();
+}
+
+// ========================
+// 絵本ページビューア（めくるアニメーション）
+// ========================
+function pageMarkup(p) {
+  return `
+    ${p.img ? `<img src="${p.img}" alt="">` : `<div class="book-page-placeholder-emoji">${p.emoji}</div><div class="book-page-placeholder-text">イラスト準備中</div>`}
+    <div class="book-page-text">
+      <div class="book-page-en">${p.en}</div>
+      <div class="book-page-ja">${p.ja}</div>
+    </div>
+  `;
+}
+
+function renderBookPage() {
+  const stage = document.getElementById('bookStage');
+  const dotsWrap = document.getElementById('bookPageDots');
+  const count = document.getElementById('bookPageCount');
+  const prevBtn = document.getElementById('bookPrevBtn');
+  const nextBtn = document.getElementById('bookNextBtn');
+  if (!stage) return;
+
+  stage.innerHTML = `<div class="book-page" id="bookPageCurrent">${pageMarkup(MONTH_BOOK_PAGES[bookPageIndex])}</div>`;
+
+  dotsWrap.innerHTML = MONTH_BOOK_PAGES.map((_, i) =>
+    `<div class="book-page-dot ${i === bookPageIndex ? 'active' : ''}"></div>`
+  ).join('');
+
+  count.textContent = (bookPageIndex + 1) + '/' + MONTH_BOOK_PAGES.length;
+  prevBtn.disabled = bookPageIndex === 0;
+  nextBtn.disabled = bookPageIndex === MONTH_BOOK_PAGES.length - 1;
+}
+
+function flipToPage(newIndex, direction) {
+  const stage = document.getElementById('bookStage');
+  const current = document.getElementById('bookPageCurrent');
+  if (!current) { bookPageIndex = newIndex; renderBookPage(); return; }
+
+  // 次のページを裏に重ねて配置
+  const incoming = document.createElement('div');
+  incoming.className = 'book-page behind';
+  incoming.innerHTML = pageMarkup(MONTH_BOOK_PAGES[newIndex]);
+  stage.appendChild(incoming);
+
+  // 現在のページをめくり出す
+  requestAnimationFrame(() => {
+    current.classList.add('flipping-out');
+  });
+
+  setTimeout(() => {
+    bookPageIndex = newIndex;
+    current.remove();
+    renderBookPage();
+  }, 600);
+}
+
+function bookNextPage() {
+  if (bookPageIndex < MONTH_BOOK_PAGES.length - 1) flipToPage(bookPageIndex + 1, 'next');
+}
+function bookPrevPage() {
+  if (bookPageIndex > 0) flipToPage(bookPageIndex - 1, 'prev');
 }
 
 // ========================
@@ -881,10 +1214,20 @@ function miniSkipNext() { miniSkipBack(); }
 // ========================
 // YouTubeキュレーション
 // ========================
+let currentYTFilter = 'all'; // 今週タブのティーザー・音楽タブのフル版で共有する現在のフィルター状態
+
 function renderYT(filter) {
   const container = document.getElementById('ytCards');
   if (!container) return;
-  const data = filter === 'all' ? YT_DATA : YT_DATA.filter(d => d.interest === filter);
+  let data;
+  if (filter === 'all') {
+    data = YT_DATA;
+  } else if (Array.isArray(filter)) {
+    data = YT_DATA.filter(d => filter.includes(d.interest));
+  } else {
+    data = YT_DATA.filter(d => d.interest === filter);
+  }
+  if (data.length === 0) data = YT_DATA; // フィルター結果が0件なら全件表示にフォールバック
   container.innerHTML = data.map(d => `
     <div class="yt-card">
       <div class="yt-thumb" style="background:${d.bg};">
@@ -904,11 +1247,62 @@ function renderYT(filter) {
     </div>
   `).join('');
 }
+
+// 今週タブ用の軽量ティーザー（先頭3件＋More songsカード）
+function renderYTTeaser(filter) {
+  const container = document.getElementById('ytTeaserCards');
+  if (!container) return;
+  let data;
+  if (filter === 'all') {
+    data = YT_DATA;
+  } else if (Array.isArray(filter)) {
+    data = YT_DATA.filter(d => filter.includes(d.interest));
+  } else {
+    data = YT_DATA.filter(d => d.interest === filter);
+  }
+  if (data.length === 0) data = YT_DATA;
+  const teaserItems = data.slice(0, 3);
+
+  container.innerHTML = teaserItems.map(d => `
+    <div class="yt-teaser-card">
+      <div class="yt-teaser-thumb" style="background:${d.bg};">
+        <span style="font-size:24px;">${d.emoji}</span>
+        <div class="yt-play-icon">▶</div>
+      </div>
+      <div class="yt-teaser-title">${d.title}</div>
+    </div>
+  `).join('') + `
+    <div class="yt-more-card" onclick="goToMusicTab()">
+      <div class="yt-more-card-icon">▶</div>
+      <div class="yt-more-card-label">More<br>songs</div>
+    </div>
+  `;
+}
+
 function filterYT(el, filter) {
   document.querySelectorAll('.ifilter-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
+  currentYTFilter = filter;
   renderYT(filter);
+  renderYTTeaser(filter);
 }
+// オンボーディングで選んだ興味すべてに合わせて初期フィルターを適用
+function applyOnboardingYTFilter(interestLabels) {
+  document.querySelectorAll('.ifilter-pill').forEach(p => {
+    const matches = interestLabels.some(label => p.textContent.includes(label));
+    p.classList.toggle('active', matches);
+  });
+  currentYTFilter = interestLabels;
+  renderYT(interestLabels);
+  renderYTTeaser(interestLabels);
+}
+
+// 「More songs」タップで音楽タブへ切り替え
+function goToMusicTab() {
+  const musicTab = document.querySelectorAll('.tab')[1];
+  switchTab('playlist', musicTab);
+}
+
 </script>
 
 <!--
