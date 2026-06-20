@@ -549,6 +549,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .month-read-btn:hover { background: #EDF6F1; }
 .month-read-btn:active { transform: scale(0.98); }
+.month-read-btn-row { display: flex; gap: 10px; }
+.month-read-btn-row .month-read-btn { flex: 1; }
+.month-read-btn.study-variant { background: #1D9E75; color: #fff; }
+.month-read-btn.study-variant span { color: #fff; }
+.month-read-btn.study-variant:hover { background: #18875F; }
 
 /* ==============================
    絵本モーダル（フルスクリーン）
@@ -571,6 +576,98 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: rgba(255,255,255,0.1); border: none; color: #fff;
   font-size: 16px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0;
+}
+
+/* きいてみる／いってみる タブ切り替え */
+.book-mode-tabs {
+  display: flex; gap: 8px; padding: 0 20px 10px; flex-shrink: 0;
+}
+.book-mode-tab {
+  flex: 1; height: 38px; border-radius: 10px; border: none;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.55);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.book-mode-tab.active { background: #ffffff; color: #2D6A4F; }
+.book-mode-tab:active { transform: scale(0.98); }
+
+/* Let's Study：いってみるオーバーレイ */
+.study-overlay {
+  position: absolute; inset: 0; z-index: 5; border-radius: 14px;
+  background: linear-gradient(160deg, #2D6A4F, #1D9E75);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; text-align: center; padding: 20px;
+}
+.study-overlay.show { display: flex; }
+.study-joel-label {
+  font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.study-mascot {
+  font-size: 64px; line-height: 1;
+  animation: studyBounce 1.1s ease-in-out infinite;
+}
+@keyframes studyBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.06); }
+}
+.study-yourturn {
+  font-size: 20px; font-weight: 700; color: #fff;
+}
+.study-phrase-echo {
+  font-size: 13px; color: rgba(255,255,255,0.75); padding: 0 12px; line-height: 1.4;
+}
+.study-progress-dots { display: flex; gap: 6px; margin-top: 4px; }
+.study-progress-dots span {
+  width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3);
+  animation: studyDotPulse 1.2s ease-in-out infinite;
+}
+.study-progress-dots span:nth-child(2) { animation-delay: 0.15s; }
+.study-progress-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes studyDotPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+.study-joel-banner {
+  position: absolute; top: 10px; left: 0; right: 0; text-align: center;
+  font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600;
+  background: rgba(0,0,0,0.18); padding: 6px 0; z-index: 6; display: none;
+}
+.study-joel-banner.show { display: block; }
+.study-next-hint {
+  margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.6);
+}
+
+/* 全フレーズ終了：言えたよボタン画面 */
+.study-complete {
+  position: absolute; inset: 0; z-index: 8; border-radius: 14px;
+  background: rgba(15,74,62,0.97);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; text-align: center; padding: 24px;
+}
+.study-complete.show { display: flex; }
+.study-complete-emoji { font-size: 48px; }
+.study-complete-title { font-size: 17px; font-weight: 700; color: #fff; }
+.study-complete-sub { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+.study-said-btn {
+  width: 100%; height: 52px; background: #F4B740; border: none; border-radius: 14px;
+  font-size: 15px; font-weight: 700; color: #5A3A00; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 6px; transition: transform 0.1s;
+}
+.study-said-btn:active { transform: scale(0.97); }
+.study-stamp-result {
+  display: none; flex-direction: column; align-items: center; gap: 10px;
+}
+.study-stamp-result.show { display: flex; }
+.study-stamp-icon { font-size: 56px; animation: stampPop 0.5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes stampPop {
+  0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+  60% { transform: scale(1.15) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+.study-joel-voice-line {
+  font-size: 13px; color: #BBDAC8; font-weight: 600; padding: 0 10px;
 }
 
 /* めくれる絵本ビューア */
@@ -752,10 +849,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             </div>
             <div class="month-title">Joel先生と<br>一緒に読もう</div>
             <div class="month-subtitle">Brown Bear, Brown Bear — Bill Martin Jr.</div>
-            <button class="month-read-btn" onclick="openBookModal()">
-              <span style="font-size:16px;">📖</span>
-              <span>Let's read（読もう！）</span>
-            </button>
+            <div class="month-read-btn-row">
+              <button class="month-read-btn" onclick="openBookModal('listen')">
+                <span style="font-size:16px;">🎧</span>
+                <span>きいてみる</span>
+              </button>
+              <button class="month-read-btn study-variant" onclick="openBookModal('study')">
+                <span style="font-size:16px;">🗣</span>
+                <span>いってみる</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1022,8 +1125,37 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <button class="book-modal-close" onclick="closeBookModal()">✕</button>
   </div>
 
+  <div class="book-mode-tabs">
+    <button class="book-mode-tab active" id="modeTabListen" onclick="switchBookMode('listen')">🎧 きいてみる</button>
+    <button class="book-mode-tab" id="modeTabStudy" onclick="switchBookMode('study')">🗣 いってみる</button>
+  </div>
+
   <div class="book-viewer">
-    <div class="book-stage" id="bookStage"></div>
+    <div class="book-stage-wrap" id="bookStageWrap" style="position:relative; flex:1; min-height:0; display:flex; flex-direction:column;">
+      <div class="book-stage" id="bookStage"></div>
+      <div class="study-joel-banner" id="studyJoelBanner">🎙 Joel先生が読んでいるよ</div>
+      <div class="study-overlay" id="studyOverlay">
+        <div class="study-joel-label">LET'S STUDY</div>
+        <div class="study-mascot" id="studyMascot">🐻</div>
+        <div class="study-yourturn">Your turn!</div>
+        <div class="study-phrase-echo" id="studyPhraseEcho"></div>
+        <div class="study-progress-dots"><span></span><span></span><span></span></div>
+        <div class="study-next-hint">まねして言ってみよう</div>
+      </div>
+      <div class="study-complete" id="studyComplete">
+        <div id="studyCompleteAsk">
+          <div class="study-complete-emoji">📖</div>
+          <div class="study-complete-title">5フレーズ、ぜんぶ終わったよ！</div>
+          <div class="study-complete-sub">今日は「言えたよ」って思える瞬間あった？<br>あったら下のボタンをタップしてね。</div>
+          <button class="study-said-btn" onclick="markSaidIt()">🌟 言えたよ！</button>
+        </div>
+        <div class="study-stamp-result" id="studyStampResult">
+          <div class="study-stamp-icon">⭐</div>
+          <div class="study-complete-title">スタンプ獲得！</div>
+          <div class="study-joel-voice-line" id="studyJoelVoiceLine">🎙 "Wow, great job! You said it!"</div>
+        </div>
+      </div>
+    </div>
     <div class="book-page-nav">
       <button class="book-page-nav-btn" id="bookPrevBtn" onclick="bookPrevPage()">‹</button>
       <div class="book-page-dots" id="bookPageDots"></div>
@@ -1032,7 +1164,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     </div>
   </div>
 
-  <div class="book-modal-player">
+  <div class="book-modal-player" id="bookModalPlayer">
     <div class="book-modal-player-row">
       <div class="book-modal-native-badge">🎙 ネイティブ音読 · Joel先生</div>
     </div>
@@ -1189,6 +1321,16 @@ let selectedInterests = [];
 let favorites = {}; // { songTitle: songData }
 let bookPlaying = false, bookProg = 0, bookTimer = null;
 let bookPageIndex = 0;
+let bookMode = 'listen'; // 'listen' | 'study'
+let studyStep = null; // null | 'joel1' | 'pause' | 'joel2' | 'done'
+let studyTimers = [];
+const STUDY_REACTIONS = [
+  '🎙 "Wow, great job! You said it!"',
+  '🎙 "Perfect! That sounded amazing!"',
+  '🎙 "Yes! You did it, well done!"',
+  '🎙 "Awesome! I heard you loud and clear!"',
+  '🎙 "Nice try, you\'re getting so good!"'
+];
 let musicProg = 0, musicTimer = null;
 let activeMode = null;
 
@@ -1372,14 +1514,16 @@ function toggleWhy() {
 // ========================
 // 絵本モーダル
 // ========================
-function openBookModal() {
+function openBookModal(mode) {
   document.getElementById('bookModal').classList.add('open');
+  switchBookMode(mode || 'listen', true);
   renderBookPage();
 }
 function closeBookModal() {
   document.getElementById('bookModal').classList.remove('open');
   // 音読が再生中なら止める
   if (bookPlaying) toggleBook();
+  clearStudyTimers();
 }
 
 // ========================
@@ -1421,7 +1565,8 @@ function renderBookPage() {
 
   count.textContent = (bookPageIndex + 1) + '/' + MONTH_BOOK_PAGES.length;
   prevBtn.disabled = bookPageIndex === 0;
-  nextBtn.disabled = bookPageIndex === MONTH_BOOK_PAGES.length - 1;
+  nextBtn.disabled = bookPageIndex === MONTH_BOOK_PAGES.length - 1 && bookMode === 'listen';
+  if (bookMode === 'listen') nextBtn.textContent = '›';
 }
 
 function flipToPage(newIndex, direction) {
@@ -1444,14 +1589,119 @@ function flipToPage(newIndex, direction) {
     bookPageIndex = newIndex;
     current.remove();
     renderBookPage();
+    if (bookMode === 'study') startStudySequence();
   }, 600);
 }
 
 function bookNextPage() {
-  if (bookPageIndex < MONTH_BOOK_PAGES.length - 1) flipToPage(bookPageIndex + 1, 'next');
+  if (bookMode === 'study' && studyStep !== 'done') return; // ポーズ中はスキップ不可
+  if (bookPageIndex < MONTH_BOOK_PAGES.length - 1) {
+    flipToPage(bookPageIndex + 1, 'next');
+  } else if (bookMode === 'study') {
+    showStudyComplete();
+  }
 }
 function bookPrevPage() {
+  if (bookMode === 'study' && studyStep !== 'done' && studyStep !== null) return;
   if (bookPageIndex > 0) flipToPage(bookPageIndex - 1, 'prev');
+}
+
+// ========================
+// Let's Study（いってみるモード）
+// ========================
+function switchBookMode(mode, silent) {
+  bookMode = mode;
+  document.getElementById('modeTabListen').classList.toggle('active', mode === 'listen');
+  document.getElementById('modeTabStudy').classList.toggle('active', mode === 'study');
+  clearStudyTimers();
+  hideStudyOverlay(); hideStudyBanner(); hideStudyComplete();
+
+  if (mode === 'listen') {
+    if (bookPlaying) toggleBook();
+    document.getElementById('bookModalPlayer').style.display = '';
+    setNavEnabled(true);
+  } else {
+    // study開始：再生中の音読は止め、下部プレイヤーは隠してJoelの声に集中させる
+    if (bookPlaying) toggleBook();
+    document.getElementById('bookModalPlayer').style.display = 'none';
+    startStudySequence();
+  }
+}
+
+function clearStudyTimers() {
+  studyTimers.forEach(t => clearTimeout(t));
+  studyTimers = [];
+}
+function hideStudyOverlay() { document.getElementById('studyOverlay').classList.remove('show'); }
+function hideStudyBanner() { document.getElementById('studyJoelBanner').classList.remove('show'); }
+function hideStudyComplete() {
+  document.getElementById('studyComplete').classList.remove('show');
+  document.getElementById('studyCompleteAsk').style.display = '';
+  document.getElementById('studyStampResult').classList.remove('show');
+}
+function setNavEnabled(enabled) {
+  const prevBtn = document.getElementById('bookPrevBtn');
+  const nextBtn = document.getElementById('bookNextBtn');
+  if (!enabled) {
+    prevBtn.disabled = true; nextBtn.disabled = true;
+  } else {
+    prevBtn.disabled = bookPageIndex === 0;
+    nextBtn.disabled = false;
+  }
+}
+
+function startStudySequence() {
+  clearStudyTimers();
+  hideStudyOverlay(); hideStudyComplete();
+  studyStep = 'joel1';
+  setNavEnabled(false);
+  document.getElementById('bookNextBtn').textContent = '›';
+
+  const banner = document.getElementById('studyJoelBanner');
+  banner.textContent = '🎙 Joel先生が読んでいるよ';
+  banner.classList.add('show');
+
+  studyTimers.push(setTimeout(() => {
+    // ① Joelが読む → ② Your turn!（無音ポーズ・スキップ不可）
+    banner.classList.remove('show');
+    studyStep = 'pause';
+    const echo = document.getElementById('studyPhraseEcho');
+    echo.textContent = MONTH_BOOK_PAGES[bookPageIndex].en;
+    document.getElementById('studyOverlay').classList.add('show');
+
+    studyTimers.push(setTimeout(() => {
+      // ③ Joelがもう一度読む（確認）
+      document.getElementById('studyOverlay').classList.remove('show');
+      studyStep = 'joel2';
+      banner.textContent = '🎙 もう一度きいてみよう';
+      banner.classList.add('show');
+
+      studyTimers.push(setTimeout(() => {
+        banner.classList.remove('show');
+        studyStep = 'done';
+        setNavEnabled(true);
+        const isLast = bookPageIndex === MONTH_BOOK_PAGES.length - 1;
+        const nextBtn = document.getElementById('bookNextBtn');
+        nextBtn.textContent = isLast ? '✓' : '›';
+      }, 1800));
+    }, 4000)); // Your turn!の無音ポーズ（3〜4秒・スキップ不可）
+  }, 1800));
+}
+
+function showStudyComplete() {
+  clearStudyTimers();
+  hideStudyOverlay(); hideStudyBanner();
+  document.getElementById('bookPrevBtn').disabled = true;
+  document.getElementById('bookNextBtn').disabled = true;
+  document.getElementById('studyComplete').classList.add('show');
+}
+
+function markSaidIt() {
+  document.getElementById('studyCompleteAsk').style.display = 'none';
+  const line = STUDY_REACTIONS[Math.floor(Math.random() * STUDY_REACTIONS.length)];
+  document.getElementById('studyJoelVoiceLine').textContent = line;
+  document.getElementById('studyStampResult').classList.add('show');
+  showToast('⭐ スタンプ1個獲得！');
 }
 
 // ========================
