@@ -574,15 +574,53 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .sub-text-sub { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.5; }
 .sub-btn { font-size: 11px; font-weight: 500; background: white; color: #4D7D63; border: none; border-radius: 8px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
 
-/* ルーティン */
-.routine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.routine-card { background: #F9FAFB; border-radius: 12px; padding: 14px; }
-.routine-card.active { background: #E6F1FB; }
-.routine-time { font-size: 10px; color: #6B7280; margin-bottom: 4px; }
-.routine-title { font-size: 13px; font-weight: 500; color: #111827; margin-bottom: 4px; }
-.routine-card.active .routine-title { color: #0C447C; }
-.routine-desc { font-size: 11px; color: #6B7280; line-height: 1.5; }
-.routine-card.active .routine-desc { color: #185FA5; }
+/* ルーティン：カテゴリーカード */
+.routine-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.routine-cat-card {
+  background: #F9FAFB; border-radius: 14px; padding: 16px 14px; cursor: pointer;
+  transition: background 0.15s; border: 1px solid transparent;
+}
+.routine-cat-card:hover { background: #F3F4F6; }
+.routine-cat-icon { font-size: 22px; margin-bottom: 8px; }
+.routine-cat-title { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 3px; }
+.routine-cat-sub { font-size: 10px; color: #9CA3AF; margin-bottom: 8px; }
+.routine-cat-count { font-size: 10px; color: #6B7280; display: flex; align-items: center; gap: 4px; }
+
+/* ルーティン：フレーズリストモーダル */
+.routine-modal {
+  position: fixed; inset: 0; z-index: 260;
+  background: #FFFDF8;
+  display: none; flex-direction: column;
+  max-width: 390px; margin: 0 auto;
+}
+.routine-modal.open { display: flex; }
+.routine-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 14px; flex-shrink: 0;
+  border-bottom: 1px solid #F0E6D2;
+}
+.routine-modal-title { font-size: 15px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 8px; }
+.routine-modal-sub { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.routine-modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #F3F4F6; border: none; color: #6B7280;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.routine-modal-body { flex: 1; overflow-y: auto; padding: 18px 20px 32px; }
+.routine-scene-card {
+  background: #F9FAFB; border-radius: 14px; padding: 14px; margin-bottom: 10px;
+}
+.routine-scene-label { font-size: 10px; color: #9CA3AF; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.routine-scene-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.routine-scene-play {
+  width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #E5E7EB;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer;
+  font-size: 11px; color: #6B7280;
+}
+.routine-scene-phrase { font-size: 14px; color: #111827; line-height: 1.4; }
+.routine-scene-reply { font-size: 11px; color: #9CA3AF; padding-left: 42px; }
+.routine-scene-reply span { color: #6B7280; }
 .hint-box { margin-top: 14px; background: #F9FAFB; border-radius: 12px; padding: 14px; font-size: 12px; color: #6B7280; line-height: 1.7; }
 
 /* フレーズ集 */
@@ -1210,30 +1248,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <!-- ルーティンタブ -->
   <div id="tab-routine" style="display:none;">
     <div class="section" style="padding-top:20px;">
-      <div class="section-label">今日のルーティン</div>
-      <div class="routine-grid">
-        <div class="routine-card active">
-          <div class="routine-time">朝 · 支度中</div>
-          <div class="routine-title">Morning BGM</div>
-          <div class="routine-desc">Morning Songsを流すだけ。親は何もしなくてOK。</div>
-        </div>
-        <div class="routine-card">
-          <div class="routine-time">移動中</div>
-          <div class="routine-title">Car Trip</div>
-          <div class="routine-desc">Car Trip Englishをかけ流し。聴くだけで◎。</div>
-        </div>
-        <div class="routine-card">
-          <div class="routine-time">食事中</div>
-          <div class="routine-title">Mealtime</div>
-          <div class="routine-desc">"More?" "All done!"が自然に耳に入る。</div>
-        </div>
-        <div class="routine-card">
-          <div class="routine-time">寝る前 · 5分</div>
-          <div class="routine-title">絵本音読</div>
-          <div class="routine-desc">Joel先生の音読を流すだけ。画面オフでOK。</div>
-        </div>
-      </div>
-      <div class="hint-box">💡 全部やらなくて大丈夫。まず「寝る前の音読」だけ1週間続けてみてください。</div>
+      <div class="section-label">困った時のフレーズ集</div>
+      <div class="routine-cat-grid" id="routineCatGrid"></div>
+      <div class="hint-box">💡 全部覚えなくて大丈夫。気になるシーンだけ、その時に開いて使ってください。</div>
     </div>
   </div>
 
@@ -1395,6 +1412,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     </div>
 
   </div>
+</div>
+
+<!-- ルーティン・フレーズリストモーダル -->
+<div class="routine-modal" id="routineModal">
+  <div class="routine-modal-header">
+    <div>
+      <div class="routine-modal-title"><span id="routineModalIcon">🌅</span><span id="routineModalTitle">Morning Time</span></div>
+      <div class="routine-modal-sub" id="routineModalSub">親が言うフレーズ集</div>
+    </div>
+    <button class="routine-modal-close" onclick="closeRoutineModal()">✕</button>
+  </div>
+  <div class="routine-modal-body" id="routineModalBody"></div>
 </div>
 
 <!-- トースト -->
@@ -2071,6 +2100,94 @@ function applyContentForSelectedDay() {
 
 renderWeekStrip();
 applyContentForSelectedDay();
+
+// ========================
+// ルーティン：困った時のフレーズ集
+// ========================
+const ROUTINE_CATEGORIES = [
+  {
+    id: 'morning', icon: '🌅', title: 'Morning Time', sub: '朝の支度タイムに使うフレーズ',
+    scenes: [
+      { label: '起床直後', en: 'Good morning! Did you sleep well?', reply: '"Yes!" / "I\'m sleepy."' },
+      { label: '着替え中', en: "Let's get dressed! Where's your shirt?", reply: '"Here!" / "I found it!"' },
+      { label: '朝ごはん中', en: 'Are you hungry? What do you want to eat?', reply: '"Yes!" / "Eggs, please!"' },
+      { label: '歯磨き・洗顔', en: 'Time to brush your teeth!', reply: '"Okay!" / "I don\'t want to!"' },
+      { label: '出発前のあいさつ', en: 'Have a good day! See you later!', reply: '"See you!" / "Bye bye!"' },
+    ],
+  },
+  {
+    id: 'beforebed', icon: '🌙', title: 'Before Bed', sub: '寝る前の時間に使うフレーズ',
+    scenes: [
+      { label: '絵本を読む前', en: 'Let\'s read a book together!', reply: '"Yay!" / "This one!"' },
+      { label: '歯磨き確認', en: 'Did you brush your teeth?', reply: '"Yes!" / "Not yet!"' },
+      { label: 'おやすみのあいさつ', en: 'Good night! Sweet dreams!', reply: '"Good night!" / "Love you!"' },
+    ],
+  },
+  {
+    id: 'afterschool', icon: '🎒', title: 'おかえり', sub: '保育園・幼稚園から帰った後に使うフレーズ',
+    scenes: [
+      { label: 'ただいまのあいさつ', en: 'Welcome home! How was your day?', reply: '"Good!" / "Fun!"' },
+      { label: '今日は何した？', en: 'What did you do today?', reply: '"I played!" / "We sang songs!"' },
+      { label: 'おやつ前', en: 'Do you want a snack?', reply: '"Yes please!" / "I\'m hungry!"' },
+    ],
+  },
+  {
+    id: 'mealtime', icon: '🍽', title: '食事タイム', sub: '食事の時間に使うフレーズ',
+    scenes: [
+      { label: '食事前のあいさつ', en: "Let's eat!", reply: '"Yay!" / "I\'m hungry!"' },
+      { label: 'もっと食べる？', en: 'Do you want more?', reply: '"Yes please!" / "No, thank you!"' },
+      { label: 'ごちそうさま', en: 'All done! Great job eating!', reply: '"All done!" / "Yummy!"' },
+    ],
+  },
+];
+
+function renderRoutineCatGrid() {
+  const grid = document.getElementById('routineCatGrid');
+  if (!grid) return;
+  grid.innerHTML = ROUTINE_CATEGORIES.map(cat => `
+    <div class="routine-cat-card" onclick="openRoutineModal('${cat.id}')">
+      <div class="routine-cat-icon">${cat.icon}</div>
+      <div class="routine-cat-title">${cat.title}</div>
+      <div class="routine-cat-sub">${cat.sub}</div>
+      <div class="routine-cat-count">📋 ${cat.scenes.length}フレーズ</div>
+    </div>
+  `).join('');
+}
+
+function openRoutineModal(catId) {
+  const cat = ROUTINE_CATEGORIES.find(c => c.id === catId);
+  if (!cat) return;
+  document.getElementById('routineModalIcon').textContent = cat.icon;
+  document.getElementById('routineModalTitle').textContent = cat.title;
+  document.getElementById('routineModalSub').textContent = cat.sub;
+  document.getElementById('routineModalBody').innerHTML = cat.scenes.map(s => `
+    <div class="routine-scene-card">
+      <div class="routine-scene-label">${s.label}</div>
+      <div class="routine-scene-row">
+        <div class="routine-scene-play" onclick="playRoutineScene(this)">▶</div>
+        <div class="routine-scene-phrase">${s.en}</div>
+      </div>
+      <div class="routine-scene-reply">キッズの返答例：<span>${s.reply}</span></div>
+    </div>
+  `).join('');
+  document.getElementById('routineModal').classList.add('open');
+}
+
+function closeRoutineModal() {
+  document.getElementById('routineModal').classList.remove('open');
+}
+
+function playRoutineScene(btn) {
+  if (btn.dataset.playing === '1') return;
+  btn.dataset.playing = '1';
+  btn.textContent = '⏸';
+  setTimeout(() => {
+    btn.textContent = '▶';
+    btn.dataset.playing = '0';
+  }, 1500);
+}
+
+renderRoutineCatGrid();
 
 // ========================
 // YouTubeキュレーション
