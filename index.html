@@ -106,9 +106,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   margin-bottom: 16px;
 }
 .weekly-mission-label {
-  font-size: 14px; font-weight: 700;
+  font-size: 19px; font-weight: 600;
   color: #2D6A4F; white-space: nowrap;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
 }
 .weekly-mission-label-ja {
   font-size: 10px; color: #6DB88A;
@@ -277,14 +277,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
 .ft-eyebrow-sub { font-size: 11px; color: #9CA3AF; margin: -6px 0 12px; }
 .ft-card {
-  background: #2A2640; border-radius: 18px; overflow: hidden;
-  position: relative; box-shadow: 0 8px 24px rgba(42,38,64,0.18);
+  background: linear-gradient(165deg, #1A4232 0%, #0F2B1F 100%); border-radius: 18px; overflow: hidden;
+  position: relative; box-shadow: 0 8px 24px rgba(15,43,31,0.28);
 }
 .ft-card-top { padding: 18px 18px 0; position: relative; z-index: 1; }
 .ft-show-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .ft-show-icon {
   width: 38px; height: 38px; border-radius: 10px;
-  background: linear-gradient(135deg, #E8A33D, #D4793E);
+  background: linear-gradient(135deg, #6DB88A, #4D9E6D);
   display: flex; align-items: center; justify-content: center;
   font-size: 17px; flex-shrink: 0;
 }
@@ -292,7 +292,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-show-meta { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
 .ft-theme-tag {
   margin-left: auto; font-size: 9px; font-weight: 600;
-  background: rgba(232,163,61,0.18); color: #E8A33D;
+  background: rgba(109,184,138,0.2); color: #9FE1CB;
   padding: 3px 9px; border-radius: 10px; white-space: nowrap;
 }
 .ft-question { font-size: 16px; font-weight: 600; color: #fff; line-height: 1.45; margin-bottom: 4px; }
@@ -306,7 +306,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   transition: background 0.25s;
   transform-origin: center;
 }
-.ft-wave-bar.played { background: #E8A33D; }
+.ft-wave-bar.played { background: #6DB88A; }
 .ft-wave.is-playing .ft-wave-bar { animation: ftWaveBounce 0.9s ease-in-out infinite; }
 @keyframes ftWaveBounce {
   0%, 100% { transform: scaleY(0.75); }
@@ -320,16 +320,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-play-row { display: flex; align-items: center; gap: 12px; }
 .ft-play-btn {
   width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
-  background: #E8A33D; border: none; cursor: pointer;
+  background: #6DB88A; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; color: #2A2640; transition: background 0.15s;
+  font-size: 16px; color: #0F2B1F; transition: background 0.15s;
 }
-.ft-play-btn:hover { background: #f0ad4d; }
+.ft-play-btn:hover { background: #5aa577; }
 .ft-play-meta { flex: 1; min-width: 0; }
 .ft-play-title { font-size: 12px; font-weight: 600; color: #fff; }
 .ft-play-len { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
 .ft-prog-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; cursor: pointer; }
-.ft-prog-fill { height: 100%; background: #E8A33D; width: 0%; border-radius: 2px; transition: width 0.4s linear; }
+.ft-prog-fill { height: 100%; background: #6DB88A; width: 0%; border-radius: 2px; transition: width 0.4s linear; }
 .ft-prog-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .ft-prog-time { font-size: 10px; color: rgba(255,255,255,0.4); min-width: 32px; text-align: right; }
 
@@ -367,7 +367,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-archive-link {
   display: flex; align-items: center; justify-content: center; gap: 5px;
   margin-top: 12px; padding: 10px 0;
-  font-size: 12px; font-weight: 600; color: #B8860B;
+  font-size: 12px; font-weight: 600; color: #4D7D63;
   cursor: pointer; background: none; border: none; width: 100%;
 }
 
@@ -539,8 +539,86 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .mp-yt:hover { opacity: 0.85; }
 
 /* ==============================
-   プレイリスト（今週 & 音楽タブ共通）
+   Weekly Playlist カルーセル
 ============================== */
+.carousel-outer {
+  position: relative;
+  overflow: hidden;
+  margin: 0 -20px;        /* 左右マージン分広げてサイドをチラ見せ */
+  padding: 6px 0 4px;
+}
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  will-change: transform;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  /* padding-left/right はJS側でセット */
+}
+.carousel-card {
+  flex: 0 0 268px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #E5E7EB;
+  transform: scale(0.84);
+  opacity: 0.52;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.42s;
+  cursor: pointer;
+}
+.carousel-card.active {
+  transform: scale(1);
+  opacity: 1;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.13);
+}
+.carousel-thumb-area {
+  width: 100%;
+  height: 148px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 60px;
+  position: relative;
+}
+.carousel-card-info {
+  padding: 14px 16px 18px;
+}
+.carousel-card-title {
+  font-size: 14px; font-weight: 700; color: #111827;
+  margin-bottom: 7px; line-height: 1.3;
+}
+.carousel-card-age {
+  display: inline-block; font-size: 10px;
+  background: #E6F1FB; color: #0C447C;
+  padding: 2px 9px; border-radius: 10px;
+  margin-bottom: 10px;
+}
+.carousel-card-sub {
+  font-size: 11px; color: #6B7280;
+  line-height: 1.65; margin-bottom: 14px;
+}
+.carousel-card-yt {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #FF0000; color: white;
+  font-size: 11px; font-weight: 600;
+  padding: 7px 14px; border-radius: 10px;
+  text-decoration: none; transition: opacity 0.15s;
+}
+.carousel-card-yt:hover { opacity: 0.85; }
+.carousel-dots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; margin-top: 18px;
+}
+.carousel-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #D1D5DB; cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.carousel-dot.active {
+  background: #6DB88A; width: 20px; border-radius: 3px;
+}
+
+/* ==============================
+   今週 & 音楽タブ共通プレイリスト
 .playlist-list { display: flex; flex-direction: column; gap: 8px; }
 .playlist-item {
   display: flex; align-items: center; gap: 12px;
@@ -1212,7 +1290,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <div class="weekly-playlist-line"></div>
       </div>
       <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップでYouTubeが開きます。かけ流しはスピーカーから流すのがおすすめ。</p>
-      <div class="mp-list" id="weeklyPlaylist"></div>
+      <div id="weeklyPlaylist"></div>
     </div>
 
     <!-- サブスクバナー -->
@@ -1534,6 +1612,9 @@ let bookPageIndex = 0;
 let bookMode = 'listen'; // 'listen' | 'study'
 let studyStep = null; // null | 'joel1' | 'pause' | 'joel2' | 'done'
 let studyTimers = [];
+let carouselIndex = 0;
+const CAROUSEL_CARD_W = 268;
+const CAROUSEL_GAP = 12;
 const STUDY_REACTIONS = [
   '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Wow, great job! You said it!"',
   '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Perfect! That sounded amazing!"',
@@ -1585,9 +1666,106 @@ function showOnboarding() {
 }
 
 // ========================
-// 今月の曲（編集部選定・テーマ固定）
+// Weekly Playlist カルーセル
 // ========================
-// 曲データからアイコン部分のHTMLを生成（videoIdがあればYouTubeサムネ、なければプレースホルダー）
+function renderWeeklyPlaylist() {
+  const container = document.getElementById('weeklyPlaylist');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="carousel-outer" id="carouselOuter">
+      <div class="carousel-track" id="carouselTrack">
+        ${MONTH_PLAYLIST.map((s, i) => `
+          <div class="carousel-card${i === 0 ? ' active' : ''}" data-index="${i}" onclick="goCarousel(${i})">
+            <div class="carousel-thumb-area" style="background:${s.bg};">
+              <span>${s.emoji}</span>
+            </div>
+            <div class="carousel-card-info">
+              <div class="carousel-card-title">${s.title}</div>
+              <div class="carousel-card-age">${s.age}</div>
+              <div class="carousel-card-sub">${s.sub}</div>
+              <a class="carousel-card-yt" href="${s.ytUrl}" target="_blank" onclick="event.stopPropagation()">
+                <span>▶</span>YouTubeで見る
+              </a>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="carousel-dots">
+        ${MONTH_PLAYLIST.map((_, i) => `
+          <div class="carousel-dot${i === 0 ? ' active' : ''}" onclick="goCarousel(${i})"></div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  carouselIndex = 0;
+  setTimeout(() => initCarousel(), 0);
+}
+
+function initCarousel() {
+  const outer = document.getElementById('carouselOuter');
+  const track = document.getElementById('carouselTrack');
+  if (!outer || !track) return;
+
+  const containerW = outer.offsetWidth;
+  const offset = (containerW - CAROUSEL_CARD_W) / 2;
+  track.style.paddingLeft = offset + 'px';
+  track.style.paddingRight = offset + 'px';
+
+  updateCarousel(0, false);
+
+  // タッチスワイプ
+  let startX = 0, startY = 0, moved = false;
+  track.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    moved = false;
+  }, { passive: true });
+  track.addEventListener('touchmove', e => { moved = true; }, { passive: true });
+  track.addEventListener('touchend', e => {
+    if (!moved) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 38) {
+      goCarousel(carouselIndex + (dx < 0 ? 1 : -1));
+    }
+  }, { passive: true });
+}
+
+function goCarousel(idx) {
+  idx = Math.max(0, Math.min(idx, MONTH_PLAYLIST.length - 1));
+  updateCarousel(idx, true);
+}
+
+function updateCarousel(idx, animate) {
+  carouselIndex = idx;
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+
+  if (!animate) {
+    track.style.transition = 'none';
+  } else {
+    track.style.transition = 'transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)';
+  }
+  track.style.transform = `translateX(${-(idx * (CAROUSEL_CARD_W + CAROUSEL_GAP))}px)`;
+  if (!animate) {
+    track.offsetHeight; // reflow
+    track.style.transition = '';
+  }
+
+  document.querySelectorAll('.carousel-card').forEach((c, i) => {
+    c.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+// ========================
+// お気に入り
+// ========================
+// お気に入りタブ用アイコンマークアップ
 function plIconMarkup(s) {
   if (s.videoId) {
     return `<div class="pl-icon" style="background-image:url('https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg');"><div class="pl-icon-play"><span>▶</span></div></div>`;
@@ -1595,44 +1773,6 @@ function plIconMarkup(s) {
   return `<div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>`;
 }
 
-// Weekly Playlist用サムネ部分（videoIdがあればYouTubeサムネ、なければプレースホルダー）
-function mpThumbMarkup(s) {
-  if (s.videoId) {
-    return `<div class="mp-thumb" style="background-image:url('https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg');"><div class="mp-thumb-play"><span>▶</span></div></div>`;
-  }
-  return `<div class="mp-thumb mp-thumb-placeholder"><div class="mp-thumb-play"><span>▶</span></div></div>`;
-}
-
-function renderWeeklyPlaylist() {
-  const container = document.getElementById('weeklyPlaylist');
-  if (!container) return;
-
-  container.innerHTML = MONTH_PLAYLIST.map(s => {
-    const isLiked = !!favorites[s.title];
-    return `
-      <div class="mp-card">
-        ${mpThumbMarkup(s)}
-        <div class="mp-body">
-          <div class="mp-title-row">
-            <div class="mp-title">${s.title}</div>
-          </div>
-          <div class="mp-meta-row">
-            <div class="mp-age">${s.age}</div>
-            <div class="pl-heart ${isLiked ? 'liked' : ''}" onclick="toggleFav(this, ${JSON.stringify(s).replace(/"/g, '&quot;')})" title="お気に入り">♡</div>
-          </div>
-          <div class="mp-sub">${s.sub}</div>
-          <div class="mp-yt-row">
-            <a class="mp-yt" href="${s.ytUrl}" target="_blank"><span class="pl-yt-icon">▶</span>YouTubeで見る</a>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-// ========================
-// お気に入り
-// ========================
 function toggleFav(el, song) {
   const isLiked = el.classList.toggle('liked');
   if (isLiked) {
@@ -1677,12 +1817,6 @@ function renderFavList() {
 
 function removeFavFromList(el, title) {
   delete favorites[title];
-  // 今月のプレイリストのハートも戻す
-  document.querySelectorAll('#weeklyPlaylist .pl-heart').forEach(h => {
-    const row = h.closest('.mp-card');
-    const t = row.querySelector('.mp-title').textContent;
-    if (t === title) { h.classList.remove('liked'); h.textContent = '♡'; }
-  });
   showToast('お気に入りから削除しました');
   renderFavList();
 }
