@@ -99,53 +99,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #F5FAF7;
   border: 1px solid #BBDAC8;
   border-radius: 20px;
-  padding: 0 0 20px;
-  overflow: hidden;
+  padding: 18px 16px 20px;
 }
-
-/* Hero イラストヘッダー */
-.mission-hero {
-  position: relative;
-  width: 100%;
+.weekly-mission-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
 }
-.mission-hero-img {
-  width: 100%;
-  display: block;
-  border-radius: 20px 20px 0 0;
-}
-.mission-hero-title {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: 14px 16px 10px;
-  background: linear-gradient(to bottom, rgba(245,250,247,0.88) 60%, rgba(245,250,247,0) 100%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.mission-hero-label {
+.weekly-mission-label {
   font-size: 19px; font-weight: 600;
   color: #2D6A4F; white-space: nowrap;
   letter-spacing: -0.3px;
 }
-.mission-hero-label-ja {
+.weekly-mission-label-ja {
   font-size: 10px; color: #6DB88A;
   font-weight: 600; margin-left: 1px;
 }
-.mission-hero-line {
-  flex: 1; height: 1px; background: rgba(45,106,79,0.25);
-}
-
-/* 旧eyebrow（hero導入後は非表示） */
-.weekly-mission-eyebrow { display: none; }
-.weekly-mission-label, .weekly-mission-label-ja, .weekly-mission-line { display: none; }
-
-/* hero以下のコンテンツにpadding */
-.weekly-mission-panel .week-strip-wrap,
-.weekly-mission-panel .ft-wrap,
-.weekly-mission-panel .at-wrap {
-  padding-left: 16px;
-  padding-right: 16px;
-}
+.weekly-mission-line { flex: 1; height: 1px; background: #BBDAC8; }
 .weekly-mission-panel .week-strip-wrap { margin: 0; }
 .weekly-mission-panel .ft-wrap { margin: 20px 0 0; }
 .weekly-mission-panel .at-wrap { margin: 20px 0 0; }
@@ -470,6 +439,117 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-lock-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
 .ft-lock-sub { font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 14px; max-width: 260px; }
 .ft-lock-btn { background: #E8A33D; color: #2A2640; border: none; border-radius: 10px; font-size: 12px; font-weight: 700; padding: 9px 20px; cursor: pointer; }
+
+/* ==============================
+   絵本ビューワーモーダル
+============================== */
+.book-viewer-modal {
+  position: fixed; inset: 0; z-index: 300;
+  background: #0a0a0a;
+  display: none; flex-direction: column;
+  max-width: 390px; margin: 0 auto;
+}
+.book-viewer-modal.open { display: flex; }
+
+/* ヘッダー */
+.bv-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px; flex-shrink: 0;
+  background: rgba(0,0,0,0.6);
+}
+.bv-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+.bv-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); border: none; color: rgba(255,255,255,0.7);
+  font-size: 18px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+
+/* ページ表示エリア */
+.bv-page-area {
+  flex: 1; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.bv-page-img {
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+  user-select: none; -webkit-user-drag: none;
+}
+/* 左右ナビ矢印 */
+.bv-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); border: none;
+  color: #fff; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px); transition: background 0.15s;
+}
+.bv-nav:hover { background: rgba(255,255,255,0.25); }
+.bv-nav.prev { left: 10px; }
+.bv-nav.next { right: 10px; }
+.bv-nav:disabled { opacity: 0.2; cursor: default; }
+
+/* ページインジケーター */
+.bv-indicator {
+  display: flex; gap: 5px; justify-content: center;
+  padding: 8px 0 4px; flex-shrink: 0;
+}
+.bv-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.25); transition: all 0.2s;
+}
+.bv-dot.active { background: #6DB88A; width: 16px; border-radius: 3px; }
+
+/* モードバー（Let's read / Let's talk） */
+.bv-mode-bar {
+  padding: 10px 16px 16px; flex-shrink: 0;
+  background: rgba(0,0,0,0.6);
+}
+.bv-mode-row {
+  display: flex; gap: 10px; margin-bottom: 10px;
+}
+.bv-mode-btn {
+  flex: 1; height: 46px; border-radius: 12px; border: none;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all 0.15s;
+}
+.bv-mode-btn.read {
+  background: #ffffff; color: #2D6A4F;
+}
+.bv-mode-btn.talk {
+  background: #6DB88A; color: #fff;
+}
+.bv-mode-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+/* Let's talk フレーズ表示 */
+.bv-talk-bar {
+  display: none; background: rgba(109,184,138,0.15);
+  border: 1px solid rgba(109,184,138,0.3); border-radius: 12px;
+  padding: 12px 14px; margin-top: 6px;
+}
+.bv-talk-bar.active { display: block; }
+.bv-talk-phrase { font-size: 18px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 4px; }
+.bv-talk-status { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; }
+.bv-talk-progress {
+  display: flex; gap: 4px; justify-content: center; margin-top: 8px;
+}
+.bv-talk-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+.bv-talk-dot.done { background: #6DB88A; }
+.bv-talk-dot.current { background: #fff; }
+
+/* 今日言えたよボタン */
+.bv-ieta-btn {
+  display: none; width: 100%; height: 48px; margin-top: 10px;
+  background: #E8A33D; border: none; border-radius: 12px;
+  color: #2C2A22; font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.bv-ieta-btn.show { display: block; }
+.bv-ieta-btn:active { opacity: 0.8; }
 
 /* 今週の一冊 */
 .weekly-book-card { background: #F9FAFB; border-radius: 14px; border: 0.5px solid #E5E7EB; overflow: hidden; }
@@ -1180,6 +1260,32 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <div class="ob-skip" onclick="finishOnboarding(true)">あとで設定する</div>
 </div>
 
+<!-- 絵本ビューワーモーダル -->
+<div class="book-viewer-modal" id="bookViewerModal">
+  <div class="bv-header">
+    <div class="bv-title" id="bvTitle">Sunny Day!</div>
+    <button class="bv-close" onclick="closeBookModal()">✕</button>
+  </div>
+  <div class="bv-page-area" id="bvPageArea">
+    <img class="bv-page-img" id="bvPageImg" src="" alt="">
+    <button class="bv-nav prev" id="bvPrev" onclick="bvChangePage(-1)">‹</button>
+    <button class="bv-nav next" id="bvNext" onclick="bvChangePage(1)">›</button>
+  </div>
+  <div class="bv-indicator" id="bvIndicator"></div>
+  <div class="bv-mode-bar">
+    <div class="bv-mode-row" id="bvModeRow">
+      <button class="bv-mode-btn read" onclick="bvStartRead()">🎧 Let's read</button>
+      <button class="bv-mode-btn talk" onclick="bvStartTalk()">🗣 Let's talk</button>
+    </div>
+    <div class="bv-talk-bar" id="bvTalkBar">
+      <div class="bv-talk-phrase" id="bvTalkPhrase"></div>
+      <div class="bv-talk-status" id="bvTalkStatus"></div>
+      <div class="bv-talk-progress" id="bvTalkProgress"></div>
+    </div>
+    <button class="bv-ieta-btn" id="bvIetaBtn" onclick="bvIeta()">🌟 今日言えたよ！</button>
+  </div>
+</div>
+
 <!-- メインアプリ -->
 <div class="app" id="mainApp" style="display:none;">
 
@@ -1243,14 +1349,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     <!-- ② Weekly Mission パネル -->
     <div class="weekly-mission-panel">
-
-      <!-- Hero イラスト -->
-      <div class="mission-hero">
-        <img class="mission-hero-img" src="weekly_mission_hero.png" alt="Weekly Mission イラスト">
-        <div class="mission-hero-title">
-          <div class="mission-hero-label">Weekly Mission <span class="mission-hero-label-ja">今週のプログラム</span></div>
-          <div class="mission-hero-line"></div>
-        </div>
+      <div class="weekly-mission-eyebrow">
+        <div class="weekly-mission-label">Weekly Mission <span class="weekly-mission-label-ja">今週のプログラム</span></div>
+        <div class="weekly-mission-line"></div>
       </div>
 
       <!-- 今週のスケジュール -->
@@ -2660,6 +2761,182 @@ function playRoutineScene(btn) {
 }
 
 renderRoutineCatGrid();
+
+// ========================
+// 絵本ビューワー
+// ========================
+const BOOK_DATA = {
+  title: 'Sunny Day!',
+  pages: [
+    { img: 'books/aug/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null },
+    { img: 'books/aug/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!" },
+    { img: 'books/aug/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!" },
+    { img: 'books/aug/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!' },
+    { img: 'books/aug/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!' },
+    { img: 'books/aug/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!' },
+    { img: 'books/aug/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null },
+    { img: 'books/aug/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!" },
+  ]
+};
+
+// Let's talkのフレーズ（talkPhrase がある5つ）
+const TALK_PHRASES = BOOK_DATA.pages.filter(p => p.talkPhrase).map(p => p.talkPhrase);
+
+let bvCurrentPage = 0;
+let bvMode = null; // 'read' | 'talk'
+let bvTalkStep = 0; // 0:Joel読む 1:Your turn 2:確認
+let bvTalkPhraseIdx = 0;
+let bvTalkTimer = null;
+let bvTalkDone = [];
+
+function openBookModal(mode) {
+  bvCurrentPage = 0;
+  bvMode = mode;
+  bvTalkStep = 0;
+  bvTalkPhraseIdx = 0;
+  bvTalkDone = [];
+  document.getElementById('bookViewerModal').classList.add('open');
+  bvRenderPage();
+  bvBuildIndicator();
+  if (mode === 'talk') {
+    setTimeout(() => bvStartTalk(), 300);
+  }
+}
+
+function closeBookModal() {
+  document.getElementById('bookViewerModal').classList.remove('open');
+  if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  document.getElementById('bvTalkBar').classList.remove('active');
+  document.getElementById('bvIetaBtn').classList.remove('show');
+  document.getElementById('bvModeRow').style.display = 'flex';
+}
+
+function bvRenderPage() {
+  const page = BOOK_DATA.pages[bvCurrentPage];
+  document.getElementById('bvPageImg').src = page.img;
+  document.getElementById('bvTitle').textContent = `Sunny Day!  ${bvCurrentPage + 1} / ${BOOK_DATA.pages.length}`;
+  document.getElementById('bvPrev').disabled = bvCurrentPage === 0;
+  document.getElementById('bvNext').disabled = bvCurrentPage === BOOK_DATA.pages.length - 1;
+  // インジケーター更新
+  document.querySelectorAll('.bv-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === bvCurrentPage);
+  });
+}
+
+function bvBuildIndicator() {
+  const ind = document.getElementById('bvIndicator');
+  ind.innerHTML = BOOK_DATA.pages.map((_, i) =>
+    `<div class="bv-dot${i === 0 ? ' active' : ''}"></div>`
+  ).join('');
+}
+
+function bvChangePage(dir) {
+  const next = bvCurrentPage + dir;
+  if (next < 0 || next >= BOOK_DATA.pages.length) return;
+  bvCurrentPage = next;
+  bvRenderPage();
+}
+
+// スワイプ対応
+let bvTouchStartX = 0;
+document.getElementById('bvPageArea').addEventListener('touchstart', e => {
+  bvTouchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.getElementById('bvPageArea').addEventListener('touchend', e => {
+  const diff = bvTouchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 40) bvChangePage(diff > 0 ? 1 : -1);
+});
+
+function bvStartRead() {
+  bvMode = 'read';
+  bvCurrentPage = 0;
+  bvRenderPage();
+  document.getElementById('bvTalkBar').classList.remove('active');
+  document.getElementById('bvIetaBtn').classList.remove('show');
+  document.getElementById('bvModeRow').style.display = 'flex';
+  // 自動ページ送り（音声がない間は3秒ごとにデモ）
+  if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvAutoRead();
+}
+
+function bvAutoRead() {
+  if (bvCurrentPage >= BOOK_DATA.pages.length - 1) return;
+  bvTalkTimer = setTimeout(() => {
+    bvChangePage(1);
+    bvAutoRead();
+  }, 3000);
+}
+
+function bvStartTalk() {
+  bvMode = 'talk';
+  bvTalkPhraseIdx = 0;
+  bvTalkDone = [];
+  if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  document.getElementById('bvModeRow').style.display = 'none';
+  document.getElementById('bvTalkBar').classList.add('active');
+  document.getElementById('bvIetaBtn').classList.remove('show');
+  // Let's talkのフレーズがあるページに移動
+  const firstTalkPage = BOOK_DATA.pages.findIndex(p => p.talkPhrase);
+  bvCurrentPage = firstTalkPage;
+  bvRenderPage();
+  bvRunTalkStep();
+}
+
+function bvRunTalkStep() {
+  const phrase = TALK_PHRASES[bvTalkPhraseIdx];
+  if (!phrase) return;
+
+  // Step 0: Joelが読む
+  document.getElementById('bvTalkPhrase').textContent = phrase;
+  document.getElementById('bvTalkStatus').textContent = '🎧 Joelの声を聞いてね';
+  bvUpdateTalkProgress();
+
+  bvTalkTimer = setTimeout(() => {
+    // Step 1: Your turn（無音ポーズ）
+    document.getElementById('bvTalkStatus').textContent = '🎤 Your turn! 言ってみよう';
+    bvTalkTimer = setTimeout(() => {
+      // Step 2: 確認読み
+      document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Joelと一緒に';
+      bvTalkDone.push(bvTalkPhraseIdx);
+      bvUpdateTalkProgress();
+
+      bvTalkTimer = setTimeout(() => {
+        bvTalkPhraseIdx++;
+        if (bvTalkPhraseIdx >= TALK_PHRASES.length) {
+          // 全フレーズ完了
+          document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
+          document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
+          document.getElementById('bvIetaBtn').classList.add('show');
+          return;
+        }
+        // 次のフレーズのページへ
+        const nextPage = BOOK_DATA.pages.findIndex((p, i) =>
+          p.talkPhrase === TALK_PHRASES[bvTalkPhraseIdx]
+        );
+        if (nextPage >= 0) { bvCurrentPage = nextPage; bvRenderPage(); }
+        bvRunTalkStep();
+      }, 2000);
+    }, 4000); // Your turnポーズ4秒
+  }, 2500); // Joel読み2.5秒
+}
+
+function bvUpdateTalkProgress() {
+  const prog = document.getElementById('bvTalkProgress');
+  prog.innerHTML = TALK_PHRASES.map((_, i) => {
+    const cls = bvTalkDone.includes(i) ? 'done' : i === bvTalkPhraseIdx ? 'current' : '';
+    return `<div class="bv-talk-dot ${cls}"></div>`;
+  }).join('');
+}
+
+function bvIeta() {
+  // 既存の言えたよ機能に連携
+  const btn = document.getElementById('bvIetaBtn');
+  btn.textContent = '✅ 記録したよ！';
+  btn.disabled = true;
+  // スタンプ機能があれば連携
+  if (typeof recordIeta === 'function') recordIeta();
+  setTimeout(() => closeBookModal(), 1500);
+}
 
 // ========================
 // YouTubeキュレーション
