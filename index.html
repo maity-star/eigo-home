@@ -99,22 +99,53 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #F5FAF7;
   border: 1px solid #BBDAC8;
   border-radius: 20px;
-  padding: 18px 16px 20px;
+  padding: 0 0 20px;
+  overflow: hidden;
 }
-.weekly-mission-eyebrow {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 16px;
+
+/* Hero イラストヘッダー */
+.mission-hero {
+  position: relative;
+  width: 100%;
 }
-.weekly-mission-label {
+.mission-hero-img {
+  width: 100%;
+  display: block;
+  border-radius: 20px 20px 0 0;
+}
+.mission-hero-title {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 14px 16px 10px;
+  background: linear-gradient(to bottom, rgba(245,250,247,0.88) 60%, rgba(245,250,247,0) 100%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mission-hero-label {
   font-size: 19px; font-weight: 600;
   color: #2D6A4F; white-space: nowrap;
   letter-spacing: -0.3px;
 }
-.weekly-mission-label-ja {
+.mission-hero-label-ja {
   font-size: 10px; color: #6DB88A;
   font-weight: 600; margin-left: 1px;
 }
-.weekly-mission-line { flex: 1; height: 1px; background: #BBDAC8; }
+.mission-hero-line {
+  flex: 1; height: 1px; background: rgba(45,106,79,0.25);
+}
+
+/* 旧eyebrow（hero導入後は非表示） */
+.weekly-mission-eyebrow { display: none; }
+.weekly-mission-label, .weekly-mission-label-ja, .weekly-mission-line { display: none; }
+
+/* hero以下のコンテンツにpadding */
+.weekly-mission-panel .week-strip-wrap,
+.weekly-mission-panel .ft-wrap,
+.weekly-mission-panel .at-wrap {
+  padding-left: 16px;
+  padding-right: 16px;
+}
 .weekly-mission-panel .week-strip-wrap { margin: 0; }
 .weekly-mission-panel .ft-wrap { margin: 20px 0 0; }
 .weekly-mission-panel .at-wrap { margin: 20px 0 0; }
@@ -696,6 +727,98 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .scene-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #6DB88A; white-space: nowrap; }
 .scene-line { flex: 1; height: 1px; background: #E5E7EB; }
 
+/* ==============================
+   あそぼタブ
+============================== */
+.asobo-hero { padding: 20px 20px 0; }
+.asobo-hero-title {
+  font-size: 22px; font-weight: 700; color: #111827;
+  margin-bottom: 4px; letter-spacing: -0.3px;
+}
+.asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-bottom: 20px; }
+
+/* サブタブ */
+.asobo-subtabs { display: flex; gap: 8px; padding: 0 20px; margin-bottom: 18px; }
+.asobo-subtab {
+  flex: 1; text-align: center; padding: 11px 8px;
+  background: #F3F4F6; border-radius: 12px;
+  font-size: 13px; font-weight: 600; color: #6B7280;
+  cursor: pointer; transition: all 0.18s;
+  border: 1.5px solid transparent;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.asobo-subtab.active { background: #FFF6E5; color: #B8680B; border-color: #F0C96D; }
+
+/* 軸フィルターピル */
+.asobo-axis-filter {
+  display: flex; gap: 7px; padding: 0 20px 16px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.asobo-axis-filter::-webkit-scrollbar { display: none; }
+.asobo-axis-pill {
+  flex-shrink: 0; font-size: 11px; font-weight: 600;
+  padding: 5px 13px; border-radius: 20px;
+  border: 1.5px solid #E5E7EB; background: #F9FAFB; color: #6B7280;
+  cursor: pointer; transition: all 0.15s;
+}
+.asobo-axis-pill.active { background: #E8A33D; color: #fff; border-color: #E8A33D; }
+
+/* 探し物ミッションカード */
+.at-archive-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.at-archive-card {
+  background: #fff; border: 1px solid #E5E7EB;
+  border-radius: 14px; padding: 14px;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.at-archive-card:hover { background: #FFFDF8; border-color: #F0C96D; }
+.at-archive-play {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: #E8A33D; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #fff; transition: background 0.15s;
+}
+.at-archive-play:hover { background: #D4793E; }
+.at-archive-play.playing { background: #BBDAC8; color: #2D6A4F; }
+.at-archive-body { flex: 1; min-width: 0; }
+.at-archive-en { font-size: 14px; font-weight: 600; color: #111827; line-height: 1.4; margin-bottom: 3px; }
+.at-archive-ja { font-size: 11px; color: #6B7280; }
+.at-archive-axis {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  background: #FFF6E5; color: #B8680B;
+  padding: 2px 8px; border-radius: 8px; margin-top: 6px;
+}
+
+/* なぞなぞカード */
+.at-riddle-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.at-riddle-card {
+  background: #fff; border: 1px solid #E5E7EB;
+  border-radius: 14px; padding: 16px;
+  transition: border-color 0.15s;
+}
+.at-riddle-card:hover { border-color: #F0C96D; }
+.at-riddle-q { font-size: 15px; font-weight: 600; color: #111827; line-height: 1.45; margin-bottom: 5px; }
+.at-riddle-ja { font-size: 12px; color: #6B7280; line-height: 1.65; margin-bottom: 12px; }
+.at-riddle-row { display: flex; align-items: center; gap: 10px; }
+.at-riddle-play {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: #E8A33D; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #fff; transition: background 0.15s;
+}
+.at-riddle-play.playing { background: #BBDAC8; color: #2D6A4F; }
+.at-riddle-show-btn {
+  font-size: 11px; color: #9CA3AF; background: none; border: none;
+  cursor: pointer; padding: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.at-riddle-answer {
+  display: none; margin-top: 12px; padding: 10px 13px;
+  background: #EDF6F1; border-radius: 10px;
+  font-size: 13px; font-weight: 600; color: #2D6A4F;
+}
+.at-riddle-answer.show { display: block; }
+
 /* サブスクバナー */
 .sub-banner { margin: 20px 20px 0; background: linear-gradient(135deg, #4D7D63, #6DB88A); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sub-text-title { font-size: 13px; font-weight: 500; color: white; margin-bottom: 3px; }
@@ -1072,6 +1195,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('home',this)">今週</div>
     <div class="tab" onclick="switchTab('playlist',this)">音楽</div>
+    <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
   </div>
 
@@ -1119,9 +1243,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     <!-- ② Weekly Mission パネル -->
     <div class="weekly-mission-panel">
-      <div class="weekly-mission-eyebrow">
-        <div class="weekly-mission-label">Weekly Mission <span class="weekly-mission-label-ja">今週のプログラム</span></div>
-        <div class="weekly-mission-line"></div>
+
+      <!-- Hero イラスト -->
+      <div class="mission-hero">
+        <img class="mission-hero-img" src="weekly_mission_hero.png" alt="Weekly Mission イラスト">
+        <div class="mission-hero-title">
+          <div class="mission-hero-label">Weekly Mission <span class="mission-hero-label-ja">今週のプログラム</span></div>
+          <div class="mission-hero-line"></div>
+        </div>
       </div>
 
       <!-- 今週のスケジュール -->
@@ -1379,6 +1508,42 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       </div>
     </div>
     <div style="height:20px;"></div>
+  </div>
+
+  <!-- あそぼタブ -->
+  <div id="tab-asobo" style="display:none;">
+
+    <div class="asobo-hero">
+      <div class="asobo-hero-title">あそぼ 🎯</div>
+      <div class="asobo-hero-sub">Joelの声に合わせて探したり答えたり。<br>気分でえらんで、何度でも遊べるよ。</div>
+    </div>
+
+    <!-- サブタブ：探し物 / なぞなぞ -->
+    <div class="asobo-subtabs">
+      <div class="asobo-subtab active" onclick="switchAsoboSubTab('find', this)">🔍 探し物ミッション</div>
+      <div class="asobo-subtab" onclick="switchAsoboSubTab('riddle', this)">🐮 なぞなぞクイズ</div>
+    </div>
+
+    <!-- 探し物ミッションセクション -->
+    <div id="asoboFindSection">
+      <div class="asobo-axis-filter">
+        <div class="asobo-axis-pill active" onclick="filterAsoboAxis(this,'all')">すべて</div>
+        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'カラー')">🎨 カラー</div>
+        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'カウント')">🔢 カウント</div>
+        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'サウンド')">🔔 サウンド</div>
+        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'ロケーション')">📍 ロケーション</div>
+        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'テクスチャー')">✋ テクスチャー</div>
+        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'カテゴリー')">📦 カテゴリー</div>
+      </div>
+      <div class="at-archive-list" id="asoboMissionList"></div>
+    </div>
+
+    <!-- なぞなぞセクション -->
+    <div id="asoboRiddleSection" style="display:none;">
+      <div class="at-riddle-list" id="asoboRiddleList"></div>
+    </div>
+
+    <div style="height:24px;"></div>
   </div>
 
   <!-- ルーティンタブ -->
@@ -1835,12 +2000,107 @@ function showToast(msg) {
 // タブ
 // ========================
 function switchTab(name, el) {
-  ['home', 'playlist', 'routine'].forEach(t => {
+  ['home', 'playlist', 'asobo', 'routine'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   if (name === 'playlist') renderFavList();
+  if (name === 'asobo') renderAsoboContent();
+}
+
+// ========================
+// あそぼタブ
+// ========================
+let asoboSubTab = 'find';
+let asoboAxisFilter = 'all';
+
+function switchAsoboSubTab(tab, el) {
+  asoboSubTab = tab;
+  asoboAxisFilter = 'all';
+  document.querySelectorAll('.asobo-subtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderAsoboContent();
+}
+
+function filterAsoboAxis(el, axis) {
+  asoboAxisFilter = axis;
+  document.querySelectorAll('.asobo-axis-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderAsoboMissions();
+}
+
+function renderAsoboContent() {
+  const findSection = document.getElementById('asoboFindSection');
+  const riddleSection = document.getElementById('asoboRiddleSection');
+  if (!findSection || !riddleSection) return;
+  findSection.style.display = asoboSubTab === 'find' ? 'block' : 'none';
+  riddleSection.style.display = asoboSubTab === 'riddle' ? 'block' : 'none';
+  if (asoboSubTab === 'find') renderAsoboMissions();
+  else renderAsoboRiddles();
+}
+
+function renderAsoboMissions() {
+  const list = document.getElementById('asoboMissionList');
+  if (!list) return;
+  const data = asoboAxisFilter === 'all'
+    ? AT_FIND
+    : AT_FIND.filter(d => d.axis === asoboAxisFilter);
+  list.innerHTML = data.map(m => `
+    <div class="at-archive-card">
+      <button class="at-archive-play" onclick="playAtArchiveItem(this)">▶</button>
+      <div class="at-archive-body">
+        <div class="at-archive-en">${m.en}</div>
+        <div class="at-archive-ja">${m.ja}</div>
+        <span class="at-archive-axis">${m.axis}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAsoboRiddles() {
+  const list = document.getElementById('asoboRiddleList');
+  if (!list) return;
+  list.innerHTML = AT_RIDDLE.map(r => `
+    <div class="at-riddle-card">
+      <div class="at-riddle-q">${r.en}</div>
+      <div class="at-riddle-ja">${r.ja}</div>
+      <div class="at-riddle-row">
+        <button class="at-riddle-play" onclick="playAtRiddle(this)">▶</button>
+        <button class="at-riddle-show-btn" onclick="showRiddleAnswer(this)">こたえを見る</button>
+      </div>
+      <div class="at-riddle-answer">🎉 ${r.answer}</div>
+    </div>
+  `).join('');
+}
+
+function playAtArchiveItem(btn) {
+  const wasPlaying = btn.classList.contains('playing');
+  document.querySelectorAll('.at-archive-play.playing, .at-riddle-play.playing').forEach(b => {
+    b.classList.remove('playing'); b.textContent = '▶';
+  });
+  if (!wasPlaying) {
+    btn.classList.add('playing'); btn.textContent = '⏸';
+    setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶'; }, 4000);
+  }
+}
+
+function playAtRiddle(btn) {
+  const wasPlaying = btn.classList.contains('playing');
+  document.querySelectorAll('.at-archive-play.playing, .at-riddle-play.playing').forEach(b => {
+    b.classList.remove('playing'); b.textContent = '▶';
+  });
+  if (!wasPlaying) {
+    btn.classList.add('playing'); btn.textContent = '⏸';
+    setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶'; }, 3500);
+  }
+}
+
+function showRiddleAnswer(btn) {
+  const card = btn.closest('.at-riddle-card');
+  const answer = card.querySelector('.at-riddle-answer');
+  const showing = answer.classList.toggle('show');
+  btn.textContent = showing ? 'こたえを隠す' : 'こたえを見る';
 }
 
 // ========================
@@ -2160,18 +2420,39 @@ renderFtWave();
 // Active Time（探し物ミッション／なぞなぞクイズ）
 // ========================
 const AT_FIND = [
+  // カラー
   { axis: 'カラー', en: 'Find something red!', ja: '赤いものを探してみよう' },
+  { axis: 'カラー', en: 'Find something blue!', ja: '青いものを探してみよう' },
+  { axis: 'カラー', en: 'Find something yellow!', ja: '黄色いものを探してみよう' },
+  { axis: 'カラー', en: 'Find something green!', ja: '緑のものを探してみよう' },
+  // カウント
   { axis: 'カウント', en: 'Find three round things!', ja: '丸いものを3つ探してみよう' },
+  { axis: 'カウント', en: 'Find two soft things!', ja: 'やわらかいものを2つ探してみよう' },
+  { axis: 'カウント', en: 'Find one big thing!', ja: '大きいものを1つ探してみよう' },
+  // サウンド
   { axis: 'サウンド', en: 'Find something that makes a sound!', ja: '音が出るものを探してみよう' },
+  { axis: 'サウンド', en: 'Find something loud!', ja: '大きな音が出るものを探してみよう' },
+  { axis: 'サウンド', en: 'Find something quiet!', ja: '小さな音が出るものを探してみよう' },
+  // ロケーション
   { axis: 'ロケーション', en: 'Find something under the table!', ja: 'テーブルの下にあるものを探してみよう' },
+  { axis: 'ロケーション', en: 'Find something near the window!', ja: '窓のそばにあるものを探してみよう' },
+  { axis: 'ロケーション', en: 'Find something on the floor!', ja: '床の上にあるものを探してみよう' },
+  // テクスチャー
   { axis: 'テクスチャー', en: 'Find something soft!', ja: 'やわらかいものを探してみよう' },
+  { axis: 'テクスチャー', en: 'Find something hard!', ja: 'かたいものを探してみよう' },
+  { axis: 'テクスチャー', en: 'Find something smooth!', ja: 'つるつるしているものを探してみよう' },
+  // カテゴリー
   { axis: 'カテゴリー', en: 'Find something you can eat!', ja: '食べられるものを探してみよう' },
+  { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう' },
+  { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう' },
 ];
 const AT_RIDDLE = [
-  { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？（こたえ：cow）' },
-  { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？（こたえ：dog）' },
-  { axis: 'なぞなぞ', en: 'I am yellow and I can fly. What am I?', ja: '黄色くて飛べるよ。私は誰？（こたえ：bird）' },
-  { axis: 'なぞなぞ', en: 'I say meow. What am I?', ja: 'ニャーって鳴くよ。私は誰？（こたえ：cat）' },
+  { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？', answer: 'cow 🐄' },
+  { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？', answer: 'dog 🐶' },
+  { axis: 'なぞなぞ', en: 'I am yellow and I can fly. What am I?', ja: '黄色くて飛べるよ。私は誰？', answer: 'bird 🐦' },
+  { axis: 'なぞなぞ', en: 'I say meow. What am I?', ja: 'ニャーって鳴くよ。私は誰？', answer: 'cat 🐱' },
+  { axis: 'なぞなぞ', en: 'I am big and gray. I have a long nose. What am I?', ja: '大きくて灰色。長いお鼻があるよ。私は誰？', answer: 'elephant 🐘' },
+  { axis: 'なぞなぞ', en: 'I am orange with black stripes. What am I?', ja: 'オレンジ色に黒いしましまがあるよ。私は誰？', answer: 'tiger 🐯' },
 ];
 let atMode = 'find';
 let atIndex = 0;
