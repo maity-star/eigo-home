@@ -226,8 +226,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .at-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
 .at-eyebrow-sub { font-size: 11px; color: #9CA3AF; margin: -6px 0 12px; }
 .at-card {
-  background: linear-gradient(165deg, #3D3A2E 0%, #2C2A22 100%); border-radius: 18px; overflow: hidden;
-  position: relative; box-shadow: 0 8px 24px rgba(60,50,30,0.2);
+  background: linear-gradient(165deg, #1A4232 0%, #0F2B1F 100%); border-radius: 18px; overflow: hidden;
+  position: relative; box-shadow: 0 8px 24px rgba(15,43,31,0.28);
 }
 .at-card-top { padding: 18px 18px 0; position: relative; z-index: 1; }
 .at-mode-row { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -1349,9 +1349,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     <!-- ② Weekly Mission パネル -->
     <div class="weekly-mission-panel">
-      <div class="weekly-mission-eyebrow">
-        <div class="weekly-mission-label">Weekly Mission <span class="weekly-mission-label-ja">今週のプログラム</span></div>
-        <div class="weekly-mission-line"></div>
+
+      <!-- 背景イラスト＋タイトルオーバーレイ -->
+      <div style="position: relative; margin: -18px -16px 16px; overflow: hidden; border-radius: 20px 20px 12px 12px; line-height: 0;">
+        <img src="weekly_mission_hero.png" alt="" style="width: 100%; display: block; object-fit: cover; max-height: 160px; object-position: center;">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(45,106,79,0.55) 0%, rgba(45,106,79,0.1) 40%, rgba(45,106,79,0.0) 100%);"></div>
+        <div style="position: absolute; top: 14px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px;">
+          <div class="weekly-mission-label" style="color:#fff; text-shadow: 0 1px 4px rgba(0,0,0,0.3);">Weekly Mission <span class="weekly-mission-label-ja" style="color:rgba(255,255,255,0.75);">今週のプログラム</span></div>
+          <div class="weekly-mission-line" style="background: rgba(255,255,255,0.35);"></div>
+        </div>
       </div>
 
       <!-- 今週のスケジュール -->
@@ -1513,6 +1519,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     </div><!-- /weekly-mission-panel -->
 
+    <!-- 背景イラスト -->
+    <div style="margin: 16px 20px 0; border-radius: 18px; overflow: hidden; line-height: 0;">
     <!-- ③ Weekly Playlist（独立セクション・3曲） -->
     <div class="weekly-playlist-section">
       <div class="weekly-playlist-eyebrow">
