@@ -2217,21 +2217,6 @@ function toggleWhy() {
 }
 
 // ========================
-// 絵本モーダル
-// ========================
-function openBookModal(mode) {
-  document.getElementById('bookModal').classList.add('open');
-  switchBookMode(mode || 'listen', true);
-  renderBookPage();
-}
-function closeBookModal() {
-  document.getElementById('bookModal').classList.remove('open');
-  // 音読が再生中なら止める
-  if (bookPlaying) toggleBook();
-  clearStudyTimers();
-}
-
-// ========================
 // 放送アーカイブモーダル
 // ========================
 function openArchiveModal() {
