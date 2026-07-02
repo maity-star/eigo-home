@@ -27,12 +27,12 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .interest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 24px; }
 .interest-card {
   background: #F9FAFB; border: 1.5px solid #E5E7EB;
-  border-radius: 16px; padding: 18px 10px;
+  border-radius: 16px; padding: 22px 10px 18px;
   text-align: center; cursor: pointer; transition: all 0.15s;
 }
 .interest-card:active { transform: scale(0.97); }
 .interest-card.selected { background: #EDF6F1; border-color: #6DB88A; }
-.ic-emoji { font-size: 28px; display: block; margin-bottom: 7px; }
+.ic-emoji { font-size: 28px; display: block; margin-bottom: 10px; }
 .ic-label { font-size: 13px; font-weight: 600; color: #374151; }
 .interest-card.selected .ic-label { color: #2D6A4F; }
 .ic-sub { font-size: 10px; color: #9CA3AF; margin-top: 2px; }
@@ -80,23 +80,70 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .content-block + .content-block { margin-top: 12px; }
 
 /* ==============================
-   コアゾーン（今月の教材絵本 + Morning Talk を束ねる）
+   今月の教材絵本（スタンドアロン・最上位ヒーロー）
 ============================== */
-.core-zone {
-  margin: 20px 20px 0;
-  background: linear-gradient(165deg, #EDF6F1 0%, #DCEFE4 100%);
-  border-radius: 24px;
-  padding: 22px 16px 20px;
-  box-shadow: 0 10px 26px rgba(109,184,138,0.16);
+.month-hero-section { margin: 20px 20px 0; }
+.month-hero-section .month-lesson-wrap { margin: 0; }
+.month-eyebrow-en {
+  display: block;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: #9CA3AF; margin-bottom: 3px;
 }
-.core-zone .month-lesson-wrap { margin: 0; }
-.core-zone .ft-wrap { margin: 18px 0 0; }
-.core-zone .ft-eyebrow-label,
-.core-zone .month-eyebrow-label { color: #2D6A4F; }
-.core-zone .month-eyebrow-line,
-.core-zone .ft-eyebrow-line { background: rgba(45,106,79,0.18); }
-.core-zone .ft-card { box-shadow: 0 8px 20px rgba(42,38,64,0.18); }
-.core-zone p { color: #4D7D63 !important; }
+
+/* ==============================
+   Weekly Mission パネル
+============================== */
+.weekly-mission-panel {
+  margin: 16px 20px 0;
+  background: #F5FAF7;
+  border: 1px solid #BBDAC8;
+  border-radius: 20px;
+  padding: 18px 16px 20px;
+}
+.weekly-mission-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+}
+.weekly-mission-label {
+  font-size: 19px; font-weight: 600;
+  color: #2D6A4F; white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+.weekly-mission-label-ja {
+  font-size: 10px; color: #6DB88A;
+  font-weight: 600; margin-left: 1px;
+}
+.weekly-mission-line { flex: 1; height: 1px; background: #BBDAC8; }
+.weekly-mission-panel .week-strip-wrap { margin: 0; }
+.weekly-mission-panel .ft-wrap { margin: 20px 0 0; }
+.weekly-mission-panel .at-wrap { margin: 20px 0 0; }
+.weekly-mission-panel .ft-eyebrow-label { color: #2D6A4F; }
+.weekly-mission-panel .at-eyebrow-label { color: #C2622E; }
+.weekly-mission-panel .ft-eyebrow-line,
+.weekly-mission-panel .at-eyebrow-line { background: rgba(45,106,79,0.18); }
+.weekly-mission-panel .ft-card { box-shadow: 0 6px 18px rgba(42,38,64,0.15); }
+.weekly-mission-panel p { color: #4D7D63 !important; }
+.weekly-mission-panel .week-strip-label { color: #4D7D63; }
+.weekly-mission-panel .week-strip-line { background: rgba(45,106,79,0.18); }
+
+/* Weekly Pick ブロック（Weekly Mission内） */
+.weekly-pick-block { margin-top: 22px; padding-top: 20px; border-top: 1px solid #BBDAC8; }
+
+/* ==============================
+   Weekly Playlist セクション（独立）
+============================== */
+.weekly-playlist-section { margin: 14px 20px 0; }
+.weekly-playlist-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px;
+}
+.weekly-playlist-label {
+  font-size: 14px; font-weight: 700;
+  color: #111827; white-space: nowrap; letter-spacing: -0.2px;
+}
+.weekly-playlist-label-ja { font-size: 10px; color: #9CA3AF; font-weight: 500; }
+.weekly-playlist-line { flex: 1; height: 1px; background: #E5E7EB; }
 
 /* 今月の教材絵本 */
 .month-lesson-wrap { margin: 20px 20px 0; }
@@ -107,12 +154,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-lesson-card-hero { position: relative; height: 220px; overflow: hidden; }
 .month-lesson-card-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; display: block; }
 .month-lesson-card-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(109,184,138,0.0) 0%, rgba(109,184,138,0.0) 50%, rgba(109,184,138,0.7) 85%, rgba(109,184,138,1.0) 100%); }
-.month-lesson-top { padding: 20px 20px 0; position: relative; z-index: 1; }
-.month-theme-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+/* hero上部オーバーレイ：Joelラベル */
+.month-hero-overlay { position: absolute; top: 16px; left: 16px; right: 0; z-index: 2; text-align: left; pointer-events: none; }
+.month-hero-label { display: inline-block; background: rgba(61,120,82,0.25); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 5px 16px; font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: 0.2px; white-space: nowrap; }
+.month-lesson-top { padding: 16px 20px 0; position: relative; z-index: 1; }
+.month-theme-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .month-theme-dot { width: 6px; height: 6px; border-radius: 50%; background: #BBDAC8; }
 .month-theme-label { font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.5px; }
-.month-title { font-size: 22px; font-weight: 600; color: #ffffff; letter-spacing: -0.4px; margin-bottom: 4px; line-height: 1.2; }
-.month-subtitle { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 18px; }
+.month-title { font-size: 17px; font-weight: 600; color: #ffffff; letter-spacing: -0.2px; margin-bottom: 6px; line-height: 1.3; }
+.month-book-feature { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 16px; }
 .month-player-inner { background: rgba(255,255,255,0.07); border-radius: 14px 14px 0 0; margin: 0 12px; padding: 16px; position: relative; z-index: 1; }
 .month-book-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .month-book-cover { width: 48px; height: 48px; background: rgba(159,225,203,0.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; border: 1px solid rgba(159,225,203,0.2); }
@@ -176,8 +226,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .at-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
 .at-eyebrow-sub { font-size: 11px; color: #9CA3AF; margin: -6px 0 12px; }
 .at-card {
-  background: linear-gradient(165deg, #3D3A2E 0%, #2C2A22 100%); border-radius: 18px; overflow: hidden;
-  position: relative; box-shadow: 0 8px 24px rgba(60,50,30,0.2);
+  background: linear-gradient(165deg, #1A4232 0%, #0F2B1F 100%); border-radius: 18px; overflow: hidden;
+  position: relative; box-shadow: 0 8px 24px rgba(15,43,31,0.28);
 }
 .at-card-top { padding: 18px 18px 0; position: relative; z-index: 1; }
 .at-mode-row { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -227,14 +277,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
 .ft-eyebrow-sub { font-size: 11px; color: #9CA3AF; margin: -6px 0 12px; }
 .ft-card {
-  background: #2A2640; border-radius: 18px; overflow: hidden;
-  position: relative; box-shadow: 0 8px 24px rgba(42,38,64,0.18);
+  background: linear-gradient(165deg, #1A4232 0%, #0F2B1F 100%); border-radius: 18px; overflow: hidden;
+  position: relative; box-shadow: 0 8px 24px rgba(15,43,31,0.28);
 }
 .ft-card-top { padding: 18px 18px 0; position: relative; z-index: 1; }
 .ft-show-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .ft-show-icon {
   width: 38px; height: 38px; border-radius: 10px;
-  background: linear-gradient(135deg, #E8A33D, #D4793E);
+  background: linear-gradient(135deg, #6DB88A, #4D9E6D);
   display: flex; align-items: center; justify-content: center;
   font-size: 17px; flex-shrink: 0;
 }
@@ -242,7 +292,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-show-meta { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
 .ft-theme-tag {
   margin-left: auto; font-size: 9px; font-weight: 600;
-  background: rgba(232,163,61,0.18); color: #E8A33D;
+  background: rgba(109,184,138,0.2); color: #9FE1CB;
   padding: 3px 9px; border-radius: 10px; white-space: nowrap;
 }
 .ft-question { font-size: 16px; font-weight: 600; color: #fff; line-height: 1.45; margin-bottom: 4px; }
@@ -256,7 +306,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   transition: background 0.25s;
   transform-origin: center;
 }
-.ft-wave-bar.played { background: #E8A33D; }
+.ft-wave-bar.played { background: #6DB88A; }
 .ft-wave.is-playing .ft-wave-bar { animation: ftWaveBounce 0.9s ease-in-out infinite; }
 @keyframes ftWaveBounce {
   0%, 100% { transform: scaleY(0.75); }
@@ -270,16 +320,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-play-row { display: flex; align-items: center; gap: 12px; }
 .ft-play-btn {
   width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
-  background: #E8A33D; border: none; cursor: pointer;
+  background: #6DB88A; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; color: #2A2640; transition: background 0.15s;
+  font-size: 16px; color: #0F2B1F; transition: background 0.15s;
 }
-.ft-play-btn:hover { background: #f0ad4d; }
+.ft-play-btn:hover { background: #5aa577; }
 .ft-play-meta { flex: 1; min-width: 0; }
 .ft-play-title { font-size: 12px; font-weight: 600; color: #fff; }
 .ft-play-len { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
 .ft-prog-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; cursor: pointer; }
-.ft-prog-fill { height: 100%; background: #E8A33D; width: 0%; border-radius: 2px; transition: width 0.4s linear; }
+.ft-prog-fill { height: 100%; background: #6DB88A; width: 0%; border-radius: 2px; transition: width 0.4s linear; }
 .ft-prog-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .ft-prog-time { font-size: 10px; color: rgba(255,255,255,0.4); min-width: 32px; text-align: right; }
 
@@ -317,7 +367,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-archive-link {
   display: flex; align-items: center; justify-content: center; gap: 5px;
   margin-top: 12px; padding: 10px 0;
-  font-size: 12px; font-weight: 600; color: #B8860B;
+  font-size: 12px; font-weight: 600; color: #4D7D63;
   cursor: pointer; background: none; border: none; width: 100%;
 }
 
@@ -389,6 +439,117 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-lock-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 3px; }
 .ft-lock-sub { font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 14px; max-width: 260px; }
 .ft-lock-btn { background: #E8A33D; color: #2A2640; border: none; border-radius: 10px; font-size: 12px; font-weight: 700; padding: 9px 20px; cursor: pointer; }
+
+/* ==============================
+   絵本ビューワーモーダル
+============================== */
+.book-viewer-modal {
+  position: fixed; inset: 0; z-index: 300;
+  background: #0a0a0a;
+  display: none; flex-direction: column;
+  max-width: 390px; margin: 0 auto;
+}
+.book-viewer-modal.open { display: flex; }
+
+/* ヘッダー */
+.bv-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px; flex-shrink: 0;
+  background: rgba(0,0,0,0.6);
+}
+.bv-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+.bv-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); border: none; color: rgba(255,255,255,0.7);
+  font-size: 18px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+
+/* ページ表示エリア */
+.bv-page-area {
+  flex: 1; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.bv-page-img {
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+  user-select: none; -webkit-user-drag: none;
+}
+/* 左右ナビ矢印 */
+.bv-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); border: none;
+  color: #fff; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px); transition: background 0.15s;
+}
+.bv-nav:hover { background: rgba(255,255,255,0.25); }
+.bv-nav.prev { left: 10px; }
+.bv-nav.next { right: 10px; }
+.bv-nav:disabled { opacity: 0.2; cursor: default; }
+
+/* ページインジケーター */
+.bv-indicator {
+  display: flex; gap: 5px; justify-content: center;
+  padding: 8px 0 4px; flex-shrink: 0;
+}
+.bv-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.25); transition: all 0.2s;
+}
+.bv-dot.active { background: #6DB88A; width: 16px; border-radius: 3px; }
+
+/* モードバー（Let's read / Let's talk） */
+.bv-mode-bar {
+  padding: 10px 16px 16px; flex-shrink: 0;
+  background: rgba(0,0,0,0.6);
+}
+.bv-mode-row {
+  display: flex; gap: 10px; margin-bottom: 10px;
+}
+.bv-mode-btn {
+  flex: 1; height: 46px; border-radius: 12px; border: none;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all 0.15s;
+}
+.bv-mode-btn.read {
+  background: #ffffff; color: #2D6A4F;
+}
+.bv-mode-btn.talk {
+  background: #6DB88A; color: #fff;
+}
+.bv-mode-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+/* Let's talk フレーズ表示 */
+.bv-talk-bar {
+  display: none; background: rgba(109,184,138,0.15);
+  border: 1px solid rgba(109,184,138,0.3); border-radius: 12px;
+  padding: 12px 14px; margin-top: 6px;
+}
+.bv-talk-bar.active { display: block; }
+.bv-talk-phrase { font-size: 18px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 4px; }
+.bv-talk-status { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; }
+.bv-talk-progress {
+  display: flex; gap: 4px; justify-content: center; margin-top: 8px;
+}
+.bv-talk-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+.bv-talk-dot.done { background: #6DB88A; }
+.bv-talk-dot.current { background: #fff; }
+
+/* 今日言えたよボタン */
+.bv-ieta-btn {
+  display: none; width: 100%; height: 48px; margin-top: 10px;
+  background: #E8A33D; border: none; border-radius: 12px;
+  color: #2C2A22; font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.bv-ieta-btn.show { display: block; }
+.bv-ieta-btn:active { opacity: 0.8; }
 
 /* 今週の一冊 */
 .weekly-book-card { background: #F9FAFB; border-radius: 14px; border: 0.5px solid #E5E7EB; overflow: hidden; }
@@ -489,8 +650,86 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .mp-yt:hover { opacity: 0.85; }
 
 /* ==============================
-   プレイリスト（今週 & 音楽タブ共通）
+   Weekly Playlist カルーセル
 ============================== */
+.carousel-outer {
+  position: relative;
+  overflow: hidden;
+  margin: 0 -20px;        /* 左右マージン分広げてサイドをチラ見せ */
+  padding: 6px 0 4px;
+}
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  will-change: transform;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  /* padding-left/right はJS側でセット */
+}
+.carousel-card {
+  flex: 0 0 268px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #E5E7EB;
+  transform: scale(0.84);
+  opacity: 0.52;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.42s;
+  cursor: pointer;
+}
+.carousel-card.active {
+  transform: scale(1);
+  opacity: 1;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.13);
+}
+.carousel-thumb-area {
+  width: 100%;
+  height: 148px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 60px;
+  position: relative;
+}
+.carousel-card-info {
+  padding: 14px 16px 18px;
+}
+.carousel-card-title {
+  font-size: 14px; font-weight: 700; color: #111827;
+  margin-bottom: 7px; line-height: 1.3;
+}
+.carousel-card-age {
+  display: inline-block; font-size: 10px;
+  background: #E6F1FB; color: #0C447C;
+  padding: 2px 9px; border-radius: 10px;
+  margin-bottom: 10px;
+}
+.carousel-card-sub {
+  font-size: 11px; color: #6B7280;
+  line-height: 1.65; margin-bottom: 14px;
+}
+.carousel-card-yt {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #FF0000; color: white;
+  font-size: 11px; font-weight: 600;
+  padding: 7px 14px; border-radius: 10px;
+  text-decoration: none; transition: opacity 0.15s;
+}
+.carousel-card-yt:hover { opacity: 0.85; }
+.carousel-dots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; margin-top: 18px;
+}
+.carousel-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #D1D5DB; cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.carousel-dot.active {
+  background: #6DB88A; width: 20px; border-radius: 3px;
+}
+
+/* ==============================
+   今週 & 音楽タブ共通プレイリスト
 .playlist-list { display: flex; flex-direction: column; gap: 8px; }
 .playlist-item {
   display: flex; align-items: center; gap: 12px;
@@ -567,6 +806,98 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .scene-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #6DB88A; white-space: nowrap; }
 .scene-line { flex: 1; height: 1px; background: #E5E7EB; }
+
+/* ==============================
+   あそぼタブ
+============================== */
+.asobo-hero { padding: 20px 20px 0; }
+.asobo-hero-title {
+  font-size: 22px; font-weight: 700; color: #111827;
+  margin-bottom: 4px; letter-spacing: -0.3px;
+}
+.asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-bottom: 20px; }
+
+/* サブタブ */
+.asobo-subtabs { display: flex; gap: 8px; padding: 0 20px; margin-bottom: 18px; }
+.asobo-subtab {
+  flex: 1; text-align: center; padding: 11px 8px;
+  background: #F3F4F6; border-radius: 12px;
+  font-size: 13px; font-weight: 600; color: #6B7280;
+  cursor: pointer; transition: all 0.18s;
+  border: 1.5px solid transparent;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.asobo-subtab.active { background: #FFF6E5; color: #B8680B; border-color: #F0C96D; }
+
+/* 軸フィルターピル */
+.asobo-axis-filter {
+  display: flex; gap: 7px; padding: 0 20px 16px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.asobo-axis-filter::-webkit-scrollbar { display: none; }
+.asobo-axis-pill {
+  flex-shrink: 0; font-size: 11px; font-weight: 600;
+  padding: 5px 13px; border-radius: 20px;
+  border: 1.5px solid #E5E7EB; background: #F9FAFB; color: #6B7280;
+  cursor: pointer; transition: all 0.15s;
+}
+.asobo-axis-pill.active { background: #E8A33D; color: #fff; border-color: #E8A33D; }
+
+/* 探し物ミッションカード */
+.at-archive-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.at-archive-card {
+  background: #fff; border: 1px solid #E5E7EB;
+  border-radius: 14px; padding: 14px;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.at-archive-card:hover { background: #FFFDF8; border-color: #F0C96D; }
+.at-archive-play {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: #E8A33D; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #fff; transition: background 0.15s;
+}
+.at-archive-play:hover { background: #D4793E; }
+.at-archive-play.playing { background: #BBDAC8; color: #2D6A4F; }
+.at-archive-body { flex: 1; min-width: 0; }
+.at-archive-en { font-size: 14px; font-weight: 600; color: #111827; line-height: 1.4; margin-bottom: 3px; }
+.at-archive-ja { font-size: 11px; color: #6B7280; }
+.at-archive-axis {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  background: #FFF6E5; color: #B8680B;
+  padding: 2px 8px; border-radius: 8px; margin-top: 6px;
+}
+
+/* なぞなぞカード */
+.at-riddle-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.at-riddle-card {
+  background: #fff; border: 1px solid #E5E7EB;
+  border-radius: 14px; padding: 16px;
+  transition: border-color 0.15s;
+}
+.at-riddle-card:hover { border-color: #F0C96D; }
+.at-riddle-q { font-size: 15px; font-weight: 600; color: #111827; line-height: 1.45; margin-bottom: 5px; }
+.at-riddle-ja { font-size: 12px; color: #6B7280; line-height: 1.65; margin-bottom: 12px; }
+.at-riddle-row { display: flex; align-items: center; gap: 10px; }
+.at-riddle-play {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: #E8A33D; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #fff; transition: background 0.15s;
+}
+.at-riddle-play.playing { background: #BBDAC8; color: #2D6A4F; }
+.at-riddle-show-btn {
+  font-size: 11px; color: #9CA3AF; background: none; border: none;
+  cursor: pointer; padding: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.at-riddle-answer {
+  display: none; margin-top: 12px; padding: 10px 13px;
+  background: #EDF6F1; border-radius: 10px;
+  font-size: 13px; font-weight: 600; color: #2D6A4F;
+}
+.at-riddle-answer.show { display: block; }
 
 /* サブスクバナー */
 .sub-banner { margin: 20px 20px 0; background: linear-gradient(135deg, #4D7D63, #6DB88A); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -659,17 +990,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* 「読もう」ボタン（メインカード） */
 .month-read-btn {
-  width: 100%; height: 52px; margin-top: 18px;
-  background: #ffffff; border: none; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center; gap: 9px;
-  cursor: pointer; transition: background 0.15s;
-  font-size: 15px; font-weight: 600; color: #4D7D63;
+  width: 100%; height: 60px; margin-top: 18px;
+  background: #ffffff; border: 2.5px solid rgba(255,255,255,0.6); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; transition: all 0.15s;
+  font-size: 16px; font-weight: 700; color: #4D7D63;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 .month-read-btn:hover { background: #EDF6F1; }
 .month-read-btn:active { transform: scale(0.98); }
 .month-read-btn-row { display: flex; gap: 10px; }
 .month-read-btn-row .month-read-btn { flex: 1; }
-.month-read-btn.study-variant { background: #1D9E75; color: #fff; }
+.month-read-btn.study-variant { background: #1D9E75; color: #fff; border: 2.5px solid rgba(255,255,255,0.35); }
 .month-read-btn.study-variant span { color: #fff; }
 .month-read-btn.study-variant:hover { background: #18875F; }
 
@@ -880,9 +1212,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   white-space: nowrap;
 }
 .toast.show { opacity: 1; }
+.icon-img{width:1em;height:1em;vertical-align:-0.15em;object-fit:contain;display:inline-block}
+.icon-img-lg{width:32px;height:32px;object-fit:contain;display:block}
 </style>
-</head>
-<body>
+</head><body>
 
 <!-- オンボーディング -->
 <div id="onboarding">
@@ -892,32 +1225,32 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <div class="ob-hint">複数選べます · あとから変更できます</div>
   <div class="interest-grid">
     <div class="interest-card" onclick="toggleInterest(this,'🚗','のりもの')">
-      <span class="ic-emoji">🚗</span>
+      <span class="ic-emoji"><img class="icon-img" style="width:28px;height:28px;" src="icons/icon_interest_norimono.png" alt="のりもの"></span>
       <div class="ic-label">のりもの</div>
       <div class="ic-sub">車・電車・飛行機</div>
     </div>
     <div class="interest-card" onclick="toggleInterest(this,'🧸','おにんぎょう')">
-      <span class="ic-emoji">🧸</span>
+      <span class="ic-emoji"><img class="icon-img" style="width:28px;height:28px;" src="icons/icon_interest_oningyou.png" alt="おにんぎょう"></span>
       <div class="ic-label">おにんぎょう</div>
       <div class="ic-sub">人形・ぬいぐるみ</div>
     </div>
     <div class="interest-card" onclick="toggleInterest(this,'🐘','どうぶつ')">
-      <span class="ic-emoji">🐘</span>
+      <span class="ic-emoji"><img class="icon-img" style="width:28px;height:28px;" src="icons/icon_interest_doubutsu.png" alt="どうぶつ"></span>
       <div class="ic-label">どうぶつ</div>
       <div class="ic-sub">いきもの全般</div>
     </div>
     <div class="interest-card" onclick="toggleInterest(this,'🎵','おんがく')">
-      <span class="ic-emoji">🎵</span>
+      <span class="ic-emoji"><img class="icon-img" style="width:28px;height:28px;" src="icons/icon_interest_ongaku.png" alt="おんがく"></span>
       <div class="ic-label">おんがく・ダンス</div>
       <div class="ic-sub">歌・リズム好き</div>
     </div>
     <div class="interest-card" onclick="toggleInterest(this,'🍳','おままごと')">
-      <span class="ic-emoji">🍳</span>
+      <span class="ic-emoji"><img class="icon-img" style="width:28px;height:28px;" src="icons/icon_interest_omamagoto.png" alt="おままごと"></span>
       <div class="ic-label">おままごと</div>
       <div class="ic-sub">料理・食べ物</div>
     </div>
     <div class="interest-card" onclick="toggleInterest(this,'🦸','ヒーロー')">
-      <span class="ic-emoji">🦸</span>
+      <span class="ic-emoji"><img class="icon-img" style="width:28px;height:28px;" src="icons/icon_interest_hero.png" alt="ヒーロー"></span>
       <div class="ic-label">ヒーロー・冒険</div>
       <div class="ic-sub">アクション好き</div>
     </div>
@@ -961,22 +1294,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             <img src="enverly_img.png" alt="Enverly">
           </div>
           <div class="month-lesson-top" style="padding-bottom:20px;">
-            <div class="month-theme-row">
-              <div class="month-theme-dot"></div>
-              <div class="month-theme-label">6月のテーマ · Colors &amp; Animals</div>
-            </div>
-            <div class="month-title">Joel先生と<br>一緒に読もう</div>
-            <div class="month-subtitle">Brown Bear, Brown Bear — Bill Martin Jr.</div>
-            <div class="month-read-btn-row">
-              <button class="month-read-btn" onclick="openBookModal('listen')">
-                <span style="font-size:16px;">🎧</span>
-                <span>きいてみる</span>
-              </button>
-              <button class="month-read-btn study-variant" onclick="openBookModal('study')">
-                <span style="font-size:16px;">🗣</span>
-                <span>いってみる</span>
-              </button>
-            </div>
+            <span class="month-hero-label">Joelと一緒に読もう</span>
           </div>
         </div>
       </div>
@@ -984,7 +1302,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <!-- 週間スケジュールストリップ -->
       <div class="week-strip-wrap">
         <div class="week-strip-eyebrow">
-          <div class="week-strip-label">📅 今週のスケジュール</div>
+          <div class="week-strip-label"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_calendar.png" alt="カレンダー"> 今週のスケジュール</div>
           <div class="week-strip-line"></div>
         </div>
         <div class="week-strip" id="weekStrip"></div>
@@ -994,7 +1312,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <!-- Morning Talk（ポッドキャスト・プレミアム限定）／月・水・金に表示 -->
       <div class="ft-wrap" id="ftWrap">
         <div class="ft-eyebrow">
-          <div class="ft-eyebrow-label">🎙 Morning Talk</div>
+          <div class="ft-eyebrow-label"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> Morning Talk</div>
           <div class="ft-eyebrow-line"></div>
         </div>
         <div class="ft-eyebrow-sub">朝のラジオ</div>
@@ -1002,7 +1320,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <div class="ft-card">
           <div class="ft-card-top">
             <div class="ft-show-row">
-              <div class="ft-show-icon">🎙</div>
+              <div class="ft-show-icon"><img class="icon-img" style="width:32px;height:32px;" src="icons/icon_func_mic.png" alt="マイク"></div>
               <div>
                 <div class="ft-show-name">Joel &amp; Mai Time</div>
                 <div class="ft-show-meta">月・水・金、夫婦のゆるい英語トーク</div>
@@ -1024,12 +1342,32 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
               </div>
             </div>
             <div class="ft-prog-row">
-              <div class="ft-prog-bar" onclick="seekFamilyTalk(event)"><div class="ft-prog-fill" id="ftFill"></div></div>
+              <div class="ft-prog-bar" onclick="seekFamilyTalk(event)">
+
+      <!-- 背景イラスト＋タイトルオーバーレイ -->
+      <div style="position: relative; margin: -18px -16px 16px; overflow: hidden; border-radius: 20px 20px 12px 12px; line-height: 0;">
+        <img src="weekly_mission_hero.png" alt="" style="width: 100%; display: block; object-fit: cover;">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(45,106,79,0.15) 0%, rgba(45,106,79,0.0) 40%, rgba(45,106,79,0.0) 60%, rgba(45,106,79,0.5) 100%);"></div>
+        <div style="position: absolute; bottom: 14px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px;">
+          <div class="weekly-mission-label" style="color:#fff; text-shadow: 0 1px 4px rgba(0,0,0,0.3);">Weekly Mission <span class="weekly-mission-label-ja" style="color:rgba(255,255,255,0.75);">今週のプログラム</span></div>
+          <div class="weekly-mission-line" style="background: rgba(255,255,255,0.35);"></div>
+        </div>
+      </div><div class="ft-prog-fill" id="ftFill"></div><div class="weekly-mission-eyebrow">
+        <div class="weekly-mission-label">Weekly Mission <span class="weekly-mission-label-ja">今週のプログラム</span></div>
+        <div class="weekly-mission-line"></div>
+      </div>
+
+      <!-- 背景イラスト -->
+      <div style="margin: 0 -16px 16px; overflow: hidden; border-radius: 12px; line-height: 0;">
+        <img src="weekly_mission_hero.png" alt="" style="width: 100%; height: 100%; display: block; object-fit: cover;">
+      </div>
+
+      </div>
               <div class="ft-prog-time" id="ftTime">0:00</div>
             </div>
           </div>
           <div class="ft-phrases-toggle" onclick="toggleFtPhrases()">
-            <div class="ft-phrases-label"><span>💬</span><span>今日のフレーズ</span></div>
+            <div class="ft-phrases-label"><span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_bubble.png" alt="フレーズ"></span><span>今日のフレーズ</span></div>
             <div class="ft-phrases-chevron" id="ftPhrasesChevron">▼</div>
           </div>
           <div class="ft-phrases-body" id="ftPhrasesBody">
@@ -1051,7 +1389,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <div class="ft-ep-item" style="opacity:0.55;">
             <div class="ft-ep-day">FRI<span>8</span></div>
             <div class="ft-ep-info"><div class="ft-ep-q">配信は金曜の朝</div><div class="ft-ep-sub">お楽しみに</div></div>
-            <div class="ft-ep-locked">🔒</div>
+            <div class="ft-ep-locked"><img class="icon-img" style="width:14px;height:14px;" src="icons/icon_func_lock.png" alt="ロック"></div>
           </div>
         </div>
         <button class="ft-archive-link" onclick="openArchiveModal()">これまでの放送 →</button>
@@ -1060,7 +1398,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <!-- Active Time（探し物ミッション／なぞなぞクイズ）／火・木・土・日に表示 -->
       <div class="at-wrap" id="atWrap" style="display:none;">
         <div class="at-eyebrow">
-          <div class="at-eyebrow-label">🏃 Active Time</div>
+          <div class="at-eyebrow-label"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブタイム"> Active Time</div>
           <div class="at-eyebrow-line"></div>
         </div>
         <div class="at-eyebrow-sub">体を動かして英語タイム</div>
@@ -1068,7 +1406,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <div class="at-card">
           <div class="at-card-top">
             <div class="at-mode-row">
-              <div class="at-mode-pill active" id="atModeFind" onclick="switchAtMode('find')">🔎 探し物ミッション</div>
+              <div class="at-mode-pill active" id="atModeFind" onclick="switchAtMode('find')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_search.png" alt="探し物"> 探し物ミッション</div>
               <div class="at-mode-pill" id="atModeRiddle" onclick="switchAtMode('riddle')">🐮 なぞなぞクイズ</div>
             </div>
             <div class="at-axis-tag" id="atAxisTag">カラー</div>
@@ -1086,7 +1424,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           </div>
           <button class="at-next-btn" onclick="nextAtQuestion()">次のお題へ →</button>
           <button class="at-done-btn" id="atDoneBtn" onclick="completeActiveTime()">
-            <span>🙌</span><span>できたよ！</span>
+            <span><img class="icon-img" style="width:24px;height:24px;" src="icons/icon_func_medal.png" alt="できたよ"></span><span>できたよ！</span>
           </button>
         </div>
       </div>
@@ -1095,7 +1433,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <!-- 今週やること（一冊＋曲） -->
     <div class="weekly-todo-panel">
       <div class="weekly-todo-eyebrow">
-        <span>📌 今週やること</span>
+        <span><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_pin.png" alt="ピン"> 今週やること</span>
         <div class="weekly-todo-eyebrow-line"></div>
       </div>
 
@@ -1119,24 +1457,24 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             </div>
             <div class="weekly-book-links">
               <a class="wbl-item featured" href="https://www.gutenberg.org/files/14838/14838-h/14838-h.htm" target="_blank">
-                <div class="wbl-icon green">🌐</div>
+                <div class="wbl-icon green"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_globe.png" alt="ブラウザで読む"></div>
                 <div class="wbl-text"><div class="wbl-title">ブラウザで絵と一緒に読む</div><div class="wbl-sub">Project Gutenberg · イラスト付き</div></div>
                 <div class="wbl-tag">おすすめ・無料</div>
                 <div class="wbl-arr">↗</div>
               </a>
               <a class="wbl-item" href="https://freekidsbooks.org/peter-rabbit/" target="_blank">
-                <div class="wbl-icon blue">📄</div>
+                <div class="wbl-icon blue"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_document.png" alt="PDF"></div>
                 <div class="wbl-text"><div class="wbl-title">PDFで見る</div><div class="wbl-sub">Free Kids Books · 絵本レイアウト版</div></div>
                 <div class="wbl-arr">↗</div>
               </a>
               <a class="wbl-item" href="https://www.amazon.co.jp/dp/0140542957" target="_blank">
-                <div class="wbl-icon gray">📦</div>
+                <div class="wbl-icon gray"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_box.png" alt="Amazon"></div>
                 <div class="wbl-text"><div class="wbl-title">手元に置く（Amazon）</div><div class="wbl-sub">英語原書ペーパーバック · ¥800〜</div></div>
                 <div class="wbl-arr">↗</div>
               </a>
             </div>
             <div class="weekly-why-toggle" onclick="toggleWhy()">
-              <div class="weekly-why-label"><span>🔍</span><span>なぜこの本が選ばれたの？</span></div>
+              <div class="weekly-why-label"><span><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_search.png" alt="なぜ"></span><span>なぜこの本が選ばれたの？</span></div>
               <div class="weekly-why-chevron" id="whyChevron">▼</div>
             </div>
             <div class="weekly-why-body" id="whyBody">
@@ -1175,7 +1513,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <div class="yt-header">
         <div>
           <div class="yt-label">YouTube かけ流し おすすめ</div>
-          <div class="yt-note">編集部が厳選 ✅</div>
+          <div class="yt-note">編集部が厳選 <img class="icon-img" style="width:14px;height:14px;" src="icons/icon_func_check.png" alt="チェック"></div>
         </div>
         <span class="interest-badge" id="interestBadge" onclick="showOnboarding()" style="display:none;"></span>
       </div>
@@ -1187,14 +1525,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <div class="ifilter-pill" onclick="filterYT(this,'おんがく')">🎵 おんがく</div>
         <div class="ifilter-pill" onclick="filterYT(this,'おままごと')">🍳 おままごと</div>
       </div>
-      <div style="height:12px;"></div>
-      <div id="ytCards"></div>
+      <div id="weeklyPlaylist"></div>
     </div>
 
     <!-- お気に入り -->
     <div class="favorites-section">
       <div class="section-header" style="margin-bottom:12px;">
-        <div class="fav-title-en">❤️ Favorites</div>
+        <div class="fav-title-en"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_heart.png" alt="お気に入り"> Favorites</div>
         <div style="font-size:11px;color:#6B7280;margin-top:2px;">お気に入り</div>
       </div>
       <div id="favList">
@@ -1226,7 +1563,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </a>
       </div>
       <div class="playlist-item">
-        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
+        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span><div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div></div></div>
         <div class="pl-info"><div class="pl-title">Car Trip English</div><div class="pl-sub">お出かけ・車の中で</div></div>
         <div class="pl-age">1〜5歳</div>
         <a class="pl-yt" href="https://www.youtube.com/results?search_query=english+songs+for+kids+car" target="_blank">
@@ -1250,7 +1587,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="section" style="padding-top:20px;">
       <div class="section-label">困った時のフレーズ集</div>
       <div class="routine-cat-grid" id="routineCatGrid"></div>
-      <div class="hint-box">💡 全部覚えなくて大丈夫。気になるシーンだけ、その時に開いて使ってください。</div>
+      <div class="hint-box"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"> 全部覚えなくて大丈夫。気になるシーンだけ、その時に開いて使ってください。</div>
     </div>
   </div>
 
@@ -1267,35 +1604,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   </div>
 
   <div class="book-mode-tabs">
-    <button class="book-mode-tab active" id="modeTabListen" onclick="switchBookMode('listen')">🎧 きいてみる</button>
-    <button class="book-mode-tab" id="modeTabStudy" onclick="switchBookMode('study')">🗣 いってみる</button>
+    <button class="book-mode-tab active" id="modeTabListen" onclick="switchBookMode('listen')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_headphone.png" alt="きいてみる"> きいてみる</button>
+    <button class="book-mode-tab" id="modeTabStudy" onclick="switchBookMode('study')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_speak.png" alt="いってみる"> いってみる</button>
   </div>
 
   <div class="book-viewer">
     <div class="book-stage-wrap" id="bookStageWrap" style="position:relative; flex:1; min-height:0; display:flex; flex-direction:column;">
       <div class="book-stage" id="bookStage"></div>
-      <div class="study-joel-banner" id="studyJoelBanner">🎙 Joel先生が読んでいるよ</div>
+      <div class="study-joel-banner" id="studyJoelBanner"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_mic.png" alt="マイク"></div>
       <div class="study-overlay" id="studyOverlay">
-        <div class="study-joel-label">LET'S STUDY</div>
-        <div class="study-mascot" id="studyMascot">🐻</div>
-        <div class="study-yourturn">Your turn!</div>
-        <div class="study-phrase-echo" id="studyPhraseEcho"></div>
-        <div class="study-progress-dots"><span></span><span></span><span></span></div>
-        <div class="study-next-hint">まねして言ってみよう</div>
-      </div>
+        </div>
       <div class="study-complete" id="studyComplete">
-        <div id="studyCompleteAsk">
-          <div class="study-complete-emoji">📖</div>
-          <div class="study-complete-title">5フレーズ、ぜんぶ終わったよ！</div>
-          <div class="study-complete-sub">今日は「言えたよ」って思える瞬間あった？<br>あったら下のボタンをタップしてね。</div>
-          <button class="study-said-btn" onclick="markSaidIt()">🌟 言えたよ！</button>
-        </div>
-        <div class="study-stamp-result" id="studyStampResult">
-          <div class="study-stamp-icon">⭐</div>
-          <div class="study-complete-title">スタンプ獲得！</div>
-          <div class="study-joel-voice-line" id="studyJoelVoiceLine">🎙 "Wow, great job! You said it!"</div>
-        </div>
-      </div>
+         Talking</div>
     </div>
     <div class="book-page-nav">
       <button class="book-page-nav-btn" id="bookPrevBtn" onclick="bookPrevPage()">‹</button>
@@ -1307,7 +1627,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
   <div class="book-modal-player" id="bookModalPlayer">
     <div class="book-modal-player-row">
-      <div class="book-modal-native-badge">🎙 ネイティブ音読 · Joel先生</div>
+      <div class="book-modal-native-badge"><img class="icon-img" style="width:14px;height:14px;" src="icons/icon_func_mic.png" alt="マイク"> ネイティブ音読 · Joel先生</div>
     </div>
     <button class="month-play-btn" id="bookPlayBtn" onclick="toggleBook()">
       <span style="font-size:18px;color:#4D7D63;" id="bookIconEmoji">▶</span>
@@ -1320,7 +1640,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <div class="month-prog-time" id="bookTime">0:00</div>
     </div>
     <div class="book-modal-tips-toggle" onclick="toggleTips()">
-      <div class="month-tips-toggle-label"><span>💡</span><span>親が読む場合のポイント</span></div>
+      <div class="month-tips-toggle-label"><span><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"></span><span>親が読む場合のポイント</span></div>
       <div class="month-tips-chevron" id="tipsChevron">▼</div>
     </div>
     <div class="month-tips-body" id="tipsBody">
@@ -1478,11 +1798,11 @@ let bookMode = 'listen'; // 'listen' | 'study'
 let studyStep = null; // null | 'joel1' | 'pause' | 'joel2' | 'done'
 let studyTimers = [];
 const STUDY_REACTIONS = [
-  '🎙 "Wow, great job! You said it!"',
-  '🎙 "Perfect! That sounded amazing!"',
-  '🎙 "Yes! You did it, well done!"',
-  '🎙 "Awesome! I heard you loud and clear!"',
-  '🎙 "Nice try, you\'re getting so good!"'
+  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Wow, great job! You said it!"',
+  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Perfect! That sounded amazing!"',
+  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Yes! You did it, well done!"',
+  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Awesome! I heard you loud and clear!"',
+  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Nice try, you\'re getting so good!"'
 ];
 let musicProg = 0, musicTimer = null;
 let activeMode = null;
@@ -1811,7 +2131,7 @@ function startStudySequence() {
   document.getElementById('bookNextBtn').textContent = '›';
 
   const banner = document.getElementById('studyJoelBanner');
-  banner.textContent = '🎙 Joel先生が読んでいるよ';
+  banner.innerHTML = '<img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_mic.png" alt="マイク"> Joel先生が読んでいるよ';
   banner.classList.add('show');
 
   studyTimers.push(setTimeout(() => {
@@ -1826,7 +2146,7 @@ function startStudySequence() {
       // ③ Joelがもう一度読む（確認）
       document.getElementById('studyOverlay').classList.remove('show');
       studyStep = 'joel2';
-      banner.textContent = '🎙 もう一度きいてみよう';
+      banner.innerHTML = '<img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_mic.png" alt="マイク"> もう一度きいてみよう';
       banner.classList.add('show');
 
       studyTimers.push(setTimeout(() => {
@@ -1852,7 +2172,7 @@ function showStudyComplete() {
 function markSaidIt() {
   document.getElementById('studyCompleteAsk').style.display = 'none';
   const line = STUDY_REACTIONS[Math.floor(Math.random() * STUDY_REACTIONS.length)];
-  document.getElementById('studyJoelVoiceLine').textContent = line;
+  document.getElementById('studyJoelVoiceLine').innerHTML = line;
   document.getElementById('studyStampResult').classList.add('show');
   showToast('⭐ スタンプ1個獲得！');
 }
@@ -2037,7 +2357,7 @@ function completeActiveTime() {
   }
   atDoneToday = true;
   btn.classList.add('done');
-  btn.innerHTML = '<span>✅</span><span>今日もできたね！</span>';
+  btn.innerHTML = '<span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_check.png" alt="チェック"></span><span>今日もできたね！</span>';
   showToast('Joelからの褒め声、再生中… 🎉');
   // 注：Active Timeはスタンプ独立カウントにせず、絵本のスタンプとは別軸で
   // 「やったら良いことがある」程度の軽い演出（褒め声）のみとする設計
@@ -2045,13 +2365,13 @@ function completeActiveTime() {
 
 // 今日のEnverly：週間スケジュールストリップ（Morning Talk / Active Time）
 const WEEK_DAYS = [
-  { day: 1, label: '月', icon: '🎙', type: 'morningtalk', preview: '"What color is your favorite animal?"' },
-  { day: 2, label: '火', icon: '🏃', type: 'activetime', preview: '🔎 Find something round!' },
-  { day: 3, label: '水', icon: '🎙', type: 'morningtalk', preview: '"What animal did you see today?"' },
-  { day: 4, label: '木', icon: '🏃', type: 'activetime', preview: '🐮 I say moo. What am I?' },
-  { day: 5, label: '金', icon: '🎙', type: 'morningtalk', preview: '配信は金曜の朝・お楽しみに' },
-  { day: 6, label: '土', icon: '🏃', type: 'activetime', preview: '🔎 Find something soft!' },
-  { day: 0, label: '日', icon: '🏃', type: 'activetime', preview: '🐮 I say woof. What am I?' },
+  { day: 1, label: '月', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク">', type: 'morningtalk', preview: '"What color is your favorite animal?"' },
+  { day: 2, label: '火', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '<img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_search.png" alt="探す"> Find something round!' },
+  { day: 3, label: '水', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク">', type: 'morningtalk', preview: '"What animal did you see today?"' },
+  { day: 4, label: '木', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '🐮 I say moo. What am I?' },
+  { day: 5, label: '金', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク">', type: 'morningtalk', preview: '配信は金曜の朝・お楽しみに' },
+  { day: 6, label: '土', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '<img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_search.png" alt="探す"> Find something soft!' },
+  { day: 0, label: '日', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '🐮 I say woof. What am I?' },
 ];
 let peekedWeekDay = new Date().getDay(); // メインカードは常に今日固定。プレビュー表示中の曜日だけ管理。
 
@@ -2077,7 +2397,7 @@ function updateWeekReasonText() {
   const typeLabel = d.type === 'morningtalk' ? 'Morning Talk' : 'Active Time';
   const box = document.getElementById('weekReasonText');
   if (isToday) {
-    box.innerHTML = `📅 今日は${d.label}曜日。<strong>${typeLabel}</strong>の日です`;
+    box.innerHTML = `<img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_calendar.png" alt="カレンダー"> 今日は${d.label}曜日。<strong>${typeLabel}</strong>の日です`;
   } else {
     box.innerHTML = `${d.label}曜日は<strong>${typeLabel}</strong>の日 ｜ ${d.preview}`;
   }
@@ -2149,7 +2469,7 @@ function renderRoutineCatGrid() {
       <div class="routine-cat-icon">${cat.icon}</div>
       <div class="routine-cat-title">${cat.title}</div>
       <div class="routine-cat-sub">${cat.sub}</div>
-      <div class="routine-cat-count">📋 ${cat.scenes.length}フレーズ</div>
+      <div class="routine-cat-count"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_list.png" alt="リスト"> ${cat.scenes.length}フレーズ</div>
     </div>
   `).join('');
 }
@@ -2220,7 +2540,7 @@ function renderYT(filter) {
           <span class="yt-tag yt-tag-age">${d.age}</span>
           <span class="yt-tag yt-tag-int">${d.interest}</span>
         </div>
-        <div class="yt-tip">💡 ${d.tip}</div>
+        <div class="yt-tip"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"> ${d.tip}</div>
       </div>
     </div>
   `).join('');
