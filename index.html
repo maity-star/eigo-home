@@ -730,6 +730,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* ==============================
    今週 & 音楽タブ共通プレイリスト
+============================== */
 .playlist-list { display: flex; flex-direction: column; gap: 8px; }
 .playlist-item {
   display: flex; align-items: center; gap: 12px;
@@ -1928,6 +1929,7 @@ function finishOnboarding(skip) {
   }
   renderWeeklyPlaylist();
   renderBookPage();
+  renderRoutineCatGrid();
 }
 
 function showOnboarding() {
@@ -2832,12 +2834,16 @@ function bvChangePage(dir) {
 
 // スワイプ対応
 let bvTouchStartX = 0;
-document.getElementById('bvPageArea').addEventListener('touchstart', e => {
-  bvTouchStartX = e.touches[0].clientX;
-}, { passive: true });
-document.getElementById('bvPageArea').addEventListener('touchend', e => {
-  const diff = bvTouchStartX - e.changedTouches[0].clientX;
-  if (Math.abs(diff) > 40) bvChangePage(diff > 0 ? 1 : -1);
+document.addEventListener('DOMContentLoaded', () => {
+  const area = document.getElementById('bvPageArea');
+  if (!area) return;
+  area.addEventListener('touchstart', e => {
+    bvTouchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  area.addEventListener('touchend', e => {
+    const diff = bvTouchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) bvChangePage(diff > 0 ? 1 : -1);
+  });
 });
 
 function bvStartRead() {
