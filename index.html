@@ -562,8 +562,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* 今週の一冊 */
 .weekly-book-card { background: #F9FAFB; border-radius: 14px; border: 0.5px solid #E5E7EB; overflow: hidden; }
-.weekly-book-cover-wrap { position: relative; width: 100%; height: 180px; overflow: hidden; background: #EDF6F1; }
-.weekly-book-cover-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+.weekly-book-cover-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #EDF6F1; }
+.weekly-book-cover-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
 .weekly-book-cover-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.45) 100%); }
 .weekly-book-overlay { position: absolute; bottom: 12px; left: 14px; right: 14px; z-index: 1; }
 .weekly-book-overlay-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
@@ -593,9 +593,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-why-body.open { display: block; }
 
 /* 童謡の歌詞（アプリ内ネイティブ表示） */
-.weekly-lyrics-body { display: none; background: #F0F5F2; border: 0.5px solid #BBDAC8; border-radius: 10px; padding: 16px 18px; margin-top: 8px; font-size: 13.5px; color: #1F2937; line-height: 2; text-align: center; }
+.weekly-lyrics-body { display: none; background: #F0F5F2; border: 0.5px solid #BBDAC8; border-radius: 10px; padding: 16px 18px; margin-top: 8px; text-align: center; }
 .weekly-lyrics-body.open { display: block; }
-.weekly-lyrics-body .lyrics-line { display: block; }
+.lyrics-line-group { margin-bottom: 14px; }
+.lyrics-line-group:last-child { margin-bottom: 0; }
+.lyrics-en { font-size: 14px; font-weight: 600; color: #1F2937; line-height: 1.5; }
+.lyrics-kana { font-size: 11px; color: #6DB88A; margin-top: 2px; }
+.lyrics-ja { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
 
 /* ==============================
    今週やることパネル（Weekly Pick + Weekly Playlist を包む）
@@ -1510,10 +1514,26 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
                 <div class="wbl-arr" id="lyricsChevron" style="transition:transform 0.25s;">▼</div>
               </div>
               <div class="weekly-lyrics-body" id="lyricsBody">
-                <span class="lyrics-line">Row, row, row your boat,</span>
-                <span class="lyrics-line">Gently down the stream.</span>
-                <span class="lyrics-line">Merrily, merrily, merrily, merrily,</span>
-                <span class="lyrics-line">Life is but a dream.</span>
+                <div class="lyrics-line-group">
+                  <div class="lyrics-en">Row, row, row your boat,</div>
+                  <div class="lyrics-kana">ロウ、ロウ、ロウ・ユア・ボウト</div>
+                  <div class="lyrics-ja">漕げ 漕げ ボートを漕げ</div>
+                </div>
+                <div class="lyrics-line-group">
+                  <div class="lyrics-en">Gently down the stream.</div>
+                  <div class="lyrics-kana">ジェントリー・ダウン・ザ・ストリーム</div>
+                  <div class="lyrics-ja">小川をゆっくり下ってく</div>
+                </div>
+                <div class="lyrics-line-group">
+                  <div class="lyrics-en">Merrily, merrily, merrily, merrily,</div>
+                  <div class="lyrics-kana">メリリー、メリリー、メリリー、メリリー</div>
+                  <div class="lyrics-ja">たのしいな たのしいな たのしいな たのしいな</div>
+                </div>
+                <div class="lyrics-line-group">
+                  <div class="lyrics-en">Life is but a dream.</div>
+                  <div class="lyrics-kana">ライフ・イズ・バット・ア・ドリーム</div>
+                  <div class="lyrics-ja">人生はまるで夢のよう</div>
+                </div>
               </div>
               <a class="wbl-item" href="https://www.youtube.com/watch?v=7otAJa3jui8" target="_blank">
                 <div class="wbl-icon red"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_headphone.png" alt="YouTube"></div>
