@@ -140,19 +140,19 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-pick-block { margin-top: 22px; padding-top: 20px; border-top: 1px solid #BBDAC8; }
 
 /* ==============================
-   Weekly Playlist セクション（独立）
+   Monthly Playlist セクション（独立）
 ============================== */
-.weekly-playlist-section { margin: 14px 20px 0; }
-.weekly-playlist-eyebrow {
+.monthly-playlist-section { margin: 14px 20px 0; }
+.monthly-playlist-eyebrow {
   display: flex; align-items: center; gap: 8px;
   margin-bottom: 14px;
 }
-.weekly-playlist-label {
+.monthly-playlist-label {
   font-size: 14px; font-weight: 700;
   color: #111827; white-space: nowrap; letter-spacing: -0.2px;
 }
-.weekly-playlist-label-ja { font-size: 10px; color: #9CA3AF; font-weight: 500; }
-.weekly-playlist-line { flex: 1; height: 1px; background: #E5E7EB; }
+.monthly-playlist-label-ja { font-size: 10px; color: #9CA3AF; font-weight: 500; }
+.monthly-playlist-line { flex: 1; height: 1px; background: #E5E7EB; }
 
 /* 今月の教材絵本 */
 .month-lesson-wrap { margin: 20px 20px 0; }
@@ -602,7 +602,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .lyrics-ja { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
 
 /* ==============================
-   今週やることパネル（Weekly Pick + Weekly Playlist を包む）
+   今週やることパネル（Weekly Pick + Monthly Playlist を包む）
 ============================== */
 .weekly-todo-panel {
   margin: 18px 20px 0;
@@ -628,7 +628,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-todo-panel .weekly-book-cover-wrap { height: 170px; }
 
 /* ==============================
-   Weekly Playlist（今月テーマ固定・コンパクト縦カード）
+   Monthly Playlist（今月テーマ固定・コンパクト縦カード）
 ============================== */
 .mp-list { display: flex; flex-direction: column; gap: 10px; }
 .mp-card {
@@ -669,7 +669,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .mp-yt:hover { opacity: 0.85; }
 
 /* ==============================
-   Weekly Playlist カルーセル
+   Monthly Playlist カルーセル
 ============================== */
 .carousel-outer {
   position: relative;
@@ -705,9 +705,21 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .carousel-thumb-area {
   width: 100%;
   height: 148px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 60px;
   position: relative;
+  overflow: hidden;
+  background: #EDF6F1;
+}
+.carousel-thumb-area img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.carousel-play-badge {
+  position: absolute; bottom: 8px; right: 8px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(0,0,0,0.55); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; padding-left: 1px;
 }
 .carousel-card-info {
   padding: 14px 16px 18px;
@@ -1561,14 +1573,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       </div><!-- /weekly-mission-panel -->
     </div><!-- /weekly-mission-wrap -->
 
-    <!-- ③ Weekly Playlist（独立セクション・3曲） -->
-    <div class="weekly-playlist-section">
-      <div class="weekly-playlist-eyebrow">
-        <div class="weekly-playlist-label">Weekly Playlist <span class="weekly-playlist-label-ja">今月のテーマに合わせた曲</span></div>
-        <div class="weekly-playlist-line"></div>
+    <!-- ③ Monthly Playlist（独立セクション・3曲） -->
+    <div class="monthly-playlist-section">
+      <div class="monthly-playlist-eyebrow">
+        <div class="monthly-playlist-label">Monthly Playlist <span class="monthly-playlist-label-ja">今月のテーマに合わせた曲</span></div>
+        <div class="monthly-playlist-line"></div>
       </div>
       <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップでYouTubeが開きます。かけ流しはスピーカーから流すのがおすすめ。</p>
-      <div id="weeklyPlaylist"></div>
+      <div id="monthlyPlaylist"></div>
     </div>
 
     <!-- サブスクバナー -->
@@ -1897,9 +1909,9 @@ const MONTH_BOOK_PAGES = [
 // 今月のテーマ（Colors & Animals）に合わせて編集部が選んだ固定プレイリスト
 // オンボーディングの興味には連動しない（興味別の出し分けはYouTubeかけ流し側で行う）
 const MONTH_PLAYLIST = [
-  { videoId:null, emoji:'🐻', bg:'#EDF6F1', title:'Brown Bear Song', sub:'今月のテーマ「Colors & Animals」にぴったり！動物の名前が自然に入る一曲。', age:'1〜3歳', ytUrl:'https://www.youtube.com/results?search_query=brown+bear+brown+bear+song' },
-  { videoId:null, emoji:'🎶', bg:'#E6F1FB', title:'Rainbow Colors Song', sub:'色の名前を歌で自然にインプット。レインボーが出てくるたびに指差して。', age:'2〜5歳', ytUrl:'https://www.youtube.com/results?search_query=rainbow+colors+song+for+kids' },
-  { videoId:null, emoji:'🦁', bg:'#EDF6F1', title:'Old MacDonald Had a Farm', sub:'動物の鳴き声を体で覚える定番曲。一緒に歌って動物の名前を耳に残す。', age:'1〜4歳', ytUrl:'https://www.youtube.com/results?search_query=old+macdonald+had+a+farm' },
+  { videoId:'KbrSWbuWtmc', title:'The Ice Cream Song', sub:'ice cream・scoopなど夏らしい単語がいっぱい。数を数えながら歌える定番曲。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=KbrSWbuWtmc' },
+  { videoId:'hlzvrEfyL2Y', title:'Mr. Sun, Sun, Mr. Golden Sun', sub:'太陽に呼びかけるやさしいメロディ。今月のテーマ「Water &amp; Sun」にぴったりの一曲。', age:'1〜4歳', ytUrl:'https://www.youtube.com/watch?v=hlzvrEfyL2Y' },
+  { videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
 ];
 
 // YouTubeキュレーションデータ
@@ -1966,7 +1978,7 @@ function finishOnboarding(skip) {
   } else {
     renderYT('all');
   }
-  renderWeeklyPlaylist();
+  renderMonthlyPlaylist();
   renderBookPage();
 }
 
@@ -1980,10 +1992,10 @@ function showOnboarding() {
 }
 
 // ========================
-// Weekly Playlist カルーセル
+// Monthly Playlist カルーセル
 // ========================
-function renderWeeklyPlaylist() {
-  const container = document.getElementById('weeklyPlaylist');
+function renderMonthlyPlaylist() {
+  const container = document.getElementById('monthlyPlaylist');
   if (!container) return;
 
   container.innerHTML = `
@@ -1991,8 +2003,9 @@ function renderWeeklyPlaylist() {
       <div class="carousel-track" id="carouselTrack">
         ${MONTH_PLAYLIST.map((s, i) => `
           <div class="carousel-card${i === 0 ? ' active' : ''}" data-index="${i}" onclick="goCarousel(${i})">
-            <div class="carousel-thumb-area" style="background:${s.bg};">
-              <span>${s.emoji}</span>
+            <div class="carousel-thumb-area">
+              <img src="https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg" alt="${s.title}">
+              <div class="carousel-play-badge">▶</div>
             </div>
             <div class="carousel-card-info">
               <div class="carousel-card-title">${s.title}</div>
