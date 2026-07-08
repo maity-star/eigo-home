@@ -714,13 +714,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   object-fit: cover;
   display: block;
 }
-.carousel-play-badge {
-  position: absolute; bottom: 8px; right: 8px;
-  width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(0,0,0,0.55); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; padding-left: 1px;
-}
 .carousel-card-info {
   padding: 14px 16px 18px;
 }
@@ -1939,6 +1932,7 @@ let bookMode = 'listen'; // 'listen' | 'study'
 let studyStep = null; // null | 'joel1' | 'pause' | 'joel2' | 'done'
 let studyTimers = [];
 let carouselIndex = 0;
+let carouselSwipeGuard = false;
 const CAROUSEL_CARD_W = 268;
 const CAROUSEL_GAP = 12;
 const STUDY_REACTIONS = [
@@ -2002,18 +1996,17 @@ function renderMonthlyPlaylist() {
     <div class="carousel-outer" id="carouselOuter">
       <div class="carousel-track" id="carouselTrack">
         ${MONTH_PLAYLIST.map((s, i) => `
-          <div class="carousel-card${i === 0 ? ' active' : ''}" data-index="${i}" onclick="goCarousel(${i})">
+          <div class="carousel-card${i === 0 ? ' active' : ''}" data-index="${i}" onclick="handleCarouselCardTap(${i})">
             <div class="carousel-thumb-area">
               <img src="https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg" alt="${s.title}">
-              <div class="carousel-play-badge">▶</div>
             </div>
             <div class="carousel-card-info">
               <div class="carousel-card-title">${s.title}</div>
               <div class="carousel-card-age">${s.age}</div>
               <div class="carousel-card-sub">${s.sub}</div>
-              <a class="carousel-card-yt" href="${s.ytUrl}" target="_blank" onclick="event.stopPropagation()">
+              <div class="carousel-card-yt">
                 <span>▶</span>YouTubeで見る
-              </a>
+              </div>
             </div>
           </div>
         `).join('')}
@@ -2028,6 +2021,12 @@ function renderMonthlyPlaylist() {
 
   carouselIndex = 0;
   setTimeout(() => initCarousel(), 0);
+}
+
+function handleCarouselCardTap(idx) {
+  if (carouselSwipeGuard) return;
+  const item = MONTH_PLAYLIST[idx];
+  if (item && item.ytUrl) window.open(item.ytUrl, '_blank', 'noopener');
 }
 
 function initCarousel() {
@@ -2057,6 +2056,9 @@ function initCarousel() {
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 38) {
       goCarousel(carouselIndex + (dx < 0 ? 1 : -1));
     }
+    // スワイプ直後の指離しをタップ扱いしてYouTubeに飛ばないようガード
+    carouselSwipeGuard = true;
+    setTimeout(() => { carouselSwipeGuard = false; }, 350);
   }, { passive: true });
 }
 
