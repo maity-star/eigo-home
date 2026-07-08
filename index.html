@@ -576,6 +576,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .wbl-icon.green { background: rgba(255,255,255,0.2); }
 .wbl-icon.blue { background: #E6F1FB; }
 .wbl-icon.gray { background: #F3F4F6; }
+.wbl-icon.red { background: #FDE8E8; }
 .wbl-text { flex: 1; }
 .wbl-title { font-size: 12px; font-weight: 500; color: #111827; }
 .wbl-item.featured .wbl-title { color: white; }
@@ -590,6 +591,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-why-chevron.open { transform: rotate(180deg); }
 .weekly-why-body { display: none; padding: 14px 16px; border-top: 0.5px solid #E5E7EB; font-size: 12px; color: #374151; line-height: 1.75; background: white; }
 .weekly-why-body.open { display: block; }
+
+/* 童謡の歌詞（アプリ内ネイティブ表示） */
+.weekly-lyrics-body { display: none; background: #F0F5F2; border: 0.5px solid #BBDAC8; border-radius: 10px; padding: 16px 18px; margin-top: 8px; font-size: 13.5px; color: #1F2937; line-height: 2; text-align: center; }
+.weekly-lyrics-body.open { display: block; }
+.weekly-lyrics-body .lyrics-line { display: block; }
 
 /* ==============================
    今週やることパネル（Weekly Pick + Weekly Playlist を包む）
@@ -1484,42 +1490,48 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <div class="section-header-en">Weekly Pick</div>
           <div class="section-header-ja">今週のおすすめ絵本</div>
         </div>
-        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">寝る前や日本語の絵本と一緒に取り入れてみてね。毎日読むと英語フレーズが自然に残っていくよ。</p>
+        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">寝る前や日本語の絵本と一緒に取り入れてみてね。毎日歌うと英語フレーズが自然に残っていくよ。</p>
         <div class="content-block" style="padding:0;">
           <div class="weekly-book-card" style="border:none;border-radius:0;background:transparent;">
             <div class="weekly-book-cover-wrap">
-              <img src="tale_of_Peter_Rabbit.jpg" alt="The Tale of Peter Rabbit">
+              <img src="books/aug/weekly_pick/row_row_row_your_boat.png" alt="Row, Row, Row Your Boat">
               <div class="weekly-book-overlay">
                 <div>
-                  <div class="weekly-book-overlay-title">The Tale of Peter Rabbit</div>
-                  <div class="weekly-book-overlay-author">Beatrix Potter · 1〜5歳 · 約5分</div>
+                  <div class="weekly-book-overlay-title">Row, Row, Row Your Boat</div>
+                  <div class="weekly-book-overlay-author">伝承童謡（Nursery Rhyme） · 1〜5歳 · 約1分</div>
                 </div>
               </div>
             </div>
             <div class="weekly-book-links">
-              <a class="wbl-item featured" href="https://www.gutenberg.org/files/14838/14838-h/14838-h.htm" target="_blank">
-                <div class="wbl-icon green"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_globe.png" alt="ブラウザで読む"></div>
-                <div class="wbl-text"><div class="wbl-title">ブラウザで絵と一緒に読む</div><div class="wbl-sub">Project Gutenberg · イラスト付き</div></div>
-                <div class="wbl-tag">おすすめ・無料</div>
+              <div class="wbl-item featured" onclick="toggleLyrics()" style="cursor:pointer;">
+                <div class="wbl-icon green"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_document.png" alt="歌詞"></div>
+                <div class="wbl-text"><div class="wbl-title">歌詞を見ながら歌う</div><div class="wbl-sub">アプリ内表示 · たったの4行</div></div>
+                <div class="wbl-tag">無料・すぐ見れる</div>
+                <div class="wbl-arr" id="lyricsChevron" style="transition:transform 0.25s;">▼</div>
+              </div>
+              <div class="weekly-lyrics-body" id="lyricsBody">
+                <span class="lyrics-line">Row, row, row your boat,</span>
+                <span class="lyrics-line">Gently down the stream.</span>
+                <span class="lyrics-line">Merrily, merrily, merrily, merrily,</span>
+                <span class="lyrics-line">Life is but a dream.</span>
+              </div>
+              <a class="wbl-item" href="https://www.youtube.com/watch?v=7otAJa3jui8" target="_blank">
+                <div class="wbl-icon red"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_headphone.png" alt="YouTube"></div>
+                <div class="wbl-text"><div class="wbl-title">YouTubeで聴く</div><div class="wbl-sub">Super Simple Songs · 定番チャンネル</div></div>
                 <div class="wbl-arr">↗</div>
               </a>
-              <a class="wbl-item" href="https://freekidsbooks.org/peter-rabbit/" target="_blank">
-                <div class="wbl-icon blue"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_document.png" alt="PDF"></div>
-                <div class="wbl-text"><div class="wbl-title">PDFで見る</div><div class="wbl-sub">Free Kids Books · 絵本レイアウト版</div></div>
-                <div class="wbl-arr">↗</div>
-              </a>
-              <a class="wbl-item" href="https://www.amazon.co.jp/dp/0140542957" target="_blank">
+              <a class="wbl-item" href="https://www.amazon.co.jp/dp/0744560276?tag=enverly-22" target="_blank">
                 <div class="wbl-icon gray"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_box.png" alt="Amazon"></div>
-                <div class="wbl-text"><div class="wbl-title">手元に置く（Amazon）</div><div class="wbl-sub">英語原書ペーパーバック · ¥800〜</div></div>
+                <div class="wbl-text"><div class="wbl-title">手元に置く（Amazon）</div><div class="wbl-sub">Mother Gooseまとめ絵本 · ¥3,300〜</div></div>
                 <div class="wbl-arr">↗</div>
               </a>
             </div>
             <div class="weekly-why-toggle" onclick="toggleWhy()">
-              <div class="weekly-why-label"><span><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_search.png" alt="なぜ"></span><span>なぜこの本が選ばれたの？</span></div>
+              <div class="weekly-why-label"><span><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_search.png" alt="なぜ"></span><span>なぜこの歌が選ばれたの？</span></div>
               <div class="weekly-why-chevron" id="whyChevron">▼</div>
             </div>
             <div class="weekly-why-body" id="whyBody">
-              動物の名前・色・野菜が自然に出てくる名作。rabbit・carrot・garden などが繰り返し登場し、今月のテーマ「Colors &amp; Animals」にぴったりです。
+              ボートを漕ぐ動作に合わせて歌える、体を動かしながら覚えられる定番の童謡。row・boat・streamなどシンプルな単語が繰り返され、今月のテーマ「Water &amp; Sun」にぴったりです。
             </div>
           </div>
         </div>
@@ -2231,6 +2243,11 @@ function toggleWhy() {
   const b = document.getElementById('whyBody'); const c = document.getElementById('whyChevron');
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
 }
+function toggleLyrics() {
+  const b = document.getElementById('lyricsBody'); const c = document.getElementById('lyricsChevron');
+  const o = b.classList.toggle('open');
+  c.style.transform = o ? 'rotate(180deg)' : 'rotate(0deg)';
+}
 
 // ========================
 // 絵本モーダル
@@ -2784,14 +2801,14 @@ renderRoutineCatGrid();
 const BOOK_DATA = {
   title: 'Sunny Day!',
   pages: [
-    { img: 'books/aug/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null },
-    { img: 'books/aug/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!" },
-    { img: 'books/aug/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!" },
-    { img: 'books/aug/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!' },
-    { img: 'books/aug/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!' },
-    { img: 'books/aug/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!' },
-    { img: 'books/aug/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null },
-    { img: 'books/aug/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!" },
+    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null },
+    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!" },
+    { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!" },
+    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!' },
+    { img: 'books/aug/monthly_book/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!' },
+    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!' },
+    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null },
+    { img: 'books/aug/monthly_book/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!" },
   ]
 };
 
