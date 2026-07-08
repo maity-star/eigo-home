@@ -487,16 +487,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* 左右ナビ矢印 */
 .bv-nav {
   position: absolute; top: 50%; transform: translateY(-50%);
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(255,255,255,0.15); border: none;
-  color: #fff; font-size: 18px; cursor: pointer;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: #FFFDF8; border: none;
+  color: #0F4A3E; font-size: 20px; font-weight: 700; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(4px); transition: background 0.15s;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
 }
-.bv-nav:hover { background: rgba(255,255,255,0.25); }
+.bv-nav:hover { background: #fff; }
+.bv-nav:active { transform: translateY(-50%) scale(0.92); }
 .bv-nav.prev { left: 10px; }
 .bv-nav.next { right: 10px; }
-.bv-nav:disabled { opacity: 0.2; cursor: default; }
+.bv-nav:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
 
 /* ページインジケーター */
 .bv-indicator {
@@ -932,11 +934,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ルーティン：カテゴリーカード */
 .routine-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .routine-cat-card {
-  background: #F9FAFB; border-radius: 14px; padding: 16px 14px; cursor: pointer;
-  transition: background 0.15s; border: 1px solid transparent;
+  background: #F9FAFB; border-radius: 14px; padding: 0; cursor: pointer;
+  transition: background 0.15s; border: 1px solid transparent; overflow: hidden;
+  -webkit-transform: translateZ(0); transform: translateZ(0);
 }
 .routine-cat-card:hover { background: #F3F4F6; }
-.routine-cat-icon { font-size: 22px; margin-bottom: 8px; }
+.routine-cat-image {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block;
+  background: #F3F4F6; -webkit-transform: translateZ(0); transform: translateZ(0);
+}
+.routine-cat-body { padding: 12px 14px 14px; }
 .routine-cat-title { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 3px; }
 .routine-cat-sub { font-size: 10px; color: #9CA3AF; margin-bottom: 8px; }
 .routine-cat-count { font-size: 10px; color: #6B7280; display: flex; align-items: center; gap: 4px; }
@@ -949,18 +956,23 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   max-width: 390px; margin: 0 auto;
 }
 .routine-modal.open { display: flex; }
+.routine-modal-hero-wrap { position: relative; flex-shrink: 0; }
+.routine-modal-hero {
+  width: 100%; aspect-ratio: 2 / 1; object-fit: cover; display: block;
+  background: #F3F4F6;
+}
 .routine-modal-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px 14px; flex-shrink: 0;
+  padding: 16px 20px 14px; flex-shrink: 0;
   border-bottom: 1px solid #F0E6D2;
 }
-.routine-modal-title { font-size: 15px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 8px; }
-.routine-modal-sub { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.routine-modal-title { font-size: 16px; font-weight: 700; color: #111827; }
+.routine-modal-sub { font-size: 11px; color: #9CA3AF; margin-top: 3px; }
 .routine-modal-close {
+  position: absolute; top: 14px; right: 14px;
   width: 32px; height: 32px; border-radius: 50%;
-  background: #F3F4F6; border: none; color: #6B7280;
+  background: rgba(255,255,255,0.9); border: none; color: #6B7280;
   font-size: 16px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0;
+  cursor: pointer; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 .routine-modal-body { flex: 1; overflow-y: auto; padding: 18px 20px 32px; }
 .routine-scene-card {
@@ -1028,6 +1040,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-read-btn.study-variant { background: #1D9E75; color: #fff; border: 2.5px solid rgba(255,255,255,0.35); }
 .month-read-btn.study-variant span { color: #fff; }
 .month-read-btn.study-variant:hover { background: #18875F; }
+.month-read-btn-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2; }
+.month-read-btn-en { font-size: 16px; font-weight: 700; }
+.month-read-btn-ja { font-size: 10px; font-weight: 500; opacity: 0.6; margin-top: 1px; }
 
 /* ==============================
    絵本モーダル（フルスクリーン）
@@ -1064,6 +1079,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .book-mode-tab.active { background: #ffffff; color: #2D6A4F; }
 .book-mode-tab:active { transform: scale(0.98); }
+.book-mode-tab-ja { font-size: 10px; font-weight: 500; opacity: 0.65; }
 
 /* Let's Study：いってみるオーバーレイ */
 .study-overlay {
@@ -1182,15 +1198,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   margin: 12px 0 8px; gap: 12px; flex-shrink: 0;
 }
 .book-page-nav-btn {
-  width: 42px; height: 42px; border-radius: 50%;
-  border: none; background: rgba(255,255,255,0.12);
-  color: #fff; font-size: 16px; display: flex;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: none; background: #FFFDF8;
+  color: #0F4A3E; font-size: 20px; font-weight: 700; display: flex;
   align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0; transition: opacity 0.15s, background 0.15s, transform 0.1s;
+  cursor: pointer; flex-shrink: 0; transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
 }
-.book-page-nav-btn:hover { background: rgba(255,255,255,0.2); }
+.book-page-nav-btn:hover { background: #fff; }
 .book-page-nav-btn:active { transform: scale(0.92); }
-.book-page-nav-btn:disabled { opacity: 0.25; cursor: default; }
+.book-page-nav-btn:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
 .book-page-dots { display: flex; gap: 6px; flex: 1; justify-content: center; flex-wrap: wrap; }
 .book-page-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: background 0.2s, width 0.2s; }
 .book-page-dot.active { background: #BBDAC8; width: 16px; border-radius: 3px; }
@@ -1317,7 +1334,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <div class="header">
     <div class="header-top">
       <div class="logo">En<span>verly</span></div>
-      <div class="week-badge">Week 3 · 6月</div>
+      <div class="week-badge">Week 1 · August</div>
     </div>
   </div>
 
@@ -1352,18 +1369,24 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <div class="month-lesson-top" style="padding-bottom:20px;">
             <div class="month-theme-row">
               <div class="month-theme-dot"></div>
-              <div class="month-theme-label">6月のテーマ · Colors &amp; Animals</div>
+              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
             </div>
-            <div class="month-title">Brown Bear, Brown Bear</div>
-            <div class="month-book-feature">色と動物の名前を繰り返しながら楽しめる絵本です。同じフレーズが続くので、読み聞かせながら一緒に声に出してみて。</div>
+            <div class="month-title">Sunny Day!</div>
+            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
             <div class="month-read-btn-row">
               <button class="month-read-btn" onclick="openBookModal('listen')">
                 <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
-                <span>Listening</span>
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Listening</span>
+                  <span class="month-read-btn-ja">聞く</span>
+                </span>
               </button>
-              <button class="month-read-btn study-variant" onclick="openBookModal('study')">
+              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
                 <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
-                <span>Talking</span>
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Talking</span>
+                  <span class="month-read-btn-ja">話す</span>
+                </span>
               </button>
             </div>
           </div>
@@ -1715,15 +1738,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 <div class="book-modal" id="bookModal">
   <div class="book-modal-header">
     <div>
-      <div class="book-modal-title">Brown Bear, Brown Bear</div>
-      <div class="book-modal-sub">Bill Martin Jr. · Joel先生の音読</div>
+      <div class="book-modal-title">Sunny Day!</div>
+      <div class="book-modal-sub">Enverlyオリジナル絵本 · Joel先生の音読</div>
     </div>
     <button class="book-modal-close" onclick="closeBookModal()">✕</button>
   </div>
 
   <div class="book-mode-tabs">
-    <button class="book-mode-tab active" id="modeTabListen" onclick="switchBookMode('listen')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_headphone.png" alt="きいてみる"> Listening</button>
-    <button class="book-mode-tab" id="modeTabStudy" onclick="switchBookMode('study')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_speak.png" alt="いってみる"> Talking</button>
+    <button class="book-mode-tab active" id="modeTabListen" onclick="switchBookMode('listen')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_headphone.png" alt="きいてみる"> Listening<span class="book-mode-tab-ja">聞く</span></button>
+    <button class="book-mode-tab" id="modeTabStudy" onclick="switchBookMode('study')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_speak.png" alt="いってみる"> Talking<span class="book-mode-tab-ja">話す</span></button>
   </div>
 
   <div class="book-viewer">
@@ -1871,12 +1894,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 <!-- ルーティン・フレーズリストモーダル -->
 <div class="routine-modal" id="routineModal">
-  <div class="routine-modal-header">
-    <div>
-      <div class="routine-modal-title"><span id="routineModalIcon">🌅</span><span id="routineModalTitle">Morning Time</span></div>
-      <div class="routine-modal-sub" id="routineModalSub">親が言うフレーズ集</div>
-    </div>
+  <div class="routine-modal-hero-wrap">
+    <img class="routine-modal-hero" id="routineModalImage" src="" alt="">
     <button class="routine-modal-close" onclick="closeRoutineModal()">✕</button>
+  </div>
+  <div class="routine-modal-header">
+    <div class="routine-modal-title" id="routineModalTitle">Morning Time</div>
+    <div class="routine-modal-sub" id="routineModalSub">親が言うフレーズ集</div>
   </div>
   <div class="routine-modal-body" id="routineModalBody"></div>
 </div>
@@ -1891,11 +1915,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 // 今月の絵本ページデータ（イラストは後で img: に差し替え可能。今は絵文字プレースホルダー）
 const MONTH_BOOK_PAGES = [
-  { img: null, emoji: '🐻', en: 'Brown bear, brown bear, what do you see?', ja: 'くまさん くまさん なにが みえる？' },
-  { img: null, emoji: '🐦', en: 'I see a red bird looking at me.', ja: 'あかい とりが みえるよ' },
-  { img: null, emoji: '🦆', en: 'I see a yellow duck looking at me.', ja: 'きいろい あひるが みえるよ' },
-  { img: null, emoji: '🐴', en: 'I see a blue horse looking at me.', ja: 'あおい うまが みえるよ' },
-  { img: null, emoji: '🐸', en: 'I see a green frog looking at me.', ja: 'みどりの かえるが みえるよ' },
+  { img: null, emoji: '☀️', en: "It's hot!", ja: 'あついね！' },
+  { img: null, emoji: '🦆', en: "Let's swim!", ja: 'およごう！' },
+  { img: null, emoji: '💦', en: 'Splash!', ja: 'ばしゃん！' },
+  { img: null, emoji: '😄', en: 'So fun!', ja: 'たのしいね！' },
+  { img: null, emoji: '🌞', en: 'Sunny!', ja: 'はれてるね！' },
 ];
 
 // 今週の曲データ（興味別）
@@ -2747,7 +2771,7 @@ applyContentForSelectedDay();
 // ========================
 const ROUTINE_CATEGORIES = [
   {
-    id: 'morning', icon: '🌅', title: 'Morning Time', sub: '朝の支度タイムに使うフレーズ',
+    id: 'morning', icon: '🌅', image: 'routine_images/routine_morning.jpg', title: 'Morning Time', sub: '朝の支度タイムに使うフレーズ',
     scenes: [
       { label: '起床直後', en: 'Good morning! Did you sleep well?', reply: '"Yes!" / "I\'m sleepy."' },
       { label: '着替え中', en: "Let's get dressed! Where's your shirt?", reply: '"Here!" / "I found it!"' },
@@ -2757,7 +2781,7 @@ const ROUTINE_CATEGORIES = [
     ],
   },
   {
-    id: 'beforebed', icon: '🌙', title: 'Before Bed', sub: '寝る前の時間に使うフレーズ',
+    id: 'beforebed', icon: '🌙', image: 'routine_images/routine_bedtime.jpg', title: 'Before Bed', sub: '寝る前の時間に使うフレーズ',
     scenes: [
       { label: '絵本を読む前', en: 'Let\'s read a book together!', reply: '"Yay!" / "This one!"' },
       { label: '歯磨き確認', en: 'Did you brush your teeth?', reply: '"Yes!" / "Not yet!"' },
@@ -2765,7 +2789,7 @@ const ROUTINE_CATEGORIES = [
     ],
   },
   {
-    id: 'afterschool', icon: '🎒', title: 'おかえり', sub: '保育園・幼稚園から帰った後に使うフレーズ',
+    id: 'afterschool', icon: '🎒', image: 'routine_images/routine_homecoming.jpg', title: 'おかえり', sub: '保育園・幼稚園から帰った後に使うフレーズ',
     scenes: [
       { label: 'ただいまのあいさつ', en: 'Welcome home! How was your day?', reply: '"Good!" / "Fun!"' },
       { label: '今日は何した？', en: 'What did you do today?', reply: '"I played!" / "We sang songs!"' },
@@ -2773,7 +2797,7 @@ const ROUTINE_CATEGORIES = [
     ],
   },
   {
-    id: 'mealtime', icon: '🍽', title: '食事タイム', sub: '食事の時間に使うフレーズ',
+    id: 'mealtime', icon: '🍽', image: 'routine_images/routine_mealtime.jpg', title: '食事タイム', sub: '食事の時間に使うフレーズ',
     scenes: [
       { label: '食事前のあいさつ', en: "Let's eat!", reply: '"Yay!" / "I\'m hungry!"' },
       { label: 'もっと食べる？', en: 'Do you want more?', reply: '"Yes please!" / "No, thank you!"' },
@@ -2787,10 +2811,12 @@ function renderRoutineCatGrid() {
   if (!grid) return;
   grid.innerHTML = ROUTINE_CATEGORIES.map(cat => `
     <div class="routine-cat-card" onclick="openRoutineModal('${cat.id}')">
-      <div class="routine-cat-icon">${cat.icon}</div>
-      <div class="routine-cat-title">${cat.title}</div>
-      <div class="routine-cat-sub">${cat.sub}</div>
-      <div class="routine-cat-count"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_list.png" alt="リスト"> ${cat.scenes.length}フレーズ</div>
+      <img class="routine-cat-image" src="${cat.image}" alt="${cat.title}">
+      <div class="routine-cat-body">
+        <div class="routine-cat-title">${cat.title}</div>
+        <div class="routine-cat-sub">${cat.sub}</div>
+        <div class="routine-cat-count"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_list.png" alt="リスト"> ${cat.scenes.length}フレーズ</div>
+      </div>
     </div>
   `).join('');
 }
@@ -2798,7 +2824,8 @@ function renderRoutineCatGrid() {
 function openRoutineModal(catId) {
   const cat = ROUTINE_CATEGORIES.find(c => c.id === catId);
   if (!cat) return;
-  document.getElementById('routineModalIcon').textContent = cat.icon;
+  document.getElementById('routineModalImage').src = cat.image;
+  document.getElementById('routineModalImage').alt = cat.title;
   document.getElementById('routineModalTitle').textContent = cat.title;
   document.getElementById('routineModalSub').textContent = cat.sub;
   document.getElementById('routineModalBody').innerHTML = cat.scenes.map(s => `
