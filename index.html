@@ -759,7 +759,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; padding: 14px 20px 18px; }
 
 /* セクション見出し（1・2の縦並び） */
-.asobo-section { padding: 0 20px 24px; }
+.asobo-section { padding: 0 20px 20px; }
+.asobo-section-card {
+  background: #FCFBF7; border: 1px solid #F0E6D2;
+  border-radius: 20px; padding: 18px;
+}
 .asobo-section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .asobo-section-num {
   width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
@@ -1574,50 +1578,54 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     <!-- 1: 探し物ミッション -->
     <div class="asobo-section">
-      <div class="asobo-section-head">
-        <div class="asobo-section-num">1</div>
-        <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;"><circle cx="10" cy="10" r="6"/><line x1="20" y1="20" x2="14.5" y2="14.5"/></svg>探し物ミッション</div>
-      </div>
-      <img class="asobo-section-illust" src="illustrations/asobo-find.png" alt="探し物ミッション">
-      <div class="asobo-gacha-wrap">
-        <button class="asobo-gacha-btn" onclick="drawAsoboGacha()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg> 今日のミッションを引く</button>
-      </div>
-      <div class="asobo-gacha-result" id="asoboGachaResult">
-        <div class="asobo-gacha-result-inner">
-          <div class="asobo-gacha-card">
-            <div class="asobo-gacha-label">TODAY'S MISSION</div>
-            <div class="asobo-gacha-en" id="asoboGachaEn"></div>
-            <div class="asobo-gacha-ja" id="asoboGachaJa"></div>
-            <div class="asobo-gacha-play-row">
-              <button class="asobo-timer-btn" onclick="startAsoboTimer()">
-                <svg class="asobo-timer-ring" viewBox="0 0 64 64">
-                  <circle class="asobo-timer-ring-bg" cx="32" cy="32" r="28"/>
-                  <circle class="asobo-timer-ring-fg" id="asoboTimerRingFg" cx="32" cy="32" r="28"/>
-                </svg>
-                <span class="asobo-timer-play-icon" id="asoboTimerPlayIcon">▶</span>
-              </button>
+      <div class="asobo-section-card">
+        <div class="asobo-section-head">
+          <div class="asobo-section-num">1</div>
+          <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;"><circle cx="10" cy="10" r="6"/><line x1="20" y1="20" x2="14.5" y2="14.5"/></svg>探し物ミッション</div>
+        </div>
+        <img class="asobo-section-illust" src="illustrations/asobo-find.png" alt="探し物ミッション">
+        <div class="asobo-gacha-wrap">
+          <button class="asobo-gacha-btn" onclick="drawAsoboGacha()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg> 今日のミッションを引く</button>
+        </div>
+        <div class="asobo-gacha-result" id="asoboGachaResult">
+          <div class="asobo-gacha-result-inner">
+            <div class="asobo-gacha-card">
+              <div class="asobo-gacha-label">TODAY'S MISSION</div>
+              <div class="asobo-gacha-en" id="asoboGachaEn"></div>
+              <div class="asobo-gacha-ja" id="asoboGachaJa"></div>
+              <div class="asobo-gacha-play-row">
+                <button class="asobo-timer-btn" onclick="startAsoboTimer()">
+                  <svg class="asobo-timer-ring" viewBox="0 0 64 64">
+                    <circle class="asobo-timer-ring-bg" cx="32" cy="32" r="28"/>
+                    <circle class="asobo-timer-ring-fg" id="asoboTimerRingFg" cx="32" cy="32" r="28"/>
+                  </svg>
+                  <span class="asobo-timer-play-icon" id="asoboTimerPlayIcon">▶</span>
+                </button>
+              </div>
+              <div class="asobo-joel-line" id="asoboJoelLine"><img src="icons/icon_func_mic.png" alt="マイク">見つかったかな？</div>
             </div>
-            <div class="asobo-joel-line" id="asoboJoelLine"><img src="icons/icon_func_mic.png" alt="マイク">見つかったかな？</div>
           </div>
         </div>
+        <div class="asobo-axis-list" id="asoboAxisList"></div>
+        <audio id="asoboTimerBgm" loop preload="none"></audio>
       </div>
-      <div class="asobo-axis-list" id="asoboAxisList"></div>
-      <audio id="asoboTimerBgm" loop preload="none"></audio>
     </div>
 
     <!-- 2: なぞなぞクイズ -->
     <div class="asobo-section">
-      <div class="asobo-section-head">
-        <div class="asobo-section-num">2</div>
-        <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg>なぞなぞクイズ</div>
-      </div>
-      <img class="asobo-section-illust" src="illustrations/asobo-riddle.png" alt="なぞなぞクイズ">
-      <div class="asobo-gacha-wrap">
-        <button class="asobo-gacha-btn" onclick="drawAsoboRiddle()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg> 今日のなぞなぞを引く</button>
-      </div>
-      <div class="asobo-riddle-result" id="asoboRiddleResult">
-        <div class="asobo-riddle-result-inner">
-          <div id="asoboRiddleResultInner"></div>
+      <div class="asobo-section-card">
+        <div class="asobo-section-head">
+          <div class="asobo-section-num">2</div>
+          <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg>なぞなぞクイズ</div>
+        </div>
+        <img class="asobo-section-illust" src="illustrations/asobo-riddle.png" alt="なぞなぞクイズ">
+        <div class="asobo-gacha-wrap">
+          <button class="asobo-gacha-btn" onclick="drawAsoboRiddle()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg> 今日のなぞなぞを引く</button>
+        </div>
+        <div class="asobo-riddle-result" id="asoboRiddleResult">
+          <div class="asobo-riddle-result-inner">
+            <div id="asoboRiddleResultInner"></div>
+          </div>
         </div>
       </div>
     </div>
