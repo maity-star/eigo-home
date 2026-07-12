@@ -754,38 +754,91 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    あそぼタブ
 ============================== */
-.asobo-hero { padding: 20px 20px 0; }
-.asobo-hero-title {
-  font-size: 22px; font-weight: 700; color: #111827;
-  margin-bottom: 4px; letter-spacing: -0.3px;
-}
-.asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-bottom: 20px; }
+.asobo-hero { padding: 0; }
+.asobo-hero-illust { width: 100%; display: block; }
+.asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; padding: 14px 20px 18px; }
 
-/* サブタブ */
-.asobo-subtabs { display: flex; gap: 8px; padding: 0 20px; margin-bottom: 18px; }
-.asobo-subtab {
-  flex: 1; text-align: center; padding: 11px 8px;
-  background: #F3F4F6; border-radius: 12px;
-  font-size: 13px; font-weight: 600; color: #6B7280;
-  cursor: pointer; transition: all 0.18s;
-  border: 1.5px solid transparent;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
+/* セクション見出し（1・2の縦並び） */
+.asobo-section { padding: 0 20px 24px; }
+.asobo-section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.asobo-section-num {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: #FFF6E5; color: #B8680B; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
 }
-.asobo-subtab.active { background: #FFF6E5; color: #B8680B; border-color: #F0C96D; }
+.asobo-section-title { font-size: 15px; font-weight: 700; color: #111827; }
+.asobo-section-title svg { width: 16px; height: 16px; margin-right: 5px; vertical-align: -3px; }
+.asobo-section-illust { width: 100%; border-radius: 16px; margin-bottom: 14px; display: block; }
 
-/* 軸フィルターピル */
-.asobo-axis-filter {
-  display: flex; gap: 7px; padding: 0 20px 16px;
-  overflow-x: auto; scrollbar-width: none;
+/* ガチャボタン（強調） */
+.asobo-gacha-wrap { margin-bottom: 12px; }
+.asobo-gacha-btn {
+  width: 100%; border: none; border-radius: 16px;
+  background: #E8A33D; color: #fff;
+  padding: 17px; font-size: 15px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 4px 14px rgba(232,163,61,0.38);
+  animation: asoboGachaPulse 2.4s ease-in-out infinite;
 }
-.asobo-axis-filter::-webkit-scrollbar { display: none; }
-.asobo-axis-pill {
-  flex-shrink: 0; font-size: 11px; font-weight: 600;
-  padding: 5px 13px; border-radius: 20px;
-  border: 1.5px solid #E5E7EB; background: #F9FAFB; color: #6B7280;
-  cursor: pointer; transition: all 0.15s;
+.asobo-gacha-btn svg { width: 20px; height: 20px; }
+.asobo-gacha-btn:active { transform: scale(0.97); background: #D4793E; }
+@keyframes asoboGachaPulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(232,163,61,0.38); }
+  50% { box-shadow: 0 4px 20px rgba(232,163,61,0.6); }
 }
-.asobo-axis-pill.active { background: #E8A33D; color: #fff; border-color: #E8A33D; }
+
+/* ガチャ結果：アコーディオン */
+.asobo-gacha-result { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; margin-bottom: 12px; }
+.asobo-gacha-result.show { grid-template-rows: 1fr; }
+.asobo-gacha-result-inner { overflow: hidden; min-height: 0; }
+.asobo-gacha-card {
+  background: #fff; border: 2px solid #E8A33D;
+  border-radius: 14px; padding: 16px; margin-top: 2px;
+}
+.asobo-gacha-label { font-size: 10px; font-weight: 700; color: #B8680B; letter-spacing: 1.2px; margin-bottom: 8px; text-align: center; }
+.asobo-gacha-en { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 3px; text-align: center; }
+.asobo-gacha-ja { font-size: 12px; color: #6B7280; text-align: center; margin-bottom: 14px; }
+.asobo-gacha-play-row { display: flex; justify-content: center; margin-bottom: 10px; }
+.asobo-timer-btn { position: relative; width: 64px; height: 64px; border: none; background: none; cursor: pointer; }
+.asobo-timer-ring { width: 64px; height: 64px; transform: rotate(-90deg); }
+.asobo-timer-ring-bg { fill: none; stroke: #F0E6D2; stroke-width: 6; }
+.asobo-timer-ring-fg { fill: none; stroke: #E8A33D; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 175.9; stroke-dashoffset: 175.9; }
+.asobo-timer-play-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #B8680B; }
+.asobo-timer-play-icon.playing { color: #2D6A4F; }
+.asobo-joel-line {
+  display: none; align-items: center; justify-content: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: #2D6A4F;
+  background: #EDF6F1; border-radius: 10px; padding: 9px 12px; margin-top: 4px;
+}
+.asobo-joel-line.show { display: flex; }
+.asobo-joel-line img { width: 16px; height: 16px; }
+
+/* 軸フレーム（アコーディオン） */
+.asobo-axis-list { display: flex; flex-direction: column; gap: 10px; }
+.asobo-axis-frame { border-radius: 14px; overflow: hidden; transition: box-shadow 0.15s; }
+.asobo-axis-frame-head {
+  display: flex; align-items: center; gap: 10px; padding: 13px; cursor: pointer;
+}
+.asobo-axis-icon { width: 22px; height: 22px; flex-shrink: 0; }
+.asobo-axis-info { flex: 1; min-width: 0; }
+.asobo-axis-label { font-size: 13px; font-weight: 700; }
+.asobo-axis-count { font-size: 10px; margin-top: 1px; }
+.asobo-axis-chevron { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.25s; }
+.asobo-axis-frame.open .asobo-axis-chevron { transform: rotate(180deg); }
+.asobo-axis-body-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.25s ease; }
+.asobo-axis-frame.open .asobo-axis-body-wrap { grid-template-rows: 1fr; }
+.asobo-axis-body { overflow: hidden; min-height: 0; }
+.asobo-axis-body-inner { padding: 0 13px 13px; display: flex; flex-direction: column; gap: 8px; }
+/* 配色：セージ＋ゴールドの濃淡のみ（既存hex流用） */
+.asobo-axis-frame.tile-color { background: #FFF6E5; color: #B8680B; }
+.asobo-axis-frame.tile-count { background: #EDF6F1; color: #2D6A4F; }
+.asobo-axis-frame.tile-sound { background: #F0E6D2; color: #B8680B; }
+.asobo-axis-frame.tile-location { background: #F0F5F2; color: #4D7D63; }
+.asobo-axis-frame.tile-texture { background: #FFFDF8; color: #D4793E; }
+.asobo-axis-frame.tile-category { background: #F9FAFB; color: #6B7280; }
+.asobo-axis-frame-ring { animation: asoboRing 0.6s ease; }
+@keyframes asoboRing { 0% { box-shadow: 0 0 0 0 rgba(232,163,61,0.5); } 100% { box-shadow: 0 0 0 6px rgba(232,163,61,0); } }
 
 /* 探し物ミッションカード */
 .at-archive-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
@@ -808,40 +861,50 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .at-archive-en { font-size: 14px; font-weight: 600; color: #111827; line-height: 1.4; margin-bottom: 3px; }
 .at-archive-ja { font-size: 11px; color: #6B7280; }
 .at-archive-axis {
-  display: inline-block; font-size: 10px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600;
   background: #FFF6E5; color: #B8680B;
   padding: 2px 8px; border-radius: 8px; margin-top: 6px;
 }
+.at-archive-axis svg { width: 10px; height: 10px; }
 
-/* なぞなぞカード */
-.at-riddle-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
-.at-riddle-card {
-  background: #fff; border: 1px solid #E5E7EB;
-  border-radius: 14px; padding: 16px;
-  transition: border-color 0.15s;
+/* なぞなぞ：今日の1問ガチャ＋フリップ式 */
+.asobo-riddle-result { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; }
+.asobo-riddle-result.show { grid-template-rows: 1fr; }
+.asobo-riddle-result-inner { overflow: hidden; min-height: 0; padding-top: 2px; }
+.asobo-riddle-thinking {
+  background: #fff; border: 1px solid #E5E7EB; border-radius: 14px;
+  padding: 20px; text-align: center; font-size: 13px; font-weight: 600; color: #9CA3AF;
 }
-.at-riddle-card:hover { border-color: #F0C96D; }
-.at-riddle-q { font-size: 15px; font-weight: 600; color: #111827; line-height: 1.45; margin-bottom: 5px; }
-.at-riddle-ja { font-size: 12px; color: #6B7280; line-height: 1.65; margin-bottom: 12px; }
-.at-riddle-row { display: flex; align-items: center; gap: 10px; }
+.asobo-riddle-thinking span { animation: asoboThinkDot 1.2s infinite; opacity: 0.3; }
+.asobo-riddle-thinking span:nth-child(2) { animation-delay: 0.2s; }
+.asobo-riddle-thinking span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes asoboThinkDot { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+.at-riddle-flip { perspective: 1200px; cursor: pointer; }
+.at-riddle-flip-inner {
+  position: relative; min-height: 120px;
+  transition: transform 0.5s; transform-style: preserve-3d;
+}
+.at-riddle-flip.flipped .at-riddle-flip-inner { transform: rotateY(180deg); }
+.at-riddle-flip.at-riddle-flip-ring .at-riddle-flip-inner { animation: asoboRing 0.6s ease; }
+.at-riddle-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  background: #fff; border: 1px solid #E5E7EB; border-radius: 14px;
+  padding: 16px; display: flex; flex-direction: column; justify-content: center;
+}
+.at-riddle-face.back { transform: rotateY(180deg); background: #EDF6F1; border-color: #BBDAC8; }
+.at-riddle-q { font-size: 14px; font-weight: 600; color: #111827; line-height: 1.45; margin-bottom: 5px; padding-right: 34px; }
+.at-riddle-ja { font-size: 11px; color: #6B7280; line-height: 1.6; }
+.at-riddle-hint { font-size: 10px; color: #9CA3AF; margin-top: 10px; }
 .at-riddle-play {
-  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  position: absolute; top: 12px; right: 12px;
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
   background: #E8A33D; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: #fff; transition: background 0.15s;
+  font-size: 12px; color: #fff; transition: background 0.15s;
 }
 .at-riddle-play.playing { background: #BBDAC8; color: #2D6A4F; }
-.at-riddle-show-btn {
-  font-size: 11px; color: #9CA3AF; background: none; border: none;
-  cursor: pointer; padding: 0;
-  text-decoration: underline; text-underline-offset: 2px;
-}
-.at-riddle-answer {
-  display: none; margin-top: 12px; padding: 10px 13px;
-  background: #EDF6F1; border-radius: 10px;
-  font-size: 13px; font-weight: 600; color: #2D6A4F;
-}
-.at-riddle-answer.show { display: block; }
+.at-riddle-answer { font-size: 15px; font-weight: 700; color: #2D6A4F; }
+.at-riddle-answer-label { font-size: 10px; color: #4D7D63; margin-bottom: 4px; }
 
 /* サブスクバナー */
 .sub-banner { margin: 20px 20px 0; background: linear-gradient(135deg, #4D7D63, #6DB88A); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -1505,33 +1568,58 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <div id="tab-asobo" style="display:none;">
 
     <div class="asobo-hero">
-      <div class="asobo-hero-title">あそぼ 🎯</div>
+      <img class="asobo-hero-illust" src="illustrations/asobo-hero.png" alt="あそぼ">
       <div class="asobo-hero-sub">Joelの声に合わせて探したり答えたり。<br>気分でえらんで、何度でも遊べるよ。</div>
     </div>
 
-    <!-- サブタブ：探し物 / なぞなぞ -->
-    <div class="asobo-subtabs">
-      <div class="asobo-subtab active" onclick="switchAsoboSubTab('find', this)">🔍 探し物ミッション</div>
-      <div class="asobo-subtab" onclick="switchAsoboSubTab('riddle', this)">🐮 なぞなぞクイズ</div>
-    </div>
-
-    <!-- 探し物ミッションセクション -->
-    <div id="asoboFindSection">
-      <div class="asobo-axis-filter">
-        <div class="asobo-axis-pill active" onclick="filterAsoboAxis(this,'all')">すべて</div>
-        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'カラー')">🎨 カラー</div>
-        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'カウント')">🔢 カウント</div>
-        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'サウンド')">🔔 サウンド</div>
-        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'ロケーション')">📍 ロケーション</div>
-        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'テクスチャー')">✋ テクスチャー</div>
-        <div class="asobo-axis-pill" onclick="filterAsoboAxis(this,'カテゴリー')">📦 カテゴリー</div>
+    <!-- 1: 探し物ミッション -->
+    <div class="asobo-section">
+      <div class="asobo-section-head">
+        <div class="asobo-section-num">1</div>
+        <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;"><circle cx="10" cy="10" r="6"/><line x1="20" y1="20" x2="14.5" y2="14.5"/></svg>探し物ミッション</div>
       </div>
-      <div class="at-archive-list" id="asoboMissionList"></div>
+      <img class="asobo-section-illust" src="illustrations/asobo-find.png" alt="探し物ミッション">
+      <div class="asobo-gacha-wrap">
+        <button class="asobo-gacha-btn" onclick="drawAsoboGacha()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg> 今日のミッションを引く</button>
+      </div>
+      <div class="asobo-gacha-result" id="asoboGachaResult">
+        <div class="asobo-gacha-result-inner">
+          <div class="asobo-gacha-card">
+            <div class="asobo-gacha-label">TODAY'S MISSION</div>
+            <div class="asobo-gacha-en" id="asoboGachaEn"></div>
+            <div class="asobo-gacha-ja" id="asoboGachaJa"></div>
+            <div class="asobo-gacha-play-row">
+              <button class="asobo-timer-btn" onclick="startAsoboTimer()">
+                <svg class="asobo-timer-ring" viewBox="0 0 64 64">
+                  <circle class="asobo-timer-ring-bg" cx="32" cy="32" r="28"/>
+                  <circle class="asobo-timer-ring-fg" id="asoboTimerRingFg" cx="32" cy="32" r="28"/>
+                </svg>
+                <span class="asobo-timer-play-icon" id="asoboTimerPlayIcon">▶</span>
+              </button>
+            </div>
+            <div class="asobo-joel-line" id="asoboJoelLine"><img src="icons/icon_func_mic.png" alt="マイク">見つかったかな？</div>
+          </div>
+        </div>
+      </div>
+      <div class="asobo-axis-list" id="asoboAxisList"></div>
+      <audio id="asoboTimerBgm" loop preload="none"></audio>
     </div>
 
-    <!-- なぞなぞセクション -->
-    <div id="asoboRiddleSection" style="display:none;">
-      <div class="at-riddle-list" id="asoboRiddleList"></div>
+    <!-- 2: なぞなぞクイズ -->
+    <div class="asobo-section">
+      <div class="asobo-section-head">
+        <div class="asobo-section-num">2</div>
+        <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg>なぞなぞクイズ</div>
+      </div>
+      <img class="asobo-section-illust" src="illustrations/asobo-riddle.png" alt="なぞなぞクイズ">
+      <div class="asobo-gacha-wrap">
+        <button class="asobo-gacha-btn" onclick="drawAsoboRiddle()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg> 今日のなぞなぞを引く</button>
+      </div>
+      <div class="asobo-riddle-result" id="asoboRiddleResult">
+        <div class="asobo-riddle-result-inner">
+          <div id="asoboRiddleResultInner"></div>
+        </div>
+      </div>
     </div>
 
     <div style="height:24px;"></div>
@@ -1951,66 +2039,161 @@ function switchTab(name, el) {
 // ========================
 // あそぼタブ
 // ========================
-let asoboSubTab = 'find';
-let asoboAxisFilter = 'all';
+let asoboOpenAxis = null;
 
-function switchAsoboSubTab(tab, el) {
-  asoboSubTab = tab;
-  asoboAxisFilter = 'all';
-  document.querySelectorAll('.asobo-subtab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  renderAsoboContent();
-}
-
-function filterAsoboAxis(el, axis) {
-  asoboAxisFilter = axis;
-  document.querySelectorAll('.asobo-axis-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  renderAsoboMissions();
-}
+const AXIS_META = {
+  'カラー': { cls: 'tile-color', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3c1.8 0 3.2-1.4 3.2-3.2C20.5 6.6 16.7 3 12 3Z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8" r="1" fill="currentColor" stroke="none"/></svg>' },
+  'カウント': { cls: 'tile-count', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="18" x2="6" y2="14"/><line x1="12" y1="18" x2="12" y2="10"/><line x1="18" y1="18" x2="18" y2="6"/></svg>' },
+  'サウンド': { cls: 'tile-sound', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M17 9a4 4 0 0 1 0 6"/><path d="M19.5 6.5a8 8 0 0 1 0 11"/></svg>' },
+  'ロケーション': { cls: 'tile-location', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.6 7-11.5A7 7 0 0 0 5 9.5C5 14.4 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg>' },
+  'テクスチャー': { cls: 'tile-texture', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11"/><path d="M10 10.5V5a1.5 1.5 0 0 1 3 0v5.5"/><path d="M13 10.5V6a1.5 1.5 0 0 1 3 0v7"/><path d="M16 12v-1a1.5 1.5 0 0 1 3 0v4a5.5 5.5 0 0 1-5.5 5.5h-2A6 6 0 0 1 6 15l-1.6-3a1.4 1.4 0 0 1 2.4-1.4"/></svg>' },
+  'カテゴリー': { cls: 'tile-category', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5L12 12 3.5 7.5Z"/><path d="M3.5 7.5V16L12 20.5V12"/><path d="M20.5 7.5V16L12 20.5"/></svg>' }
+};
+const ICON_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
 function renderAsoboContent() {
-  const findSection = document.getElementById('asoboFindSection');
-  const riddleSection = document.getElementById('asoboRiddleSection');
-  if (!findSection || !riddleSection) return;
-  findSection.style.display = asoboSubTab === 'find' ? 'block' : 'none';
-  riddleSection.style.display = asoboSubTab === 'riddle' ? 'block' : 'none';
-  if (asoboSubTab === 'find') renderAsoboMissions();
-  else renderAsoboRiddles();
+  renderAsoboAxisList();
 }
 
-function renderAsoboMissions() {
-  const list = document.getElementById('asoboMissionList');
-  if (!list) return;
-  const data = asoboAxisFilter === 'all'
-    ? AT_FIND
-    : AT_FIND.filter(d => d.axis === asoboAxisFilter);
-  list.innerHTML = data.map(m => `
-    <div class="at-archive-card">
-      <button class="at-archive-play" onclick="playAtArchiveItem(this)">▶</button>
-      <div class="at-archive-body">
-        <div class="at-archive-en">${m.en}</div>
-        <div class="at-archive-ja">${m.ja}</div>
-        <span class="at-archive-axis">${m.axis}</span>
+function renderAsoboAxisList() {
+  const wrap = document.getElementById('asoboAxisList');
+  if (!wrap) return;
+  const axes = Object.keys(AXIS_META);
+  wrap.innerHTML = axes.map(axis => {
+    const meta = AXIS_META[axis];
+    const missions = AT_FIND.filter(d => d.axis === axis);
+    const cards = missions.map(m => `
+        <div class="at-archive-card">
+          <button class="at-archive-play" onclick="playAtArchiveItem(this); event.stopPropagation();">▶</button>
+          <div class="at-archive-body">
+            <div class="at-archive-en">${m.en}</div>
+            <div class="at-archive-ja">${m.ja}</div>
+          </div>
+        </div>`).join('');
+    return `
+    <div class="asobo-axis-frame ${meta.cls}" id="axisFrame-${meta.cls}" data-axis="${axis}">
+      <div class="asobo-axis-frame-head" onclick="toggleAxisFrame('${axis}')">
+        <div class="asobo-axis-icon">${meta.icon}</div>
+        <div class="asobo-axis-info">
+          <div class="asobo-axis-label">${axis}</div>
+          <div class="asobo-axis-count">${missions.length}このミッション</div>
+        </div>
+        <div class="asobo-axis-chevron">${ICON_CHEVRON}</div>
       </div>
-    </div>
-  `).join('');
+      <div class="asobo-axis-body-wrap">
+        <div class="asobo-axis-body">
+          <div class="asobo-axis-body-inner">${cards}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function renderAsoboRiddles() {
-  const list = document.getElementById('asoboRiddleList');
-  if (!list) return;
-  list.innerHTML = AT_RIDDLE.map(r => `
-    <div class="at-riddle-card">
-      <div class="at-riddle-q">${r.en}</div>
-      <div class="at-riddle-ja">${r.ja}</div>
-      <div class="at-riddle-row">
-        <button class="at-riddle-play" onclick="playAtRiddle(this)">▶</button>
-        <button class="at-riddle-show-btn" onclick="showRiddleAnswer(this)">こたえを見る</button>
+function toggleAxisFrame(axis) {
+  const isOpen = asoboOpenAxis === axis;
+  document.querySelectorAll('.asobo-axis-frame.open').forEach(f => f.classList.remove('open'));
+  asoboOpenAxis = isOpen ? null : axis;
+  if (!isOpen) {
+    const meta = AXIS_META[axis];
+    const frame = document.getElementById('axisFrame-' + meta.cls);
+    if (frame) frame.classList.add('open');
+  }
+}
+
+let asoboTimerTimeout = null;
+const ASOBO_TIMER_CIRCUMFERENCE = 175.9;
+
+function drawAsoboGacha() {
+  const pick = AT_FIND[Math.floor(Math.random() * AT_FIND.length)];
+  document.getElementById('asoboGachaEn').textContent = pick.en;
+  document.getElementById('asoboGachaJa').textContent = pick.ja;
+  document.getElementById('asoboGachaResult').classList.add('show');
+  resetAsoboTimer();
+  const meta = AXIS_META[pick.axis];
+  const frame = document.getElementById('axisFrame-' + meta.cls);
+  if (frame) {
+    frame.classList.remove('asobo-axis-frame-ring');
+    void frame.offsetWidth;
+    frame.classList.add('asobo-axis-frame-ring');
+    setTimeout(() => frame.classList.remove('asobo-axis-frame-ring'), 650);
+  }
+}
+
+function resetAsoboTimer() {
+  clearTimeout(asoboTimerTimeout);
+  const ring = document.getElementById('asoboTimerRingFg');
+  const icon = document.getElementById('asoboTimerPlayIcon');
+  const joelLine = document.getElementById('asoboJoelLine');
+  const bgm = document.getElementById('asoboTimerBgm');
+  if (!ring) return;
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = String(ASOBO_TIMER_CIRCUMFERENCE);
+  icon.classList.remove('playing');
+  icon.textContent = '▶';
+  joelLine.classList.remove('show');
+  try { bgm.pause(); } catch (e) {}
+}
+
+function startAsoboTimer() {
+  const ring = document.getElementById('asoboTimerRingFg');
+  const icon = document.getElementById('asoboTimerPlayIcon');
+  const joelLine = document.getElementById('asoboJoelLine');
+  const bgm = document.getElementById('asoboTimerBgm');
+  if (!ring) return;
+  joelLine.classList.remove('show');
+  icon.classList.add('playing');
+  icon.textContent = '⏸';
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = String(ASOBO_TIMER_CIRCUMFERENCE);
+  void ring.offsetWidth;
+  ring.style.transition = 'stroke-dashoffset 60s linear';
+  ring.style.strokeDashoffset = '0';
+  try { bgm.currentTime = 0; bgm.play().catch(() => {}); } catch (e) {}
+  clearTimeout(asoboTimerTimeout);
+  asoboTimerTimeout = setTimeout(() => {
+    icon.classList.remove('playing');
+    icon.textContent = '▶';
+    joelLine.classList.add('show');
+    try { bgm.pause(); } catch (e) {}
+  }, 60000);
+}
+
+let asoboRiddleTimeout = null;
+
+function drawAsoboRiddle() {
+  const wrap = document.getElementById('asoboRiddleResult');
+  const inner = document.getElementById('asoboRiddleResultInner');
+  wrap.classList.add('show');
+  inner.innerHTML = '<div class="asobo-riddle-thinking">考え中<span>.</span><span>.</span><span>.</span></div>';
+  clearTimeout(asoboRiddleTimeout);
+  asoboRiddleTimeout = setTimeout(() => {
+    const r = AT_RIDDLE[Math.floor(Math.random() * AT_RIDDLE.length)];
+    inner.innerHTML = `
+    <div class="at-riddle-flip" onclick="toggleRiddleFlip(this)">
+      <div class="at-riddle-flip-inner">
+        <div class="at-riddle-face front">
+          <div class="at-riddle-q">${r.en}</div>
+          <div class="at-riddle-ja">${r.ja}</div>
+          <div class="at-riddle-hint">タップしてこたえを見る</div>
+          <button class="at-riddle-play" onclick="playAtRiddle(this,event)">▶</button>
+        </div>
+        <div class="at-riddle-face back">
+          <div class="at-riddle-answer-label">こたえ</div>
+          <div class="at-riddle-answer">${r.answer}</div>
+        </div>
       </div>
-      <div class="at-riddle-answer">🎉 ${r.answer}</div>
-    </div>
-  `).join('');
+    </div>`;
+  }, 800);
+}
+
+function toggleRiddleFlip(card) {
+  card.classList.toggle('flipped');
+  if (card.classList.contains('flipped')) {
+    card.classList.remove('at-riddle-flip-ring');
+    void card.offsetWidth;
+    card.classList.add('at-riddle-flip-ring');
+    setTimeout(() => card.classList.remove('at-riddle-flip-ring'), 650);
+  }
 }
 
 function playAtArchiveItem(btn) {
@@ -2024,7 +2207,8 @@ function playAtArchiveItem(btn) {
   }
 }
 
-function playAtRiddle(btn) {
+function playAtRiddle(btn, evt) {
+  if (evt) evt.stopPropagation();
   const wasPlaying = btn.classList.contains('playing');
   document.querySelectorAll('.at-archive-play.playing, .at-riddle-play.playing').forEach(b => {
     b.classList.remove('playing'); b.textContent = '▶';
@@ -2033,13 +2217,6 @@ function playAtRiddle(btn) {
     btn.classList.add('playing'); btn.textContent = '⏸';
     setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶'; }, 3500);
   }
-}
-
-function showRiddleAnswer(btn) {
-  const card = btn.closest('.at-riddle-card');
-  const answer = card.querySelector('.at-riddle-answer');
-  const showing = answer.classList.toggle('show');
-  btn.textContent = showing ? 'こたえを隠す' : 'こたえを見る';
 }
 
 // ========================
@@ -2406,12 +2583,12 @@ const AT_FIND = [
   { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう' },
 ];
 const AT_RIDDLE = [
-  { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？', answer: 'cow 🐄' },
-  { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？', answer: 'dog 🐶' },
-  { axis: 'なぞなぞ', en: 'I am yellow and I can fly. What am I?', ja: '黄色くて飛べるよ。私は誰？', answer: 'bird 🐦' },
-  { axis: 'なぞなぞ', en: 'I say meow. What am I?', ja: 'ニャーって鳴くよ。私は誰？', answer: 'cat 🐱' },
-  { axis: 'なぞなぞ', en: 'I am big and gray. I have a long nose. What am I?', ja: '大きくて灰色。長いお鼻があるよ。私は誰？', answer: 'elephant 🐘' },
-  { axis: 'なぞなぞ', en: 'I am orange with black stripes. What am I?', ja: 'オレンジ色に黒いしましまがあるよ。私は誰？', answer: 'tiger 🐯' },
+  { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？', answer: 'cow' },
+  { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？', answer: 'dog' },
+  { axis: 'なぞなぞ', en: 'I am yellow and I can fly. What am I?', ja: '黄色くて飛べるよ。私は誰？', answer: 'bird' },
+  { axis: 'なぞなぞ', en: 'I say meow. What am I?', ja: 'ニャーって鳴くよ。私は誰？', answer: 'cat' },
+  { axis: 'なぞなぞ', en: 'I am big and gray. I have a long nose. What am I?', ja: '大きくて灰色。長いお鼻があるよ。私は誰？', answer: 'elephant' },
+  { axis: 'なぞなぞ', en: 'I am orange with black stripes. What am I?', ja: 'オレンジ色に黒いしましまがあるよ。私は誰？', answer: 'tiger' },
 ];
 let atMode = 'find';
 let atIndex = 0;
