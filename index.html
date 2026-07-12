@@ -12,38 +12,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    オンボーディング
 ============================== */
-#onboarding {
-  position: fixed; inset: 0; z-index: 200;
-  background: #ffffff;
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 40px 28px 32px;
-  max-width: 390px; margin: 0 auto; overflow-y: auto;
-}
-.ob-logo { font-size: 20px; font-weight: 500; color: #111827; margin-bottom: 4px; letter-spacing: -0.3px; }
-.ob-logo span { color: #6DB88A; }
-.ob-tagline { font-size: 11px; color: #9CA3AF; margin-bottom: 32px; text-align: center; }
-.ob-question { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 4px; text-align: center; line-height: 1.4; }
-.ob-hint { font-size: 12px; color: #9CA3AF; margin-bottom: 22px; text-align: center; }
-.interest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 24px; }
-.interest-card {
-  background: #F9FAFB; border: 1.5px solid #E5E7EB;
-  border-radius: 16px; padding: 22px 10px 18px;
-  text-align: center; cursor: pointer; transition: all 0.15s;
-}
-.interest-card:active { transform: scale(0.97); }
-.interest-card.selected { background: #EDF6F1; border-color: #6DB88A; }
-.ic-emoji { font-size: 28px; display: block; margin-bottom: 10px; }
-.ic-label { font-size: 13px; font-weight: 600; color: #374151; }
-.interest-card.selected .ic-label { color: #2D6A4F; }
-.ic-sub { font-size: 10px; color: #9CA3AF; margin-top: 2px; }
-.ob-btn {
-  width: 100%; height: 52px; background: #6DB88A; border: none; border-radius: 14px;
-  font-size: 15px; font-weight: 600; color: white; cursor: pointer;
-  opacity: 0.35; transition: opacity 0.2s, background 0.15s;
-}
-.ob-btn.ready { opacity: 1; }
-.ob-btn.ready:hover { background: #5aa577; }
-.ob-skip { margin-top: 14px; font-size: 12px; color: #9CA3AF; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+/* オンボーディング（興味選択）は2026年7月に廃止・別ファイルへ退避済み
+   → enverly_onboarding_interest_module.html を参照 */
 
 /* ヘッダー */
 .header { padding: 24px 20px 16px; border-bottom: 0.5px solid #E5E7EB; }
@@ -52,12 +22,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .logo span { color: #6DB88A; }
 .week-badge { font-size: 11px; background: #EDF6F1; color: #4D7D63; padding: 3px 10px; border-radius: 20px; }
 .header-sub { font-size: 12px; color: #6B7280; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.interest-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; background: #EDF6F1; color: #4D7D63;
-  padding: 3px 10px; border-radius: 20px; cursor: pointer;
-  border: 1px solid #BBDAC8; flex-shrink: 0;
-}
 
 /* タブ */
 .tab-bar { display: flex; border-bottom: 0.5px solid #E5E7EB; margin: 0 20px; }
@@ -124,17 +88,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 /* コンテンツエリア */
 .weekly-mission-content { padding: 14px 16px 20px; }
-.weekly-mission-panel .week-strip-wrap { margin: 0; }
 .weekly-mission-panel .ft-wrap { margin: 20px 0 0; }
 .weekly-mission-panel .at-wrap { margin: 20px 0 0; }
 .weekly-mission-panel .ft-eyebrow-label { color: #2D6A4F; }
 .weekly-mission-panel .at-eyebrow-label { color: #2D6A4F; }
 .weekly-mission-panel .ft-eyebrow-line,
 .weekly-mission-panel .at-eyebrow-line { background: rgba(45,106,79,0.18); }
-.weekly-mission-panel .ft-card { box-shadow: 0 6px 18px rgba(42,38,64,0.15); }
+.weekly-mission-panel .ft-card { box-shadow: 0 6px 18px rgba(45,106,79,0.10); }
 .weekly-mission-panel p { color: #4D7D63 !important; }
-.weekly-mission-panel .week-strip-label { color: #4D7D63; }
-.weekly-mission-panel .week-strip-line { background: rgba(45,106,79,0.18); }
 
 /* Weekly Pick ブロック（Weekly Mission内） */
 .weekly-pick-block { margin-top: 22px; padding-top: 20px; border-top: 1px solid #BBDAC8; }
@@ -198,36 +159,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-tip-num { width: 18px; height: 18px; border-radius: 50%; background: rgba(159,225,203,0.25); color: #BBDAC8; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
 
 /* ==============================
-   週間スケジュールストリップ（Morning Talk / Active Time 切替）
-============================== */
-.week-strip-wrap { margin: 22px 20px 0; }
-.week-strip-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.week-strip-label { font-size: 13px; font-weight: 600; color: #4D7D63; }
-.week-strip-line { flex: 1; height: 1px; background: rgba(45,106,79,0.18); }
-.week-strip { display: flex; gap: 6px; margin-bottom: 12px; }
-.week-day-pill {
-  flex: 1; position: relative; background: rgba(255,255,255,0.55); border: 1.5px solid transparent;
-  border-radius: 14px; padding: 10px 2px 8px; text-align: center; cursor: pointer;
-  transition: all 0.15s;
-}
-.week-day-pill:hover { background: rgba(255,255,255,0.8); }
-.week-day-pill.today { border-color: #6DB88A; }
-.week-day-pill.peeked { background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.week-day-pill.active { background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.week-day-icon { font-size: 16px; margin-bottom: 4px; }
-.week-day-label { font-size: 11px; font-weight: 600; color: #4D7D63; }
-.week-day-badge {
-  position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
-  font-size: 8px; font-weight: 700; background: #6DB88A; color: #fff;
-  padding: 1px 6px; border-radius: 8px; white-space: nowrap;
-}
-.week-reason-text {
-  font-size: 12px; font-weight: 500; color: #2D6A4F; background: rgba(255,255,255,0.6);
-  border-radius: 10px; padding: 9px 12px; line-height: 1.5;
-}
-
-/* ==============================
-   Active Time（日替わり・火木土日）
+   Active Time（ホーム非表示・あそぼタブのみ／スタイル定義は流用）
 ============================== */
 .at-wrap { margin: 22px 20px 0; }
 .at-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
@@ -285,33 +217,25 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-eyebrow-label { font-size: 19px; font-weight: 600; letter-spacing: -0.3px; text-transform: none; color: #B8860B; display: flex; align-items: center; gap: 7px; }
 .ft-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
 .ft-eyebrow-sub { font-size: 11px; color: #9CA3AF; margin: -6px 0 12px; }
+.ft-today-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.ft-date-badge { font-size: 14px; font-weight: 700; color: #4D7D63; }
+.ft-status-tag { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
+.ft-status-tag.new { background: #E8A33D; color: #fff; }
+.ft-status-tag.replay { background: rgba(77,125,99,0.12); color: #4D7D63; }
+.ft-replay-note { font-size: 12px; color: #6B7280; margin: 0 0 12px; }
 .ft-card {
-  background: linear-gradient(165deg, #1A4232 0%, #0F2B1F 100%); border-radius: 18px; overflow: hidden;
-  position: relative; box-shadow: 0 8px 24px rgba(15,43,31,0.28);
+  background: linear-gradient(165deg, #EAF4EE 0%, #DCEFE4 100%); border-radius: 18px; overflow: hidden;
+  position: relative; box-shadow: 0 6px 18px rgba(45,106,79,0.10); border: 1px solid #CFE6D9;
 }
 .ft-card-top { padding: 18px 18px 0; position: relative; z-index: 1; }
-.ft-show-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.ft-show-icon {
-  width: 38px; height: 38px; border-radius: 10px;
-  background: linear-gradient(135deg, #6DB88A, #4D9E6D);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; flex-shrink: 0;
-}
-.ft-show-name { font-size: 13px; font-weight: 700; color: #fff; }
-.ft-show-meta { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
-.ft-theme-tag {
-  margin-left: auto; font-size: 9px; font-weight: 600;
-  background: rgba(109,184,138,0.2); color: #9FE1CB;
-  padding: 3px 9px; border-radius: 10px; white-space: nowrap;
-}
-.ft-question { font-size: 16px; font-weight: 600; color: #fff; line-height: 1.45; margin-bottom: 4px; }
-.ft-question-ja { font-size: 11px; color: rgba(255,255,255,0.45); margin-bottom: 16px; }
+.ft-question { font-size: 16px; font-weight: 600; color: #1A4232; line-height: 1.45; margin-bottom: 4px; }
+.ft-question-ja { font-size: 11px; color: #6B8577; margin-bottom: 16px; }
 
 /* 波形ビジュアル */
 .ft-wave { display: flex; align-items: center; gap: 3px; height: 28px; margin-bottom: 14px; }
 .ft-wave-bar {
   width: 3px; border-radius: 2px; flex-shrink: 0;
-  background: rgba(255,255,255,0.18);
+  background: rgba(45,106,79,0.18);
   transition: background 0.25s;
   transform-origin: center;
 }
@@ -325,7 +249,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   .ft-wave.is-playing .ft-wave-bar { animation: none; }
 }
 
-.ft-player-inner { background: rgba(255,255,255,0.06); border-radius: 14px 14px 0 0; margin: 0 0; padding: 14px 16px; position: relative; z-index: 1; }
+.ft-player-inner { background: rgba(255,255,255,0.55); border-radius: 14px 14px 0 0; margin: 0 0; padding: 14px 16px; position: relative; z-index: 1; }
 .ft-play-row { display: flex; align-items: center; gap: 12px; }
 .ft-play-btn {
   width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
@@ -335,23 +259,23 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .ft-play-btn:hover { background: #5aa577; }
 .ft-play-meta { flex: 1; min-width: 0; }
-.ft-play-title { font-size: 12px; font-weight: 600; color: #fff; }
-.ft-play-len { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
-.ft-prog-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; cursor: pointer; }
+.ft-play-title { font-size: 12px; font-weight: 600; color: #1A4232; }
+.ft-play-len { font-size: 10px; color: #6B8577; margin-top: 1px; }
+.ft-prog-bar { flex: 1; height: 3px; background: rgba(45,106,79,0.15); border-radius: 2px; overflow: hidden; cursor: pointer; }
 .ft-prog-fill { height: 100%; background: #6DB88A; width: 0%; border-radius: 2px; transition: width 0.4s linear; }
 .ft-prog-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-.ft-prog-time { font-size: 10px; color: rgba(255,255,255,0.4); min-width: 32px; text-align: right; }
+.ft-prog-time { font-size: 10px; color: #6B8577; min-width: 32px; text-align: right; }
 
 .ft-phrases-toggle { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px 15px; cursor: pointer; position: relative; z-index: 1; }
-.ft-phrases-label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6); }
-.ft-phrases-chevron { font-size: 10px; color: rgba(255,255,255,0.35); transition: transform 0.25s; }
+.ft-phrases-label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 500; color: #4D7D63; }
+.ft-phrases-chevron { font-size: 10px; color: #9CA3AF; transition: transform 0.25s; }
 .ft-phrases-chevron.open { transform: rotate(180deg); }
 .ft-phrases-body { display: none; margin: 0 16px 14px; }
 .ft-phrases-body.open { display: block; }
-.ft-phrase-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.8); padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.07); }
+.ft-phrase-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: #374151; padding: 6px 0; border-top: 1px solid rgba(45,106,79,0.1); }
 .ft-phrase-row:first-child { border-top: none; }
-.ft-phrase-en { font-weight: 600; color: #fff; }
-.ft-phrase-ja { color: rgba(255,255,255,0.4); font-size: 11px; }
+.ft-phrase-en { font-weight: 600; color: #1A4232; }
+.ft-phrase-ja { color: #6B8577; font-size: 11px; }
 
 /* エピソード一覧（今週分） */
 .ft-ep-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
@@ -378,6 +302,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   margin-top: 12px; padding: 10px 0;
   font-size: 12px; font-weight: 600; color: #4D7D63;
   cursor: pointer; background: none; border: none; width: 100%;
+}
+.ft-auto-next { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #E5E7EB; }
+.ft-auto-next.show { display: block; }
+.ft-auto-next-label { font-size: 11px; color: #6B7280; display: flex; align-items: center; gap: 5px; }
+.ft-auto-next-stop {
+  background: none; border: none; color: #6DB88A; font-size: 15px;
+  cursor: pointer; flex-shrink: 0; padding: 4px 8px;
 }
 
 /* ==============================
@@ -734,13 +665,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   line-height: 1.65; margin-bottom: 14px;
 }
 .carousel-card-yt {
-  display: inline-flex; align-items: center; gap: 5px;
-  background: #FF0000; color: white;
-  font-size: 11px; font-weight: 600;
-  padding: 7px 14px; border-radius: 10px;
-  text-decoration: none; transition: opacity 0.15s;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #fff; color: #6B7280;
+  font-size: 11px; font-weight: 500;
+  padding: 6px 12px; border-radius: 8px;
+  border: 0.5px solid #E5E7EB;
+  text-decoration: none; transition: background 0.15s;
 }
-.carousel-card-yt:hover { opacity: 0.85; }
+.carousel-card-yt:hover { background: #F9FAFB; }
+.carousel-card-yt span { color: #E24B4A; font-size: 10px; }
 .carousel-dots {
   display: flex; align-items: center; justify-content: center;
   gap: 7px; margin-top: 18px;
@@ -771,6 +704,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   position: relative; overflow: hidden;
 }
 .pl-icon.pl-icon-placeholder { background: #EEF0F2; }
+/* シーン別カード */
+.scene-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; }
+.scene-card { background: #fff; border: 0.5px solid #E5E7EB; border-radius: 14px; overflow: hidden; text-decoration: none; display: block; }
+.scene-card-thumb { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #EEF0F2; }
+.scene-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.scene-card-tag { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 8px; margin: 10px 12px 6px; }
+.scene-card-channel { font-size: 12px; font-weight: 500; color: #111827; padding: 0 12px; }
+.scene-card-note { font-size: 10.5px; color: #6B7280; line-height: 1.55; padding: 3px 12px 10px; }
+.scene-card-cta { display: flex; align-items: center; gap: 4px; margin: 0 12px 12px; padding: 6px 0; border-top: 0.5px solid #E5E7EB; padding-top: 8px; color: #6B7280; font-size: 11px; }
+.scene-card-cta span { color: #E24B4A; font-size: 10px; }
 .pl-icon-play {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   background: rgba(0,0,0,0.18);
@@ -787,43 +730,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .pl-sub { font-size: 11px; color: #6B7280; margin-top: 2px; }
 .pl-age { font-size: 10px; background: #E6F1FB; color: #0C447C; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
 
-/* ハートボタン */
-.pl-heart {
-  width: 30px; height: 30px; border-radius: 50%;
-  border: 0.5px solid #E5E7EB; background: #fff;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0; font-size: 14px;
-  transition: all 0.15s; color: #D1D5DB;
-}
-.pl-heart.liked { color: #F87171; border-color: #FCA5A5; background: #FEF2F2; }
-
 /* YouTubeボタン */
 .pl-yt {
-  display: flex; align-items: center; gap: 5px;
-  background: #FF0000; color: white;
-  font-size: 10px; font-weight: 600;
-  padding: 5px 10px; border-radius: 8px;
+  display: flex; align-items: center; gap: 4px;
+  background: #fff; color: #6B7280;
+  font-size: 11px; font-weight: 500;
+  padding: 6px 10px; border-radius: 8px;
+  border: 0.5px solid #E5E7EB;
   text-decoration: none; flex-shrink: 0;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
 }
-.pl-yt:hover { opacity: 0.85; }
-.pl-yt-icon { font-size: 11px; }
-
-/* ==============================
-   お気に入りセクション（音楽タブ）
-============================== */
-.favorites-section { padding: 20px 20px 0; }
-.fav-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.fav-title-en { font-size: 18px; font-weight: 700; color: #111827; letter-spacing: -0.3px; }
-.fav-title-ja { font-size: 11px; color: #6B7280; margin-top: 2px; }
-.fav-empty {
-  background: #F9FAFB; border: 1.5px dashed #E5E7EB;
-  border-radius: 14px; padding: 24px 20px;
-  text-align: center;
-}
-.fav-empty-icon { font-size: 28px; margin-bottom: 8px; }
-.fav-empty-text { font-size: 13px; color: #9CA3AF; line-height: 1.6; }
-.fav-empty-hint { font-size: 11px; color: #BBDAC8; margin-top: 6px; }
+.pl-yt:hover { background: #F9FAFB; }
+.pl-yt-icon { font-size: 10px; color: #E24B4A; }
 
 /* シーン別区切り */
 .scene-divider {
@@ -1005,24 +923,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* YouTubeキュレーション */
 .yt-section { padding: 20px 20px 0; }
 .yt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.yt-label { font-size: 11px; font-weight: 500; color: #6B7280; letter-spacing: 0.8px; text-transform: uppercase; }
-.yt-note { font-size: 10px; color: #9CA3AF; }
-.yt-card { background: #F9FAFB; border-radius: 14px; overflow: hidden; border: 0.5px solid #E5E7EB; margin-bottom: 10px; display: flex; align-items: stretch; }
-.yt-thumb { width: 88px; flex-shrink: 0; background: #9FE1CB; display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; }
-.yt-thumb .yt-play-icon { position: absolute; width: 28px; height: 28px; background: rgba(0,0,0,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; }
-.yt-body { padding: 12px 13px; flex: 1; min-width: 0; }
-.yt-title { font-size: 13px; font-weight: 500; color: #111827; margin-bottom: 3px; line-height: 1.4; }
-.yt-channel { font-size: 11px; color: #6B7280; margin-bottom: 6px; }
-.yt-tags { display: flex; gap: 5px; flex-wrap: wrap; }
-.yt-tag { font-size: 10px; padding: 2px 7px; border-radius: 8px; }
-.yt-tag-when { background: #EDF6F1; color: #4D7D63; }
-.yt-tag-age { background: #E6F1FB; color: #0C447C; }
-.yt-tag-int { background: #FAEEDA; color: #92400E; }
-.yt-tip { font-size: 11px; color: #4D7D63; margin-top: 8px; padding-top: 8px; border-top: 0.5px solid #E5E7EB; line-height: 1.6; }
-.interest-filter { display: flex; gap: 7px; padding: 0 20px; margin-bottom: 2px; overflow-x: auto; scrollbar-width: none; }
-.interest-filter::-webkit-scrollbar { display: none; }
-.ifilter-pill { flex-shrink: 0; font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1px solid #E5E7EB; background: #F9FAFB; color: #6B7280; cursor: pointer; transition: all 0.15s; }
-.ifilter-pill.active { background: #4D7D63; color: white; border-color: #4D7D63; }
+.yt-label { font-size: 15px; font-weight: 500; color: #111827; letter-spacing: -0.2px; }
+.yt-note { font-size: 10px; color: #9CA3AF; display: flex; align-items: center; gap: 3px; margin-top: 2px; }
+.yt-card { background: #ffffff; border-radius: 12px; border: 0.5px solid #E5E7EB; margin-bottom: 8px; padding: 10px 12px; }
+.yt-card-top { display: flex; align-items: center; gap: 12px; }
+.yt-thumb { width: 64px; height: 48px; border-radius: 10px; background: #EDF6F1; flex-shrink: 0; overflow: hidden; }
+.yt-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.yt-body { flex: 1; min-width: 0; }
+.yt-title { font-size: 13px; font-weight: 500; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.yt-channel { font-size: 11px; color: #6B7280; margin-top: 2px; }
+.yt-cta { display: flex; align-items: center; gap: 4px; flex-shrink: 0; padding: 6px 10px; border-radius: 8px; border: 0.5px solid #E5E7EB; color: #6B7280; text-decoration: none; }
+.yt-cta span { font-size: 11px; }
+.yt-tip { display: flex; gap: 5px; font-size: 10.5px; color: #6B7280; margin-top: 8px; padding-top: 8px; border-top: 0.5px solid #E5E7EB; line-height: 1.6; }
 
 /* 「読もう」ボタン（メインカード） */
 .month-read-btn {
@@ -1259,47 +1171,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 </head>
 <body>
 
-<!-- オンボーディング -->
-<div id="onboarding">
-  <div class="ob-logo">En<span>verly</span></div>
-  <div class="ob-tagline">まず、お子さんのことを教えてください</div>
-  <div class="ob-question">好きなものは<br>なんですか？</div>
-  <div class="ob-hint">複数選べます · あとから変更できます</div>
-  <div class="interest-grid">
-    <div class="interest-card" onclick="toggleInterest(this,'🚗','のりもの')">
-      <span class="ic-emoji"><img class="icon-img" style="width:80px;height:80px;" src="icons/icon_interest_norimono.png" alt="のりもの"></span>
-      <div class="ic-label">のりもの</div>
-      <div class="ic-sub">車・電車・飛行機</div>
-    </div>
-    <div class="interest-card" onclick="toggleInterest(this,'🧸','おにんぎょう')">
-      <span class="ic-emoji"><img class="icon-img" style="width:80px;height:80px;" src="icons/icon_interest_oningyou.png" alt="おにんぎょう"></span>
-      <div class="ic-label">おにんぎょう</div>
-      <div class="ic-sub">人形・ぬいぐるみ</div>
-    </div>
-    <div class="interest-card" onclick="toggleInterest(this,'🐘','どうぶつ')">
-      <span class="ic-emoji"><img class="icon-img" style="width:80px;height:80px;" src="icons/icon_interest_doubutsu.png" alt="どうぶつ"></span>
-      <div class="ic-label">どうぶつ</div>
-      <div class="ic-sub">いきもの全般</div>
-    </div>
-    <div class="interest-card" onclick="toggleInterest(this,'🎵','おんがく')">
-      <span class="ic-emoji"><img class="icon-img" style="width:80px;height:80px;" src="icons/icon_interest_ongaku.png" alt="おんがく"></span>
-      <div class="ic-label">おんがく・ダンス</div>
-      <div class="ic-sub">歌・リズム好き</div>
-    </div>
-    <div class="interest-card" onclick="toggleInterest(this,'🍳','おままごと')">
-      <span class="ic-emoji"><img class="icon-img" style="width:80px;height:80px;" src="icons/icon_interest_omamagoto.png" alt="おままごと"></span>
-      <div class="ic-label">おままごと</div>
-      <div class="ic-sub">料理・食べ物</div>
-    </div>
-    <div class="interest-card" onclick="toggleInterest(this,'🦸','ヒーロー')">
-      <span class="ic-emoji"><img class="icon-img" style="width:80px;height:80px;" src="icons/icon_interest_hero.png" alt="ヒーロー"></span>
-      <div class="ic-label">ヒーロー・冒険</div>
-      <div class="ic-sub">アクション好き</div>
-    </div>
-  </div>
-  <button class="ob-btn" id="obBtn" onclick="finishOnboarding()" disabled>はじめる →</button>
-  <div class="ob-skip" onclick="finishOnboarding(true)">あとで設定する</div>
-</div>
+<!-- オンボーディング（興味選択）は2026年7月に廃止・別ファイルへ退避済み
+     → enverly_onboarding_interest_module.html を参照 -->
 
 <!-- 絵本ビューワーモーダル -->
 <div class="book-viewer-modal" id="bookViewerModal">
@@ -1328,7 +1201,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 </div>
 
 <!-- メインアプリ -->
-<div class="app" id="mainApp" style="display:none;">
+<div class="app" id="mainApp">
 
   <!-- ヘッダー -->
   <div class="header">
@@ -1341,7 +1214,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <!-- タブバー -->
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('home',this)">今週</div>
-    <div class="tab" onclick="switchTab('playlist',this)">音楽</div>
+    <div class="tab" onclick="switchTab('playlist',this)">みる</div>
     <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
   </div>
@@ -1349,52 +1222,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <!-- 今週タブ -->
   <div id="tab-home">
 
-    <!-- ① 今月の教材絵本（最上位ヒーロー） -->
-    <div class="month-hero-section">
-      <div class="month-lesson-wrap">
-        <div class="month-lesson-eyebrow">
-          <div class="month-eyebrow-label">
-            <span class="month-eyebrow-en">Monthly Book</span>
-            今月の教材絵本
-          </div>
-          <div class="month-eyebrow-line"></div>
-        </div>
-        <div class="month-lesson-card">
-          <div class="month-lesson-card-hero">
-            <img src="enverly_img.png" alt="Enverly">
-            <div class="month-hero-overlay">
-              <span class="month-hero-label">Joelと一緒に読もう</span>
-            </div>
-          </div>
-          <div class="month-lesson-top" style="padding-bottom:20px;">
-            <div class="month-theme-row">
-              <div class="month-theme-dot"></div>
-              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
-            </div>
-            <div class="month-title">Sunny Day!</div>
-            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
-            <div class="month-read-btn-row">
-              <button class="month-read-btn" onclick="openBookModal('listen')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Listening</span>
-                  <span class="month-read-btn-ja">聞く</span>
-                </span>
-              </button>
-              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Talking</span>
-                  <span class="month-read-btn-ja">話す</span>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /month-hero-section -->
-
-    <!-- ② Weekly Mission（絵本セクションと同じ構造：見出しが外、画像がパネル内） -->
+    <!-- ① 今日のEnverly（曜日でMorning Talk/Active Time自動切替・週ストリップ内蔵） -->
     <div class="weekly-mission-wrap">
       <div class="weekly-mission-eyebrow">
         <div class="weekly-mission-label">Weekly Mission <span class="weekly-mission-label-ja">今週のプログラム</span></div>
@@ -1406,34 +1234,21 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </div>
         <div class="weekly-mission-content">
 
-      <!-- 今週のスケジュール -->
-      <div class="week-strip-wrap">
-        <div class="week-strip-eyebrow">
-          <div class="week-strip-label"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_calendar.png" alt="カレンダー"> 今週のスケジュール</div>
-          <div class="week-strip-line"></div>
-        </div>
-        <div class="week-strip" id="weekStrip"></div>
-        <div class="week-reason-text" id="weekReasonText"></div>
-      </div>
-
-      <!-- Morning Talk（ポッドキャスト・プレミアム限定）／月・水・金に表示 -->
+      <!-- Morning Talk（ポッドキャスト・プレミアム限定）／毎日表示・新作は月・水・金 -->
       <div class="ft-wrap" id="ftWrap">
         <div class="ft-eyebrow">
           <div class="ft-eyebrow-label"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> Morning Talk</div>
           <div class="ft-eyebrow-line"></div>
         </div>
         <div class="ft-eyebrow-sub">朝のラジオ</div>
+        <div class="ft-today-row">
+          <span class="ft-date-badge" id="ftDateBadge"></span>
+          <span class="ft-status-tag" id="ftStatusTag"></span>
+        </div>
+        <div class="ft-replay-note" id="ftReplayNote" style="display:none;"></div>
         <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">朝のひととき、ラジオ感覚で流してみてね。<br>ふと出てきたフレーズが、今日の親子の話のきっかけになりますように。</p>
         <div class="ft-card">
           <div class="ft-card-top">
-            <div class="ft-show-row">
-              <div class="ft-show-icon"><img class="icon-img" style="width:32px;height:32px;" src="icons/icon_func_mic.png" alt="マイク"></div>
-              <div>
-                <div class="ft-show-name">Joel &amp; Mai Time</div>
-                <div class="ft-show-meta">月・水・金、夫婦のゆるい英語トーク</div>
-              </div>
-              <div class="ft-theme-tag">Colors &amp; Animals</div>
-            </div>
             <div class="ft-question">"What animal did you see today?"</div>
             <div class="ft-question-ja">今日のお話：今日見た動物は何色だった？</div>
             <div class="ft-wave" id="ftWave"></div>
@@ -1480,9 +1295,20 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           </div>
         </div>
         <button class="ft-archive-link" onclick="openArchiveModal()">これまでの放送 →</button>
+
+        <!-- Morning Talk終了後、自動で朝の音楽に切り替わる導線（プロトタイプ：視覚状態のみ再現。
+             実音源チェーンは著作権フリー音源ライブラリ選定後に実装） -->
+        <div class="ft-auto-next" id="ftAutoNext">
+          <div class="ft-auto-next-label"><img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_headphone.png" alt="音楽"> そのまま朝の音楽が流れています</div>
+          <div class="playlist-item playing" style="margin-top:8px;">
+            <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>♪</span></div></div>
+            <div class="pl-info"><div class="pl-title">Morning Routine Songs</div><div class="pl-sub">朝の支度BGM · 自動再生中</div></div>
+            <button class="ft-auto-next-stop" onclick="stopFtAutoNext()">⏸</button>
+          </div>
+        </div>
       </div>
 
-      <!-- Active Time（探し物ミッション／なぞなぞクイズ）／火・木・土・日に表示 -->
+      <!-- Active Time（探し物ミッション／なぞなぞクイズ）／ホームからは非表示。あそぼタブへ移動 -->
       <div class="at-wrap" id="atWrap" style="display:none;">
         <div class="at-eyebrow">
           <div class="at-eyebrow-label"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブタイム"> Active Time</div>
@@ -1589,6 +1415,51 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       </div><!-- /weekly-mission-panel -->
     </div><!-- /weekly-mission-wrap -->
 
+    <!-- ② 今月の教材絵本 -->
+    <div class="month-hero-section">
+      <div class="month-lesson-wrap">
+        <div class="month-lesson-eyebrow">
+          <div class="month-eyebrow-label">
+            <span class="month-eyebrow-en">Monthly Book</span>
+            今月の教材絵本
+          </div>
+          <div class="month-eyebrow-line"></div>
+        </div>
+        <div class="month-lesson-card">
+          <div class="month-lesson-card-hero">
+            <img src="enverly_img.png" alt="Enverly">
+            <div class="month-hero-overlay">
+              <span class="month-hero-label">Joelと一緒に読もう</span>
+            </div>
+          </div>
+          <div class="month-lesson-top" style="padding-bottom:20px;">
+            <div class="month-theme-row">
+              <div class="month-theme-dot"></div>
+              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
+            </div>
+            <div class="month-title">Sunny Day!</div>
+            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
+            <div class="month-read-btn-row">
+              <button class="month-read-btn" onclick="openBookModal('listen')">
+                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Listening</span>
+                  <span class="month-read-btn-ja">聞く</span>
+                </span>
+              </button>
+              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
+                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Talking</span>
+                  <span class="month-read-btn-ja">話す</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /month-hero-section -->
+
     <!-- ③ Monthly Playlist（独立セクション・3曲） -->
     <div class="monthly-playlist-section">
       <div class="monthly-playlist-eyebrow">
@@ -1616,74 +1487,17 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="yt-section" id="ytFullSection" style="padding-top:20px;">
       <div class="yt-header">
         <div>
-          <div class="yt-label">YouTube かけ流し おすすめ</div>
-          <div class="yt-note">編集部が厳選 <img class="icon-img" style="width:14px;height:14px;" src="icons/icon_func_check.png" alt="チェック"></div>
+          <div class="yt-label">おすすめの英語学習YouTube</div>
+          <div class="yt-note">Maiが実際に見せているチャンネル <img class="icon-img" style="width:14px;height:14px;" src="icons/icon_func_check.png" alt="チェック"></div>
         </div>
-        <span class="interest-badge" id="interestBadge" onclick="showOnboarding()" style="display:none;"></span>
-      </div>
-      <div class="interest-filter" id="ytFilter">
-        <div class="ifilter-pill active" onclick="filterYT(this,'all')">すべて</div>
-        <div class="ifilter-pill" onclick="filterYT(this,'のりもの')">🚗 のりもの</div>
-        <div class="ifilter-pill" onclick="filterYT(this,'おにんぎょう')">🧸 おにんぎょう</div>
-        <div class="ifilter-pill" onclick="filterYT(this,'どうぶつ')">🐘 どうぶつ</div>
-        <div class="ifilter-pill" onclick="filterYT(this,'おんがく')">🎵 おんがく</div>
-        <div class="ifilter-pill" onclick="filterYT(this,'おままごと')">🍳 おままごと</div>
       </div>
       <div style="height:12px;"></div>
       <div id="ytCards"></div>
     </div>
 
-    <!-- お気に入り -->
-    <div class="favorites-section">
-      <div class="section-header" style="margin-bottom:12px;">
-        <div class="fav-title-en"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_heart.png" alt="お気に入り"> Favorites</div>
-        <div style="font-size:11px;color:#6B7280;margin-top:2px;">お気に入り</div>
-      </div>
-      <div id="favList">
-        <div class="fav-empty" id="favEmpty">
-          <div class="fav-empty-icon">🎵</div>
-          <div class="fav-empty-text">まだお気に入りがありません</div>
-          <div class="fav-empty-hint">今週の曲の ♡ をタップして追加してね</div>
-        </div>
-      </div>
-    </div>
-
     <!-- シーン別プレイリスト -->
     <div class="scene-divider"><div class="scene-label">シーン別</div><div class="scene-line"></div></div>
-    <div style="padding: 0 20px; display:flex; flex-direction:column; gap:8px;">
-      <div class="playlist-item">
-        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
-        <div class="pl-info"><div class="pl-title">Goodnight Songs</div><div class="pl-sub">寝かしつけ前の英語タイム</div></div>
-        <div class="pl-age">0〜2歳</div>
-        <a class="pl-yt" href="https://www.youtube.com/results?search_query=goodnight+songs+for+kids" target="_blank">
-          <span class="pl-yt-icon">▶</span>YT
-        </a>
-      </div>
-      <div class="playlist-item">
-        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
-        <div class="pl-info"><div class="pl-title">Morning Routine Songs</div><div class="pl-sub">朝の支度BGMに</div></div>
-        <div class="pl-age">2〜5歳</div>
-        <a class="pl-yt" href="https://www.youtube.com/results?search_query=morning+routine+songs+for+kids" target="_blank">
-          <span class="pl-yt-icon">▶</span>YT
-        </a>
-      </div>
-      <div class="playlist-item">
-        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
-        <div class="pl-info"><div class="pl-title">Car Trip English</div><div class="pl-sub">お出かけ・車の中で</div></div>
-        <div class="pl-age">1〜5歳</div>
-        <a class="pl-yt" href="https://www.youtube.com/results?search_query=english+songs+for+kids+car" target="_blank">
-          <span class="pl-yt-icon">▶</span>YT
-        </a>
-      </div>
-      <div class="playlist-item">
-        <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>
-        <div class="pl-info"><div class="pl-title">Mealtime Phrases</div><div class="pl-sub">食事中に流す短いフレーズ集</div></div>
-        <div class="pl-age">2〜5歳</div>
-        <a class="pl-yt" href="https://www.youtube.com/results?search_query=mealtime+english+phrases+kids" target="_blank">
-          <span class="pl-yt-icon">▶</span>YT
-        </a>
-      </div>
-    </div>
+    <div class="scene-grid" id="sceneCards"></div>
     <div style="height:20px;"></div>
   </div>
 
@@ -1933,23 +1747,46 @@ const MONTH_PLAYLIST = [
 
 // YouTubeキュレーションデータ
 const YT_DATA = [
-  { emoji:'🚂', bg:'#FAEEDA', title:'Blippi Trains for Kids', channel:'Blippi', when:'おでかけ・移動中', age:'2〜5歳', interest:'のりもの', tip:'英語のみ・字幕オフ推奨。移動音が好きな子は飽きずに見られます。' },
-  { emoji:'🚒', bg:'#FAEEDA', title:'Fire Trucks for Kids', channel:'Kids Channel', when:'朝の支度BGMに', age:'1〜4歳', interest:'のりもの', tip:'繰り返しが多く単語が定着しやすい。音だけでもOK。' },
-  { emoji:'🧸', bg:'#EEEDFE', title:'Play With Me Sesame', channel:'Sesame Street', when:'食事中・リラックスタイム', age:'2〜5歳', interest:'おにんぎょう', tip:'Elmoが人形を使って会話を展開。表情豊かで感情語が自然に入ります。' },
-  { emoji:'👗', bg:'#EEEDFE', title:'Barbie Dreamhouse Adventures', channel:'Barbie Official', when:'おやつタイム・遊び中', age:'3〜6歳', interest:'おにんぎょう', tip:"日常会話フレーズが豊富。Let's go!など使いやすい表現が多い。" },
-  { emoji:'🐘', bg:'#EDF6F1', title:'Animal Songs for Kids', channel:'Super Simple Songs', when:'寝る前・落ち着いた時間', age:'1〜4歳', interest:'どうぶつ', tip:'今週のテーマ「Colors & Animals」に完全マッチ。' },
-  { emoji:'🦁', bg:'#EDF6F1', title:'Wild Kratts', channel:'Wild Kratts Official', when:'おでかけ前・夕方', age:'3〜6歳', interest:'どうぶつ', tip:'動物の名前や生態を英語で説明。好奇心旺盛な子に特におすすめ。' },
-  { emoji:'🎵', bg:'#E6F1FB', title:'Super Simple Songs', channel:'Super Simple Songs', when:'いつでも・BGMに', age:'0〜4歳', interest:'おんがく', tip:'シンプルな繰り返しメロディで英語耳を育てる定番チャンネル。' },
-  { emoji:'💃', bg:'#E6F1FB', title:'Cocomelon Nursery Rhymes', channel:'Cocomelon', when:'朝・テンションを上げたい時', age:'1〜4歳', interest:'おんがく', tip:'リズムが良く体を動かしながら英語を体感できる。' },
-  { emoji:'🍳', bg:'#FDE8E8', title:'Play Doh Kitchen', channel:'Play-Doh', when:'食事の前後', age:'2〜5歳', interest:'おままごと', tip:'More? All done!など食卓で使えるフレーズが自然に耳に入ります。' },
-  { emoji:'🧁', bg:'#FDE8E8', title:'Bluey Cooking Episodes', channel:'Bluey Official', when:'夕飯づくりのBGMに', age:'2〜6歳', interest:'おままごと', tip:'家族の日常会話が英語で聴ける。親も一緒に楽しめるクオリティ。' },
+  { icon:'talk', videoId:'zwL2o4jZxbc', title:'Ms. Rachel', when:'発語・語りかけ', age:'0〜4歳', interest:'ことば・発話', tip:'一番のお気に入り。うちの子はこれを見て育ちました。ゆったりした発音と、子どもの反応を引き出す間の取り方が心地いい。', url:'https://www.youtube.com/@msrachel' },
+  { icon:'music', videoId:'9UasekNr8KI', title:'Super Simple Songs', when:'いつでも・BGMに', age:'0〜4歳', interest:'うた・音楽', tip:'小さい頃からずっとお世話になってる定番。CGに頼らない、良質な英語の歌がたくさん。', url:'https://www.youtube.com/channel/UCLsooMJoIpl_7ux2jvdPB-Q' },
+  { icon:'search', videoId:'2Rd-QIj91FU', title:'Blippi', when:'おでかけ気分・知育タイム', age:'2〜6歳', interest:'たんけん・知育', tip:'正直、最初は「うるさいお兄さん」だと思ってました。でも4歳を過ぎた娘が夢中になって、内容をちゃんと見たら教育的な部分が多いことに気づいた一本。', url:'https://www.youtube.com/channel/UC5PYHgAzJ1wLEidB58SK6Xw' },
+  { icon:'run', videoId:'DsUPVERZFlI', title:'Danny Go', when:'体を動かしたい時', age:'3〜6歳', interest:'からだを動かす', tip:'体を動かしながら英語に触れられるチャンネル。音楽の質もよくて、うちの4歳はこれしか見ません。', url:'https://www.youtube.com/@DannyGo' },
 ];
+
+const SCENE_DATA = [
+  { tag:'寝る前', color:'night', channel:'Ms. Rachel', videoId:'fqINYZwVXV4', note:'静かな語りかけとねんねルーティンで、そのまま眠りに向かえる。', age:'0〜3歳', url:'https://www.youtube.com/watch?v=fqINYZwVXV4' },
+  { tag:'朝の支度中', color:'morning', channel:'Super Simple Songs', videoId:'K53J44ioDxI', note:'元気が出る定番ソングをかけ流して、支度のテンションを上げる。', age:'1〜5歳', url:'https://www.youtube.com/watch?v=K53J44ioDxI' },
+  { tag:'おでかけ・車の中', color:'out', channel:'Blippi', videoId:'DhJ5Ld-LpUE', note:'乗り物を実況しながら紹介。移動中の暇つぶしにもぴったり。', age:'2〜6歳', url:'https://www.youtube.com/watch?v=DhJ5Ld-LpUE' },
+  { tag:'食事中', color:'meal', channel:'Super Simple Songs', videoId:'frN3nvhIHUk', note:'子どもが好きな定番の食べ物ソング。食卓のBGMに。', age:'1〜5歳', url:'https://www.youtube.com/watch?v=frN3nvhIHUk' },
+];
+
+const SCENE_COLORS = {
+  night: { bg:'#EEEDFE', text:'#4C3F8C' },
+  morning: { bg:'#FAEEDA', text:'#92400E' },
+  out: { bg:'#EDF6F1', text:'#3B6D11' },
+  meal: { bg:'#FDE8E8', text:'#9C3131' },
+};
+
+function renderScenes() {
+  const container = document.getElementById('sceneCards');
+  if (!container) return;
+  container.innerHTML = SCENE_DATA.map(s => {
+    const c = SCENE_COLORS[s.color];
+    return `
+    <a class="scene-card" href="${s.url}" target="_blank" rel="noopener">
+      <div class="scene-card-thumb"><img src="https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg" alt="${s.tag}"></div>
+      <div class="scene-card-tag" style="background:${c.bg};color:${c.text};">${s.tag}</div>
+      <div class="scene-card-channel">${s.channel}</div>
+      <div class="scene-card-note">${s.note}</div>
+      <div class="scene-card-cta"><span>▶</span>見る</div>
+    </a>
+  `;
+  }).join('');
+}
 
 // ========================
 // 状態
 // ========================
-let selectedInterests = [];
-let favorites = {}; // { songTitle: songData }
 let bookPlaying = false, bookProg = 0, bookTimer = null;
 let bookPageIndex = 0;
 let bookMode = 'listen'; // 'listen' | 'study'
@@ -1970,44 +1807,18 @@ let musicProg = 0, musicTimer = null;
 let activeMode = null;
 
 // ========================
-// オンボーディング
+// アプリ初期化
 // ========================
-function toggleInterest(el, emoji, label) {
-  el.classList.toggle('selected');
-  if (el.classList.contains('selected')) {
-    selectedInterests.push({ emoji, label });
-  } else {
-    selectedInterests = selectedInterests.filter(i => i.label !== label);
-  }
-  const btn = document.getElementById('obBtn');
-  btn.disabled = selectedInterests.length === 0;
-  btn.classList.toggle('ready', selectedInterests.length > 0);
-}
-
-function finishOnboarding(skip) {
-  document.getElementById('onboarding').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-
-  if (!skip && selectedInterests.length > 0) {
-    const badge = document.getElementById('interestBadge');
-    badge.textContent = selectedInterests.map(i => i.emoji).join('') + ' ' + selectedInterests.map(i => i.label).join('・');
-    badge.style.display = 'inline-flex';
-    applyOnboardingYTFilter(selectedInterests.map(i => i.label));
-  } else {
-    renderYT('all');
-  }
+// オンボーディング（興味選択）は廃止し、「今日のEnverly」おまかせ型に統一。
+// 以前はfinishOnboarding()内で呼んでいた初期描画を、ここで直接実行する。
+// → 興味選択UI自体は enverly_onboarding_interest_module.html に保管済み（将来の別用途向け）
+function initApp() {
+  renderYT();
+  renderScenes();
   renderMonthlyPlaylist();
   renderBookPage();
 }
-
-function showOnboarding() {
-  selectedInterests = [];
-  document.querySelectorAll('.interest-card').forEach(c => c.classList.remove('selected'));
-  const btn = document.getElementById('obBtn');
-  btn.disabled = true; btn.classList.remove('ready');
-  document.getElementById('onboarding').style.display = 'flex';
-  document.getElementById('mainApp').style.display = 'none';
-}
+initApp();
 
 // ========================
 // Monthly Playlist カルーセル
@@ -2029,7 +1840,7 @@ function renderMonthlyPlaylist() {
               <div class="carousel-card-age">${s.age}</div>
               <div class="carousel-card-sub">${s.sub}</div>
               <div class="carousel-card-yt">
-                <span>▶</span>YouTubeで見る
+                <span>▶</span>見る
               </div>
             </div>
           </div>
@@ -2116,65 +1927,6 @@ function updateCarousel(idx, animate) {
 }
 
 // ========================
-// お気に入り
-// ========================
-// お気に入りタブ用アイコンマークアップ
-function plIconMarkup(s) {
-  if (s.videoId) {
-    return `<div class="pl-icon" style="background-image:url('https://img.youtube.com/vi/${s.videoId}/mqdefault.jpg');"><div class="pl-icon-play"><span>▶</span></div></div>`;
-  }
-  return `<div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>▶</span></div></div>`;
-}
-
-function toggleFav(el, song) {
-  const isLiked = el.classList.toggle('liked');
-  if (isLiked) {
-    el.textContent = '♥';
-    favorites[song.title] = song;
-    showToast('♥ お気に入りに追加しました');
-  } else {
-    el.textContent = '♡';
-    delete favorites[song.title];
-    showToast('お気に入りから削除しました');
-  }
-  renderFavList();
-}
-
-function renderFavList() {
-  const container = document.getElementById('favList');
-  const keys = Object.keys(favorites);
-  if (keys.length === 0) {
-    container.innerHTML = `
-      <div class="fav-empty" id="favEmpty">
-        <div class="fav-empty-icon">🎵</div>
-        <div class="fav-empty-text">まだお気に入りがありません</div>
-        <div class="fav-empty-hint">今週の曲の ♡ をタップして追加してね</div>
-      </div>`;
-    return;
-  }
-  container.innerHTML = keys.map(title => {
-    const s = favorites[title];
-    return `
-      <div class="playlist-item" style="flex-wrap:nowrap;">
-        ${plIconMarkup(s)}
-        <div class="pl-info">
-          <div class="pl-title">${s.title}</div>
-          <div class="pl-sub">${s.sub}</div>
-        </div>
-        <div class="pl-age">${s.age}</div>
-        <div class="pl-heart liked" onclick="removeFavFromList(this,'${title.replace(/'/g,"\\'")}')">♥</div>
-        <a class="pl-yt" href="${s.ytUrl}" target="_blank"><span class="pl-yt-icon">▶</span>YT</a>
-      </div>`;
-  }).join('');
-}
-
-function removeFavFromList(el, title) {
-  delete favorites[title];
-  showToast('お気に入りから削除しました');
-  renderFavList();
-}
-
-// ========================
 // トースト
 // ========================
 function showToast(msg) {
@@ -2193,7 +1945,6 @@ function switchTab(name, el) {
   });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  if (name === 'playlist') renderFavList();
   if (name === 'asobo') renderAsoboContent();
 }
 
@@ -2594,8 +2345,23 @@ function startFtTimer() {
       clearInterval(ftTimer); ftPlaying = false;
       setFtWavePlaying(false);
       document.getElementById('ftPlayIcon').textContent = '▶';
+      showFtAutoNext();
     }
   }, 300);
+}
+// Morning Talk再生完了→自動で朝の音楽（BGM）に切り替わる導線を表示。
+// ※現状は視覚状態のみのプロトタイプ。実際の音声チェーンは、
+//   著作権フリー音源ライブラリの選定・mp3組み込み後に実装する。
+function showFtAutoNext() {
+  const el = document.getElementById('ftAutoNext');
+  if (!el) return;
+  el.classList.add('show');
+  showToast('🎵 そのまま朝の音楽に切り替わります');
+}
+function stopFtAutoNext() {
+  const el = document.getElementById('ftAutoNext');
+  if (!el) return;
+  el.classList.remove('show');
 }
 function seekFamilyTalk(e) {
   const rect = e.currentTarget.getBoundingClientRect();
@@ -2708,63 +2474,49 @@ function completeActiveTime() {
   // 「やったら良いことがある」程度の軽い演出（褒め声）のみとする設計
 }
 
-// 今日のEnverly：週間スケジュールストリップ（Morning Talk / Active Time）
-const WEEK_DAYS = [
-  { day: 1, label: '月', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク">', type: 'morningtalk', preview: '"What color is your favorite animal?"' },
-  { day: 2, label: '火', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '<img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_search.png" alt="探す"> Find something round!' },
-  { day: 3, label: '水', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク">', type: 'morningtalk', preview: '"What animal did you see today?"' },
-  { day: 4, label: '木', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '🐮 I say moo. What am I?' },
-  { day: 5, label: '金', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク">', type: 'morningtalk', preview: '配信は金曜の朝・お楽しみに' },
-  { day: 6, label: '土', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '<img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_search.png" alt="探す"> Find something soft!' },
-  { day: 0, label: '日', icon: '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブ">', type: 'activetime', preview: '🐮 I say woof. What am I?' },
+// 今日のEnverly：Morning Talk（毎日表示・新作は月・水・金、それ以外は再放送）
+const MORNING_DAYS = [
+  { day: 1, label: '月', isNew: true },
+  { day: 2, label: '火', isNew: false },
+  { day: 3, label: '水', isNew: true },
+  { day: 4, label: '木', isNew: false },
+  { day: 5, label: '金', isNew: true },
+  { day: 6, label: '土', isNew: false },
+  { day: 0, label: '日', isNew: false },
 ];
-let peekedWeekDay = new Date().getDay(); // メインカードは常に今日固定。プレビュー表示中の曜日だけ管理。
 
-function renderWeekStrip() {
-  const strip = document.getElementById('weekStrip');
-  const today = new Date().getDay();
-  strip.innerHTML = WEEK_DAYS.map(d => {
-    const isToday = d.day === today;
-    const isPeeked = d.day === peekedWeekDay;
-    return `<div class="week-day-pill ${isToday ? 'today' : ''} ${isPeeked ? 'peeked' : ''}" onclick="peekWeekDay(${d.day})">
-      ${isToday ? '<div class="week-day-badge">今日</div>' : ''}
-      <div class="week-day-icon">${d.icon}</div>
-      <div class="week-day-label">${d.label}</div>
-    </div>`;
-  }).join('');
-  updateWeekReasonText();
+function mostRecentNewDayLabel(today) {
+  for (let back = 1; back <= 7; back++) {
+    const d = (today - back + 7) % 7;
+    const found = MORNING_DAYS.find(x => x.day === d);
+    if (found && found.isNew) return found.label;
+  }
+  return null;
 }
 
-function updateWeekReasonText() {
-  const today = new Date().getDay();
-  const d = WEEK_DAYS.find(x => x.day === peekedWeekDay);
-  const isToday = peekedWeekDay === today;
-  const typeLabel = d.type === 'morningtalk' ? 'Morning Talk' : 'Active Time';
-  const box = document.getElementById('weekReasonText');
-  if (isToday) {
-    box.innerHTML = `<img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_calendar.png" alt="カレンダー"> 今日は${d.label}曜日。<strong>${typeLabel}</strong>の日です`;
+function applyTodayBadge() {
+  const now = new Date();
+  const today = now.getDay();
+  const d = MORNING_DAYS.find(x => x.day === today);
+  const dateLabel = `${now.getMonth() + 1}/${now.getDate()}(${d.label})`;
+  document.getElementById('ftDateBadge').textContent = dateLabel;
+
+  const tag = document.getElementById('ftStatusTag');
+  const note = document.getElementById('ftReplayNote');
+  if (d.isNew) {
+    tag.textContent = 'NEW';
+    tag.className = 'ft-status-tag new';
+    note.style.display = 'none';
   } else {
-    box.innerHTML = `${d.label}曜日は<strong>${typeLabel}</strong>の日 ｜ ${d.preview}`;
+    tag.textContent = '今週の再放送';
+    tag.className = 'ft-status-tag replay';
+    const recent = mostRecentNewDayLabel(today);
+    note.textContent = recent ? `${recent}曜日の回をもう一度お届け中` : '';
+    note.style.display = 'block';
   }
 }
 
-// 曜日pillをタップ：一行プレビューだけ更新。メインカード（今日の分）は切り替えない。
-function peekWeekDay(day) {
-  peekedWeekDay = day;
-  renderWeekStrip();
-}
-
-function applyContentForSelectedDay() {
-  const today = new Date().getDay();
-  const d = WEEK_DAYS.find(x => x.day === today);
-  const isMorningTalk = d.type === 'morningtalk';
-  document.getElementById('ftWrap').style.display = isMorningTalk ? 'block' : 'none';
-  document.getElementById('atWrap').style.display = isMorningTalk ? 'none' : 'block';
-  if (!isMorningTalk) renderAtQuestion();
-}
-
-renderWeekStrip();
-applyContentForSelectedDay();
+applyTodayBadge();
 
 // ========================
 // ルーティン：困った時のフレーズ集
@@ -3036,56 +2788,28 @@ function bvIeta() {
 // ========================
 // YouTubeキュレーション
 // ========================
-let currentYTFilter = 'all'; // 今週タブのティーザー・音楽タブのフル版で共有する現在のフィルター状態
-
-function renderYT(filter) {
+function renderYT() {
   const container = document.getElementById('ytCards');
   if (!container) return;
-  let data;
-  if (filter === 'all') {
-    data = YT_DATA;
-  } else if (Array.isArray(filter)) {
-    data = YT_DATA.filter(d => filter.includes(d.interest));
-  } else {
-    data = YT_DATA.filter(d => d.interest === filter);
-  }
-  if (data.length === 0) data = YT_DATA; // フィルター結果が0件なら全件表示にフォールバック
-  container.innerHTML = data.map(d => `
+  container.innerHTML = YT_DATA.map(d => `
     <div class="yt-card">
-      <div class="yt-thumb" style="background:${d.bg};">
-        <span style="font-size:32px;">${d.emoji}</span>
-        <div class="yt-play-icon">▶</div>
-      </div>
-      <div class="yt-body">
-        <div class="yt-title">${d.title}</div>
-        <div class="yt-channel">${d.channel}</div>
-        <div class="yt-tags">
-          <span class="yt-tag yt-tag-when">⏰ ${d.when}</span>
-          <span class="yt-tag yt-tag-age">${d.age}</span>
-          <span class="yt-tag yt-tag-int">${d.interest}</span>
+      <div class="yt-card-top">
+        <div class="yt-thumb">
+          <img src="https://img.youtube.com/vi/${d.videoId}/hqdefault.jpg" alt="${d.title}">
         </div>
-        <div class="yt-tip"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"> ${d.tip}</div>
+        <div class="yt-body">
+          <div class="yt-title">${d.title}</div>
+          <div class="yt-channel">${d.when} ・ ${d.age}</div>
+        </div>
+        <a class="yt-cta" href="${d.url}" target="_blank" rel="noopener">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#E24B4A"><path d="M8 5v14l11-7z"/></svg>
+          <span>見る</span>
+        </a>
       </div>
+      <div class="yt-tip"><img class="icon-img" style="width:16px;height:16px;flex-shrink:0;" src="icons/icon_func_idea.png" alt="ヒント">${d.tip}</div>
     </div>
   `).join('');
 }
-
-function filterYT(el, filter) {
-  document.querySelectorAll('.ifilter-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  currentYTFilter = filter;
-  renderYT(filter);
-}
-// オンボーディングで選んだ興味すべてに合わせて初期フィルターを適用
-function applyOnboardingYTFilter(interestLabels) {
-  document.querySelectorAll('.ifilter-pill').forEach(p => {
-    const matches = interestLabels.some(label => p.textContent.includes(label));
-    p.classList.toggle('active', matches);
-  });
-  currentYTFilter = interestLabels;
-  renderYT(interestLabels);
-}
-
 </script>
 
 <!--
