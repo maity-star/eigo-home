@@ -2485,7 +2485,10 @@ function playRoutineScene(btn, src) {
   };
   routineAudioEl.onended = reset;
   routineAudioEl.onerror = reset;
-  routineAudioEl.play().catch(reset);
+  try {
+    const p = routineAudioEl.play();
+    if (p && typeof p.catch === 'function') { p.catch(reset); }
+  } catch (e) { reset(); }
 }
 
 renderRoutineCatGrid();
@@ -2517,13 +2520,23 @@ const bvAudioEl = new Audio();
 function bvPlayAudio(src, onEnded) {
   bvAudioEl.onended = null;
   bvAudioEl.onerror = null;
-  bvAudioEl.pause();
+  try { bvAudioEl.pause(); } catch (e) {}
   if (!src) { if (onEnded) onEnded(); return; }
   bvAudioEl.src = src;
   bvAudioEl.currentTime = 0;
   bvAudioEl.onended = () => { if (onEnded) onEnded(); };
-  bvAudioEl.onerror = () => { if (onEnded) onEnded(); }; // 音源が見つからない場合も進行を止めない
-  bvAudioEl.play().catch(() => { if (onEnded) onEnded(); });
+  bvAudioEl.onerror = () => {
+    console.warn('[Enverly] 絵本の音声読み込みに失敗:', src);
+    if (onEnded) onEnded();
+  }; // 音源が見つからない場合も進行を止めない
+  try {
+    const p = bvAudioEl.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => { if (onEnded) onEnded(); });
+    }
+  } catch (e) {
+    if (onEnded) onEnded();
+  }
 }
 function bvStopAudio() {
   bvAudioEl.onended = null;
@@ -2549,6 +2562,8 @@ function openBookModal(mode) {
   bvBuildIndicator();
   if (mode === 'talk') {
     setTimeout(() => bvStartTalk(), 300);
+  } else {
+    setTimeout(() => bvStartRead(), 300);
   }
 }
 
