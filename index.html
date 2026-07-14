@@ -415,21 +415,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   object-fit: contain; display: block;
   user-select: none; -webkit-user-drag: none;
 }
-/* 左右ナビ矢印 */
+/* 左右ナビ（画像の高さに合わせて動的に調整・タップ領域は左右半分ずつ） */
 .bv-nav {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 44px; height: 44px; border-radius: 50%;
-  background: #FFFDF8; border: none;
-  color: #0F4A3E; font-size: 20px; font-weight: 700; cursor: pointer;
+  position: absolute; top: 0; bottom: 0;
+  width: 50%; border-radius: 0;
+  background: transparent; border: none;
+  color: #3d6b4f; font-size: 38px; font-weight: 700; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, transform 0.1s;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  transition: background 0.15s;
+  box-shadow: none;
 }
-.bv-nav:hover { background: #fff; }
-.bv-nav:active { transform: translateY(-50%) scale(0.92); }
-.bv-nav.prev { left: 10px; }
-.bv-nav.next { right: 10px; }
-.bv-nav:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
+.bv-nav.prev { left: 0; justify-content: flex-start; background: linear-gradient(to right, rgba(255,255,255,0.55), rgba(255,255,255,0) 40%); }
+.bv-nav.next { right: 0; justify-content: flex-end; background: linear-gradient(to left, rgba(255,255,255,0.55), rgba(255,255,255,0) 40%); }
+.bv-nav.prev:hover { background: linear-gradient(to right, rgba(255,255,255,0.7), rgba(255,255,255,0) 40%); }
+.bv-nav.next:hover { background: linear-gradient(to left, rgba(255,255,255,0.7), rgba(255,255,255,0) 40%); }
+.bv-nav.prev > span, .bv-nav.next > span { padding: 0 14px; }
+.bv-nav:disabled { opacity: 0.25; cursor: default; }
 
 /* ページインジケーター */
 .bv-indicator {
@@ -1249,8 +1250,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   </div>
   <div class="bv-page-area" id="bvPageArea">
     <img class="bv-page-img" id="bvPageImg" src="" alt="">
-    <button class="bv-nav prev" id="bvPrev" onclick="bvChangePage(-1)">‹</button>
-    <button class="bv-nav next" id="bvNext" onclick="bvChangePage(1)">›</button>
+    <button class="bv-nav prev" id="bvPrev" onclick="bvChangePage(-1)"><span>‹</span></button>
+    <button class="bv-nav next" id="bvNext" onclick="bvChangePage(1)"><span>›</span></button>
   </div>
   <div class="bv-indicator" id="bvIndicator"></div>
   <div class="bv-mode-bar">
@@ -1644,82 +1645,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 </div><!-- /mainApp -->
 
-<!-- 絵本モーダル -->
-<div class="book-modal" id="bookModal">
-  <div class="book-modal-header">
-    <div>
-      <div class="book-modal-title">Sunny Day!</div>
-      <div class="book-modal-sub">Enverlyオリジナル絵本 · Joel先生の音読</div>
-    </div>
-    <button class="book-modal-close" onclick="closeBookModal()">✕</button>
-  </div>
-
-  <div class="book-mode-tabs">
-    <button class="book-mode-tab active" id="modeTabListen" onclick="switchBookMode('listen')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_headphone.png" alt="きいてみる"> Listening<span class="book-mode-tab-ja">聞く</span></button>
-    <button class="book-mode-tab" id="modeTabStudy" onclick="switchBookMode('study')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_speak.png" alt="いってみる"> Talking<span class="book-mode-tab-ja">話す</span></button>
-  </div>
-
-  <div class="book-viewer">
-    <div class="book-stage-wrap" id="bookStageWrap" style="position:relative; flex:1; min-height:0; display:flex; flex-direction:column;">
-      <div class="book-stage" id="bookStage"></div>
-      <div class="study-joel-banner" id="studyJoelBanner"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_mic.png" alt="マイク"> Joel先生が読んでいるよ</div>
-      <div class="study-overlay" id="studyOverlay">
-        <div class="study-joel-label">LET'S STUDY</div>
-        <div class="study-mascot" id="studyMascot">🐻</div>
-        <div class="study-yourturn">Your turn!</div>
-        <div class="study-phrase-echo" id="studyPhraseEcho"></div>
-        <div class="study-progress-dots"><span></span><span></span><span></span></div>
-        <div class="study-next-hint">まねして言ってみよう</div>
-      </div>
-      <div class="study-complete" id="studyComplete">
-        <div id="studyCompleteAsk">
-          <div class="study-complete-emoji">📖</div>
-          <div class="study-complete-title">5フレーズ、ぜんぶ終わったよ！</div>
-          <div class="study-complete-sub">今日は「言えたよ」って思える瞬間あった？<br>あったら下のボタンをタップしてね。</div>
-          <button class="study-said-btn" onclick="markSaidIt()"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_star.png" alt="言えたよ"> 言えたよ！</button>
-        </div>
-        <div class="study-stamp-result" id="studyStampResult">
-          <div class="study-stamp-icon">⭐</div>
-          <div class="study-complete-title">スタンプ獲得！</div>
-          <div class="study-joel-voice-line" id="studyJoelVoiceLine"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Wow, great job! You said it!"</div>
-        </div>
-      </div>
-    </div>
-    <div class="book-page-nav">
-      <button class="book-page-nav-btn" id="bookPrevBtn" onclick="bookPrevPage()">‹</button>
-      <div class="book-page-dots" id="bookPageDots"></div>
-      <div class="book-page-count" id="bookPageCount">1/5</div>
-      <button class="book-page-nav-btn" id="bookNextBtn" onclick="bookNextPage()">›</button>
-    </div>
-  </div>
-
-  <div class="book-modal-player" id="bookModalPlayer">
-    <div class="book-modal-player-row">
-      <div class="book-modal-native-badge"><img class="icon-img" style="width:14px;height:14px;" src="icons/icon_func_mic.png" alt="マイク"> ネイティブ音読 · Joel先生</div>
-    </div>
-    <button class="month-play-btn" id="bookPlayBtn" onclick="toggleBook()">
-      <span style="font-size:18px;color:#4D7D63;" id="bookIconEmoji">▶</span>
-      <span class="month-play-label" id="bookLabel">音読を再生する</span>
-    </button>
-    <div class="month-progress-row">
-      <div class="month-prog-bar" onclick="seekBook(event)">
-        <div class="month-prog-fill" id="bookFill"></div>
-      </div>
-      <div class="month-prog-time" id="bookTime">0:00</div>
-    </div>
-    <div class="book-modal-tips-toggle" onclick="toggleTips()">
-      <div class="month-tips-toggle-label"><span><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"></span><span>親が読む場合のポイント</span></div>
-      <div class="month-tips-chevron" id="tipsChevron">▼</div>
-    </div>
-    <div class="month-tips-body" id="tipsBody">
-      <div class="month-tip-item"><div class="month-tip-num">1</div><div>訳さなくてOK。繰り返しフレーズが自然に耳に残ります。</div></div>
-      <div class="month-tip-item"><div class="month-tip-num">2</div><div>動物が出るたびに絵を指さしながら読むと単語が定着します。</div></div>
-      <div class="month-tip-item"><div class="month-tip-num">3</div><div>毎晩同じ本を繰り返すのがコツ。子どもが一緒に言い始めたら大成功。</div></div>
-      <div class="month-tip-item"><div class="month-tip-num">4</div><div>Joel先生の音読を先に聴かせてから、一緒に読む順番が効果的です。</div></div>
-    </div>
-  </div>
-</div>
-
 <!-- 放送アーカイブモーダル -->
 <div class="archive-modal" id="archiveModal">
   <div class="archive-modal-header">
@@ -1823,15 +1748,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 // データ
 // ========================
 
-// 今月の絵本ページデータ（イラストは後で img: に差し替え可能。今は絵文字プレースホルダー）
-const MONTH_BOOK_PAGES = [
-  { img: null, emoji: '☀️', en: "It's hot!", ja: 'あついね！' },
-  { img: null, emoji: '🦆', en: "Let's swim!", ja: 'およごう！' },
-  { img: null, emoji: '💦', en: 'Splash!', ja: 'ばしゃん！' },
-  { img: null, emoji: '😄', en: 'So fun!', ja: 'たのしいね！' },
-  { img: null, emoji: '🌞', en: 'Sunny!', ja: 'はれてるね！' },
-];
-
 // 今週の曲データ（興味別）
 // 今月のテーマ（Colors & Animals）に合わせて編集部が選んだ固定プレイリスト
 // オンボーディングの興味には連動しない（興味別の出し分けはYouTubeかけ流し側で行う）
@@ -1883,22 +1799,10 @@ function renderScenes() {
 // ========================
 // 状態
 // ========================
-let bookPlaying = false, bookProg = 0, bookTimer = null;
-let bookPageIndex = 0;
-let bookMode = 'listen'; // 'listen' | 'study'
-let studyStep = null; // null | 'joel1' | 'pause' | 'joel2' | 'done'
-let studyTimers = [];
 let carouselIndex = 0;
 let carouselSwipeGuard = false;
 const CAROUSEL_CARD_W = 268;
 const CAROUSEL_GAP = 12;
-const STUDY_REACTIONS = [
-  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Wow, great job! You said it!"',
-  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Perfect! That sounded amazing!"',
-  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Yes! You did it, well done!"',
-  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Awesome! I heard you loud and clear!"',
-  '<img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> "Nice try, you\'re getting so good!"'
-];
 let musicProg = 0, musicTimer = null;
 let activeMode = null;
 
@@ -1912,7 +1816,6 @@ function initApp() {
   renderYT();
   renderScenes();
   renderMonthlyPlaylist();
-  renderBookPage();
 }
 initApp();
 
@@ -2230,10 +2133,6 @@ function playAtRiddle(btn, evt) {
 // ========================
 // アコーディオン
 // ========================
-function toggleTips() {
-  const b = document.getElementById('tipsBody'); const c = document.getElementById('tipsChevron');
-  const o = b.classList.toggle('open'); c.classList.toggle('open', o);
-}
 function toggleWhy() {
   const b = document.getElementById('whyBody'); const c = document.getElementById('whyChevron');
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
@@ -2244,236 +2143,6 @@ function toggleLyrics() {
   c.style.transform = o ? 'rotate(180deg)' : 'rotate(0deg)';
 }
 
-// ========================
-// 絵本モーダル
-// ========================
-function openBookModal(mode) {
-  document.getElementById('bookModal').classList.add('open');
-  switchBookMode(mode || 'listen', true);
-  renderBookPage();
-}
-function closeBookModal() {
-  document.getElementById('bookModal').classList.remove('open');
-  // 音読が再生中なら止める
-  if (bookPlaying) toggleBook();
-  clearStudyTimers();
-}
-
-// ========================
-// 放送アーカイブモーダル
-// ========================
-function openArchiveModal() {
-  document.getElementById('archiveModal').classList.add('open');
-}
-function closeArchiveModal() {
-  document.getElementById('archiveModal').classList.remove('open');
-}
-
-// ========================
-// 絵本ページビューア（めくるアニメーション）
-// ========================
-function pageMarkup(p) {
-  return `
-    ${p.img ? `<img src="${p.img}" alt="">` : `<div class="book-page-placeholder-emoji">${p.emoji}</div><div class="book-page-placeholder-text">イラスト準備中</div>`}
-    <div class="book-page-text">
-      <div class="book-page-en">${p.en}</div>
-      <div class="book-page-ja">${p.ja}</div>
-    </div>
-  `;
-}
-
-function renderBookPage() {
-  const stage = document.getElementById('bookStage');
-  const dotsWrap = document.getElementById('bookPageDots');
-  const count = document.getElementById('bookPageCount');
-  const prevBtn = document.getElementById('bookPrevBtn');
-  const nextBtn = document.getElementById('bookNextBtn');
-  if (!stage) return;
-
-  stage.innerHTML = `<div class="book-page" id="bookPageCurrent">${pageMarkup(MONTH_BOOK_PAGES[bookPageIndex])}</div>`;
-
-  dotsWrap.innerHTML = MONTH_BOOK_PAGES.map((_, i) =>
-    `<div class="book-page-dot ${i === bookPageIndex ? 'active' : ''}"></div>`
-  ).join('');
-
-  count.textContent = (bookPageIndex + 1) + '/' + MONTH_BOOK_PAGES.length;
-  prevBtn.disabled = bookPageIndex === 0;
-  nextBtn.disabled = bookPageIndex === MONTH_BOOK_PAGES.length - 1 && bookMode === 'listen';
-  if (bookMode === 'listen') nextBtn.textContent = '›';
-}
-
-function flipToPage(newIndex, direction) {
-  const stage = document.getElementById('bookStage');
-  const current = document.getElementById('bookPageCurrent');
-  if (!current) { bookPageIndex = newIndex; renderBookPage(); return; }
-
-  // 次のページを裏に重ねて配置
-  const incoming = document.createElement('div');
-  incoming.className = 'book-page behind';
-  incoming.innerHTML = pageMarkup(MONTH_BOOK_PAGES[newIndex]);
-  stage.appendChild(incoming);
-
-  // 現在のページをめくり出す
-  requestAnimationFrame(() => {
-    current.classList.add('flipping-out');
-  });
-
-  setTimeout(() => {
-    bookPageIndex = newIndex;
-    current.remove();
-    renderBookPage();
-    if (bookMode === 'study') startStudySequence();
-  }, 600);
-}
-
-function bookNextPage() {
-  if (bookMode === 'study' && studyStep !== 'done') return; // ポーズ中はスキップ不可
-  if (bookPageIndex < MONTH_BOOK_PAGES.length - 1) {
-    flipToPage(bookPageIndex + 1, 'next');
-  } else if (bookMode === 'study') {
-    showStudyComplete();
-  }
-}
-function bookPrevPage() {
-  if (bookMode === 'study' && studyStep !== 'done' && studyStep !== null) return;
-  if (bookPageIndex > 0) flipToPage(bookPageIndex - 1, 'prev');
-}
-
-// ========================
-// Let's Study（いってみるモード）
-// ========================
-function switchBookMode(mode, silent) {
-  bookMode = mode;
-  document.getElementById('modeTabListen').classList.toggle('active', mode === 'listen');
-  document.getElementById('modeTabStudy').classList.toggle('active', mode === 'study');
-  clearStudyTimers();
-  hideStudyOverlay(); hideStudyBanner(); hideStudyComplete();
-
-  if (mode === 'listen') {
-    if (bookPlaying) toggleBook();
-    document.getElementById('bookModalPlayer').style.display = '';
-    setNavEnabled(true);
-  } else {
-    // study開始：再生中の音読は止め、下部プレイヤーは隠してJoelの声に集中させる
-    if (bookPlaying) toggleBook();
-    document.getElementById('bookModalPlayer').style.display = 'none';
-    startStudySequence();
-  }
-}
-
-function clearStudyTimers() {
-  studyTimers.forEach(t => clearTimeout(t));
-  studyTimers = [];
-}
-function hideStudyOverlay() { document.getElementById('studyOverlay').classList.remove('show'); }
-function hideStudyBanner() { document.getElementById('studyJoelBanner').classList.remove('show'); }
-function hideStudyComplete() {
-  document.getElementById('studyComplete').classList.remove('show');
-  document.getElementById('studyCompleteAsk').style.display = '';
-  document.getElementById('studyStampResult').classList.remove('show');
-}
-function setNavEnabled(enabled) {
-  const prevBtn = document.getElementById('bookPrevBtn');
-  const nextBtn = document.getElementById('bookNextBtn');
-  if (!enabled) {
-    prevBtn.disabled = true; nextBtn.disabled = true;
-  } else {
-    prevBtn.disabled = bookPageIndex === 0;
-    nextBtn.disabled = false;
-  }
-}
-
-function startStudySequence() {
-  clearStudyTimers();
-  hideStudyOverlay(); hideStudyComplete();
-  studyStep = 'joel1';
-  setNavEnabled(false);
-  document.getElementById('bookNextBtn').textContent = '›';
-
-  const banner = document.getElementById('studyJoelBanner');
-  banner.innerHTML = '<img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_mic.png" alt="マイク"> Joel先生が読んでいるよ';
-  banner.classList.add('show');
-
-  studyTimers.push(setTimeout(() => {
-    // ① Joelが読む → ② Your turn!（無音ポーズ・スキップ不可）
-    banner.classList.remove('show');
-    studyStep = 'pause';
-    const echo = document.getElementById('studyPhraseEcho');
-    echo.textContent = MONTH_BOOK_PAGES[bookPageIndex].en;
-    document.getElementById('studyOverlay').classList.add('show');
-
-    studyTimers.push(setTimeout(() => {
-      // ③ Joelがもう一度読む（確認）
-      document.getElementById('studyOverlay').classList.remove('show');
-      studyStep = 'joel2';
-      banner.innerHTML = '<img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_mic.png" alt="マイク"> もう一度きいてみよう';
-      banner.classList.add('show');
-
-      studyTimers.push(setTimeout(() => {
-        banner.classList.remove('show');
-        studyStep = 'done';
-        setNavEnabled(true);
-        const isLast = bookPageIndex === MONTH_BOOK_PAGES.length - 1;
-        const nextBtn = document.getElementById('bookNextBtn');
-        nextBtn.textContent = isLast ? '✓' : '›';
-      }, 1800));
-    }, 4000)); // Your turn!の無音ポーズ（3〜4秒・スキップ不可）
-  }, 1800));
-}
-
-function showStudyComplete() {
-  clearStudyTimers();
-  hideStudyOverlay(); hideStudyBanner();
-  document.getElementById('bookPrevBtn').disabled = true;
-  document.getElementById('bookNextBtn').disabled = true;
-  document.getElementById('studyComplete').classList.add('show');
-}
-
-function markSaidIt() {
-  document.getElementById('studyCompleteAsk').style.display = 'none';
-  const line = STUDY_REACTIONS[Math.floor(Math.random() * STUDY_REACTIONS.length)];
-  document.getElementById('studyJoelVoiceLine').innerHTML = line;
-  document.getElementById('studyStampResult').classList.add('show');
-  showToast('⭐ スタンプ1個獲得！');
-}
-
-// ========================
-// 絵本プレイヤー
-// ========================
-function toggleBook() {
-  activeMode = 'book'; bookPlaying = !bookPlaying;
-  const btn = document.getElementById('bookPlayBtn');
-  const emoji = document.getElementById('bookIconEmoji');
-  const label = document.getElementById('bookLabel');
-  if (bookPlaying) {
-    btn.classList.add('playing'); emoji.textContent = '⏸'; label.textContent = '再生中...';
-    startBookTimer();
-  } else {
-    btn.classList.remove('playing'); emoji.textContent = '▶'; label.textContent = '音読を再生する';
-    clearInterval(bookTimer);
-  }
-}
-function startBookTimer() {
-  clearInterval(bookTimer);
-  bookTimer = setInterval(() => {
-    bookProg = Math.min(bookProg + 0.4, 100);
-    document.getElementById('bookFill').style.width = bookProg.toFixed(1) + '%';
-    const sec = Math.round(bookProg * 1.5);
-    const t = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
-    document.getElementById('bookTime').textContent = t;
-    if (bookProg >= 100) {
-      clearInterval(bookTimer); bookPlaying = false;
-      document.getElementById('bookIconEmoji').textContent = '▶';
-      document.getElementById('bookLabel').textContent = '音読を再生する';
-      document.getElementById('bookPlayBtn').classList.remove('playing');
-    }
-  }, 300);
-}
-function seekBook(e) {
-  const rect = e.currentTarget.getBoundingClientRect();
-  bookProg = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-  document.getElementById('bookFill').style.width = bookProg + '%';
-}
 // ========================
 // Family Talk（ポッドキャスト）
 // ========================
@@ -2710,35 +2379,35 @@ const ROUTINE_CATEGORIES = [
   {
     id: 'morning', icon: '🌅', image: 'routine_images/routine_morning.jpg', title: 'Morning Time', sub: '朝の支度タイムに使うフレーズ',
     scenes: [
-      { label: '起床直後', en: 'Good morning! Did you sleep well?', reply: '"Yes!" / "I\'m sleepy."' },
-      { label: '着替え中', en: "Let's get dressed! Where's your shirt?", reply: '"Here!" / "I found it!"' },
-      { label: '朝ごはん中', en: 'Are you hungry? What do you want to eat?', reply: '"Yes!" / "Eggs, please!"' },
-      { label: '歯磨き・洗顔', en: 'Time to brush your teeth!', reply: '"Okay!" / "I don\'t want to!"' },
-      { label: '出発前のあいさつ', en: 'Have a good day! See you later!', reply: '"See you!" / "Bye bye!"' },
+      { label: '起床直後', en: 'Good morning! Did you sleep well?', reply: '"Yes!" / "I\'m sleepy."', audio: 'audio/routine_audio/morning_01.mp3' },
+      { label: '着替え中', en: "Let's get dressed! Where's your shirt?", reply: '"Here!" / "I found it!"', audio: 'audio/routine_audio/morning_02.mp3' },
+      { label: '朝ごはん中', en: 'Are you hungry? What do you want to eat?', reply: '"Yes!" / "Eggs, please!"', audio: 'audio/routine_audio/morning_03.mp3' },
+      { label: '歯磨き・洗顔', en: 'Time to brush your teeth!', reply: '"Okay!" / "I don\'t want to!"', audio: 'audio/routine_audio/morning_04.mp3' },
+      { label: '出発前のあいさつ', en: 'Have a good day! See you later!', reply: '"See you!" / "Bye bye!"', audio: 'audio/routine_audio/morning_05.mp3' },
     ],
   },
   {
     id: 'beforebed', icon: '🌙', image: 'routine_images/routine_bedtime.jpg', title: 'Before Bed', sub: '寝る前の時間に使うフレーズ',
     scenes: [
-      { label: '絵本を読む前', en: 'Let\'s read a book together!', reply: '"Yay!" / "This one!"' },
-      { label: '歯磨き確認', en: 'Did you brush your teeth?', reply: '"Yes!" / "Not yet!"' },
-      { label: 'おやすみのあいさつ', en: 'Good night! Sweet dreams!', reply: '"Good night!" / "Love you!"' },
+      { label: '絵本を読む前', en: 'Let\'s read a book together!', reply: '"Yay!" / "This one!"', audio: 'audio/routine_audio/beforebed_01.mp3' },
+      { label: '歯磨き確認', en: 'Did you brush your teeth?', reply: '"Yes!" / "Not yet!"', audio: 'audio/routine_audio/beforebed_02.mp3' },
+      { label: 'おやすみのあいさつ', en: 'Good night! Sweet dreams!', reply: '"Good night!" / "Love you!"', audio: 'audio/routine_audio/beforebed_03.mp3' },
     ],
   },
   {
     id: 'afterschool', icon: '🎒', image: 'routine_images/routine_homecoming.jpg', title: 'おかえり', sub: '保育園・幼稚園から帰った後に使うフレーズ',
     scenes: [
-      { label: 'ただいまのあいさつ', en: 'Welcome home! How was your day?', reply: '"Good!" / "Fun!"' },
-      { label: '今日は何した？', en: 'What did you do today?', reply: '"I played!" / "We sang songs!"' },
-      { label: 'おやつ前', en: 'Do you want a snack?', reply: '"Yes please!" / "I\'m hungry!"' },
+      { label: 'ただいまのあいさつ', en: 'Welcome home! How was your day?', reply: '"Good!" / "Fun!"', audio: 'audio/routine_audio/afterschool_01.mp3' },
+      { label: '今日は何した？', en: 'What did you do today?', reply: '"I played!" / "We sang songs!"', audio: 'audio/routine_audio/afterschool_02.mp3' },
+      { label: 'おやつ前', en: 'Do you want a snack?', reply: '"Yes please!" / "I\'m hungry!"', audio: 'audio/routine_audio/afterschool_03.mp3' },
     ],
   },
   {
     id: 'mealtime', icon: '🍽', image: 'routine_images/routine_mealtime.jpg', title: '食事タイム', sub: '食事の時間に使うフレーズ',
     scenes: [
-      { label: '食事前のあいさつ', en: "Let's eat!", reply: '"Yay!" / "I\'m hungry!"' },
-      { label: 'もっと食べる？', en: 'Do you want more?', reply: '"Yes please!" / "No, thank you!"' },
-      { label: 'ごちそうさま', en: 'All done! Great job eating!', reply: '"All done!" / "Yummy!"' },
+      { label: '食事前のあいさつ', en: "Let's eat!", reply: '"Yay!" / "I\'m hungry!"', audio: 'audio/routine_audio/mealtime_01.mp3' },
+      { label: 'もっと食べる？', en: 'Do you want more?', reply: '"Yes please!" / "No, thank you!"', audio: 'audio/routine_audio/mealtime_02.mp3' },
+      { label: 'ごちそうさま', en: 'All done! Great job eating!', reply: '"All done!" / "Yummy!"', audio: 'audio/routine_audio/mealtime_03.mp3' },
     ],
   },
 ];
@@ -2769,7 +2438,7 @@ function openRoutineModal(catId) {
     <div class="routine-scene-card">
       <div class="routine-scene-label">${s.label}</div>
       <div class="routine-scene-row">
-        <div class="routine-scene-play" onclick="playRoutineScene(this)">▶</div>
+        <div class="routine-scene-play" onclick="playRoutineScene(this, '${s.audio}')">▶</div>
         <div class="routine-scene-phrase">${s.en}</div>
       </div>
       <div class="routine-scene-reply">キッズの返答例：<span>${s.reply}</span></div>
@@ -2780,16 +2449,43 @@ function openRoutineModal(catId) {
 
 function closeRoutineModal() {
   document.getElementById('routineModal').classList.remove('open');
+  routineAudioEl.pause();
+  if (routineActiveBtn) { routineActiveBtn.textContent = '▶'; routineActiveBtn.dataset.playing = '0'; routineActiveBtn = null; }
 }
 
-function playRoutineScene(btn) {
-  if (btn.dataset.playing === '1') return;
-  btn.dataset.playing = '1';
-  btn.textContent = '⏸';
-  setTimeout(() => {
+// ルーティンフレーズ用の音声プレイヤー（同時に1個だけ再生）
+const routineAudioEl = new Audio();
+let routineActiveBtn = null;
+
+function playRoutineScene(btn, src) {
+  // 別のフレーズが再生中なら止めてアイコンを戻す
+  if (routineActiveBtn && routineActiveBtn !== btn) {
+    routineActiveBtn.textContent = '▶';
+    routineActiveBtn.dataset.playing = '0';
+  }
+  if (btn.dataset.playing === '1') {
+    routineAudioEl.pause();
     btn.textContent = '▶';
     btn.dataset.playing = '0';
-  }, 1500);
+    routineActiveBtn = null;
+    return;
+  }
+  routineActiveBtn = btn;
+  btn.dataset.playing = '1';
+  btn.textContent = '⏸';
+  routineAudioEl.onended = null;
+  routineAudioEl.onerror = null;
+  routineAudioEl.pause();
+  routineAudioEl.src = src;
+  routineAudioEl.currentTime = 0;
+  const reset = () => {
+    btn.textContent = '▶';
+    btn.dataset.playing = '0';
+    if (routineActiveBtn === btn) routineActiveBtn = null;
+  };
+  routineAudioEl.onended = reset;
+  routineAudioEl.onerror = reset;
+  routineAudioEl.play().catch(reset);
 }
 
 renderRoutineCatGrid();
@@ -2800,19 +2496,40 @@ renderRoutineCatGrid();
 const BOOK_DATA = {
   title: 'Sunny Day!',
   pages: [
-    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null },
-    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!" },
-    { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!" },
-    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!' },
-    { img: 'books/aug/monthly_book/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!' },
-    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!' },
-    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null },
-    { img: 'books/aug/monthly_book/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!" },
+    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null, audio: 'audio/book_audio/sunnyday_01.mp3' },
+    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!", audio: 'audio/book_audio/sunnyday_02.mp3' },
+    { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday_03.mp3' },
+    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!', audio: 'audio/book_audio/sunnyday_04.mp3' },
+    { img: 'books/aug/monthly_book/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!', audio: 'audio/book_audio/sunnyday_05.mp3' },
+    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!', audio: 'audio/book_audio/sunnyday_06.mp3' },
+    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null, audio: 'audio/book_audio/sunnyday_07.mp3' },
+    { img: 'books/aug/monthly_book/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!", audio: 'audio/book_audio/sunnyday_08.mp3' },
   ]
 };
 
-// Let's talkのフレーズ（talkPhrase がある5つ）
-const TALK_PHRASES = BOOK_DATA.pages.filter(p => p.talkPhrase).map(p => p.talkPhrase);
+// Let's talkで使うページ（talkPhraseがある5ページ、フレーズと音源をセットで保持）
+const TALK_PAGES = BOOK_DATA.pages.filter(p => p.talkPhrase);
+// (後方互換：フレーズ文字列だけの配列も残す)
+const TALK_PHRASES = TALK_PAGES.map(p => p.talkPhrase);
+
+// 絵本ビューワー共通の音声プレイヤー（Let's read / Let's talk 兼用）
+const bvAudioEl = new Audio();
+function bvPlayAudio(src, onEnded) {
+  bvAudioEl.onended = null;
+  bvAudioEl.onerror = null;
+  bvAudioEl.pause();
+  if (!src) { if (onEnded) onEnded(); return; }
+  bvAudioEl.src = src;
+  bvAudioEl.currentTime = 0;
+  bvAudioEl.onended = () => { if (onEnded) onEnded(); };
+  bvAudioEl.onerror = () => { if (onEnded) onEnded(); }; // 音源が見つからない場合も進行を止めない
+  bvAudioEl.play().catch(() => { if (onEnded) onEnded(); });
+}
+function bvStopAudio() {
+  bvAudioEl.onended = null;
+  bvAudioEl.onerror = null;
+  bvAudioEl.pause();
+}
 
 let bvCurrentPage = 0;
 let bvMode = null; // 'read' | 'talk'
@@ -2838,6 +2555,7 @@ function openBookModal(mode) {
 function closeBookModal() {
   document.getElementById('bookViewerModal').classList.remove('open');
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvStopAudio();
   document.getElementById('bvTalkBar').classList.remove('active');
   document.getElementById('bvIetaBtn').classList.remove('show');
   document.getElementById('bvModeRow').style.display = 'flex';
@@ -2845,7 +2563,8 @@ function closeBookModal() {
 
 function bvRenderPage() {
   const page = BOOK_DATA.pages[bvCurrentPage];
-  document.getElementById('bvPageImg').src = page.img;
+  const img = document.getElementById('bvPageImg');
+  img.src = page.img;
   document.getElementById('bvTitle').textContent = `Sunny Day!  ${bvCurrentPage + 1} / ${BOOK_DATA.pages.length}`;
   document.getElementById('bvPrev').disabled = bvCurrentPage === 0;
   document.getElementById('bvNext').disabled = bvCurrentPage === BOOK_DATA.pages.length - 1;
@@ -2853,7 +2572,34 @@ function bvRenderPage() {
   document.querySelectorAll('.bv-dot').forEach((d, i) => {
     d.classList.toggle('active', i === bvCurrentPage);
   });
+  bvSyncNavToImage(img);
 }
+
+// object-fit:contain で表示中のイラストの実際の高さに、左右ナビの縦幅を合わせる
+// （上下に黒帯ができるページでも、半透明の帯がイラスト部分だけに収まるようにする）
+function bvSyncNavToImage(img) {
+  const area = document.getElementById('bvPageArea');
+  if (!img || !area) return;
+  const apply = () => {
+    if (!img.naturalWidth || !img.naturalHeight) return;
+    const areaW = area.clientWidth, areaH = area.clientHeight;
+    const containerRatio = areaW / areaH;
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    let top = 0, bottom = 0;
+    if (imgRatio > containerRatio) {
+      // 画像が横長 → 上下に黒帯
+      const renderedH = areaW / imgRatio;
+      top = bottom = Math.max(0, (areaH - renderedH) / 2);
+    }
+    document.querySelectorAll('.bv-nav').forEach(btn => {
+      btn.style.top = top + 'px';
+      btn.style.bottom = bottom + 'px';
+    });
+  };
+  if (img.complete && img.naturalWidth) { apply(); }
+  else { img.onload = apply; }
+}
+window.addEventListener('resize', () => bvSyncNavToImage(document.getElementById('bvPageImg')));
 
 function bvBuildIndicator() {
   const ind = document.getElementById('bvIndicator');
@@ -2867,6 +2613,10 @@ function bvChangePage(dir) {
   if (next < 0 || next >= BOOK_DATA.pages.length) return;
   bvCurrentPage = next;
   bvRenderPage();
+  if (bvMode === 'read') {
+    if (bvTalkTimer) clearTimeout(bvTalkTimer);
+    bvPlayPageThenAdvance();
+  }
 }
 
 // スワイプ対応
@@ -2886,17 +2636,23 @@ function bvStartRead() {
   document.getElementById('bvTalkBar').classList.remove('active');
   document.getElementById('bvIetaBtn').classList.remove('show');
   document.getElementById('bvModeRow').style.display = 'flex';
-  // 自動ページ送り（音声がない間は3秒ごとにデモ）
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
-  bvAutoRead();
+  bvPlayPageThenAdvance();
 }
 
-function bvAutoRead() {
-  if (bvCurrentPage >= BOOK_DATA.pages.length - 1) return;
-  bvTalkTimer = setTimeout(() => {
-    bvChangePage(1);
-    bvAutoRead();
-  }, 3000);
+// 現在のページの音声を再生 → 再生し終わったら少し間を置いて次ページへ
+function bvPlayPageThenAdvance() {
+  const page = BOOK_DATA.pages[bvCurrentPage];
+  bvPlayAudio(page.audio, () => {
+    if (bvMode !== 'read') return; // モードが切り替わっていたら止める
+    if (bvCurrentPage < BOOK_DATA.pages.length - 1) {
+      bvTalkTimer = setTimeout(() => {
+        bvCurrentPage++;
+        bvRenderPage();
+        bvPlayPageThenAdvance();
+      }, 700); // ページ間の間（ページめくりアニメーションの余白）
+    }
+  });
 }
 
 function bvStartTalk() {
@@ -2904,52 +2660,56 @@ function bvStartTalk() {
   bvTalkPhraseIdx = 0;
   bvTalkDone = [];
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvStopAudio();
   document.getElementById('bvModeRow').style.display = 'none';
   document.getElementById('bvTalkBar').classList.add('active');
   document.getElementById('bvIetaBtn').classList.remove('show');
   // Let's talkのフレーズがあるページに移動
-  const firstTalkPage = BOOK_DATA.pages.findIndex(p => p.talkPhrase);
+  const firstTalkPage = BOOK_DATA.pages.indexOf(TALK_PAGES[0]);
   bvCurrentPage = firstTalkPage;
   bvRenderPage();
   bvRunTalkStep();
 }
 
 function bvRunTalkStep() {
-  const phrase = TALK_PHRASES[bvTalkPhraseIdx];
-  if (!phrase) return;
+  const page = TALK_PAGES[bvTalkPhraseIdx];
+  if (!page) return;
 
-  // Step 0: Joelが読む
-  document.getElementById('bvTalkPhrase').textContent = phrase;
+  // Step 0: Joelが読む（実音声）
+  document.getElementById('bvTalkPhrase').textContent = page.talkPhrase;
   document.getElementById('bvTalkStatus').textContent = '🎧 Joelの声を聞いてね';
   bvUpdateTalkProgress();
 
-  bvTalkTimer = setTimeout(() => {
-    // Step 1: Your turn（無音ポーズ）
+  bvPlayAudio(page.audio, () => {
+    if (bvMode !== 'talk') return;
+    // Step 1: Your turn（無音ポーズ・スキップ不可）
     document.getElementById('bvTalkStatus').textContent = '🎤 Your turn! 言ってみよう';
     bvTalkTimer = setTimeout(() => {
-      // Step 2: 確認読み
+      if (bvMode !== 'talk') return;
+      // Step 2: 確認読み（同じ音声をもう一度）
       document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Joelと一緒に';
       bvTalkDone.push(bvTalkPhraseIdx);
       bvUpdateTalkProgress();
 
-      bvTalkTimer = setTimeout(() => {
-        bvTalkPhraseIdx++;
-        if (bvTalkPhraseIdx >= TALK_PHRASES.length) {
-          // 全フレーズ完了
-          document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
-          document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
-          document.getElementById('bvIetaBtn').classList.add('show');
-          return;
-        }
-        // 次のフレーズのページへ
-        const nextPage = BOOK_DATA.pages.findIndex((p, i) =>
-          p.talkPhrase === TALK_PHRASES[bvTalkPhraseIdx]
-        );
-        if (nextPage >= 0) { bvCurrentPage = nextPage; bvRenderPage(); }
-        bvRunTalkStep();
-      }, 2000);
-    }, 4000); // Your turnポーズ4秒
-  }, 2500); // Joel読み2.5秒
+      bvPlayAudio(page.audio, () => {
+        if (bvMode !== 'talk') return;
+        bvTalkTimer = setTimeout(() => {
+          bvTalkPhraseIdx++;
+          if (bvTalkPhraseIdx >= TALK_PAGES.length) {
+            // 全フレーズ完了
+            document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
+            document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
+            document.getElementById('bvIetaBtn').classList.add('show');
+            return;
+          }
+          // 次のフレーズのページへ
+          const nextPage = BOOK_DATA.pages.indexOf(TALK_PAGES[bvTalkPhraseIdx]);
+          if (nextPage >= 0) { bvCurrentPage = nextPage; bvRenderPage(); }
+          bvRunTalkStep();
+        }, 900); // 次のフレーズへ移る間の余白
+      });
+    }, 4000); // Your turnポーズ4秒（スキップ不可）
+  });
 }
 
 function bvUpdateTalkProgress() {
