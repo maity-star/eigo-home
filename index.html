@@ -2499,21 +2499,16 @@ renderRoutineCatGrid();
 const BOOK_DATA = {
   title: 'Sunny Day!',
   pages: [
-    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null, audio: 'audio/book_audio/sunnyday_01.mp3' },
-    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!", audio: 'audio/book_audio/sunnyday_02.mp3' },
-    { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday_03.mp3' },
-    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!', audio: 'audio/book_audio/sunnyday_04.mp3' },
-    { img: 'books/aug/monthly_book/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!', audio: 'audio/book_audio/sunnyday_05.mp3' },
-    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!', audio: 'audio/book_audio/sunnyday_06.mp3' },
-    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null, audio: 'audio/book_audio/sunnyday_07.mp3' },
-    { img: 'books/aug/monthly_book/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!", audio: 'audio/book_audio/sunnyday_08.mp3' },
+    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
+    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
+    { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday/sunnyday_03.mp3' },
+    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
+    { img: 'books/aug/monthly_book/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!', audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
+    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
+    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
+    { img: 'books/aug/monthly_book/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!", audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
   ]
 };
-
-// Let's talkで使うページ（talkPhraseがある5ページ、フレーズと音源をセットで保持）
-const TALK_PAGES = BOOK_DATA.pages.filter(p => p.talkPhrase);
-// (後方互換：フレーズ文字列だけの配列も残す)
-const TALK_PHRASES = TALK_PAGES.map(p => p.talkPhrase);
 
 // 絵本ビューワー共通の音声プレイヤー（Let's read / Let's talk 兼用）
 const bvAudioEl = new Audio();
@@ -2546,16 +2541,13 @@ function bvStopAudio() {
 
 let bvCurrentPage = 0;
 let bvMode = null; // 'read' | 'talk'
-let bvTalkStep = 0; // 0:Joel読む 1:Your turn 2:確認
-let bvTalkPhraseIdx = 0;
 let bvTalkTimer = null;
 let bvTalkDone = [];
+let bvTalkToken = 0; // Let's talkチェーンの世代管理（多重起動防止）
 
 function openBookModal(mode) {
   bvCurrentPage = 0;
   bvMode = mode;
-  bvTalkStep = 0;
-  bvTalkPhraseIdx = 0;
   bvTalkDone = [];
   document.getElementById('bookViewerModal').classList.add('open');
   bvRenderPage();
@@ -2571,6 +2563,8 @@ function closeBookModal() {
   document.getElementById('bookViewerModal').classList.remove('open');
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
   bvStopAudio();
+  bvReadToken++;
+  bvTalkToken++;
   document.getElementById('bvTalkBar').classList.remove('active');
   document.getElementById('bvIetaBtn').classList.remove('show');
   document.getElementById('bvModeRow').style.display = 'flex';
@@ -2578,6 +2572,7 @@ function closeBookModal() {
 
 function bvRenderPage() {
   const page = BOOK_DATA.pages[bvCurrentPage];
+  if (!page) return; // 想定外のページ番号なら何もしない（クラッシュ防止）
   const img = document.getElementById('bvPageImg');
   img.src = page.img;
   document.getElementById('bvTitle').textContent = `Sunny Day!  ${bvCurrentPage + 1} / ${BOOK_DATA.pages.length}`;
@@ -2630,7 +2625,8 @@ function bvChangePage(dir) {
   bvRenderPage();
   if (bvMode === 'read') {
     if (bvTalkTimer) clearTimeout(bvTalkTimer);
-    bvPlayPageThenAdvance();
+    bvReadToken++; // 進行中の自動送りチェーンを無効化してからやり直す
+    bvPlayPageThenAdvance(bvReadToken);
   }
 }
 
@@ -2644,6 +2640,8 @@ document.getElementById('bvPageArea').addEventListener('touchend', e => {
   if (Math.abs(diff) > 40) bvChangePage(diff > 0 ? 1 : -1);
 });
 
+let bvReadToken = 0; // 自動送りチェーンの世代管理（多重起動によるページ暴走を防ぐ）
+
 function bvStartRead() {
   bvMode = 'read';
   bvCurrentPage = 0;
@@ -2652,19 +2650,22 @@ function bvStartRead() {
   document.getElementById('bvIetaBtn').classList.remove('show');
   document.getElementById('bvModeRow').style.display = 'flex';
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
-  bvPlayPageThenAdvance();
+  bvReadToken++; // 新しいチェーンを開始。古いチェーンはこの後token不一致で止まる
+  bvPlayPageThenAdvance(bvReadToken);
 }
 
 // 現在のページの音声を再生 → 再生し終わったら少し間を置いて次ページへ
-function bvPlayPageThenAdvance() {
+function bvPlayPageThenAdvance(token) {
   const page = BOOK_DATA.pages[bvCurrentPage];
+  if (!page) return;
   bvPlayAudio(page.audio, () => {
-    if (bvMode !== 'read') return; // モードが切り替わっていたら止める
+    if (bvMode !== 'read' || token !== bvReadToken) return; // モード変更 or 古いチェーンなら中断
     if (bvCurrentPage < BOOK_DATA.pages.length - 1) {
       bvTalkTimer = setTimeout(() => {
+        if (token !== bvReadToken) return;
         bvCurrentPage++;
         bvRenderPage();
-        bvPlayPageThenAdvance();
+        bvPlayPageThenAdvance(token);
       }, 700); // ページ間の間（ページめくりアニメーションの余白）
     }
   });
@@ -2672,65 +2673,140 @@ function bvPlayPageThenAdvance() {
 
 function bvStartTalk() {
   bvMode = 'talk';
-  bvTalkPhraseIdx = 0;
   bvTalkDone = [];
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
   bvStopAudio();
   document.getElementById('bvModeRow').style.display = 'none';
   document.getElementById('bvTalkBar').classList.add('active');
   document.getElementById('bvIetaBtn').classList.remove('show');
-  // Let's talkのフレーズがあるページに移動
-  const firstTalkPage = BOOK_DATA.pages.indexOf(TALK_PAGES[0]);
-  bvCurrentPage = firstTalkPage;
+  // 1ページ目（イントロ）から通して再生。ナレーションページは一時停止なし、練習フレーズのページでYour turnループに入る
+  bvCurrentPage = 0;
   bvRenderPage();
-  bvRunTalkStep();
+  bvTalkToken++; // 新しいチェーンを開始。古いチェーンはtoken不一致で止まる
+  bvUpdateTalkProgress();
+  bvRunTalkStep(bvTalkToken);
 }
 
-function bvRunTalkStep() {
-  const page = TALK_PAGES[bvTalkPhraseIdx];
+// 効果音まわり
+let bvAudioCtx = null;
+function bvGetAudioCtx() {
+  if (!bvAudioCtx) bvAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (bvAudioCtx.state === 'suspended') bvAudioCtx.resume();
+  return bvAudioCtx;
+}
+// 「Your turn!」の合図：実音源（Pixabayからダウンロードした効果音）を再生。読み込めない場合は合成音にフォールバック
+const bvSfxEl = new Audio();
+function bvPlayChime() {
+  try {
+    bvSfxEl.pause();
+    bvSfxEl.src = 'audio/sfx/talking_start.mp3';
+    bvSfxEl.currentTime = 0;
+    bvSfxEl.onerror = () => bvPlaySynthChime();
+    const p = bvSfxEl.play();
+    if (p && typeof p.catch === 'function') p.catch(() => bvPlaySynthChime());
+  } catch (e) { bvPlaySynthChime(); }
+}
+// 合成チャイム（フォールバック用）：弾むような3音の子供っぽいチャイム
+function bvPlaySynthChime() {
+  try {
+    const ctx = bvGetAudioCtx();
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99]; // ド・ミ・ソ（元気に跳ねる感じ）
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      const start = now + i * 0.1;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.32, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.25);
+    });
+  } catch (e) { /* Web Audio非対応環境でも無視して進行 */ }
+}
+// 「もう一度Joelと一緒に」の合図：実音源（Pixabayの効果音）を再生。読み込めない場合は合成音にフォールバック
+function bvPlayReadyChime() {
+  try {
+    bvSfxEl.pause();
+    bvSfxEl.src = 'audio/sfx/joel_again.mp3';
+    bvSfxEl.currentTime = 0;
+    bvSfxEl.onerror = () => bvPlaySynthReadyChime();
+    const p = bvSfxEl.play();
+    if (p && typeof p.catch === 'function') p.catch(() => bvPlaySynthReadyChime());
+  } catch (e) { bvPlaySynthReadyChime(); }
+}
+// 合成版「ぽよん」チャイム（フォールバック用）：跳ねて着地する1音
+function bvPlaySynthReadyChime() {
+  try {
+    const ctx = bvGetAudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(660, now);
+    osc.frequency.exponentialRampToValueAtTime(440, now + 0.18); // 弾んで着地する下降ピッチ
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.32);
+  } catch (e) { /* Web Audio非対応環境でも無視して進行 */ }
+}
+
+function bvRunTalkStep(token) {
+  const page = BOOK_DATA.pages[bvCurrentPage];
   if (!page) return;
 
-  // Step 0: Joelが読む（実音声）
-  document.getElementById('bvTalkPhrase').textContent = page.talkPhrase;
+  // 全ページ共通：Joel読む→チャイム→Your turn→もう一度→次へ
+  document.getElementById('bvTalkPhrase').textContent = page.talkPhrase || page.phrase;
   document.getElementById('bvTalkStatus').textContent = '🎧 Joelの声を聞いてね';
   bvUpdateTalkProgress();
 
   bvPlayAudio(page.audio, () => {
-    if (bvMode !== 'talk') return;
+    if (bvMode !== 'talk' || token !== bvTalkToken) return;
     // Step 1: Your turn（無音ポーズ・スキップ不可）
+    bvPlayChime();
     document.getElementById('bvTalkStatus').textContent = '🎤 Your turn! 言ってみよう';
     bvTalkTimer = setTimeout(() => {
-      if (bvMode !== 'talk') return;
+      if (token !== bvTalkToken) return;
       // Step 2: 確認読み（同じ音声をもう一度）
+      bvPlayReadyChime();
       document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Joelと一緒に';
-      bvTalkDone.push(bvTalkPhraseIdx);
+      if (!bvTalkDone.includes(bvCurrentPage)) bvTalkDone.push(bvCurrentPage);
       bvUpdateTalkProgress();
 
       bvPlayAudio(page.audio, () => {
-        if (bvMode !== 'talk') return;
+        if (bvMode !== 'talk' || token !== bvTalkToken) return;
         bvTalkTimer = setTimeout(() => {
-          bvTalkPhraseIdx++;
-          if (bvTalkPhraseIdx >= TALK_PAGES.length) {
-            // 全フレーズ完了
-            document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
-            document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
-            document.getElementById('bvIetaBtn').classList.add('show');
-            return;
-          }
-          // 次のフレーズのページへ
-          const nextPage = BOOK_DATA.pages.indexOf(TALK_PAGES[bvTalkPhraseIdx]);
-          if (nextPage >= 0) { bvCurrentPage = nextPage; bvRenderPage(); }
-          bvRunTalkStep();
-        }, 900); // 次のフレーズへ移る間の余白
+          if (token !== bvTalkToken) return;
+          bvAdvanceTalkPage(token);
+        }, 900); // 次のページへ移る間の余白
       });
     }, 4000); // Your turnポーズ4秒（スキップ不可）
   });
 }
 
+function bvAdvanceTalkPage(token) {
+  if (bvCurrentPage >= BOOK_DATA.pages.length - 1) {
+    // 最後まで到達：全ページ完了
+    document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
+    document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
+    document.getElementById('bvIetaBtn').classList.add('show');
+    return;
+  }
+  bvCurrentPage++;
+  bvRenderPage();
+  bvRunTalkStep(token);
+}
+
 function bvUpdateTalkProgress() {
   const prog = document.getElementById('bvTalkProgress');
-  prog.innerHTML = TALK_PHRASES.map((_, i) => {
-    const cls = bvTalkDone.includes(i) ? 'done' : i === bvTalkPhraseIdx ? 'current' : '';
+  prog.innerHTML = BOOK_DATA.pages.map((_, i) => {
+    const cls = bvTalkDone.includes(i) ? 'done' : i === bvCurrentPage ? 'current' : '';
     return `<div class="bv-talk-dot ${cls}"></div>`;
   }).join('');
 }
