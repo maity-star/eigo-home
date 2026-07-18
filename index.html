@@ -1429,8 +1429,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">朝のひととき、ラジオ感覚で流してみてね。<br>ふと出てきたフレーズが、今日の親子の話のきっかけになりますように。</p>
         <div class="ft-card">
           <div class="ft-card-top">
-            <div class="ft-question">"What animal did you see today?"</div>
-            <div class="ft-question-ja">今日のお話：今日見た動物は何色だった？</div>
+            <div class="ft-question" id="ftQuestion">"What animal did you see today?"</div>
+            <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
             <div class="ft-wave" id="ftWave"></div>
           </div>
           <div class="ft-player-inner">
@@ -1439,7 +1439,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
                 <span id="ftPlayIcon">▶</span>
               </button>
               <div class="ft-play-meta">
-                <div class="ft-play-title">Wed · What animal did you see today?</div>
+                <div class="ft-play-title" id="ftPlayTitle">Wed · What animal did you see today?</div>
                 <div class="ft-play-len" id="ftPlayLen">3:40</div>
               </div>
             </div>
@@ -2413,14 +2413,169 @@ function toggleLyrics() {
 // ========================
 let ftPlaying = false, ftProg = 0;
 
-// 週替わり音源マッピング（収録が済んだ分だけ登録。未収録の曜日はnullのまま＝再生ボタン無効）
+// ---- 月1回まとめて入れるデータ（台本執筆と同時に作る想定）----
+// 月・水・金：フル新作。火・木：会話は直近のNEW回を再利用＋Maiの新規ミニレッスン。土・日：金曜の再放送。
+const MORNING_TALK_MONTH = 'aug';
+const MORNING_TALK_WEEKS = {
+  w1: {
+    theme: '基本｜暑い日・プール開き',
+    days: {
+      mon: { title: "It's hot!", phrases: [{ en: "It's hot!", ja: "暑いね！" }, { en: "Let's swim!", ja: "泳ごう！" }] },
+      tue: { title: "「Let's + 動詞」で広げよう", phrases: [{ en: "Let's eat!", ja: "一緒に食べよう！" }] },
+      wed: { title: 'So fun!', phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }] },
+      thu: { title: "「It's + 形容詞」で広げよう", phrases: [{ en: "It's cold!", ja: '冷たいね！' }] },
+      fri: { title: 'Splash!', phrases: [{ en: 'Splash!', ja: 'バシャッ！' }] },
+    }
+  },
+  w2: {
+    theme: '家族旅行｜海・おばあちゃんの家',
+    days: {
+      mon: { title: "Let's go!", phrases: [{ en: "Let's go!", ja: '行こう！' }] },
+      tue: { title: "「Let's go + 場所」で広げよう", phrases: [{ en: "Let's go to the park!", ja: '公園に行こう！' }] },
+      wed: { title: "Let's swim!", phrases: [{ en: "Let's swim!", ja: '泳ごう！' }] },
+      thu: { title: '「I see + 名詞」で広げよう', phrases: [{ en: 'I see a car!', ja: '車が見える！' }] },
+      fri: { title: 'Sunny!', phrases: [{ en: 'Sunny!', ja: '晴れてるね！' }] },
+    }
+  },
+  w3: {
+    theme: '夏の涼み方｜アイス・かき氷',
+    days: {
+      mon: { title: 'I want ice cream!', phrases: [{ en: 'I want ice cream!', ja: 'アイスが欲しい！' }] },
+      tue: { title: '「I want + 名詞」で広げよう', phrases: [{ en: 'I want water!', ja: 'お水が欲しい！' }] },
+      wed: { title: 'So cold!', phrases: [{ en: 'So cold!', ja: 'すごく冷たい！' }] },
+      thu: { title: '「So + 形容詞」で広げよう', phrases: [{ en: 'So yummy!', ja: 'すごく美味しい！' }] },
+      fri: { title: "It's hot!（復習）", phrases: [{ en: "It's hot!", ja: '暑いね！' }] },
+    }
+  },
+  w4: {
+    theme: '夏祭り・花火｜夏休みの締めくくり',
+    days: {
+      mon: { title: 'So fun!（復習）', phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }] },
+      tue: { title: '「I like + 名詞」で広げよう', phrases: [{ en: 'I like candy!', ja: '飴が好き！' }] },
+      wed: { title: 'Wow!', phrases: [{ en: 'Wow!', ja: 'わあ！' }] },
+      thu: { title: '「I love + 名詞」で広げよう', phrases: [{ en: 'I love fireworks!', ja: '花火が大好き！' }] },
+      fri: { title: 'Splash!（復習）', phrases: [{ en: 'Splash!', ja: 'バシャッ！' }] },
+    }
+  },
+};
+const MORNING_TALK_WEEK_STARTS = { w1: '2026-08-03', w2: '2026-08-10', w3: '2026-08-17', w4: '2026-08-24' };
+const MORNING_TALK_WEEK_ORDER = ['w1', 'w2', 'w3', 'w4'];
+const DAY_KEY_BY_INDEX = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const DAY_LABEL_JA = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日' };
+const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
+
+// 音源マッピング（収録が済んだ分だけ登録。未収録は null＝再生ボタン無効）
 // 命名規則: audio/morning_talk/[月]_w[週数]_[曜日].mp3
 const MORNING_TALK_AUDIO = {
   aug_w1_mon: 'audio/morning_talk/aug_w1_mon.mp3',
-  aug_w1_tue: null, // Maiのミニレッスン部分、未収録
+  aug_w1_tue: null,
 };
-// 今の画面に表示する回（今後、曜日パターン別マスター運用に合わせて出し分け予定）
-const CURRENT_FT_KEY = 'aug_w1_mon';
+
+function resolveMorningTalkWeekKey(date) {
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const daysSince = Math.floor((date - w1Start) / 86400000);
+  let idx = Math.floor(daysSince / 7);
+  if (idx < 0) idx = 0;
+  if (idx > MORNING_TALK_WEEK_ORDER.length - 1) idx = MORNING_TALK_WEEK_ORDER.length - 1;
+  return MORNING_TALK_WEEK_ORDER[idx];
+}
+
+// 今日表示すべき回を、日付から自動解決する（＝人間が毎日触らなくていい部分）
+// ファミリープレビュー用の裏口：enverly.jp/?familypreview=w2_wed のように週×曜日を指定すると、
+// 公開日を待たずにその回をそのまま体験できる（本番の公開ロジック自体は変更しない）
+// 例: ?familypreview=1 → 月曜(w1_mon)固定（後方互換）／?familypreview=w3_fri → 第3週金曜
+const FAMILY_PREVIEW_PARAM = (typeof window !== 'undefined' && window.location)
+  ? new URLSearchParams(window.location.search).get('familypreview')
+  : null;
+const FAMILY_PREVIEW = !!FAMILY_PREVIEW_PARAM;
+
+function parseFamilyPreviewKey(param) {
+  if (!param) return null;
+  if (param === '1') return { weekKey: 'w1', dayKey: 'mon' }; // 旧形式との互換
+  const m = /^(w[1-4])_(mon|tue|wed|thu|fri)$/.exec(param);
+  if (!m) return null;
+  const weekKey = m[1], dayKey = m[2];
+  if (!MORNING_TALK_WEEKS[weekKey] || !MORNING_TALK_WEEKS[weekKey].days[dayKey]) return null;
+  return { weekKey, dayKey };
+}
+
+function getTodayMorningTalkInfo() {
+  const now = new Date();
+  if (FAMILY_PREVIEW) {
+    const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
+    const { weekKey, dayKey } = parsed;
+    const content = MORNING_TALK_WEEKS[weekKey].days[dayKey];
+    const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+    const isNew = NEW_DAY_KEYS.includes(dayKey);
+    return { now, dayKey, weekKey, isNew, isWeekend: false, isPreLaunch: false, content, audioKey };
+  }
+  const dayKey = DAY_KEY_BY_INDEX[now.getDay()];
+  const weekKey = resolveMorningTalkWeekKey(now);
+  const isWeekend = (dayKey === 'sat' || dayKey === 'sun');
+  const contentDayKey = isWeekend ? 'fri' : dayKey; // 土日は金曜回の再放送
+  const isNew = NEW_DAY_KEYS.includes(dayKey);
+  const content = MORNING_TALK_WEEKS[weekKey].days[contentDayKey];
+  const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${contentDayKey}`;
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const isPreLaunch = now < w1Start; // 配信開始日より前＝まだ何も放送していない
+  return { now, dayKey, weekKey, isNew, isWeekend, isPreLaunch, content, audioKey };
+}
+
+// データから今日の表示内容（タイトル・フレーズ・NEW/再放送バッジ）を反映
+function renderMorningTalkContent() {
+  const info = getTodayMorningTalkInfo();
+  const dateLabel = `${info.now.getMonth() + 1}/${info.now.getDate()}(${DAY_LABEL_JA[info.dayKey]})`;
+  document.getElementById('ftDateBadge').textContent = dateLabel;
+
+  const tag = document.getElementById('ftStatusTag');
+  const note = document.getElementById('ftReplayNote');
+
+  if (info.isPreLaunch) {
+    // 配信開始日（8/3）より前：まだ何も放送していないので「近日公開」表示にする
+    tag.textContent = '近日公開';
+    tag.className = 'ft-status-tag replay';
+    note.textContent = '配信は8月3日（月）から毎朝お届けします';
+    note.style.display = 'block';
+    document.getElementById('ftQuestion').textContent = 'Coming soon!';
+    document.getElementById('ftQuestionJa').textContent = 'もうすぐ配信スタート';
+    document.getElementById('ftPlayTitle').textContent = '配信準備中';
+    const body = document.getElementById('ftPhrasesBody');
+    if (body) body.innerHTML = '';
+    return null; // 音源キーなし＝再生ボタンは無効のまま
+  }
+
+  if (info.isNew) {
+    tag.textContent = 'NEW';
+    tag.className = 'ft-status-tag new';
+    note.style.display = 'none';
+  } else {
+    tag.className = 'ft-status-tag replay';
+    if (info.isWeekend) {
+      tag.textContent = '今週の再放送';
+      note.textContent = '金曜日の回をもう一度お届け中';
+    } else {
+      tag.textContent = 'Maiのひとこと';
+      note.textContent = '会話パートは直近の回を再利用、Maiの新しい解説つき';
+    }
+    note.style.display = 'block';
+  }
+
+  const c = info.content;
+  document.getElementById('ftQuestion').textContent = `"${c.title}"`;
+  document.getElementById('ftQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
+  document.getElementById('ftPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
+
+  const body = document.getElementById('ftPhrasesBody');
+  if (body) {
+    body.innerHTML = c.phrases.map(p =>
+      `<div class="ft-phrase-row"><span class="ft-phrase-en">"${p.en}"</span><span class="ft-phrase-ja">${p.ja}</span></div>`
+    ).join('');
+  }
+
+  return info.audioKey;
+}
+
+let ftCurrentAudioKey = null;
 
 // Morning Talk専用の音声プレイヤー
 const ftAudioEl = new Audio();
@@ -2433,7 +2588,8 @@ function fmtFtTime(sec) {
 }
 
 function initFtAudio() {
-  const src = MORNING_TALK_AUDIO[CURRENT_FT_KEY];
+  ftCurrentAudioKey = renderMorningTalkContent();
+  const src = MORNING_TALK_AUDIO[ftCurrentAudioKey];
   const playBtn = document.getElementById('ftPlayBtn');
   if (!src) {
     // 未収録：再生ボタンを無効化し、準備中である旨を表示
@@ -2442,6 +2598,7 @@ function initFtAudio() {
     if (lenEl) lenEl.textContent = '収録準備中';
     return;
   }
+  if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
   ftAudioEl.src = src;
   ftAudioEl.addEventListener('loadedmetadata', () => {
     ftAudioLoaded = true;
@@ -2496,7 +2653,7 @@ function setFtWavePlaying(isPlaying) {
 }
 
 function toggleFamilyTalk() {
-  if (!MORNING_TALK_AUDIO[CURRENT_FT_KEY]) return; // 未収録は何もしない
+  if (!MORNING_TALK_AUDIO[ftCurrentAudioKey]) return; // 未収録は何もしない
   activeMode = 'familytalk';
   ftPlaying = !ftPlaying;
   const icon = document.getElementById('ftPlayIcon');
@@ -2532,7 +2689,7 @@ function stopFtAutoNext() {
   el.classList.remove('show');
 }
 function seekFamilyTalk(e) {
-  if (!MORNING_TALK_AUDIO[CURRENT_FT_KEY] || !ftAudioEl.duration) return;
+  if (!MORNING_TALK_AUDIO[ftCurrentAudioKey] || !ftAudioEl.duration) return;
   const rect = e.currentTarget.getBoundingClientRect();
   const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
   ftAudioEl.currentTime = (pct / 100) * ftAudioEl.duration;
@@ -2645,50 +2802,6 @@ function completeActiveTime() {
   // 注：Active Timeはスタンプ独立カウントにせず、絵本のスタンプとは別軸で
   // 「やったら良いことがある」程度の軽い演出（褒め声）のみとする設計
 }
-
-// 今日のEnverly：Morning Talk（毎日表示・新作は月・水・金、それ以外は再放送）
-const MORNING_DAYS = [
-  { day: 1, label: '月', isNew: true },
-  { day: 2, label: '火', isNew: false },
-  { day: 3, label: '水', isNew: true },
-  { day: 4, label: '木', isNew: false },
-  { day: 5, label: '金', isNew: true },
-  { day: 6, label: '土', isNew: false },
-  { day: 0, label: '日', isNew: false },
-];
-
-function mostRecentNewDayLabel(today) {
-  for (let back = 1; back <= 7; back++) {
-    const d = (today - back + 7) % 7;
-    const found = MORNING_DAYS.find(x => x.day === d);
-    if (found && found.isNew) return found.label;
-  }
-  return null;
-}
-
-function applyTodayBadge() {
-  const now = new Date();
-  const today = now.getDay();
-  const d = MORNING_DAYS.find(x => x.day === today);
-  const dateLabel = `${now.getMonth() + 1}/${now.getDate()}(${d.label})`;
-  document.getElementById('ftDateBadge').textContent = dateLabel;
-
-  const tag = document.getElementById('ftStatusTag');
-  const note = document.getElementById('ftReplayNote');
-  if (d.isNew) {
-    tag.textContent = 'NEW';
-    tag.className = 'ft-status-tag new';
-    note.style.display = 'none';
-  } else {
-    tag.textContent = '今週の再放送';
-    tag.className = 'ft-status-tag replay';
-    const recent = mostRecentNewDayLabel(today);
-    note.textContent = recent ? `${recent}曜日の回をもう一度お届け中` : '';
-    note.style.display = 'block';
-  }
-}
-
-applyTodayBadge();
 
 // ========================
 // ルーティン：困った時のフレーズ集
