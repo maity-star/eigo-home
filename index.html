@@ -1440,7 +1440,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
               </button>
               <div class="ft-play-meta">
                 <div class="ft-play-title">Wed · What animal did you see today?</div>
-                <div class="ft-play-len">3:40</div>
+                <div class="ft-play-len" id="ftPlayLen">3:40</div>
               </div>
             </div>
             <div class="ft-prog-row">
@@ -2409,9 +2409,66 @@ function toggleLyrics() {
 }
 
 // ========================
-// Family Talk（ポッドキャスト）
+// Family Talk（ポッドキャスト＝Morning Talk）
 // ========================
-let ftPlaying = false, ftProg = 0, ftTimer = null;
+let ftPlaying = false, ftProg = 0;
+
+// 週替わり音源マッピング（収録が済んだ分だけ登録。未収録の曜日はnullのまま＝再生ボタン無効）
+// 命名規則: audio/morning_talk/[月]_w[週数]_[曜日].mp3
+const MORNING_TALK_AUDIO = {
+  aug_w1_mon: 'audio/morning_talk/aug_w1_mon.mp3',
+  aug_w1_tue: null, // Maiのミニレッスン部分、未収録
+};
+// 今の画面に表示する回（今後、曜日パターン別マスター運用に合わせて出し分け予定）
+const CURRENT_FT_KEY = 'aug_w1_mon';
+
+// Morning Talk専用の音声プレイヤー
+const ftAudioEl = new Audio();
+let ftAudioLoaded = false;
+
+function fmtFtTime(sec) {
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const s = Math.floor(sec);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+function initFtAudio() {
+  const src = MORNING_TALK_AUDIO[CURRENT_FT_KEY];
+  const playBtn = document.getElementById('ftPlayBtn');
+  if (!src) {
+    // 未収録：再生ボタンを無効化し、準備中である旨を表示
+    if (playBtn) { playBtn.disabled = true; playBtn.style.opacity = '0.4'; }
+    const lenEl = document.getElementById('ftPlayLen');
+    if (lenEl) lenEl.textContent = '収録準備中';
+    return;
+  }
+  ftAudioEl.src = src;
+  ftAudioEl.addEventListener('loadedmetadata', () => {
+    ftAudioLoaded = true;
+    const lenEl = document.getElementById('ftPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
+  });
+  ftAudioEl.addEventListener('timeupdate', () => {
+    if (!ftAudioEl.duration) return;
+    ftProg = (ftAudioEl.currentTime / ftAudioEl.duration) * 100;
+    document.getElementById('ftFill').style.width = ftProg.toFixed(1) + '%';
+    updateFtWaveProgress(ftProg);
+    document.getElementById('ftTime').textContent = fmtFtTime(ftAudioEl.currentTime);
+  });
+  ftAudioEl.addEventListener('ended', () => {
+    ftPlaying = false;
+    setFtWavePlaying(false);
+    document.getElementById('ftPlayIcon').textContent = '▶';
+    showFtAutoNext();
+  });
+  ftAudioEl.addEventListener('error', () => {
+    ftPlaying = false;
+    setFtWavePlaying(false);
+    const icon = document.getElementById('ftPlayIcon');
+    if (icon) icon.textContent = '▶';
+    showToast('音声の読み込みに失敗しました');
+  });
+}
 
 function renderFtWave() {
   const wave = document.getElementById('ftWave');
@@ -2439,34 +2496,26 @@ function setFtWavePlaying(isPlaying) {
 }
 
 function toggleFamilyTalk() {
+  if (!MORNING_TALK_AUDIO[CURRENT_FT_KEY]) return; // 未収録は何もしない
   activeMode = 'familytalk';
   ftPlaying = !ftPlaying;
   const icon = document.getElementById('ftPlayIcon');
   setFtWavePlaying(ftPlaying);
   if (ftPlaying) {
     icon.textContent = '⏸';
-    startFtTimer();
+    const p = ftAudioEl.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        ftPlaying = false;
+        icon.textContent = '▶';
+        setFtWavePlaying(false);
+        showToast('再生できませんでした');
+      });
+    }
   } else {
     icon.textContent = '▶';
-    clearInterval(ftTimer);
+    ftAudioEl.pause();
   }
-}
-function startFtTimer() {
-  clearInterval(ftTimer);
-  ftTimer = setInterval(() => {
-    ftProg = Math.min(ftProg + 0.5, 100);
-    document.getElementById('ftFill').style.width = ftProg.toFixed(1) + '%';
-    updateFtWaveProgress(ftProg);
-    const sec = Math.round(ftProg * 2.2);
-    const t = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
-    document.getElementById('ftTime').textContent = t;
-    if (ftProg >= 100) {
-      clearInterval(ftTimer); ftPlaying = false;
-      setFtWavePlaying(false);
-      document.getElementById('ftPlayIcon').textContent = '▶';
-      showFtAutoNext();
-    }
-  }, 300);
 }
 // Morning Talk再生完了→自動で朝の音楽（BGM）に切り替わる導線を表示。
 // ※現状は視覚状態のみのプロトタイプ。実際の音声チェーンは、
@@ -2483,8 +2532,11 @@ function stopFtAutoNext() {
   el.classList.remove('show');
 }
 function seekFamilyTalk(e) {
+  if (!MORNING_TALK_AUDIO[CURRENT_FT_KEY] || !ftAudioEl.duration) return;
   const rect = e.currentTarget.getBoundingClientRect();
-  ftProg = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+  const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+  ftAudioEl.currentTime = (pct / 100) * ftAudioEl.duration;
+  ftProg = pct;
   document.getElementById('ftFill').style.width = ftProg + '%';
   updateFtWaveProgress(ftProg);
 }
@@ -2493,6 +2545,7 @@ function toggleFtPhrases() {
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
 }
 renderFtWave();
+initFtAudio();
 
 // ========================
 // Active Time（探し物ミッション／なぞなぞクイズ）
