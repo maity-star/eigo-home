@@ -15,6 +15,41 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* オンボーディング（興味選択）は2026年7月に廃止・別ファイルへ退避済み
    → enverly_onboarding_interest_module.html を参照 */
 
+/* ==============================
+   今日のジャーニー（①②③ステップ誘導＋時間帯ナビ）
+============================== */
+.journey-nav { margin: 16px 20px 0; }
+.journey-eyebrow { font-size: 11px; font-weight: 600; color: #9CA3AF; margin-bottom: 8px; letter-spacing: 0.02em; }
+.journey-rail { display: flex; gap: 8px; }
+.journey-pill { flex: 1; position: relative; border-radius: 14px; padding: 10px 6px 9px; text-align: center; cursor: pointer; border: 1.5px solid #E5E7EB; background: #fff; transition: all .2s ease; }
+.journey-pill-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; font-weight: 700; margin-bottom: 4px; background: #E5E7EB; color: #6B7280; }
+.journey-pill-label { display: block; font-size: 11px; font-weight: 600; color: #6B7280; line-height: 1.3; }
+.journey-pill.active { border-color: #2D6A4F; background: #EAF4EE; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(45,106,79,0.15); }
+.journey-pill.active .journey-pill-num { background: #2D6A4F; color: #fff; }
+.journey-pill.active .journey-pill-label { color: #2D6A4F; }
+.journey-pill-stamp { position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; opacity: 0; transform: scale(0) rotate(-25deg); transition: all .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
+.journey-pill.opened .journey-pill-stamp { opacity: 1; transform: scale(1) rotate(-8deg); }
+
+.journey-block .journey-full { display: block; }
+.journey-block .journey-mini-card { display: none; }
+.journey-block.collapsed .journey-full { display: none; }
+.journey-block.collapsed .journey-mini-card { display: flex; }
+.journey-mini-card {
+  align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px;
+  background: #FAF9F5; border: 1px solid #E7E2D8; cursor: pointer;
+  margin: 16px 20px 0; transition: background .15s;
+}
+.journey-mini-card:active { background: #F1EFE7; }
+.journey-mini-icon { width: 34px; height: 34px; border-radius: 10px; background: #fff; border: 1px solid #E7E2D8; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.journey-mini-text { flex: 1; }
+.journey-mini-title { font-size: 12.5px; font-weight: 700; color: #111827; }
+.journey-mini-sub { font-size: 10.5px; color: #6B7280; margin-top: 1px; }
+.journey-mini-chev { font-size: 12px; color: #9CA3AF; }
+
+/* Weekly Pickを独立セクション化（旧：Weekly Mission内ネスト） */
+.weekly-pick-standalone { margin: 16px 20px 0; background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 20px; padding: 18px 16px 20px; }
+.weekly-pick-standalone .weekly-pick-block { margin-top: 0; padding-top: 0; border-top: none; }
+
 /* ヘッダー */
 .header { padding: 24px 20px 16px; border-bottom: 0.5px solid #E5E7EB; }
 .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
@@ -22,11 +57,51 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .logo span { color: #6DB88A; }
 .week-badge { font-size: 11px; background: #EDF6F1; color: #4D7D63; padding: 3px 10px; border-radius: 20px; }
 .header-sub { font-size: 12px; color: #6B7280; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.header-top-right { display: flex; align-items: center; gap: 8px; }
+.settings-gear-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #F3F4F6; border: none; color: #6B7280;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: background .15s;
+}
+.settings-gear-btn:active { background: #E5E7EB; }
 
-/* タブ */
-.tab-bar { display: flex; border-bottom: 0.5px solid #E5E7EB; margin: 0 20px; }
-.tab { flex: 1; text-align: center; padding: 10px 4px; font-size: 12px; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; }
-.tab.active { color: #6DB88A; border-bottom-color: #6DB88A; font-weight: 500; }
+/* 設定モーダル */
+.settings-modal {
+  position: fixed; inset: 0; z-index: 260;
+  background: #FFFDF8;
+  display: none; flex-direction: column;
+  max-width: 390px; margin: 0 auto;
+}
+.settings-modal.open { display: flex; }
+.settings-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 14px; flex-shrink: 0;
+  border-bottom: 1px solid #F0E6D2;
+}
+.settings-modal-title { font-size: 15px; font-weight: 700; color: #111827; }
+.settings-modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #F3F4F6; border: none; color: #6B7280;
+  font-size: 16px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.settings-body { flex: 1; overflow-y: auto; padding: 20px 20px 40px; }
+.settings-block-label { font-size: 11px; font-weight: 600; color: #9CA3AF; letter-spacing: .05em; margin: 22px 0 8px; text-transform: uppercase; }
+.settings-block-label:first-child { margin-top: 0; }
+.settings-rows { display: flex; flex-direction: column; gap: 8px; }
+.settings-account-card { background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+.settings-account-plan { font-size: 13px; font-weight: 700; color: #2D6A4F; }
+.settings-account-email { font-size: 11px; color: #6B7280; margin-top: 3px; }
+.settings-logout-btn {
+  width: 100%; margin-top: 22px; padding: 12px 0; border-radius: 12px;
+  background: #F3F4F6; border: none; color: #6B7280; font-size: 12.5px; font-weight: 600; cursor: pointer;
+}
+
+/* タブ（Option A：塗りつぶしピル / セグメントコントロール） */
+.tab-bar { display: flex; gap: 4px; margin: 14px 20px 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
+.tab { flex: 1; text-align: center; padding: 9px 4px; font-size: 12.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-radius: 10px; transition: background .2s ease, color .2s ease, box-shadow .2s ease; }
+.tab.active { background: #6DB88A; color: #fff; box-shadow: 0 2px 6px rgba(109,184,138,0.35); }
 
 /* セクション */
 .section { padding: 20px 20px 0; }
@@ -1275,13 +1350,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <div class="header">
     <div class="header-top">
       <div class="logo">En<span>verly</span></div>
-      <div class="week-badge">Week 1 · August</div>
+      <div class="header-top-right">
+        <div class="week-badge">Week 1 · August</div>
+        <button class="settings-gear-btn" onclick="openSettingsModal()" aria-label="設定">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- タブバー -->
   <div class="tab-bar">
-    <div class="tab active" onclick="switchTab('home',this)">今週</div>
+    <div class="tab active" onclick="switchTab('home',this)">ホーム</div>
     <div class="tab" onclick="switchTab('playlist',this)">みる</div>
     <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
@@ -1290,7 +1370,39 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <!-- 今週タブ -->
   <div id="tab-home">
 
+    <!-- 今日のジャーニー（①②③ステップ誘導＋時間帯ナビ） -->
+    <div class="journey-nav">
+      <div class="journey-eyebrow">きょうのとびら</div>
+      <div class="journey-rail">
+        <div class="journey-pill" data-slot="morning" onclick="focusJourneyBlock('morning')">
+          <svg class="journey-pill-stamp" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="5.5" fill="#E8A33D"/><g stroke="#E8A33D" stroke-width="2" stroke-linecap="round"><line x1="13" y1="1" x2="13" y2="4.5"/><line x1="13" y1="21.5" x2="13" y2="25"/><line x1="1" y1="13" x2="4.5" y2="13"/><line x1="21.5" y1="13" x2="25" y2="13"/><line x1="4.6" y1="4.6" x2="7" y2="7"/><line x1="19" y1="19" x2="21.4" y2="21.4"/><line x1="21.4" y1="4.6" x2="19" y2="7"/><line x1="7" y1="19" x2="4.6" y2="21.4"/></g></svg>
+          <span class="journey-pill-num">1</span>
+          <span class="journey-pill-label">朝のラジオ</span>
+        </div>
+        <div class="journey-pill" data-slot="day" onclick="focusJourneyBlock('day')">
+          <svg class="journey-pill-stamp" viewBox="0 0 26 26" fill="none"><g fill="#6DB88A"><circle cx="13" cy="6" r="4"/><circle cx="20" cy="13" r="4"/><circle cx="13" cy="20" r="4"/><circle cx="6" cy="13" r="4"/></g><circle cx="13" cy="13" r="3.5" fill="#2D6A4F"/></svg>
+          <span class="journey-pill-num">2</span>
+          <span class="journey-pill-label">今週のおたのしみ</span>
+        </div>
+        <div class="journey-pill" data-slot="night" onclick="focusJourneyBlock('night')">
+          <svg class="journey-pill-stamp" viewBox="0 0 26 26" fill="none"><g fill="#3d6b4f"><ellipse cx="13" cy="16" rx="4.5" ry="6"/><ellipse cx="6.5" cy="7" rx="2.1" ry="2.8" transform="rotate(-20 6.5 7)"/><ellipse cx="11" cy="4.5" rx="2.1" ry="2.8" transform="rotate(-5 11 4.5)"/><ellipse cx="16" cy="4.5" rx="2.1" ry="2.8" transform="rotate(5 16 4.5)"/><ellipse cx="20" cy="7" rx="2.1" ry="2.8" transform="rotate(20 20 7)"/></g></svg>
+          <span class="journey-pill-num">3</span>
+          <span class="journey-pill-label">えほんタイム</span>
+        </div>
+      </div>
+    </div>
+
     <!-- ① 今日のEnverly（曜日でMorning Talk/Active Time自動切替・週ストリップ内蔵） -->
+    <div class="journey-block" id="jblock-morning" data-slot="morning">
+      <div class="journey-mini-card" onclick="focusJourneyBlock('morning')">
+        <div class="journey-mini-icon">🎙️</div>
+        <div class="journey-mini-text">
+          <div class="journey-mini-title">朝のラジオ</div>
+          <div class="journey-mini-sub">Morning Talk・今日の分</div>
+        </div>
+        <div class="journey-mini-chev">▸</div>
+      </div>
+      <div class="journey-full">
     <div class="weekly-mission-wrap">
       <div class="weekly-mission-eyebrow">
         <div class="weekly-mission-label">Weekly Mission <span class="weekly-mission-label-ja">今週のプログラム</span></div>
@@ -1410,7 +1522,24 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </div>
       </div>
 
-      <!-- Weekly Pick（今週のおすすめ絵本） -->
+        </div><!-- /weekly-mission-content -->
+      </div><!-- /weekly-mission-panel -->
+    </div><!-- /weekly-mission-wrap -->
+      </div><!-- /journey-full (morning) -->
+    </div><!-- /journey-block jblock-morning -->
+
+    <!-- ② Weekly Pick（今週のおすすめ絵本） -->
+    <div class="journey-block" id="jblock-day" data-slot="day">
+      <div class="journey-mini-card" onclick="focusJourneyBlock('day')">
+        <div class="journey-mini-icon">🎵</div>
+        <div class="journey-mini-text">
+          <div class="journey-mini-title">今週のおたのしみ</div>
+          <div class="journey-mini-sub">Weekly Pick・Row, Row, Row Your Boat</div>
+        </div>
+        <div class="journey-mini-chev">▸</div>
+      </div>
+      <div class="journey-full">
+    <div class="weekly-pick-standalone">
       <div class="weekly-pick-block">
         <div class="section-header" style="margin-bottom:10px;">
           <div class="section-header-en">Weekly Pick</div>
@@ -1478,12 +1607,21 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           </div>
         </div>
       </div>
+    </div><!-- /weekly-pick-standalone -->
+      </div><!-- /journey-full (day) -->
+    </div><!-- /journey-block jblock-day -->
 
-        </div><!-- /weekly-mission-content -->
-      </div><!-- /weekly-mission-panel -->
-    </div><!-- /weekly-mission-wrap -->
-
-    <!-- ② 今月の教材絵本 -->
+    <!-- ③ 今月の教材絵本 -->
+    <div class="journey-block" id="jblock-night" data-slot="night">
+      <div class="journey-mini-card" onclick="focusJourneyBlock('night')">
+        <div class="journey-mini-icon">📖</div>
+        <div class="journey-mini-text">
+          <div class="journey-mini-title">えほんタイム</div>
+          <div class="journey-mini-sub">Sunny Day!・Water &amp; Sun</div>
+        </div>
+        <div class="journey-mini-chev">▸</div>
+      </div>
+      <div class="journey-full">
     <div class="month-hero-section">
       <div class="month-lesson-wrap">
         <div class="month-lesson-eyebrow">
@@ -1527,8 +1665,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </div>
       </div>
     </div><!-- /month-hero-section -->
+      </div><!-- /journey-full (night) -->
+    </div><!-- /journey-block jblock-night -->
 
-    <!-- ③ Monthly Playlist（独立セクション・3曲） -->
+    <!-- Monthly Playlist（独立セクション・3曲） -->
     <div class="monthly-playlist-section">
       <div class="monthly-playlist-eyebrow">
         <div class="monthly-playlist-label">Monthly Playlist <span class="monthly-playlist-label-ja">今月のテーマに合わせた曲</span></div>
@@ -1644,6 +1784,59 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   </div>
 
 </div><!-- /mainApp -->
+
+<!-- 設定モーダル -->
+<div class="settings-modal" id="settingsModal">
+  <div class="settings-modal-header">
+    <div class="settings-modal-title">設定</div>
+    <button class="settings-modal-close" onclick="closeSettingsModal()">✕</button>
+  </div>
+  <div class="settings-body">
+
+    <div class="settings-block-label">アカウント</div>
+    <div class="settings-account-card">
+      <div class="settings-account-plan" id="settingsPlanLabel">Full プラン</div>
+      <div class="settings-account-email" id="settingsEmailLabel">mai@example.com</div>
+    </div>
+    <div class="settings-rows">
+      <a class="wbl-item" href="https://billing.stripe.com/p/login/xxxxxxx" target="_blank">
+        <div class="wbl-icon blue">💳</div>
+        <div class="wbl-text"><div class="wbl-title">支払い方法の変更・解約</div><div class="wbl-sub">Stripeカスタマーポータルへ</div></div>
+        <div class="wbl-arr">↗</div>
+      </a>
+      <div class="wbl-item" onclick="logoutEnverly()">
+        <div class="wbl-icon gray">🚪</div>
+        <div class="wbl-text"><div class="wbl-title">ログアウト</div></div>
+        <div class="wbl-arr">＞</div>
+      </div>
+    </div>
+
+    <div class="settings-block-label">サービス情報</div>
+    <div class="settings-rows">
+      <a class="wbl-item" href="tokushoho.html" target="_blank">
+        <div class="wbl-icon gray">📄</div>
+        <div class="wbl-text"><div class="wbl-title">特定商取引法に基づく表記</div></div>
+        <div class="wbl-arr">＞</div>
+      </a>
+      <a class="wbl-item" href="privacy.html" target="_blank">
+        <div class="wbl-icon gray">🔒</div>
+        <div class="wbl-text"><div class="wbl-title">プライバシーポリシー</div></div>
+        <div class="wbl-arr">＞</div>
+      </a>
+      <a class="wbl-item" href="terms.html" target="_blank">
+        <div class="wbl-icon gray">📋</div>
+        <div class="wbl-text"><div class="wbl-title">利用規約</div></div>
+        <div class="wbl-arr">＞</div>
+      </a>
+      <a class="wbl-item" href="mailto:Enverly.official@gmail.com">
+        <div class="wbl-icon gray">✉️</div>
+        <div class="wbl-text"><div class="wbl-title">お問い合わせ</div><div class="wbl-sub">Enverly.official@gmail.com</div></div>
+        <div class="wbl-arr">＞</div>
+      </a>
+    </div>
+
+  </div>
+</div>
 
 <!-- 放送アーカイブモーダル -->
 <div class="archive-modal" id="archiveModal">
@@ -1946,6 +2139,78 @@ function switchTab(name, el) {
   el.classList.add('active');
   if (name === 'asobo') renderAsoboContent();
 }
+
+// ========================
+// トップ：今日のジャーニー（①②③ステップ誘導＋時間帯ナビ＋テーマ別スタンプ）
+// ========================
+const JOURNEY_SLOTS = ['morning', 'day', 'night'];
+let journeyManualFocus = null; // ピル/ミニカードをタップして手動で開いたスロット（時間帯と無関係にいつでも開ける）
+
+function getJourneyTimeSlot() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 11) return 'morning';   // 5-11時：Morning Talk
+  if (h >= 11 && h < 17) return 'day';      // 11-17時：Weekly Pick
+  return 'night';                            // 17-5時：Monthly Book
+}
+
+function journeyStorageKey() {
+  return 'enverly_journey_opened_' + new Date().toISOString().slice(0, 10); // 日付が変わればキーごと変わり、当日限定の目印になる
+}
+function getJourneyOpenedSet() {
+  try {
+    const raw = localStorage.getItem(journeyStorageKey());
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) { return new Set(); }
+}
+function markJourneyOpened(slot) {
+  const set = getJourneyOpenedSet();
+  if (set.has(slot)) return;
+  set.add(slot);
+  try { localStorage.setItem(journeyStorageKey(), JSON.stringify([...set])); } catch (e) {}
+}
+
+function applyJourneyState() {
+  const timeSlot = getJourneyTimeSlot();
+  markJourneyOpened(timeSlot); // 今の時間帯のコンテンツは自動的に「見た」扱い（スタンプ対象）
+  const activeSlot = journeyManualFocus || timeSlot;
+  const opened = getJourneyOpenedSet();
+
+  JOURNEY_SLOTS.forEach(slot => {
+    const block = document.getElementById('jblock-' + slot);
+    const pill = document.querySelector('.journey-pill[data-slot="' + slot + '"]');
+    if (block) block.classList.toggle('collapsed', slot !== activeSlot);
+    if (pill) {
+      pill.classList.toggle('active', slot === activeSlot);
+      pill.classList.toggle('opened', opened.has(slot));
+    }
+  });
+}
+
+function focusJourneyBlock(slot) {
+  journeyManualFocus = slot;
+  markJourneyOpened(slot);
+  applyJourneyState();
+  const block = document.getElementById('jblock-' + slot);
+  if (block && typeof block.scrollIntoView === 'function') block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+applyJourneyState();
+
+
+// ========================
+// 設定モーダル
+// ========================
+function openSettingsModal() {
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettingsModal() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+function logoutEnverly() {
+  // ログイン基盤（Stripe/認証）実装後に本処理を接続。現状はプレースホルダー
+  alert('ログアウト機能は認証実装後に接続予定です');
+}
+
 
 // ========================
 // あそぼタブ
@@ -2499,14 +2764,14 @@ renderRoutineCatGrid();
 const BOOK_DATA = {
   title: 'Sunny Day!',
   pages: [
-    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is Duck. Today is a sunny day.', talkPhrase: null, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
-    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot!", talkPhrase: "It's hot!", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
+    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
+    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot.", talkPhrase: "It's hot.", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
     { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday/sunnyday_03.mp3' },
-    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'Splash!', talkPhrase: 'Splash!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
-    { img: 'books/aug/monthly_book/p5.jpg', phrase: 'So fun!', talkPhrase: 'So fun!', audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
-    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'Sunny!', talkPhrase: 'Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
-    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Then... the rain came. Drip. Drop. Drip. Drop.', talkPhrase: null, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
-    { img: 'books/aug/monthly_book/p8.jpg', phrase: "Duck smiled. I'm already wet!", talkPhrase: "I'm already wet!", audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
+    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', talkPhrase: 'SPLASH!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
+    { img: 'books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", talkPhrase: "It's so fun!", audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
+    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', talkPhrase: 'So Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
+    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', talkPhrase: null, talkPause: 6000, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
+    { img: 'books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
   ]
 };
 
@@ -2786,7 +3051,7 @@ function bvRunTalkStep(token) {
           bvAdvanceTalkPage(token);
         }, 900); // 次のページへ移る間の余白
       });
-    }, 4000); // Your turnポーズ4秒（スキップ不可）
+    }, page.talkPause || 4000); // Your turnポーズ（スキップ不可）。ページ側にtalkPauseがあればそちらを優先
   });
 }
 
