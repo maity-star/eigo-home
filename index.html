@@ -1470,6 +1470,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
               <div class="ft-prog-bar" onclick="seekFamilyTalk(event)"><div class="ft-prog-fill" id="ftFill"></div></div>
               <div class="ft-prog-time" id="ftTime">0:00</div>
             </div>
+            <div id="ftDebugOverlay" style="display:none; margin-top:8px; padding:8px 10px; background:rgba(0,0,0,0.75); border-radius:8px; font-size:10px; color:#B7F5C8; font-family:monospace; line-height:1.6; white-space:pre-wrap;"></div>
           </div>
           <div class="ft-phrases-toggle" onclick="toggleFtPhrases()">
             <div class="ft-phrases-label"><span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_bubble.png" alt="フレーズ"></span><span>今日のフレーズ</span></div>
@@ -2835,6 +2836,13 @@ const FAMILY_PREVIEW_PARAM = (typeof window !== 'undefined' && window.location)
   : null;
 const FAMILY_PREVIEW = !!FAMILY_PREVIEW_PARAM;
 
+// カラオケハイライトのデバッグ用裏口：enverly.jp/?ftdebug=1 でアクセスすると、
+// Morning Talkプレイヤーの下に currentTime/duration/アクティブ行 などの実測値がその場で表示される。
+// 「ハイライトが止まる」系の不具合は数値を見ないと原因を切り分けにくいための一時的な計測ツール。
+const FT_DEBUG = (typeof window !== 'undefined' && window.location)
+  ? new URLSearchParams(window.location.search).get('ftdebug') === '1'
+  : false;
+
 function parseFamilyPreviewKey(param) {
   if (!param) return null;
   if (param === '1') return { weekKey: 'w1', dayKey: 'mon' }; // 旧形式との互換
@@ -2975,18 +2983,49 @@ function computeFtPhraseTimings(phrases, totalDuration) {
 }
 
 function updateFtPhraseHighlight(t) {
-  if (!ftPhraseTimings.length) return;
-  let activeIdx = ftPhraseTimings.length - 1;
-  for (let i = 0; i < ftPhraseTimings.length; i++) {
-    if (t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+  try {
+    if (FT_DEBUG) renderFtDebugOverlay(t);
+    if (!ftPhraseTimings.length) return;
+    let activeIdx = ftPhraseTimings.length - 1;
+    for (let i = 0; i < ftPhraseTimings.length; i++) {
+      if (t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+    }
+    ftPhraseTimings.forEach((_, i) => {
+      const row = document.getElementById('ftPhraseRow' + i);
+      if (!row) return;
+      row.classList.remove('active', 'done');
+      if (i < activeIdx) row.classList.add('done');
+      if (i === activeIdx) row.classList.add('active');
+    });
+  } catch (e) {
+    // ここで例外が出ると以後ずっとハイライトが更新されなくなる（＝「止まって見える」原因になりうる）ため、
+    // 握りつぶして次のtimeupdateでの再試行に賭ける。ftdebug=1なら画面にエラー内容を出す。
+    if (FT_DEBUG) {
+      const el = document.getElementById('ftDebugOverlay');
+      if (el) el.textContent = 'updateFtPhraseHighlight ERROR: ' + (e && e.message);
+    }
   }
-  ftPhraseTimings.forEach((_, i) => {
-    const row = document.getElementById('ftPhraseRow' + i);
-    if (!row) return;
-    row.classList.remove('active', 'done');
-    if (i < activeIdx) row.classList.add('done');
-    if (i === activeIdx) row.classList.add('active');
-  });
+}
+
+// ftdebug=1専用：Morning Talkの再生に関する実測値をその場で表示する（原因切り分け用）
+function renderFtDebugOverlay(t) {
+  const el = document.getElementById('ftDebugOverlay');
+  if (!el) return;
+  el.style.display = 'block';
+  let activeIdx = -1;
+  if (ftPhraseTimings.length) {
+    activeIdx = ftPhraseTimings.length - 1;
+    for (let i = 0; i < ftPhraseTimings.length; i++) {
+      if (t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+    }
+  }
+  const lines = [
+    `currentTime: ${t.toFixed(2)}s / duration: ${(ftAudioEl.duration || 0).toFixed(2)}s`,
+    `ftCurrentPhrases.length: ${ftCurrentPhrases.length} / ftPhraseTimings.length: ${ftPhraseTimings.length}`,
+    `activeIdx: ${activeIdx}`,
+    ftPhraseTimings[activeIdx] ? `active row range: ${ftPhraseTimings[activeIdx].start.toFixed(2)} - ${ftPhraseTimings[activeIdx].end.toFixed(2)}` : '',
+  ];
+  el.textContent = lines.join('\n');
 }
 
 function clearFtPhraseHighlight() {
