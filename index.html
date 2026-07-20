@@ -3098,7 +3098,8 @@ function initFtAudio() {
     document.getElementById('ftFill').style.width = ftProg.toFixed(1) + '%';
     updateFtWaveProgress(ftProg);
     document.getElementById('ftTime').textContent = fmtFtTime(ftAudioEl.currentTime);
-    updateFtPhraseHighlight(ftAudioEl.currentTime);
+    // 一時オフ：ハイライトのズレが解決するまで無効化。ロジック自体は残しているので原因が分かり次第これを戻す。
+    // updateFtPhraseHighlight(ftAudioEl.currentTime);
   });
   ftAudioEl.addEventListener('ended', () => {
     ftPlaying = false;
@@ -3149,7 +3150,8 @@ function toggleFamilyTalk() {
   setFtWavePlaying(ftPlaying);
   if (ftPlaying) {
     icon.textContent = '⏸';
-    openFtPhrasesAuto();
+    // 一時オフ：カラオケハイライトと合わせて無効化中
+    // openFtPhrasesAuto();
     const p = ftAudioEl.play();
     if (p && typeof p.catch === 'function') {
       p.catch(() => {
