@@ -361,6 +361,17 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-phrase-row.active .ft-phrase-en { color: #0F2B1F; }
 .ft-phrase-row.active .ft-phrase-ja { color: #4D7D63; }
 .ft-phrase-row.done { opacity: 0.45; }
+.ft-phrase-speaker {
+  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; flex-shrink: 0;
+  align-self: center;
+}
+.ft-phrase-speaker.joel { background: #E1EFE6; color: #1A4232; }
+.ft-phrase-speaker.mai { background: #FBEAD6; color: #9A6B1E; }
+.ft-maitalk {
+  margin-top: 10px; padding: 12px 14px; background: rgba(255,255,255,0.55); border-radius: 12px;
+  font-size: 12px; color: #4D5F55; line-height: 1.75;
+}
+.ft-maitalk-label { font-size: 10px; font-weight: 700; color: #B8860B; margin-bottom: 4px; }
 .ft-phrase-en { font-weight: 600; color: #1A4232; }
 .ft-phrase-ja { color: #6B8577; font-size: 11px; }
 
@@ -1467,6 +1478,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <div class="ft-phrases-body" id="ftPhrasesBody">
             <div class="ft-phrase-row"><span class="ft-phrase-en">"What animal did you see today?"</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div>
             <div class="ft-phrase-row"><span class="ft-phrase-en">"It was brown!"</span><span class="ft-phrase-ja">茶色だったよ！</span></div>
+            <div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>
           </div>
         </div>
 
@@ -2489,41 +2501,306 @@ const MORNING_TALK_WEEKS = {
   w1: {
     theme: '基本｜暑い日・プール開き',
     days: {
-      mon: { title: "It's hot!", phrases: [{ en: "It's hot!", ja: "暑いね！" }, { en: "Let's swim!", ja: "泳ごう！" }] },
-      tue: { title: "「Let's + 動詞」で広げよう", phrases: [{ en: "Let's eat!", ja: "一緒に食べよう！" }] },
-      wed: { title: 'So fun!', phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }] },
-      thu: { title: "「It's + 形容詞」で広げよう", phrases: [{ en: "It's cold!", ja: '冷たいね！' }] },
-      fri: { title: 'Splash!', phrases: [{ en: 'Splash!', ja: 'バシャッ！' }] },
+      mon: {
+        title: "It's hot!",
+        phrases: [{ en: "It's hot!", ja: "暑いね！" }, { en: "Let's swim!", ja: "泳ごう！" }],
+        // 台本はJoel/Maiが普段書いてる「Joel: ...」「Mai: ...」形式のまま貼るだけでOK。
+        // ①②③⑤の英語セリフだけが自動抽出されてカラオケハイライトの対象になる。
+        // ④のMai日本語解説（プレフィックスなし）や見出し・ト書きは自然と対象外になる。
+        rawScript: `
+Joel: Good morning, Mai!
+Mai: Good morning! Wow, it's already so hot today.
+Joel: I know! It's summer time.
+Joel: Hey, did you look outside this morning? How is the weather?
+Mai: Yes! It's so sunny and hot outside.
+Joel: It's hot, it's hot! I think we need to drink lots of water today.
+Mai: Good idea. Maybe we can go swimming later?
+Joel: Yes! Let's swim! That sounds perfect for a hot day like this.
+Mai: I can't wait. It's hot, but swimming makes it fun.
+Joel: Hey kids, can you say it with me? "How's the weather? It's sunny and hot!"
+Joel: Great job! It's hot, it's hot! It's sunny and hot!
+Mai: Okay, let's go swimming and cool down!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "It\'s hot!"（暑いね！）というフレーズを話したよ。あと "Let\'s swim!"（泳ごう！）も出てきたね。夏はお子さんが「暑い！」って感じる場面、結構多いと思うから、そんな時にぜひ真似して言ってみてください。',
+      },
+      // 火・木は英会話パートを直近のNEW回から再利用（＝rawScriptは前日を流用するため未設定）、
+      // Maiの解説だけ新規録音。maiTalkだけ差し替えれば運用としては十分。
+      tue: {
+        title: "「Let's + 動詞」で広げよう",
+        phrases: [{ en: "Let's eat!", ja: "一緒に食べよう！" }],
+        maiTalk: '月曜日の会話に出てきた "Let\'s swim!"、覚えてるかな？実はこの "Let\'s"、「一緒に〜しよう」って誘う時に使えるフレーズなんだよ。例えば "Let\'s eat!"（一緒に食べよう！）とか "Let\'s dance!"（一緒に踊ろう！）みたいに、いろんな言葉と組み合わせられるの。今日はぜひお子さんを "Let\'s eat!" って誘ってみてください。',
+      },
+      wed: {
+        title: 'So fun!',
+        phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }],
+        rawScript: `
+Joel: Good morning, Mai!
+Mai: Good morning, Joel! I had a great dream about the pool.
+Joel: Ha, me too! I can't wait for today.
+Mai: Hey Joel, remember yesterday at the pool?
+Joel: Yes! It was so fun!
+Mai: So fun, so fun! I want to go again today.
+Joel: Me too! Splashing in the water is so fun.
+Mai: Building sandcastles is so fun too!
+Joel: Everything about summer is so fun!
+Joel: Hey kids, can you say it with me? "So fun!"
+Joel: Yes! So fun, so fun!
+Mai: Okay, let's get ready for another fun day!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "So fun!"（すごく楽しい！）というフレーズを話したよ。楽しいことがあった時、ぜひお子さんと一緒に "So fun!" って言ってみてください。',
+      },
+      thu: {
+        title: "「It's + 形容詞」で広げよう",
+        phrases: [{ en: "It's cold!", ja: '冷たいね！' }],
+        maiTalk: '月曜日に出てきた "It\'s hot!"、覚えてるかな？実はこの "It\'s"、「〜だね」って様子を伝える時に使えるフレーズなんだよ。例えば "It\'s cold!"（冷たいね！）とか "It\'s yummy!"（美味しいね！）みたいに、いろんな言葉と組み合わせられるの。今日は何か冷たいものを触った時に、ぜひ "It\'s cold!" って言ってみてください。',
+      },
+      fri: {
+        title: 'Splash!',
+        phrases: [{ en: 'Splash!', ja: 'バシャッ！' }],
+        rawScript: `
+Joel: Good morning, Mai! Ready for Friday?
+Mai: Yes! I heard we're going to the pool again today.
+Joel: That's right! It's going to be so fun.
+Joel: Watch this, Mai! Splash!
+Mai: Wow, big splash! That was so fun!
+Joel: Splash, splash! Let's make more splashes!
+Mai: Okay, ready... Splash!
+Joel: Haha, so fun! That was a great splash.
+Mai: This is the best summer day ever!
+Joel: Hey kids, can you say it with me? "Splash!"
+Joel: Great job! Splash, splash!
+Mai: Have a wonderful weekend, everyone!
+Joel: See you next week! Bye bye!
+        `,
+        maiTalk: '今日は "Splash!"（バシャッ！）というフレーズを話したよ。お風呂やプールで水しぶきをあげる時に、ぜひ一緒に言ってみてください。',
+      },
     }
   },
   w2: {
     theme: '家族旅行｜海・おばあちゃんの家',
     days: {
-      mon: { title: "Let's go!", phrases: [{ en: "Let's go!", ja: '行こう！' }] },
-      tue: { title: "「Let's go + 場所」で広げよう", phrases: [{ en: "Let's go to the park!", ja: '公園に行こう！' }] },
-      wed: { title: "Let's swim!", phrases: [{ en: "Let's swim!", ja: '泳ごう！' }] },
-      thu: { title: '「I see + 名詞」で広げよう', phrases: [{ en: 'I see a car!', ja: '車が見える！' }] },
-      fri: { title: 'Sunny!', phrases: [{ en: 'Sunny!', ja: '晴れてるね！' }] },
+      mon: {
+        title: "Let's go!",
+        phrases: [{ en: "Let's go!", ja: '行こう！' }],
+        rawScript: `
+Joel: Good morning, Mai! Big day today.
+Mai: Good morning! I'm so excited, we're going on a trip.
+Joel: Me too! Time to pack the car.
+Mai: Are you ready? Let's go!
+Joel: Yes, let's go! I can't wait to see grandma.
+Mai: Let's go, let's go! The beach is waiting for us.
+Joel: I packed the swimsuits and the sunscreen.
+Mai: Great! Let's go see the ocean!
+Joel: Let's go, everyone!
+Joel: Hey kids, can you say it with me? "Let's go!"
+Joel: Yes! Let's go, let's go!
+Mai: Okay, everyone in the car!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "Let\'s go!"（行こう！）というフレーズを話したよ。お出かけの時、車に乗る時、ぜひ "Let\'s go!" って声をかけてみてください。',
+      },
+      tue: {
+        title: "「Let's go + 場所」で広げよう",
+        phrases: [{ en: "Let's go to the park!", ja: '公園に行こう！' }],
+        maiTalk: '月曜日の "Let\'s go!"、覚えてるかな？実はこの後に場所を付け加えると、もっと具体的に誘えるんだよ。例えば "Let\'s go to the beach!"（海に行こう！）とか "Let\'s go to the park!"（公園に行こう！）みたいに。今日はぜひ "Let\'s go to the park!" って誘ってみてください。',
+      },
+      wed: {
+        title: "Let's swim!",
+        phrases: [{ en: "Let's swim!", ja: '泳ごう！' }],
+        rawScript: `
+Joel: Good morning, Mai! We made it to grandma's house.
+Mai: Good morning! I slept so well after the trip.
+Joel: Me too. Look, the pool is right there!
+Mai: Hey Joel, do you want to go swimming today?
+Joel: Yes! Let's swim! Grandma's pool looks so nice.
+Mai: Let's swim, let's swim! The water looks so cool.
+Joel: Grab your swimsuit, let's go!
+Mai: I'm ready! Let's swim together!
+Joel: Yay! Let's swim!
+Joel: Hey kids, can you say it with me? "Let's swim!"
+Joel: Awesome! Let's swim, let's swim!
+Mai: Okay, let's grab our swimsuits!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "Let\'s swim!"（泳ごう！）を話したよ。おばあちゃんの家やプールに行った時、ぜひこのフレーズで誘ってみてください。',
+      },
+      thu: {
+        title: '「I see + 名詞」で広げよう',
+        phrases: [{ en: 'I see a car!', ja: '車が見える！' }],
+        maiTalk: '旅行中、色んなものが目に入るよね。そんな時に使えるのが "I see ___!"（〜が見える！）。例えば "I see the ocean!"（海が見える！）とか "I see a boat!"（船が見える！）みたいに。今日はぜひ、車の窓から見えるものを "I see a car!" みたいに言ってみてください。',
+      },
+      fri: {
+        title: 'Sunny!',
+        phrases: [{ en: 'Sunny!', ja: '晴れてるね！' }],
+        rawScript: `
+Joel: Good morning, Mai! Look at that blue sky.
+Mai: Good morning! It's so sunny today.
+Joel: Perfect beach weather!
+Mai: Joel, look up! Sunny, sunny!
+Joel: Yes! It's so sunny, I need my sunglasses.
+Mai: Me too! Sunny days are the best for the beach.
+Joel: Sunny! Let's build a sandcastle.
+Mai: Great idea! Sunny and warm, just perfect.
+Joel: Sunny, sunny! Best day ever.
+Joel: Hey kids, can you say it with me? "Sunny!"
+Joel: Great! Sunny, sunny!
+Mai: Okay, let's put on sunscreen and go outside!
+Joel: See you next week! Bye bye!
+        `,
+        maiTalk: '今日は "Sunny!"（晴れてるね！）というフレーズを話したよ。朝、外を見て晴れてる日は、ぜひお子さんと "Sunny!" って言ってみてください。',
+      },
     }
   },
   w3: {
     theme: '夏の涼み方｜アイス・かき氷',
     days: {
-      mon: { title: 'I want ice cream!', phrases: [{ en: 'I want ice cream!', ja: 'アイスが欲しい！' }] },
-      tue: { title: '「I want + 名詞」で広げよう', phrases: [{ en: 'I want water!', ja: 'お水が欲しい！' }] },
-      wed: { title: 'So cold!', phrases: [{ en: 'So cold!', ja: 'すごく冷たい！' }] },
-      thu: { title: '「So + 形容詞」で広げよう', phrases: [{ en: 'So yummy!', ja: 'すごく美味しい！' }] },
-      fri: { title: "It's hot!（復習）", phrases: [{ en: "It's hot!", ja: '暑いね！' }] },
+      mon: {
+        title: 'I want ice cream!',
+        phrases: [{ en: 'I want ice cream!', ja: 'アイスが欲しい！' }],
+        rawScript: `
+Joel: Good morning, Mai! It's so hot again today.
+Mai: Good morning! I know, I already want something cold.
+Joel: Same here!
+Mai: Hey Joel, I want ice cream!
+Joel: Me too! I want ice cream so bad.
+Mai: I want ice cream, I want ice cream! Chocolate please.
+Joel: I want strawberry ice cream!
+Mai: Let's go get some after lunch.
+Joel: Yes! I want ice cream!
+Joel: Hey kids, can you say it with me? "I want ice cream!"
+Joel: Great! I want ice cream, I want ice cream!
+Mai: Okay, let's go get some ice cream!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "I want ice cream!"（アイスが欲しい！）というフレーズを話したよ。暑い日、ぜひお子さんと一緒に言ってみてください。',
+      },
+      tue: {
+        title: '「I want + 名詞」で広げよう',
+        phrases: [{ en: 'I want water!', ja: 'お水が欲しい！' }],
+        maiTalk: '月曜日の "I want ice cream!"、覚えてるかな？この "I want ___" は、欲しいものを伝える時に使えるフレーズなんだよ。例えば "I want juice!"（ジュースが欲しい！）とか "I want water!"（お水が欲しい！）みたいに。今日は喉が渇いた時、ぜひ "I want water!" って言ってみてください。',
+      },
+      wed: {
+        title: 'So cold!',
+        phrases: [{ en: 'So cold!', ja: 'すごく冷たい！' }],
+        rawScript: `
+Joel: Good morning, Mai! Guess what I'm eating.
+Mai: Good morning! Ice cream already?
+Joel: Yes! And it's so cold!
+Mai: Ooh, can I try? Wow, so cold!
+Joel: I know! So cold, so cold! But so good.
+Mai: My hands are freezing. So cold!
+Joel: Let's eat it fast before it melts.
+Mai: Good idea! So cold, so yummy.
+Joel: Best summer treat ever!
+Joel: Hey kids, can you say it with me? "So cold!"
+Joel: Great! So cold, so cold!
+Mai: Okay, let's finish this before it melts!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "So cold!"（すごく冷たい！）というフレーズを話したよ。アイスや氷を触った時、ぜひ一緒に言ってみてください。',
+      },
+      thu: {
+        title: '「So + 形容詞」で広げよう',
+        phrases: [{ en: 'So yummy!', ja: 'すごく美味しい！' }],
+        maiTalk: '水曜日の "So cold!"、覚えてるかな？この "So ___" は、何かをすごく強調したい時に使えるフレーズなんだよ。例えば "So yummy!"（すごく美味しい！）とか "So sweet!"（すごく甘い！）みたいに。今日はおやつを食べた時、ぜひ "So yummy!" って言ってみてください。',
+      },
+      fri: {
+        title: "It's hot!（復習）",
+        phrases: [{ en: "It's hot!", ja: '暑いね！' }],
+        rawScript: `
+Joel: Good morning, Mai! Another hot one today.
+Mai: Good morning! It's hot!
+Joel: Very hot! Time to stay cool.
+Mai: It's hot, it's hot! I need some shade.
+Joel: Me too. Let's sit under the tree.
+Mai: Good idea. It's so hot outside today.
+Joel: It's hot! Let's drink some cold water.
+Mai: Yes, that sounds perfect.
+Joel: It's hot, but we'll stay cool together!
+Joel: Hey kids, can you say it with me? "It's hot!"
+Joel: Great! It's hot, it's hot!
+Mai: Okay, let's find some shade and cool down!
+Joel: See you next week! Bye bye!
+        `,
+        maiTalk: '今日は "It\'s hot!" をもう一度。暑い夏、何度でも使えるフレーズだから、しっかり覚えておこうね。',
+      },
     }
   },
   w4: {
     theme: '夏祭り・花火｜夏休みの締めくくり',
     days: {
-      mon: { title: 'So fun!（復習）', phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }] },
-      tue: { title: '「I like + 名詞」で広げよう', phrases: [{ en: 'I like candy!', ja: '飴が好き！' }] },
-      wed: { title: 'Wow!', phrases: [{ en: 'Wow!', ja: 'わあ！' }] },
-      thu: { title: '「I love + 名詞」で広げよう', phrases: [{ en: 'I love fireworks!', ja: '花火が大好き！' }] },
-      fri: { title: 'Splash!（復習）', phrases: [{ en: 'Splash!', ja: 'バシャッ！' }] },
+      mon: {
+        title: 'So fun!（復習）',
+        phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }],
+        rawScript: `
+Joel: Good morning, Mai! Tonight's the summer festival.
+Mai: Good morning! I'm so excited!
+Joel: Me too, it's going to be so fun.
+Mai: The festival is so fun! I love the food stalls.
+Joel: So fun, so fun! I want to play the games.
+Mai: Me too! And later, fireworks!
+Joel: Fireworks are always so fun.
+Mai: This is going to be the best night.
+Joel: So fun, so fun!
+Joel: Hey kids, can you say it with me? "So fun!"
+Joel: Great! So fun, so fun!
+Mai: Okay, let's get ready for the festival!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "So fun!" をもう一度話したよ。お祭りや楽しいイベントの時、ぜひこのフレーズを使ってみてください。',
+      },
+      tue: {
+        title: '「I like + 名詞」で広げよう',
+        phrases: [{ en: 'I like candy!', ja: '飴が好き！' }],
+        maiTalk: 'お祭りにはいろんな屋台があるよね。好きなものを伝えたい時は "I like ___!"（〜が好き！）が使えるよ。例えば "I like candy!"（飴が好き！）とか "I like games!"（ゲームが好き！）みたいに。今日はお子さんに "What do you like?" って聞いて、"I like ___!" って答えてもらってみてください。',
+      },
+      wed: {
+        title: 'Wow!',
+        phrases: [{ en: 'Wow!', ja: 'わあ！' }],
+        rawScript: `
+Joel: Good morning, Mai! Wasn't last night amazing?
+Mai: Good morning! Yes, the fireworks were beautiful.
+Joel: I know, so many colors!
+Mai: Wow! Did you see that big one?
+Joel: Wow! It was huge! So many colors.
+Mai: Wow, wow! I loved the golden ones.
+Joel: Me too! Wow, that was amazing.
+Mai: I want to see fireworks again.
+Joel: Wow! Best summer night ever.
+Joel: Hey kids, can you say it with me? "Wow!"
+Joel: Great! Wow, wow!
+Mai: Okay, let's look at our festival photos!
+Joel: See you tomorrow! Bye bye!
+        `,
+        maiTalk: '今日は "Wow!"（わあ！）というフレーズを話したよ。花火や綺麗なものを見た時、ぜひ一緒に "Wow!" って言ってみてください。',
+      },
+      thu: {
+        title: '「I love + 名詞」で広げよう',
+        phrases: [{ en: 'I love fireworks!', ja: '花火が大好き！' }],
+        maiTalk: '火曜日の "I like ___!"、覚えてるかな？もっと強く好きって伝えたい時は "I love ___!"（大好き！）が使えるよ。例えば "I love fireworks!"（花火が大好き！）とか "I love summer!"（夏が大好き！）みたいに。今日はぜひお子さんと "I love you!" って言い合ってみてください。',
+      },
+      fri: {
+        title: 'Splash!（復習）',
+        phrases: [{ en: 'Splash!', ja: 'バシャッ！' }],
+        rawScript: `
+Joel: Good morning, Mai! Last swim of the summer?
+Mai: Good morning! Let's make it a good one.
+Joel: Definitely!
+Joel: Watch this, Mai! Splash!
+Mai: Splash! Nice one!
+Joel: Splash, splash! One more time!
+Mai: Okay, ready... Splash!
+Joel: Haha, great splash! This summer was so much fun.
+Mai: The best. Let's remember it forever.
+Joel: Hey kids, can you say it with me? "Splash!"
+Joel: Great job! Splash, splash!
+Mai: Thank you for a wonderful summer, everyone!
+Joel: See you next month! Bye bye!
+        `,
+        maiTalk: '今日は "Splash!" をもう一度。この夏、たくさんの新しいフレーズを一緒に覚えたね。9月からも一緒に頑張ろうね！',
+      },
     }
   },
 };
@@ -2636,16 +2913,40 @@ function renderMorningTalkContent() {
   document.getElementById('ftQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
   document.getElementById('ftPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
 
+  // rawScript（Joel:/Mai:形式の台本）があればそこから英語セリフだけを自動抽出してハイライト対象にする。
+  // まだ台本形式で用意していない日は、従来通り短い「今日のフレーズ」をそのまま表示する（フォールバック）。
+  const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
+    : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
+
   const body = document.getElementById('ftPhrasesBody');
   if (body) {
-    body.innerHTML = c.phrases.map((p, i) =>
-      `<div class="ft-phrase-row" id="ftPhraseRow${i}"><span class="ft-phrase-en">"${p.en}"</span><span class="ft-phrase-ja">${p.ja}</span></div>`
-    ).join('');
+    const rowsHtml = lines.map((l, i) => {
+      const speakerTag = l.speaker
+        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Joel' : 'Mai'}</span>` : '';
+      const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
+      return `<div class="ft-phrase-row" id="ftPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
+    }).join('');
+    const maiTalkHtml = c.maiTalk
+      ? `<div class="ft-maitalk" id="ftMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
+      : `<div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>`;
+    body.innerHTML = rowsHtml + maiTalkHtml;
   }
-  ftCurrentPhrases = c.phrases;
+  ftCurrentPhrases = lines;
   ftPhraseTimings = []; // 音声のdurationが取れたらinitFtAudio側で再計算する
 
   return info.audioKey;
+}
+
+// 台本テキストから「Joel: ...」「Mai: ...」で始まる行だけを抽出してセリフ配列にする。
+// ④のMai日本語解説（プレフィックスなし）や①②③の見出し・ト書きは、プレフィックスが無いため自然と除外される。
+// ＝台本をそのまま貼るだけでよく、書き起こしや整形作業は発生しない。
+function parseMorningTalkScript(raw) {
+  if (!raw) return [];
+  return raw.split('\n')
+    .map(l => l.trim())
+    .map(l => /^(Joel|Mai)\s*[:：]\s*(.+)$/.exec(l))
+    .filter(Boolean)
+    .map(m => ({ speaker: m[1].toLowerCase(), en: m[2].trim() }));
 }
 
 // ========================
