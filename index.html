@@ -347,8 +347,20 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-phrases-chevron.open { transform: rotate(180deg); }
 .ft-phrases-body { display: none; margin: 0 16px 14px; }
 .ft-phrases-body.open { display: block; }
-.ft-phrase-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: #374151; padding: 6px 0; border-top: 1px solid rgba(45,106,79,0.1); }
+.ft-phrase-row {
+  display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: #374151; padding: 6px 8px;
+  border-top: 1px solid rgba(45,106,79,0.1); margin: 0 -8px; border-radius: 8px;
+  transition: background 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease, transform 0.35s ease;
+}
 .ft-phrase-row:first-child { border-top: none; }
+/* 再生中のフレーズだけ白く浮かせて視線を誘導（カラオケ演出／文字数比率で自動同期・完全な精度は狙わない） */
+.ft-phrase-row.active {
+  background: #ffffff; box-shadow: 0 2px 8px rgba(45,106,79,0.14);
+  border-top-color: transparent; transform: scale(1.02);
+}
+.ft-phrase-row.active .ft-phrase-en { color: #0F2B1F; }
+.ft-phrase-row.active .ft-phrase-ja { color: #4D7D63; }
+.ft-phrase-row.done { opacity: 0.45; }
 .ft-phrase-en { font-weight: 600; color: #1A4232; }
 .ft-phrase-ja { color: #6B8577; font-size: 11px; }
 
@@ -1733,6 +1745,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </div>
         <div class="asobo-axis-list" id="asoboAxisList"></div>
         <audio id="asoboTimerBgm" loop preload="none"></audio>
+        <audio id="asoboVoicePlayer" preload="none"></audio>
+        <audio id="asoboSePlayer" preload="none"></audio>
       </div>
     </div>
 
@@ -1921,6 +1935,29 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 <div class="toast" id="toast"></div>
 
 <script>
+// ========================
+// グローバル音声マネージャー
+// ========================
+// アプリ内には複数の独立したAudio要素が存在する（Morning Talk / ルーティンフレーズ / 絵本ナレーション・効果音 /
+// Active TimeのBGM・ミッション音声・効果音等）。どれか1つが再生を始めたら、他の音声は自動的に止める（二重再生防止）。
+// 使い方：Audio要素を作成/取得した直後に registerAudio(要素) を呼ぶだけ。個別のplay()呼び出し側の変更は不要。
+const AUDIO_REGISTRY = [];
+function registerAudio(el) {
+  if (!el || AUDIO_REGISTRY.includes(el)) return;
+  AUDIO_REGISTRY.push(el);
+  el.addEventListener('play', () => {
+    AUDIO_REGISTRY.forEach(other => {
+      if (other !== el && !other.paused) {
+        try { other.pause(); } catch (e) {}
+      }
+    });
+  });
+}
+// Active Time関連（HTML側に既存の<audio>要素）をここで登録
+registerAudio(document.getElementById('asoboTimerBgm'));
+registerAudio(document.getElementById('asoboVoicePlayer'));
+registerAudio(document.getElementById('asoboSePlayer'));
+
 // ========================
 // データ
 // ========================
@@ -2262,9 +2299,30 @@ function toggleAxisFrame(axis) {
 
 let asoboTimerTimeout = null;
 const ASOBO_TIMER_CIRCUMFERENCE = 175.9;
+let currentFindItem = null;
+
+function playAsoboSe(src) {
+  const se = document.getElementById('asoboSePlayer');
+  if (!se || !src) return;
+  try { se.src = src; se.currentTime = 0; se.play().catch(() => {}); } catch (e) {}
+}
+
+function playAsoboVoice(src, onEnded) {
+  const voice = document.getElementById('asoboVoicePlayer');
+  if (!voice || !src) { if (onEnded) onEnded(); return; }
+  voice.onended = null;
+  try {
+    voice.src = src;
+    voice.currentTime = 0;
+    if (onEnded) voice.onended = onEnded;
+    voice.play().catch(() => { if (onEnded) onEnded(); });
+  } catch (e) { if (onEnded) onEnded(); }
+}
 
 function drawAsoboGacha() {
   const pick = AT_FIND[Math.floor(Math.random() * AT_FIND.length)];
+  currentFindItem = pick;
+  playAsoboSe(ASOBO_SFX.gachaDraw);
   document.getElementById('asoboGachaEn').textContent = pick.en;
   document.getElementById('asoboGachaJa').textContent = pick.ja;
   document.getElementById('asoboGachaResult').classList.add('show');
@@ -2292,6 +2350,8 @@ function resetAsoboTimer() {
   icon.textContent = '▶';
   joelLine.classList.remove('show');
   try { bgm.pause(); } catch (e) {}
+  const voice = document.getElementById('asoboVoicePlayer');
+  try { voice.pause(); voice.onended = null; } catch (e) {}
 }
 
 function startAsoboTimer() {
@@ -2306,28 +2366,37 @@ function startAsoboTimer() {
   ring.style.transition = 'none';
   ring.style.strokeDashoffset = String(ASOBO_TIMER_CIRCUMFERENCE);
   void ring.offsetWidth;
-  ring.style.transition = 'stroke-dashoffset 60s linear';
-  ring.style.strokeDashoffset = '0';
-  try { bgm.currentTime = 0; bgm.play().catch(() => {}); } catch (e) {}
   clearTimeout(asoboTimerTimeout);
-  asoboTimerTimeout = setTimeout(() => {
-    icon.classList.remove('playing');
-    icon.textContent = '▶';
-    joelLine.classList.add('show');
-    try { bgm.pause(); } catch (e) {}
-  }, 60000);
+  const startCountdown = () => {
+    ring.style.transition = 'stroke-dashoffset 60s linear';
+    ring.style.strokeDashoffset = '0';
+    try { bgm.src = ASOBO_SFX.timerBgm; bgm.currentTime = 0; bgm.play().catch(() => {}); } catch (e) {}
+    asoboTimerTimeout = setTimeout(() => {
+      icon.classList.remove('playing');
+      icon.textContent = '▶';
+      joelLine.classList.add('show');
+      try { bgm.pause(); } catch (e) {}
+      playAsoboSe(ASOBO_SFX.timerEnd);
+      playAsoboVoice(AT_FIND_DONE_AUDIO);
+    }, 60000);
+  };
+  // 先にJoelのミッション音声を再生してからタイマー(BGM)をスタート
+  playAsoboVoice(currentFindItem ? currentFindItem.audio : null, startCountdown);
 }
 
 let asoboRiddleTimeout = null;
+let currentRiddleItem = null;
 
 function drawAsoboRiddle() {
   const wrap = document.getElementById('asoboRiddleResult');
   const inner = document.getElementById('asoboRiddleResultInner');
   wrap.classList.add('show');
   inner.innerHTML = '<div class="asobo-riddle-thinking">考え中<span>.</span><span>.</span><span>.</span></div>';
+  playAsoboSe(ASOBO_SFX.riddleThinking);
   clearTimeout(asoboRiddleTimeout);
   asoboRiddleTimeout = setTimeout(() => {
     const r = AT_RIDDLE[Math.floor(Math.random() * AT_RIDDLE.length)];
+    currentRiddleItem = r;
     inner.innerHTML = `
     <div class="at-riddle-flip" onclick="toggleRiddleFlip(this)">
       <div class="at-riddle-flip-inner">
@@ -2353,6 +2422,13 @@ function toggleRiddleFlip(card) {
     void card.offsetWidth;
     card.classList.add('at-riddle-flip-ring');
     setTimeout(() => card.classList.remove('at-riddle-flip-ring'), 650);
+    playAsoboSe(ASOBO_SFX.riddleFlip);
+    if (currentRiddleItem) {
+      setTimeout(() => {
+        playAsoboSe(ASOBO_SFX.riddleCorrect);
+        playAsoboVoice(currentRiddleItem.answerAudio);
+      }, 300);
+    }
   }
 }
 
@@ -2373,9 +2449,18 @@ function playAtRiddle(btn, evt) {
   document.querySelectorAll('.at-archive-play.playing, .at-riddle-play.playing').forEach(b => {
     b.classList.remove('playing'); b.textContent = '▶';
   });
-  if (!wasPlaying) {
-    btn.classList.add('playing'); btn.textContent = '⏸';
-    setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶'; }, 3500);
+  const voice = document.getElementById('asoboVoicePlayer');
+  if (wasPlaying) {
+    try { voice.pause(); voice.onended = null; } catch (e) {}
+    return;
+  }
+  btn.classList.add('playing'); btn.textContent = '⏸';
+  const reset = () => { btn.classList.remove('playing'); btn.textContent = '▶'; };
+  const src = currentRiddleItem ? currentRiddleItem.audio : null;
+  if (src) {
+    playAsoboVoice(src, reset);
+  } else {
+    setTimeout(reset, 3500);
   }
 }
 
@@ -2525,6 +2610,8 @@ function renderMorningTalkContent() {
     document.getElementById('ftPlayTitle').textContent = '配信準備中';
     const body = document.getElementById('ftPhrasesBody');
     if (body) body.innerHTML = '';
+    ftCurrentPhrases = [];
+    ftPhraseTimings = [];
     return null; // 音源キーなし＝再生ボタンは無効のまま
   }
 
@@ -2551,18 +2638,80 @@ function renderMorningTalkContent() {
 
   const body = document.getElementById('ftPhrasesBody');
   if (body) {
-    body.innerHTML = c.phrases.map(p =>
-      `<div class="ft-phrase-row"><span class="ft-phrase-en">"${p.en}"</span><span class="ft-phrase-ja">${p.ja}</span></div>`
+    body.innerHTML = c.phrases.map((p, i) =>
+      `<div class="ft-phrase-row" id="ftPhraseRow${i}"><span class="ft-phrase-en">"${p.en}"</span><span class="ft-phrase-ja">${p.ja}</span></div>`
     ).join('');
   }
+  ftCurrentPhrases = c.phrases;
+  ftPhraseTimings = []; // 音声のdurationが取れたらinitFtAudio側で再計算する
 
   return info.audioKey;
+}
+
+// ========================
+// Morning Talk カラオケハイライト
+// ========================
+// 手動タイムスタンプなしで「今喋っている行」をふんわり合わせる仕組み。
+// 英語フレーズの文字数比率で尺を仮配分→実音声の総尺(duration)にスケーリングして当てはめる。
+// 完全な精度は狙わない（=収録のたびに手打ちする運用コストをかけない）。目的は「迷子にならない」こと。
+let ftCurrentPhrases = [];
+let ftPhraseTimings = [];
+const FT_MIN_PHRASE_SEC = 1.6;
+const FT_CHARS_PER_SEC = 9;
+
+function computeFtPhraseTimings(phrases, totalDuration) {
+  if (!phrases || !phrases.length || !totalDuration || !isFinite(totalDuration)) return [];
+  const rawDurations = phrases.map(p => Math.max(FT_MIN_PHRASE_SEC, (p.en || '').length / FT_CHARS_PER_SEC));
+  const rawTotal = rawDurations.reduce((a, b) => a + b, 0);
+  const scale = rawTotal ? totalDuration / rawTotal : 1;
+  let acc = 0;
+  return rawDurations.map(d => {
+    const scaled = d * scale;
+    const seg = { start: acc, end: acc + scaled };
+    acc += scaled;
+    return seg;
+  });
+}
+
+function updateFtPhraseHighlight(t) {
+  if (!ftPhraseTimings.length) return;
+  let activeIdx = ftPhraseTimings.length - 1;
+  for (let i = 0; i < ftPhraseTimings.length; i++) {
+    if (t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+  }
+  ftPhraseTimings.forEach((_, i) => {
+    const row = document.getElementById('ftPhraseRow' + i);
+    if (!row) return;
+    row.classList.remove('active', 'done');
+    if (i < activeIdx) row.classList.add('done');
+    if (i === activeIdx) row.classList.add('active');
+  });
+}
+
+function clearFtPhraseHighlight() {
+  ftPhraseTimings.forEach((_, i) => {
+    const row = document.getElementById('ftPhraseRow' + i);
+    if (row) row.classList.remove('active', 'done');
+  });
+}
+
+// 「今日のフレーズ」自動オープン：再生開始時、ユーザーがまだ手動で開閉していなければ自動で開く。
+// 一度でも手動操作したら以降は尊重して自動オープンしない。
+let ftPhrasesManualToggle = false;
+function openFtPhrasesAuto() {
+  if (ftPhrasesManualToggle) return;
+  const b = document.getElementById('ftPhrasesBody');
+  const c = document.getElementById('ftPhrasesChevron');
+  if (!b || !c) return;
+  b.classList.add('open');
+  c.classList.add('open');
 }
 
 let ftCurrentAudioKey = null;
 
 // Morning Talk専用の音声プレイヤー
 const ftAudioEl = new Audio();
+registerAudio(ftAudioEl);
 let ftAudioLoaded = false;
 
 function fmtFtTime(sec) {
@@ -2588,6 +2737,7 @@ function initFtAudio() {
     ftAudioLoaded = true;
     const lenEl = document.getElementById('ftPlayLen');
     if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
+    ftPhraseTimings = computeFtPhraseTimings(ftCurrentPhrases, ftAudioEl.duration);
   });
   ftAudioEl.addEventListener('timeupdate', () => {
     if (!ftAudioEl.duration) return;
@@ -2595,11 +2745,13 @@ function initFtAudio() {
     document.getElementById('ftFill').style.width = ftProg.toFixed(1) + '%';
     updateFtWaveProgress(ftProg);
     document.getElementById('ftTime').textContent = fmtFtTime(ftAudioEl.currentTime);
+    updateFtPhraseHighlight(ftAudioEl.currentTime);
   });
   ftAudioEl.addEventListener('ended', () => {
     ftPlaying = false;
     setFtWavePlaying(false);
     document.getElementById('ftPlayIcon').textContent = '▶';
+    clearFtPhraseHighlight();
     showFtAutoNext();
   });
   ftAudioEl.addEventListener('error', () => {
@@ -2644,6 +2796,7 @@ function toggleFamilyTalk() {
   setFtWavePlaying(ftPlaying);
   if (ftPlaying) {
     icon.textContent = '⏸';
+    openFtPhrasesAuto();
     const p = ftAudioEl.play();
     if (p && typeof p.catch === 'function') {
       p.catch(() => {
@@ -2682,6 +2835,7 @@ function seekFamilyTalk(e) {
   updateFtWaveProgress(ftProg);
 }
 function toggleFtPhrases() {
+  ftPhrasesManualToggle = true;
   const b = document.getElementById('ftPhrasesBody'); const c = document.getElementById('ftPhrasesChevron');
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
 }
@@ -2693,39 +2847,47 @@ initFtAudio();
 // ========================
 const AT_FIND = [
   // カラー
-  { axis: 'カラー', en: 'Find something red!', ja: '赤いものを探してみよう' },
-  { axis: 'カラー', en: 'Find something blue!', ja: '青いものを探してみよう' },
-  { axis: 'カラー', en: 'Find something yellow!', ja: '黄色いものを探してみよう' },
-  { axis: 'カラー', en: 'Find something green!', ja: '緑のものを探してみよう' },
+  { axis: 'カラー', en: 'Find something red!', ja: '赤いものを探してみよう', audio: 'audio/asobo_audio/find_red.mp3' },
+  { axis: 'カラー', en: 'Find something blue!', ja: '青いものを探してみよう', audio: 'audio/asobo_audio/find_blue.mp3' },
+  { axis: 'カラー', en: 'Find something yellow!', ja: '黄色いものを探してみよう', audio: 'audio/asobo_audio/find_yellow.mp3' },
+  { axis: 'カラー', en: 'Find something green!', ja: '緑のものを探してみよう', audio: 'audio/asobo_audio/find_green.mp3' },
   // カウント
-  { axis: 'カウント', en: 'Find three round things!', ja: '丸いものを3つ探してみよう' },
-  { axis: 'カウント', en: 'Find two soft things!', ja: 'やわらかいものを2つ探してみよう' },
-  { axis: 'カウント', en: 'Find one big thing!', ja: '大きいものを1つ探してみよう' },
+  { axis: 'カウント', en: 'Find three round things!', ja: '丸いものを3つ探してみよう', audio: 'audio/asobo_audio/find_three_round.mp3' },
+  { axis: 'カウント', en: 'Find two little things!', ja: '小さいものを2つ探してみよう', audio: 'audio/asobo_audio/find_two_little.mp3' },
+  { axis: 'カウント', en: 'Find one big thing!', ja: '大きいものを1つ探してみよう', audio: 'audio/asobo_audio/find_one_big.mp3' },
   // サウンド
-  { axis: 'サウンド', en: 'Find something that makes a sound!', ja: '音が出るものを探してみよう' },
-  { axis: 'サウンド', en: 'Find something loud!', ja: '大きな音が出るものを探してみよう' },
-  { axis: 'サウンド', en: 'Find something quiet!', ja: '小さな音が出るものを探してみよう' },
+  { axis: 'サウンド', en: 'Find something that makes a sound!', ja: '音が出るものを探してみよう', audio: 'audio/asobo_audio/find_sound.mp3' },
+  { axis: 'サウンド', en: 'Find something loud!', ja: '大きな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_loud.mp3' },
+  { axis: 'サウンド', en: 'Find something quiet!', ja: '小さな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_quiet.mp3' },
   // ロケーション
-  { axis: 'ロケーション', en: 'Find something under the table!', ja: 'テーブルの下にあるものを探してみよう' },
-  { axis: 'ロケーション', en: 'Find something near the window!', ja: '窓のそばにあるものを探してみよう' },
-  { axis: 'ロケーション', en: 'Find something on the floor!', ja: '床の上にあるものを探してみよう' },
+  { axis: 'ロケーション', en: 'Find something under the table!', ja: 'テーブルの下にあるものを探してみよう', audio: 'audio/asobo_audio/find_under_table.mp3' },
+  { axis: 'ロケーション', en: 'Find something near the window!', ja: '窓のそばにあるものを探してみよう', audio: 'audio/asobo_audio/find_near_window.mp3' },
+  { axis: 'ロケーション', en: 'Find something on the floor!', ja: '床の上にあるものを探してみよう', audio: 'audio/asobo_audio/find_floor.mp3' },
   // テクスチャー
-  { axis: 'テクスチャー', en: 'Find something soft!', ja: 'やわらかいものを探してみよう' },
-  { axis: 'テクスチャー', en: 'Find something hard!', ja: 'かたいものを探してみよう' },
-  { axis: 'テクスチャー', en: 'Find something smooth!', ja: 'つるつるしているものを探してみよう' },
+  { axis: 'テクスチャー', en: 'Find something soft!', ja: 'やわらかいものを探してみよう', audio: 'audio/asobo_audio/find_soft.mp3' },
+  { axis: 'テクスチャー', en: 'Find something hard!', ja: 'かたいものを探してみよう', audio: 'audio/asobo_audio/find_hard.mp3' },
+  { axis: 'テクスチャー', en: 'Find something smooth!', ja: 'つるつるしているものを探してみよう', audio: 'audio/asobo_audio/find_smooth.mp3' },
   // カテゴリー
-  { axis: 'カテゴリー', en: 'Find something you can eat!', ja: '食べられるものを探してみよう' },
-  { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう' },
-  { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう' },
+  { axis: 'カテゴリー', en: 'Find something you can eat!', ja: '食べられるものを探してみよう', audio: 'audio/asobo_audio/find_eat.mp3' },
+  { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう', audio: 'audio/asobo_audio/find_wear.mp3' },
+  { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう', audio: 'audio/asobo_audio/find_read.mp3' },
 ];
+const AT_FIND_DONE_AUDIO = 'audio/asobo_audio/find_done.mp3';
 const AT_RIDDLE = [
-  { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？', answer: 'cow' },
-  { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？', answer: 'dog' },
-  { axis: 'なぞなぞ', en: 'I am yellow and I can fly. What am I?', ja: '黄色くて飛べるよ。私は誰？', answer: 'bird' },
-  { axis: 'なぞなぞ', en: 'I say meow. What am I?', ja: 'ニャーって鳴くよ。私は誰？', answer: 'cat' },
-  { axis: 'なぞなぞ', en: 'I am big and gray. I have a long nose. What am I?', ja: '大きくて灰色。長いお鼻があるよ。私は誰？', answer: 'elephant' },
-  { axis: 'なぞなぞ', en: 'I am orange with black stripes. What am I?', ja: 'オレンジ色に黒いしましまがあるよ。私は誰？', answer: 'tiger' },
+  { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？', answer: 'cow', audio: 'audio/asobo_audio/riddle_cow.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_cow.mp3' },
+  { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？', answer: 'dog', audio: 'audio/asobo_audio/riddle_dog.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_dog.mp3' },
+  { axis: 'なぞなぞ', en: 'I am yellow and I can fly. I also say bzzz. What am I?', ja: '黄色くて飛べるよ。ブーンって鳴くよ。私は誰？', answer: 'bee', audio: 'audio/asobo_audio/riddle_bee.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_bee.mp3' },
+  { axis: 'なぞなぞ', en: 'I am big and gray. I have a long nose. What am I?', ja: '大きくて灰色。長いお鼻があるよ。私は誰？', answer: 'elephant', audio: 'audio/asobo_audio/riddle_elephant.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_elephant.mp3' },
+  { axis: 'なぞなぞ', en: 'I am orange with black stripes. What am I?', ja: 'オレンジ色に黒いしましまがあるよ。私は誰？', answer: 'tiger', audio: 'audio/asobo_audio/riddle_tiger.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_tiger.mp3' },
 ];
+const ASOBO_SFX = {
+  gachaDraw: 'audio/asobo_audio/se_gacha_draw.mp3',
+  timerBgm: 'audio/asobo_audio/bgm_timer_loop.mp3',
+  timerEnd: 'audio/asobo_audio/se_timer_end.mp3',
+  riddleThinking: 'audio/asobo_audio/se_riddle_thinking.mp3',
+  riddleFlip: 'audio/asobo_audio/se_riddle_flip.mp3',
+  riddleCorrect: 'audio/asobo_audio/se_riddle_correct.mp3',
+};
 let atMode = 'find';
 let atIndex = 0;
 let atPlaying = false;
@@ -2870,6 +3032,7 @@ function closeRoutineModal() {
 
 // ルーティンフレーズ用の音声プレイヤー（同時に1個だけ再生）
 const routineAudioEl = new Audio();
+registerAudio(routineAudioEl);
 let routineActiveBtn = null;
 
 function playRoutineScene(btn, src) {
@@ -2927,6 +3090,7 @@ const BOOK_DATA = {
 
 // 絵本ビューワー共通の音声プレイヤー（Let's read / Let's talk 兼用）
 const bvAudioEl = new Audio();
+registerAudio(bvAudioEl);
 function bvPlayAudio(src, onEnded) {
   bvAudioEl.onended = null;
   bvAudioEl.onerror = null;
@@ -3111,6 +3275,7 @@ function bvGetAudioCtx() {
 }
 // 「Your turn!」の合図：実音源（Pixabayからダウンロードした効果音）を再生。読み込めない場合は合成音にフォールバック
 const bvSfxEl = new Audio();
+registerAudio(bvSfxEl);
 function bvPlayChime() {
   try {
     bvSfxEl.pause();
