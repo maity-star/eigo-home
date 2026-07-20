@@ -3040,6 +3040,16 @@ function initFtAudio() {
     if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
     ftPhraseTimings = computeFtPhraseTimings(ftCurrentPhrases, ftAudioEl.duration);
   });
+  // Safari(特にiOS)はVBR形式のmp3で初回のduration取得値が不正確なことがあり、
+  // 再生が進むにつれて durationchange で正しい値に補正されるケースがある。
+  // ここでも都度タイミングを再計算しないと、「実際の音声はもう終わってるのにハイライトが古い（長すぎる）
+  // durationを基準にした位置で止まって見える」という不具合が起きるため。
+  ftAudioEl.addEventListener('durationchange', () => {
+    if (!isFinite(ftAudioEl.duration)) return;
+    const lenEl = document.getElementById('ftPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
+    ftPhraseTimings = computeFtPhraseTimings(ftCurrentPhrases, ftAudioEl.duration);
+  });
   ftAudioEl.addEventListener('timeupdate', () => {
     if (!ftAudioEl.duration) return;
     ftProg = (ftAudioEl.currentTime / ftAudioEl.duration) * 100;
