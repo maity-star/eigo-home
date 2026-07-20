@@ -2523,6 +2523,7 @@ Joel: Great job! It's hot, it's hot! It's sunny and hot!
 Mai: Okay, let's go swimming and cool down!
 Joel: See you tomorrow! Bye bye!
         `,
+        talkDuration: 150, // 会話パート(①〜⑤)の目安秒数(2:30)。実際の収録に合わせて後で微調整可
         maiTalk: '今日は "It\'s hot!"（暑いね！）というフレーズを話したよ。あと "Let\'s swim!"（泳ごう！）も出てきたね。夏はお子さんが「暑い！」って感じる場面、結構多いと思うから、そんな時にぜひ真似して言ってみてください。',
       },
       // 火・木は英会話パートを直近のNEW回から再利用（＝rawScriptは前日を流用するため未設定）、
@@ -2940,6 +2941,7 @@ function renderMorningTalkContent() {
     body.innerHTML = rowsHtml + maiTalkHtml;
   }
   ftCurrentPhrases = lines;
+  ftCurrentTalkDuration = c.talkDuration || null; // 会話パートの目安秒数（音楽等の後半を除く）。未設定なら音声全体のdurationにフォールバック
   ftPhraseTimings = []; // 音声のdurationが取れたらinitFtAudio側で再計算する
 
   return info.audioKey;
@@ -2964,6 +2966,7 @@ function parseMorningTalkScript(raw) {
 // 英語フレーズの文字数比率で尺を仮配分→実音声の総尺(duration)にスケーリングして当てはめる。
 // 完全な精度は狙わない（=収録のたびに手打ちする運用コストをかけない）。目的は「迷子にならない」こと。
 let ftCurrentPhrases = [];
+let ftCurrentTalkDuration = null;
 let ftPhraseTimings = [];
 const FT_MIN_PHRASE_SEC = 1.6;
 const FT_CHARS_PER_SEC = 9;
@@ -3077,7 +3080,7 @@ function initFtAudio() {
     ftAudioLoaded = true;
     const lenEl = document.getElementById('ftPlayLen');
     if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
-    ftPhraseTimings = computeFtPhraseTimings(ftCurrentPhrases, ftAudioEl.duration);
+    ftPhraseTimings = computeFtPhraseTimings(ftCurrentPhrases, ftCurrentTalkDuration || ftAudioEl.duration);
   });
   // Safari(特にiOS)はVBR形式のmp3で初回のduration取得値が不正確なことがあり、
   // 再生が進むにつれて durationchange で正しい値に補正されるケースがある。
@@ -3087,7 +3090,7 @@ function initFtAudio() {
     if (!isFinite(ftAudioEl.duration)) return;
     const lenEl = document.getElementById('ftPlayLen');
     if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
-    ftPhraseTimings = computeFtPhraseTimings(ftCurrentPhrases, ftAudioEl.duration);
+    ftPhraseTimings = computeFtPhraseTimings(ftCurrentPhrases, ftCurrentTalkDuration || ftAudioEl.duration);
   });
   ftAudioEl.addEventListener('timeupdate', () => {
     if (!ftAudioEl.duration) return;
