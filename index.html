@@ -27,11 +27,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .journey-pill.active { border-color: #2D6A4F; background: #EAF4EE; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(45,106,79,0.15); }
 .journey-pill.active .journey-pill-num { background: #2D6A4F; color: #fff; }
 .journey-pill.active .journey-pill-label { color: #2D6A4F; }
-.journey-pill-stamp { position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; object-fit: contain; opacity: 0; transform: scale(0) rotate(-25deg); transition: all .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
+.journey-pill-stamp { position: absolute; top: -9px; right: -7px; width: 26px; height: 26px; opacity: 0; transform: scale(0) rotate(-25deg); transition: all .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; padding: 3px; box-sizing: border-box; border-radius: 50%; background: #FBF9F4; border: 1.5px solid rgba(61,107,79,0.4); box-shadow: 0 2px 3px rgba(0,0,0,0.15); }
+.journey-pill-stamp img { display: block; width: 100%; height: 100%; object-fit: contain; filter: contrast(1.9) brightness(0.45); }
 .journey-pill.opened .journey-pill-stamp { opacity: 1; transform: scale(1) rotate(-8deg); }
 
 .journey-block .journey-full { display: block; }
-.journey-block .journey-mini-card { display: none; }
+.journey-pill.teaser-next { border-color: #F0B93D; box-shadow: 0 0 0 3px rgba(240,185,61,0.18); }
+.journey-pill.teaser-next .journey-pill-label { color: #92650C; }
+.journey-mini-card.teaser-next { border-color: #F0B93D; background: #FFF9EC; }
+.journey-mini-card.teaser-next::after { content: 'もうすぐ'; font-size: 9.5px; font-weight: 700; color: #92650C; background: #FCEBBD; border-radius: 6px; padding: 2px 6px; margin-left: 6px; flex-shrink: 0; }
+.journey-mini-card { display: none; }
 .journey-block.collapsed .journey-full { display: none; }
 .journey-block.collapsed .journey-mini-card { display: flex; }
 .journey-mini-card {
@@ -61,6 +66,71 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .joel-line-text { font-size: 12px; color: #374151; line-height: 1.6; }
 .joel-line-text .en { font-weight: 600; color: #2D6A4F; display: block; margin-bottom: 2px; }
 .joel-line-text .ja { font-size: 11px; color: #9CA3AF; }
+
+/* 週間スタンプカード（紙のスタンプカード風・きょうのとびら直下） */
+.stamp-card-panel {
+  margin: 14px 20px 0;
+  padding: 22px 18px 16px;
+  background-color: #F3ECDD;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(0,0,0,0.015) 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(0,0,0,0.015) 0%, transparent 40%),
+    radial-gradient(circle at 40% 80%, rgba(0,0,0,0.012) 0%, transparent 35%);
+  border-radius: 18px 20px 17px 19px;
+  box-shadow: 0 8px 20px rgba(61,107,79,0.10), 0 2px 6px rgba(61,107,79,0.06);
+  position: relative;
+}
+.stamp-card-panel::before {
+  content: "スタンプカード";
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #8A9A8F;
+  background: #F7F5F0;
+  padding: 2px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+}
+.stamp-card-slots { display: flex; justify-content: center; gap: 10px; }
+.stamp-card-slot {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: #EAE7E0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+.stamp-card-slot.slot-5:not(.filled) { box-shadow: inset 0 2px 4px rgba(232,163,61,0.22); }
+.stamp-card-slot.filled { background: transparent; box-shadow: none; }
+.stamp-card-slot img { width: 100%; height: 100%; object-fit: contain; }
+.stamp-card-slot.pop { animation: stampCardPop 0.5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes stampCardPop { 0% { transform: scale(0); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.stamp-card-footer { text-align: center; font-size: 10.5px; color: #8A9A8F; margin-top: 10px; letter-spacing: 0.01em; }
+.stamp-card-ayumi-link { text-align: center; font-size: 10.5px; color: #2D6A4F; font-weight: 600; margin-top: 8px; cursor: pointer; opacity: 0.75; }
+.stamp-card-ayumi-link:active { opacity: 1; }
+
+/* 5マス達成時のお祝いポップアップ */
+.stamp-celebrate-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(45,106,79,0.28);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.stamp-celebrate-overlay.show { display: flex; }
+.stamp-celebrate-card {
+  background: #fff; border-radius: 22px; padding: 28px 24px 22px;
+  text-align: center; max-width: 300px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+  animation: stampCardPop 0.45s cubic-bezier(.34,1.56,.64,1);
+}
+.stamp-celebrate-card img { width: 96px; height: auto; margin: 0 auto 12px; }
+.stamp-celebrate-title { font-size: 15px; font-weight: 700; color: #2D6A4F; margin-bottom: 6px; }
+.stamp-celebrate-sub { font-size: 12px; color: #6B7280; line-height: 1.6; margin-bottom: 18px; }
+.stamp-celebrate-btn { background: #2D6A4F; color: #fff; border: none; border-radius: 12px; padding: 10px 16px; font-size: 12.5px; font-weight: 700; flex: 1; white-space: nowrap; }
 
 /* Weekly Pickを独立セクション化（旧：Weekly Mission内ネスト） */
 .weekly-pick-standalone { margin: 16px 20px 0; background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 20px; padding: 18px 16px 20px; }
@@ -107,6 +177,20 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .settings-block-label:first-child { margin-top: 0; }
 .settings-rows { display: flex; flex-direction: column; gap: 8px; }
 .settings-account-card { background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+
+.ayumi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.ayumi-card { background: #F3ECDD; border-radius: 14px; padding: 14px 12px; text-align: center; }
+.ayumi-num { font-size: 22px; font-weight: 700; color: #2D6A4F; line-height: 1.2; }
+.ayumi-label { font-size: 10.5px; color: #8A7B5E; margin-top: 4px; line-height: 1.4; }
+
+.ayumi-badge {
+  display: flex; align-items: center; gap: 12px;
+  background: #EAF4EE; border: 1.5px solid #BBDAC8; border-radius: 16px;
+  padding: 12px 16px; margin-bottom: 12px;
+}
+.ayumi-badge img { width: 44px; height: 44px; object-fit: contain; flex-shrink: 0; }
+.ayumi-badge-name { font-size: 13.5px; font-weight: 700; color: #2D6A4F; }
+.ayumi-badge-sub { font-size: 10.5px; color: #6B7280; margin-top: 2px; }
 .settings-account-plan { font-size: 13px; font-weight: 700; color: #2D6A4F; }
 .settings-account-email { font-size: 11px; color: #6B7280; margin-top: 3px; }
 .settings-logout-btn {
@@ -115,8 +199,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 
 /* タブ（Option A：塗りつぶしピル / セグメントコントロール） */
-.tab-bar { display: flex; gap: 4px; margin: 14px 20px 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
-.tab { flex: 1; text-align: center; padding: 9px 4px; font-size: 12.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-radius: 10px; transition: background .2s ease, color .2s ease, box-shadow .2s ease; }
+.tab-bar { display: flex; gap: 3px; margin: 14px 20px 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
+.tab { flex: 1; text-align: center; padding: 9px 2px; font-size: 11.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-radius: 10px; transition: background .2s ease, color .2s ease, box-shadow .2s ease; white-space: nowrap; }
 .tab.active { background: #6DB88A; color: #fff; box-shadow: 0 2px 6px rgba(109,184,138,0.35); }
 
 /* セクション */
@@ -519,6 +603,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   cursor: pointer;
 }
 
+/* 絵本レベル切り替え（とどらー/きんだー） */
+.book-level-toggle { display: none; gap: 4px; }
+.book-level-pill {
+  font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: 20px;
+  cursor: pointer; border: 1.5px solid transparent; color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.08); transition: all .15s ease;
+}
+.book-level-pill.active[data-level="todler"] { background: #F5D879; color: #6B4B00; }
+.book-level-pill.active[data-level="kinder"] { background: #6DB88A; color: #fff; }
+.month-lesson-top .book-level-toggle { gap: 6px; }
+.month-lesson-top .book-level-pill {
+  color: #6B7280; background: #F1EFE7; border: 1.5px solid #E5E7EB;
+}
+.month-lesson-top .book-level-pill.active[data-level="todler"] { background: #FCEBBD; color: #92650C; border-color: #F0B93D; }
+.month-lesson-top .book-level-pill.active[data-level="kinder"] { background: #EAF4EE; color: #2D6A4F; border-color: #6DB88A; }
+
 /* ページ表示エリア */
 .bv-page-area {
   flex: 1; position: relative; overflow: hidden;
@@ -873,10 +973,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .asobo-hero-illust { width: 100%; display: block; }
 .asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; padding: 14px 20px 18px; }
 
+.shiru-hero { padding: 20px 20px 4px; }
+.shiru-hero-en { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #9CA3AF; text-transform: uppercase; }
+.shiru-hero-title { font-size: 17px; font-weight: 700; color: #111827; margin-top: 4px; }
+.shiru-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-top: 6px; }
+
 /* セクション見出し（1・2の縦並び） */
 .asobo-section { padding: 0 20px 20px; }
 
-.asobo-coming-soon {
+.asobo-coming-soon, .coming-soon-panel {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -885,9 +990,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #F3ECDD;
   border-radius: 16px;
 }
-.asobo-coming-soon-avatar { width: 52px; height: auto; flex-shrink: 0; }
-.asobo-coming-soon-main { font-size: 12.5px; font-weight: 700; color: #2D6A4F; line-height: 1.5; }
-.asobo-coming-soon-sub { font-size: 11px; color: #8A9A8F; margin-top: 2px; }
+.asobo-coming-soon-avatar, .coming-soon-avatar { width: 52px; height: auto; flex-shrink: 0; }
+.asobo-coming-soon-main, .coming-soon-main { font-size: 12.5px; font-weight: 700; color: #2D6A4F; line-height: 1.5; }
+.asobo-coming-soon-sub, .coming-soon-sub { font-size: 11px; color: #8A9A8F; margin-top: 2px; }
 .asobo-section-card {
   background: #FCFBF7; border: 1px solid #F0E6D2;
   border-radius: 20px; padding: 18px;
@@ -1373,6 +1478,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 <div class="book-viewer-modal" id="bookViewerModal">
   <div class="bv-header">
     <div class="bv-title" id="bvTitle">Sunny Day!</div>
+    <div class="book-level-toggle" style="display:none;">
+      <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
+      <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
+    </div>
     <button class="bv-close" onclick="closeBookModal()">✕</button>
   </div>
   <div class="bv-page-area" id="bvPageArea">
@@ -1416,6 +1525,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="tab active" onclick="switchTab('home',this)">ホーム</div>
     <div class="tab" onclick="switchTab('playlist',this)">みる</div>
     <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
+    <div class="tab" onclick="switchTab('shiru',this)">しる</div>
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
   </div>
 
@@ -1427,17 +1537,17 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <div class="journey-eyebrow">きょうのとびら</div>
       <div class="journey-rail">
         <div class="journey-pill" data-slot="morning" onclick="focusJourneyBlock('morning')">
-          <img class="journey-pill-stamp" src="illustrations/stamps/stamp_nav_common.png" alt="">
+          <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
           <span class="journey-pill-num">1</span>
           <span class="journey-pill-label">朝のラジオ</span>
         </div>
-        <div class="journey-pill" data-slot="day" onclick="focusJourneyBlock('day')">
-          <img class="journey-pill-stamp" src="illustrations/stamps/stamp_nav_common.png" alt="">
+        <div class="journey-pill" data-slot="evening" onclick="focusJourneyBlock('evening')">
+          <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_evening_star.png" alt=""></div>
           <span class="journey-pill-num">2</span>
-          <span class="journey-pill-label">今週のおたのしみ</span>
+          <span class="journey-pill-label">イブニングトーク</span>
         </div>
         <div class="journey-pill" data-slot="night" onclick="focusJourneyBlock('night')">
-          <img class="journey-pill-stamp" src="illustrations/stamps/stamp_nav_common.png" alt="">
+          <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
           <span class="journey-pill-num">3</span>
           <span class="journey-pill-label">えほんタイム</span>
         </div>
@@ -1452,10 +1562,17 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       </div>
     </div>
 
+    <!-- 週間スタンプカード -->
+    <div class="stamp-card-panel">
+      <div class="stamp-card-slots" id="stampCardSlots"></div>
+      <div class="stamp-card-footer">絵本のLet's talk・きょうのとびら・あそぼ、どれか1つで1日1つゲット</div>
+      <div class="stamp-card-ayumi-link" onclick="openSettingsModal()">これまでのあゆみを見る ＞</div>
+    </div>
+
     <!-- ① 今日のEnverly（曜日でMorning Talk/Active Time自動切替・週ストリップ内蔵） -->
     <div class="journey-block" id="jblock-morning" data-slot="morning">
       <div class="journey-mini-card" onclick="focusJourneyBlock('morning')">
-        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
+        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_mic.png" alt=""></div>
         <div class="journey-mini-text">
           <div class="journey-mini-title">朝のラジオ</div>
           <div class="journey-mini-sub">Morning Talk・今日の分</div>
@@ -1574,17 +1691,99 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       </div><!-- /journey-full (morning) -->
     </div><!-- /journey-block jblock-morning -->
 
-    <!-- ② Weekly Pick（今週のおすすめ絵本） -->
-    <div class="journey-block" id="jblock-day" data-slot="day">
-      <div class="journey-mini-card" onclick="focusJourneyBlock('day')">
-        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
+    <!-- ② Evening Talk（帰宅後の一言＋Did you know?） -->
+    <div class="journey-block" id="jblock-evening" data-slot="evening">
+      <div class="journey-mini-card" onclick="focusJourneyBlock('evening')">
+        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_star.png" alt=""></div>
         <div class="journey-mini-text">
-          <div class="journey-mini-title">今週のおたのしみ</div>
-          <div class="journey-mini-sub">Weekly Pick・Row, Row, Row Your Boat</div>
+          <div class="journey-mini-title">イブニングトーク</div>
+          <div class="journey-mini-sub">今日どうだった？・Did you know?</div>
         </div>
         <div class="journey-mini-chev">▸</div>
       </div>
       <div class="journey-full">
+        <div class="section-header" style="margin:16px 20px 10px;">
+          <div class="section-header-en">Evening Talk</div>
+          <div class="section-header-ja">今日どうだった？</div>
+        </div>
+        <div class="coming-soon-panel">
+          <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
+          <div class="coming-soon-text">
+            <div class="coming-soon-main">まもなく配信予定！</div>
+            <div class="coming-soon-sub">帰ってきたら「今日どうだった？」の一言と、Joelの豆知識コーナー"Did you know?"が届くようになります。もう少しお待ちください♪</div>
+          </div>
+        </div>
+      </div><!-- /journey-full (evening) -->
+    </div><!-- /journey-block jblock-evening -->
+
+
+    <!-- ③ 今月の教材絵本 -->
+    <div class="journey-block" id="jblock-night" data-slot="night">
+      <div class="journey-mini-card" onclick="focusJourneyBlock('night')">
+        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_speak.png" alt=""></div>
+        <div class="journey-mini-text">
+          <div class="journey-mini-title">えほんタイム</div>
+          <div class="journey-mini-sub">Sunny Day!・Water &amp; Sun</div>
+        </div>
+        <div class="journey-mini-chev">▸</div>
+      </div>
+      <div class="journey-full">
+    <div class="month-hero-section">
+      <div class="month-lesson-wrap">
+        <div class="month-lesson-eyebrow">
+          <div class="month-eyebrow-label">
+            <span class="month-eyebrow-en">Monthly Book</span>
+            今月の教材絵本
+          </div>
+          <div class="month-eyebrow-line"></div>
+        </div>
+        <div class="month-lesson-card">
+          <div class="month-lesson-card-hero">
+            <img src="enverly_img.png" alt="Enverly">
+            <div class="month-hero-overlay">
+              <span class="month-hero-label">Joelと一緒に読もう</span>
+            </div>
+          </div>
+          <div class="month-lesson-top" style="padding-bottom:20px;">
+            <div class="month-theme-row">
+              <div class="month-theme-dot"></div>
+              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
+            </div>
+            <div class="month-title">Sunny Day!</div>
+            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
+            <div class="book-level-toggle" style="display:none; margin-bottom:12px;">
+              <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
+              <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
+            </div>
+            <div class="month-read-btn-row">
+              <button class="month-read-btn" onclick="openBookModal('listen')">
+                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Listening</span>
+                  <span class="month-read-btn-ja">聞く</span>
+                </span>
+              </button>
+              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
+                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Talking</span>
+                  <span class="month-read-btn-ja">話す</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /month-hero-section -->
+      </div><!-- /journey-full (night) -->
+    </div><!-- /journey-block jblock-night -->
+
+    <!-- ブラウズエリア（ジャーニーとは独立・常時閲覧可、キュレーション系） -->
+    <div class="browse-area-eyebrow" style="margin:22px 20px 0;">
+      <div class="journey-eyebrow">気になったらのぞいてみる</div>
+    </div>
+
+    <!-- Weekly Pick（今週のおすすめ絵本） -->
     <div class="weekly-pick-standalone">
       <div class="weekly-pick-block">
         <div class="section-header" style="margin-bottom:10px;">
@@ -1654,65 +1853,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </div>
       </div>
     </div><!-- /weekly-pick-standalone -->
-      </div><!-- /journey-full (day) -->
-    </div><!-- /journey-block jblock-day -->
-
-    <!-- ③ 今月の教材絵本 -->
-    <div class="journey-block" id="jblock-night" data-slot="night">
-      <div class="journey-mini-card" onclick="focusJourneyBlock('night')">
-        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
-        <div class="journey-mini-text">
-          <div class="journey-mini-title">えほんタイム</div>
-          <div class="journey-mini-sub">Sunny Day!・Water &amp; Sun</div>
-        </div>
-        <div class="journey-mini-chev">▸</div>
-      </div>
-      <div class="journey-full">
-    <div class="month-hero-section">
-      <div class="month-lesson-wrap">
-        <div class="month-lesson-eyebrow">
-          <div class="month-eyebrow-label">
-            <span class="month-eyebrow-en">Monthly Book</span>
-            今月の教材絵本
-          </div>
-          <div class="month-eyebrow-line"></div>
-        </div>
-        <div class="month-lesson-card">
-          <div class="month-lesson-card-hero">
-            <img src="enverly_img.png" alt="Enverly">
-            <div class="month-hero-overlay">
-              <span class="month-hero-label">Joelと一緒に読もう</span>
-            </div>
-          </div>
-          <div class="month-lesson-top" style="padding-bottom:20px;">
-            <div class="month-theme-row">
-              <div class="month-theme-dot"></div>
-              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
-            </div>
-            <div class="month-title">Sunny Day!</div>
-            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
-            <div class="month-read-btn-row">
-              <button class="month-read-btn" onclick="openBookModal('listen')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Listening</span>
-                  <span class="month-read-btn-ja">聞く</span>
-                </span>
-              </button>
-              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Talking</span>
-                  <span class="month-read-btn-ja">話す</span>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /month-hero-section -->
-      </div><!-- /journey-full (night) -->
-    </div><!-- /journey-block jblock-night -->
 
     <!-- Monthly Playlist（独立セクション・3曲） -->
     <div class="monthly-playlist-section">
@@ -1723,6 +1863,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップでYouTubeが開きます。かけ流しはスピーカーから流すのがおすすめ。</p>
       <div id="monthlyPlaylist"></div>
     </div>
+
 
     <!-- サブスクバナー -->
     <div class="sub-banner">
@@ -1831,6 +1972,25 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div style="height:24px;"></div>
   </div>
 
+  <!-- しるタブ -->
+  <div id="tab-shiru" style="display:none;">
+    <div class="shiru-hero">
+      <div class="shiru-hero-en">Shiru</div>
+      <div class="shiru-hero-title">今日知ったこと、ためていく場所</div>
+      <div class="shiru-hero-sub">イブニングトークの"Did you know?"で出てきた豆知識が、ここにどんどん貯まっていくよ。</div>
+    </div>
+
+    <div class="coming-soon-panel" style="margin:16px 20px 0;">
+      <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
+      <div class="coming-soon-text">
+        <div class="coming-soon-main">今はまだ少ないけど、これからどんどん増えていくよ。</div>
+        <div class="coming-soon-sub">楽しみにしててね♪</div>
+      </div>
+    </div>
+
+    <div style="height:24px;"></div>
+  </div>
+
   <!-- ルーティンタブ -->
   <div id="tab-routine" style="display:none;">
     <div class="section" style="padding-top:20px;">
@@ -1843,12 +2003,50 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 </div><!-- /mainApp -->
 
 <!-- 設定モーダル -->
+<!-- 週間スタンプカード達成お祝い -->
+<div class="stamp-celebrate-overlay" id="stampCelebrateOverlay">
+  <div class="stamp-celebrate-card">
+    <img src="illustrations/joel/joel_banzai_960x640.png" alt="Joel">
+    <div class="stamp-celebrate-title">スタンプカード、コンプリート！</div>
+    <div class="stamp-celebrate-sub">毎日えらいね。<br>このまま眺めていても、新しいカードをはじめてもいいよ。</div>
+    <div style="display:flex; gap:8px; justify-content:center;">
+      <button class="stamp-celebrate-btn" onclick="closeStampCelebrate()" style="background:#fff; color:#2D6A4F; border:1.5px solid #2D6A4F;">とじる</button>
+      <button class="stamp-celebrate-btn" onclick="advanceStampCard()">次のカードをはじめる</button>
+    </div>
+  </div>
+</div>
+
 <div class="settings-modal" id="settingsModal">
   <div class="settings-modal-header">
     <div class="settings-modal-title">設定</div>
     <button class="settings-modal-close" onclick="closeSettingsModal()">✕</button>
   </div>
   <div class="settings-body">
+
+    <div class="settings-block-label">あゆみ</div>
+    <div class="ayumi-badge" id="ayumiBadge"></div>
+    <div class="ayumi-grid">
+      <div class="ayumi-card">
+        <div class="ayumi-num" id="lifetimeTotalStamps">0</div>
+        <div class="ayumi-label">通算スタンプ</div>
+      </div>
+      <div class="ayumi-card">
+        <div class="ayumi-num" id="lifetimeCardsCompleted">0</div>
+        <div class="ayumi-label">完成したカード</div>
+      </div>
+      <div class="ayumi-card">
+        <div class="ayumi-num" id="lifetimeTalkCount">0</div>
+        <div class="ayumi-label">絵本Let's talk</div>
+      </div>
+      <div class="ayumi-card">
+        <div class="ayumi-num" id="lifetimeMorningTalkPlays">0</div>
+        <div class="ayumi-label">Morning Talk再生</div>
+      </div>
+      <div class="ayumi-card">
+        <div class="ayumi-num" id="lifetimeAsoboPlays">0</div>
+        <div class="ayumi-label">あそぼで遊んだ回数</div>
+      </div>
+    </div>
 
     <div class="settings-block-label">アカウント</div>
     <div class="settings-account-card">
@@ -2049,6 +2247,169 @@ function renderJoelLine() {
   el.innerHTML = `<span class="en">${line.en}</span><span class="ja">${line.ja}</span>`;
 }
 
+// ========================
+// 通算のあゆみ（累計スタッツ・カードのリセットとは無関係に積み上がる）
+// ========================
+const LIFETIME_STATS_KEY = 'enverly_lifetime_stats';
+
+function getLifetimeStats() {
+  let s = null;
+  try {
+    const raw = localStorage.getItem(LIFETIME_STATS_KEY);
+    s = raw ? JSON.parse(raw) : null;
+  } catch (e) { s = null; }
+  if (!s) {
+    s = { totalStamps: 0, cardsCompleted: 0, talkCount: 0, morningTalkPlays: 0, asoboPlays: 0, journeyOpens: 0 };
+    saveLifetimeStats(s);
+  }
+  return s;
+}
+function saveLifetimeStats(s) {
+  try { localStorage.setItem(LIFETIME_STATS_KEY, JSON.stringify(s)); } catch (e) {}
+}
+function bumpLifetimeStat(key, amount) {
+  const s = getLifetimeStats();
+  s[key] = (s[key] || 0) + (amount || 1);
+  saveLifetimeStats(s);
+}
+
+// 通算スタンプ数に応じた称号バッジ（週間カードの成長スタンプ絵柄をそのまま流用）
+const STAMP_BADGES = [
+  { min: 0,  img: 'illustrations/stamps/stamp_week_01.png', name: 'めがでたよ' },
+  { min: 5,  img: 'illustrations/stamps/stamp_week_02.png', name: 'ふたばになったよ' },
+  { min: 15, img: 'illustrations/stamps/stamp_week_03.png', name: 'はっぱもりもり' },
+  { min: 30, img: 'illustrations/stamps/stamp_week_04.png', name: 'つぼみふくらんだ' },
+  { min: 60, img: 'illustrations/stamps/stamp_week_05.png', name: 'はなさいたよ！' },
+];
+function getStampBadge(total) {
+  let badge = STAMP_BADGES[0];
+  for (const b of STAMP_BADGES) {
+    if (total >= b.min) badge = b;
+  }
+  return badge;
+}
+
+function renderLifetimeStats() {
+  const s = getLifetimeStats();
+  const map = {
+    lifetimeTotalStamps: s.totalStamps,
+    lifetimeCardsCompleted: s.cardsCompleted,
+    lifetimeTalkCount: s.talkCount,
+    lifetimeMorningTalkPlays: s.morningTalkPlays,
+    lifetimeAsoboPlays: s.asoboPlays,
+  };
+  Object.keys(map).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = map[id];
+  });
+
+  const badgeEl = document.getElementById('ayumiBadge');
+  if (badgeEl) {
+    const badge = getStampBadge(s.totalStamps);
+    badgeEl.innerHTML = `
+      <img src="${badge.img}" alt="${badge.name}">
+      <div>
+        <div class="ayumi-badge-name">${badge.name}</div>
+        <div class="ayumi-badge-sub">通算${s.totalStamps}スタンプ</div>
+      </div>
+    `;
+  }
+}
+
+
+// スタンプの絵柄は成長5段階（week_01=芽 〜 week_05=満開）を、貯まった数に応じて表示する。
+// トリガーは3カテゴリ：talk（絵本のLet's talk完了）／journey（きょうのとびらのどれか1つ）／asobo（あそぼでの遊び）。
+// 各カテゴリは1日1回まで。カレンダー週には紐付けず、5個貯まったら完成→ユーザーが手動で「次のカードをはじめる」を押すまで
+// 完成状態のまま表示され続ける（曜日固定でない・柔軟日程制という元々の設計方針に準拠）。
+const STAMP_CARD_KEY = 'enverly_stamp_card';
+const STAMP_CARD_MAX = 5;
+
+function getStampCardState() {
+  let state = null;
+  try {
+    const raw = localStorage.getItem(STAMP_CARD_KEY);
+    state = raw ? JSON.parse(raw) : null;
+  } catch (e) { state = null; }
+  if (!state) {
+    state = { count: 0, days: {}, celebrated: false };
+    saveStampCardState(state);
+  }
+  return state;
+}
+
+function saveStampCardState(state) {
+  try { localStorage.setItem(STAMP_CARD_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+// category: 'talk' | 'journey' | 'asobo'（カテゴリごとに1日1回まで、カードが満了したらそれ以上は積み上がらない）
+function earnStamp(category) {
+  const state = getStampCardState();
+  const todayKey = new Date().toISOString().slice(0, 10);
+  if (!state.days[todayKey]) state.days[todayKey] = {};
+  if (state.days[todayKey][category]) return; // 同じカテゴリは当日2回目以降カウントしない
+  if (state.count >= STAMP_CARD_MAX) return; // カード満了中は次のカードをはじめるまで積み上がらない
+  state.days[todayKey][category] = true;
+  state.count += 1;
+  saveStampCardState(state);
+  bumpLifetimeStat('totalStamps');
+  renderStampCard(true);
+  if (state.count >= STAMP_CARD_MAX && !state.celebrated) {
+    state.celebrated = true;
+    saveStampCardState(state);
+    bumpLifetimeStat('cardsCompleted');
+    setTimeout(() => openStampCelebrate(), 550);
+  }
+}
+
+// 「次のカードをはじめる」：完成したカードを手動で次に進める（自動リセットはしない）
+function advanceStampCard() {
+  const state = { count: 0, days: {}, celebrated: false };
+  saveStampCardState(state);
+  renderStampCard();
+  closeStampCelebrate();
+}
+
+function renderStampCard(justEarned) {
+  const wrap = document.getElementById('stampCardSlots');
+  if (!wrap) return;
+  const state = getStampCardState();
+  const slotsHtml = [];
+  for (let i = 1; i <= STAMP_CARD_MAX; i++) {
+    const filled = i <= state.count;
+    const isNew = justEarned && i === state.count;
+    const cls = ['stamp-card-slot'];
+    if (filled) cls.push('filled');
+    if (i === STAMP_CARD_MAX) cls.push('slot-5');
+    if (isNew) cls.push('pop');
+    const img = filled
+      ? `<img src="illustrations/stamps/stamp_week_0${i}.png" alt="スタンプ${i}">`
+      : '';
+    slotsHtml.push(`<div class="${cls.join(' ')}">${img}</div>`);
+  }
+  wrap.innerHTML = slotsHtml.join('');
+}
+
+function openStampCelebrate() {
+  const el = document.getElementById('stampCelebrateOverlay');
+  if (el) el.classList.add('show');
+}
+function closeStampCelebrate() {
+  const el = document.getElementById('stampCelebrateOverlay');
+  if (el) el.classList.remove('show');
+}
+
+// 絵本のLet's talk完了 → talkスタンプ（既存の「今日言えたよ！」ボタンから連携）
+function recordIeta() {
+  bumpLifetimeStat('talkCount');
+  earnStamp('talk');
+}
+
+// あそぼでの遊び → asoboスタンプ（探し物ミッションのタイマー完了 or なぞなぞの答えを見た時点で発火）
+function recordAsoboPlayed() {
+  bumpLifetimeStat('asoboPlays');
+  earnStamp('asobo');
+}
+
 // YouTubeキュレーションデータ
 const YT_DATA = [
   { icon:'talk', videoId:'zwL2o4jZxbc', title:'Ms. Rachel', when:'発語・語りかけ', age:'0〜4歳', interest:'ことば・発話', tip:'一番のお気に入り。うちの子はこれを見て育ちました。ゆったりした発音と、子どもの反応を引き出す間の取り方が心地いい。', url:'https://www.youtube.com/@msrachel' },
@@ -2109,6 +2470,7 @@ function initApp() {
   renderScenes();
   renderMonthlyPlaylist();
   renderJoelLine();
+  renderStampCard();
 }
 initApp();
 
@@ -2232,7 +2594,7 @@ function showToast(msg) {
 // タブ
 // ========================
 function switchTab(name, el) {
-  ['home', 'playlist', 'asobo', 'routine'].forEach(t => {
+  ['home', 'playlist', 'asobo', 'shiru', 'routine'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2243,14 +2605,15 @@ function switchTab(name, el) {
 // ========================
 // トップ：今日のジャーニー（①②③ステップ誘導＋時間帯ナビ＋テーマ別スタンプ）
 // ========================
-const JOURNEY_SLOTS = ['morning', 'day', 'night'];
+const JOURNEY_SLOTS = ['morning', 'evening', 'night'];
 let journeyManualFocus = null; // ピル/ミニカードをタップして手動で開いたスロット（時間帯と無関係にいつでも開ける）
 
 function getJourneyTimeSlot() {
   const h = new Date().getHours();
   if (h >= 5 && h < 11) return 'morning';   // 5-11時：Morning Talk
-  if (h >= 11 && h < 17) return 'day';      // 11-17時：Weekly Pick
-  return 'night';                            // 17-5時：Monthly Book
+  if (h >= 11 && h < 17) return 'teaser';   // 11-17時：ジャーニーは空き時間帯（全ピルmini化＋eveningをティーザー強調）
+  if (h >= 17 && h < 19) return 'evening';  // 17-19時：Evening Talk
+  return 'night';                            // 19-5時：Monthly Book
 }
 
 function journeyStorageKey() {
@@ -2267,12 +2630,14 @@ function markJourneyOpened(slot) {
   if (set.has(slot)) return;
   set.add(slot);
   try { localStorage.setItem(journeyStorageKey(), JSON.stringify([...set])); } catch (e) {}
+  bumpLifetimeStat('journeyOpens');
+  earnStamp('journey'); // きょうのとびら、どれか1つ触れた時点でスタンプ対象（カテゴリにつき1日1回）
 }
 
 function applyJourneyState() {
   const timeSlot = getJourneyTimeSlot();
-  markJourneyOpened(timeSlot); // 今の時間帯のコンテンツは自動的に「見た」扱い（スタンプ対象）
-  const activeSlot = journeyManualFocus || timeSlot;
+  if (timeSlot !== 'teaser') markJourneyOpened(timeSlot); // 今の時間帯のコンテンツは自動的に「見た」扱い（スタンプ対象）。teaser中は対象コンテンツがないので記録しない
+  const activeSlot = journeyManualFocus || (timeSlot === 'teaser' ? null : timeSlot);
   const opened = getJourneyOpenedSet();
 
   JOURNEY_SLOTS.forEach(slot => {
@@ -2282,7 +2647,11 @@ function applyJourneyState() {
     if (pill) {
       pill.classList.toggle('active', slot === activeSlot);
       pill.classList.toggle('opened', opened.has(slot));
+      // 11-17時・手動フォーカスなし：Evening Talkだけ「もうすぐ」ティーザー強調
+      pill.classList.toggle('teaser-next', !journeyManualFocus && timeSlot === 'teaser' && slot === 'evening');
     }
+    const mini = document.querySelector('.journey-block[data-slot="' + slot + '"] .journey-mini-card');
+    if (mini) mini.classList.toggle('teaser-next', !journeyManualFocus && timeSlot === 'teaser' && slot === 'evening');
   });
 }
 
@@ -2301,6 +2670,7 @@ applyJourneyState();
 // 設定モーダル
 // ========================
 function openSettingsModal() {
+  renderLifetimeStats();
   document.getElementById('settingsModal').classList.add('open');
 }
 function closeSettingsModal() {
@@ -2457,6 +2827,7 @@ function startAsoboTimer() {
       try { bgm.pause(); } catch (e) {}
       playAsoboSe(ASOBO_SFX.timerEnd);
       playAsoboVoice(AT_FIND_DONE_AUDIO);
+      recordAsoboPlayed();
     }, 60000);
   };
   // 先にJoelのミッション音声を再生してからタイマー(BGM)をスタート
@@ -2502,6 +2873,7 @@ function toggleRiddleFlip(card) {
     card.classList.add('at-riddle-flip-ring');
     setTimeout(() => card.classList.remove('at-riddle-flip-ring'), 650);
     playAsoboSe(ASOBO_SFX.riddleFlip);
+    recordAsoboPlayed();
     if (currentRiddleItem) {
       setTimeout(() => {
         playAsoboSe(ASOBO_SFX.riddleCorrect);
@@ -3172,6 +3544,7 @@ function initFtAudio() {
     setFtWavePlaying(false);
     document.getElementById('ftPlayIcon').textContent = '▶';
     clearFtPhraseHighlight();
+    bumpLifetimeStat('morningTalkPlays');
     showFtAutoNext();
   });
   ftAudioEl.addEventListener('error', () => {
@@ -3497,17 +3870,61 @@ renderRoutineCatGrid();
 // ========================
 const BOOK_DATA = {
   title: 'Sunny Day!',
-  pages: [
-    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
-    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot.", talkPhrase: "It's hot.", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
-    { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday/sunnyday_03.mp3' },
-    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', talkPhrase: 'SPLASH!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
-    { img: 'books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", talkPhrase: "It's so fun!", audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
-    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', talkPhrase: 'So Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
-    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', talkPhrase: null, talkPause: 6000, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
-    { img: 'books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
-  ]
+  levels: ['todler'], // この本が対応するレベル一覧。1つだけなら選択UIは自動的に非表示になる（9月号からtodler/kinderの2つに拡張予定）
+  pagesByLevel: {
+    todler: [
+      { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
+      { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot.", talkPhrase: "It's hot.", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
+      { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday/sunnyday_03.mp3' },
+      { img: 'books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', talkPhrase: 'SPLASH!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
+      { img: 'books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", talkPhrase: "It's so fun!", audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
+      { img: 'books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', talkPhrase: 'So Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
+      { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', talkPhrase: null, talkPause: 6000, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
+      { img: 'books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
+    ]
+  }
 };
+// BOOK_DATA.pages は「現在選択中のレベルのページ配列」を返すgetter。
+// 既存コード（BOOK_DATA.pages[...]・.length・.map など）は変更なしで動く。
+Object.defineProperty(BOOK_DATA, 'pages', {
+  get() {
+    return BOOK_DATA.pagesByLevel[getBookLevel()] || BOOK_DATA.pagesByLevel[BOOK_DATA.levels[0]];
+  }
+});
+
+// ========================
+// 絵本レベル（とどらー/きんだー）：端末単位で記憶、本ごとにlevelsが違っても安全にフォールバック
+// ========================
+const BOOK_LEVEL_LABELS = { todler: { label: 'とどらー', badgeClass: 'book-level-badge-todler' }, kinder: { label: 'きんだー', badgeClass: 'book-level-badge-kinder' } };
+const BOOK_LEVEL_STORAGE_KEY = 'enverly_book_level';
+
+function getBookLevel() {
+  let stored = null;
+  try { stored = localStorage.getItem(BOOK_LEVEL_STORAGE_KEY); } catch (e) {}
+  if (stored && BOOK_DATA.levels.includes(stored)) return stored;
+  return BOOK_DATA.levels[0]; // 記憶がない・非対応レベルの場合は先頭レベルにフォールバック
+}
+function setBookLevel(level) {
+  if (!BOOK_DATA.levels.includes(level)) return;
+  try { localStorage.setItem(BOOK_LEVEL_STORAGE_KEY, level); } catch (e) {}
+  bvCurrentPage = 0; // レベル切り替え時はページ構成が変わりうるので先頭に戻す
+  renderBookLevelToggles();
+  if (document.getElementById('bookViewerModal') && document.getElementById('bookViewerModal').classList.contains('open')) {
+    bvRenderPage();
+    bvBuildIndicator();
+  }
+}
+function renderBookLevelToggles() {
+  document.querySelectorAll('.book-level-toggle').forEach(wrap => {
+    if (BOOK_DATA.levels.length <= 1) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'flex';
+    const current = getBookLevel();
+    wrap.querySelectorAll('.book-level-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.dataset.level === current);
+    });
+  });
+}
+renderBookLevelToggles(); // 初期表示（この時点でBOOK_DATAは定義済み）
 
 // 絵本ビューワー共通の音声プレイヤー（Let's read / Let's talk 兼用）
 const bvAudioEl = new Audio();
