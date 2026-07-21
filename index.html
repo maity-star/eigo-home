@@ -27,7 +27,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .journey-pill.active { border-color: #2D6A4F; background: #EAF4EE; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(45,106,79,0.15); }
 .journey-pill.active .journey-pill-num { background: #2D6A4F; color: #fff; }
 .journey-pill.active .journey-pill-label { color: #2D6A4F; }
-.journey-pill-stamp { position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; opacity: 0; transform: scale(0) rotate(-25deg); transition: all .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
+.journey-pill-stamp { position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; object-fit: contain; opacity: 0; transform: scale(0) rotate(-25deg); transition: all .35s cubic-bezier(.34,1.56,.64,1); pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12)); }
 .journey-pill.opened .journey-pill-stamp { opacity: 1; transform: scale(1) rotate(-8deg); }
 
 .journey-block .journey-full { display: block; }
@@ -45,6 +45,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .journey-mini-title { font-size: 12.5px; font-weight: 700; color: #111827; }
 .journey-mini-sub { font-size: 10.5px; color: #6B7280; margin-top: 1px; }
 .journey-mini-chev { font-size: 12px; color: #9CA3AF; }
+
+/* Joelのひとこと（ジャーニーナビ直下） */
+.joel-line-wrap { display: flex; align-items: flex-start; gap: 10px; margin: 14px 20px 0; }
+.joel-line-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1.5px solid #BBDAC8; }
+.joel-line-bubble {
+  position: relative;
+  flex: 1;
+  background: #fff;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 4px 16px 16px 16px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(45,106,79,0.06);
+}
+.joel-line-text { font-size: 12px; color: #374151; line-height: 1.6; }
+.joel-line-text .en { font-weight: 600; color: #2D6A4F; display: block; margin-bottom: 2px; }
+.joel-line-text .ja { font-size: 11px; color: #9CA3AF; }
 
 /* Weekly Pickを独立セクション化（旧：Weekly Mission内ネスト） */
 .weekly-pick-standalone { margin: 16px 20px 0; background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 20px; padding: 18px 16px 20px; }
@@ -859,6 +875,19 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* セクション見出し（1・2の縦並び） */
 .asobo-section { padding: 0 20px 20px; }
+
+.asobo-coming-soon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 20px 0;
+  padding: 14px 16px;
+  background: #F3ECDD;
+  border-radius: 16px;
+}
+.asobo-coming-soon-avatar { width: 52px; height: auto; flex-shrink: 0; }
+.asobo-coming-soon-main { font-size: 12.5px; font-weight: 700; color: #2D6A4F; line-height: 1.5; }
+.asobo-coming-soon-sub { font-size: 11px; color: #8A9A8F; margin-top: 2px; }
 .asobo-section-card {
   background: #FCFBF7; border: 1px solid #F0E6D2;
   border-radius: 20px; padding: 18px;
@@ -1398,27 +1427,35 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <div class="journey-eyebrow">きょうのとびら</div>
       <div class="journey-rail">
         <div class="journey-pill" data-slot="morning" onclick="focusJourneyBlock('morning')">
-          <svg class="journey-pill-stamp" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="5.5" fill="#E8A33D"/><g stroke="#E8A33D" stroke-width="2" stroke-linecap="round"><line x1="13" y1="1" x2="13" y2="4.5"/><line x1="13" y1="21.5" x2="13" y2="25"/><line x1="1" y1="13" x2="4.5" y2="13"/><line x1="21.5" y1="13" x2="25" y2="13"/><line x1="4.6" y1="4.6" x2="7" y2="7"/><line x1="19" y1="19" x2="21.4" y2="21.4"/><line x1="21.4" y1="4.6" x2="19" y2="7"/><line x1="7" y1="19" x2="4.6" y2="21.4"/></g></svg>
+          <img class="journey-pill-stamp" src="illustrations/stamps/stamp_nav_common.png" alt="">
           <span class="journey-pill-num">1</span>
           <span class="journey-pill-label">朝のラジオ</span>
         </div>
         <div class="journey-pill" data-slot="day" onclick="focusJourneyBlock('day')">
-          <svg class="journey-pill-stamp" viewBox="0 0 26 26" fill="none"><g fill="#6DB88A"><circle cx="13" cy="6" r="4"/><circle cx="20" cy="13" r="4"/><circle cx="13" cy="20" r="4"/><circle cx="6" cy="13" r="4"/></g><circle cx="13" cy="13" r="3.5" fill="#2D6A4F"/></svg>
+          <img class="journey-pill-stamp" src="illustrations/stamps/stamp_nav_common.png" alt="">
           <span class="journey-pill-num">2</span>
           <span class="journey-pill-label">今週のおたのしみ</span>
         </div>
         <div class="journey-pill" data-slot="night" onclick="focusJourneyBlock('night')">
-          <svg class="journey-pill-stamp" viewBox="0 0 26 26" fill="none"><g fill="#3d6b4f"><ellipse cx="13" cy="16" rx="4.5" ry="6"/><ellipse cx="6.5" cy="7" rx="2.1" ry="2.8" transform="rotate(-20 6.5 7)"/><ellipse cx="11" cy="4.5" rx="2.1" ry="2.8" transform="rotate(-5 11 4.5)"/><ellipse cx="16" cy="4.5" rx="2.1" ry="2.8" transform="rotate(5 16 4.5)"/><ellipse cx="20" cy="7" rx="2.1" ry="2.8" transform="rotate(20 20 7)"/></g></svg>
+          <img class="journey-pill-stamp" src="illustrations/stamps/stamp_nav_common.png" alt="">
           <span class="journey-pill-num">3</span>
           <span class="journey-pill-label">えほんタイム</span>
         </div>
       </div>
     </div>
 
+    <!-- Joelのひとこと（きょうのとびら直下） -->
+    <div class="joel-line-wrap">
+      <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Joel">
+      <div class="joel-line-bubble">
+        <div class="joel-line-text" id="joelLineText"></div>
+      </div>
+    </div>
+
     <!-- ① 今日のEnverly（曜日でMorning Talk/Active Time自動切替・週ストリップ内蔵） -->
     <div class="journey-block" id="jblock-morning" data-slot="morning">
       <div class="journey-mini-card" onclick="focusJourneyBlock('morning')">
-        <div class="journey-mini-icon">🎙️</div>
+        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
         <div class="journey-mini-text">
           <div class="journey-mini-title">朝のラジオ</div>
           <div class="journey-mini-sub">Morning Talk・今日の分</div>
@@ -1540,7 +1577,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <!-- ② Weekly Pick（今週のおすすめ絵本） -->
     <div class="journey-block" id="jblock-day" data-slot="day">
       <div class="journey-mini-card" onclick="focusJourneyBlock('day')">
-        <div class="journey-mini-icon">🎵</div>
+        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
         <div class="journey-mini-text">
           <div class="journey-mini-title">今週のおたのしみ</div>
           <div class="journey-mini-sub">Weekly Pick・Row, Row, Row Your Boat</div>
@@ -1623,7 +1660,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <!-- ③ 今月の教材絵本 -->
     <div class="journey-block" id="jblock-night" data-slot="night">
       <div class="journey-mini-card" onclick="focusJourneyBlock('night')">
-        <div class="journey-mini-icon">📖</div>
+        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
         <div class="journey-mini-text">
           <div class="journey-mini-title">えほんタイム</div>
           <div class="journey-mini-sub">Sunny Day!・Water &amp; Sun</div>
@@ -1779,6 +1816,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             <div id="asoboRiddleResultInner"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 今後のコンテンツ拡張予告（初期の物量不足による離脱抑制） -->
+    <div class="asobo-coming-soon">
+      <img class="asobo-coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
+      <div class="asobo-coming-soon-text">
+        <div class="asobo-coming-soon-main">今後も楽しいあそびを続々追加予定！</div>
+        <div class="asobo-coming-soon-sub">お楽しみに♪</div>
       </div>
     </div>
 
@@ -1984,6 +2030,25 @@ const MONTH_PLAYLIST = [
   { videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
 ];
 
+// Joelのひとこと（きょうのとびら直下・日替わり表示）
+const JOEL_ONE_LINERS = [
+  { en: "It's okay to make mistakes!", ja: '間違えても大丈夫だよ！' },
+  { en: 'One word a day is enough.', ja: '1日1単語でじゅうぶん。' },
+  { en: "You don't have to be perfect.", ja: '完璧じゃなくていいんだ。' },
+  { en: 'Small steps still count.', ja: '小さな一歩も、ちゃんと前進だよ。' },
+  { en: 'Have fun today, too!', ja: '今日も楽しんでいこうね！' },
+  { en: 'Your voice matters.', ja: '君の声には価値があるよ。' },
+  { en: "Let's take it easy today.", ja: '今日はゆっくりいこう。' },
+];
+
+function renderJoelLine() {
+  const el = document.getElementById('joelLineText');
+  if (!el) return;
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const line = JOEL_ONE_LINERS[dayOfYear % JOEL_ONE_LINERS.length];
+  el.innerHTML = `<span class="en">${line.en}</span><span class="ja">${line.ja}</span>`;
+}
+
 // YouTubeキュレーションデータ
 const YT_DATA = [
   { icon:'talk', videoId:'zwL2o4jZxbc', title:'Ms. Rachel', when:'発語・語りかけ', age:'0〜4歳', interest:'ことば・発話', tip:'一番のお気に入り。うちの子はこれを見て育ちました。ゆったりした発音と、子どもの反応を引き出す間の取り方が心地いい。', url:'https://www.youtube.com/@msrachel' },
@@ -2043,6 +2108,7 @@ function initApp() {
   renderYT();
   renderScenes();
   renderMonthlyPlaylist();
+  renderJoelLine();
 }
 initApp();
 
