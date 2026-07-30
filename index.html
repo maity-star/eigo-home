@@ -2995,16 +2995,19 @@ const MORNING_TALK_WEEKS = {
 Joel: Good morning, Mai! | おはよう、マイ！
 Mai: Good morning! Wow, it's already so hot today. | おはよう！わあ、今日はもうこんなに暑いね。
 Joel: I know! It's summer time. | だよね！夏だもん。
-Joel: Hey, did you look outside this morning? How is the weather? | ねえ、今朝外を見た？お天気どう？
+Joel: Hey, did you look outside this morning? | ねえ、今朝外を見た？
+Joel: How is the weather? | お天気どう？
 Mai: Yes! It's so sunny and hot outside. | うん！外はすごく晴れてて暑いよ。
 Joel: It's hot, it's hot! I think we need to drink lots of water today. | 暑い、暑い！今日はたくさん水を飲まなきゃね。
 Mai: Good idea. Maybe we can go swimming later? | いいね。あとでプールに行こうか？
 Joel: Yes! Let's swim! That sounds perfect for a hot day like this. | いいね！泳ごう！こんな暑い日にはぴったりだ。
 Mai: I can't wait. It's hot, but swimming makes it fun. | 待ちきれない。暑いけど、泳ぐと楽しくなるね。
-Joel: Hey kids, can you say it with me? "How's the weather? It's sunny and hot!" | ねえみんな、一緒に言ってみよう。「お天気どう？晴れてて暑いよ！」
+Joel: Hey kids, can you say it with me? | ねえみんな、一緒に言ってみよう。
+Joel: "How's the weather? | 「お天気どう？
+Joel: It's sunny and hot!" | 晴れてて暑いよ！」
 Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました！暑い、暑い！晴れてて暑い！
-Mai: Okay, let's go swimming and cool down! | よし、泳いで涼もう！
-Joel: See you tomorrow! Bye bye! | また明日！バイバイ！
+(Mai) Okay, let's go swimming and cool down! — ハイライト対象外（Maiの日本語解説の後に続く、音楽前のクロージング）
+(Joel) See you tomorrow! Bye bye! — ハイライト対象外
         `,
         talkDuration: 150, // 会話パート(①〜⑤)の目安秒数(2:30)。実際の収録に合わせて後で微調整可
         maiTalk: '今日は "It\'s hot!"（暑いね！）というフレーズを話したよ。あと "Let\'s swim!"（泳ごう！）も出てきたね。夏はお子さんが「暑い！」って感じる場面、結構多いと思うから、そんな時にぜひ真似して言ってみてください。',
@@ -3308,6 +3311,8 @@ const MORNING_TALK_AUDIO = {
 // ここに未登録の回、または配列の長さがセリフ数と合わない回は、
 // 自動的に旧来の文字数比率スケーリング方式（computeFtPhraseTimings）にフォールバックする。
 const MORNING_TALK_LINE_TIMINGS = {
+  // 2026-07-30 Audition実測（Mai計測）。4行目・10行目は台本側も分割して行数を合わせてある。
+  aug_w1_mon: [0.454, 8.188, 13.545, 19.022, 21.969, 23.505, 28.689, 36.105, 40.426, 47.121, 53.720, 59.282, 63.387, 73.166],
 };
 
 // Joel/Maiの口パクアバター画像（トーク系プロファイル）。3コマをループさせて話している間だけ動かす。
@@ -3498,10 +3503,15 @@ function computeFtPhraseTimings(phrases, totalDuration) {
 }
 
 // Audition実測のstart秒配列から、各行の[start, end)セグメントを作る。
-// endは「次の行のstart」、最後の行だけtotalDuration（会話パートの目安秒数 or 音声全体duration）を使う。
-function buildFtLineSegmentsFromStarts(starts, totalDuration) {
+// endは「次の行のstart」。最後の行だけ次のstartが無いので、セリフの文字数から自然な長さを推定する
+// （talkDuration/音声全体durationまで引き伸ばすと、実際にはもう次のパート（Maiの日本語解説や音楽）に
+// 進んでいるのに最後の英語セリフがいつまでもハイライトされ続けて見える、という不自然さが出るため）。
+function buildFtLineSegmentsFromStarts(starts, totalDuration, phrases) {
   return starts.map((s, i) => {
-    const end = i < starts.length - 1 ? starts[i + 1] : (isFinite(totalDuration) && totalDuration > s ? totalDuration : s + 4);
+    if (i < starts.length - 1) return { start: s, end: starts[i + 1] };
+    const lastText = (phrases && phrases[i] && phrases[i].en) || '';
+    const estimated = Math.max(FT_MIN_PHRASE_SEC, lastText.length / FT_CHARS_PER_SEC);
+    const end = isFinite(totalDuration) && totalDuration > s ? Math.min(totalDuration, s + estimated) : s + estimated;
     return { start: s, end };
   });
 }
@@ -3511,7 +3521,7 @@ function buildFtLineSegmentsFromStarts(starts, totalDuration) {
 function resolveFtPhraseTimings(audioKey, phrases, totalDuration) {
   const starts = MORNING_TALK_LINE_TIMINGS[audioKey];
   if (starts && starts.length === phrases.length) {
-    return buildFtLineSegmentsFromStarts(starts, totalDuration);
+    return buildFtLineSegmentsFromStarts(starts, totalDuration, phrases);
   }
   return computeFtPhraseTimings(phrases, totalDuration);
 }
@@ -3520,7 +3530,9 @@ function updateFtPhraseHighlight(t) {
   try {
     if (FT_DEBUG) renderFtDebugOverlay(t);
     if (!ftPhraseTimings.length) { setFtActiveSpeaker(null); updateFtBubble(null, null); return; }
-    let activeIdx = ftPhraseTimings.length - 1;
+    // 該当する区間が見つからない(＝最後の行の終了時刻も過ぎた)場合はactiveIdx=-1のまま。
+    // 「最後の行にずっと留まる」のではなく、以降は誰もハイライトしない(ふきだしも隠れる)状態にする。
+    let activeIdx = -1;
     for (let i = 0; i < ftPhraseTimings.length; i++) {
       if (t < ftPhraseTimings[i].end) { activeIdx = i; break; }
     }
@@ -3528,10 +3540,10 @@ function updateFtPhraseHighlight(t) {
       const row = document.getElementById('ftPhraseRow' + i);
       if (!row) return;
       row.classList.remove('active', 'done');
-      if (i < activeIdx) row.classList.add('done');
-      if (i === activeIdx) row.classList.add('active');
+      if (activeIdx === -1 || i < activeIdx) row.classList.add('done');
+      else if (i === activeIdx) row.classList.add('active');
     });
-    const activeLine = ftCurrentPhrases[activeIdx];
+    const activeLine = activeIdx !== -1 ? ftCurrentPhrases[activeIdx] : null;
     const speaker = activeLine ? activeLine.speaker : null;
     setFtActiveSpeaker(speaker);
     updateFtBubble(activeLine, speaker);
