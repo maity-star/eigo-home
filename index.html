@@ -1982,6 +1982,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <audio id="asoboTimerBgm" loop preload="none"></audio>
         <audio id="asoboVoicePlayer" preload="none"></audio>
         <audio id="asoboSePlayer" preload="none"></audio>
+        <audio id="asoboSePlayer2" preload="none"></audio>
       </div>
     </div>
 
@@ -2257,7 +2258,20 @@ function registerAudio(el) {
 // Active Time関連（HTML側に既存の<audio>要素）をここで登録
 registerAudio(document.getElementById('asoboTimerBgm'));
 registerAudio(document.getElementById('asoboVoicePlayer'));
-registerAudio(document.getElementById('asoboSePlayer'));
+// asoboSePlayer / asoboSePlayer2（探し物ミッション・なぞなぞの短い効果音チャンネル）は
+// あえて登録しない：preload="none"のため実際の再生開始（=playイベント発火）が
+// ネットワーク読み込み待ちで遅れることがあり、その遅延した瞬間に「他の音声を
+// 全部止める」仕様が発動してJoelの本編音声(voice)を巻き込んで中断させる事故
+// （AbortErrorの原因）があったため。効果音は短く、主役の音声と多少重なっても
+// 実害が小さい一方、主役の音声が止まる方が致命的なので、効果音側を対象外にする。
+// 効果音は答え音声(Joelの声)と重なることがあるため、音量を控えめにして
+// 音声の頭が聞こえなくならないようにする
+(function () {
+  const se = document.getElementById('asoboSePlayer');
+  const se2 = document.getElementById('asoboSePlayer2');
+  if (se) se.volume = 0.45;
+  if (se2) se2.volume = 0.5;
+})();
 
 // ========================
 // データ
@@ -2797,19 +2811,50 @@ let currentFindItem = null;
 function playAsoboSe(src) {
   const se = document.getElementById('asoboSePlayer');
   if (!se || !src) return;
-  try { se.src = src; se.currentTime = 0; se.play().catch(() => {}); } catch (e) {}
+  try {
+    let isSameSrc = false;
+    try { isSameSrc = se.src === new URL(src, window.location.href).href; } catch (e2) {}
+    if (isSameSrc) { se.currentTime = 0; } else { se.src = src; }
+    se.play().catch(() => {});
+  } catch (e) {}
 }
 
-function playAsoboVoice(src, onEnded) {
+function playAsoboSe2(src) {
+  const se = document.getElementById('asoboSePlayer2');
+  if (!se || !src) return;
+  try {
+    let isSameSrc = false;
+    try { isSameSrc = se.src === new URL(src, window.location.href).href; } catch (e2) {}
+    if (isSameSrc) { se.currentTime = 0; } else { se.src = src; }
+    se.play().catch(() => {});
+  } catch (e) {}
+}
+
+function playAsoboVoice(src, onEnded, onError) {
   const voice = document.getElementById('asoboVoicePlayer');
   if (!voice || !src) { if (onEnded) onEnded(); return; }
   voice.onended = null;
   try {
-    voice.src = src;
-    voice.currentTime = 0;
     if (onEnded) voice.onended = onEnded;
-    voice.play().catch(() => { if (onEnded) onEnded(); });
-  } catch (e) { if (onEnded) onEnded(); }
+    // 同じファイルを再生し直す時だけcurrentTimeを巻き戻す。
+    // 新しいsrcをセットした直後にcurrentTime=0を触ると、
+    // 読み込み未完了の状態でシークが発生し、直前のplay()が
+    // AbortErrorで中断されるブラウザのバグがあるため。
+    let isSameSrc = false;
+    try { isSameSrc = voice.src === new URL(src, window.location.href).href; } catch (e2) {}
+    if (isSameSrc) {
+      voice.currentTime = 0;
+    } else {
+      voice.src = src;
+    }
+    voice.play().catch((err) => {
+      if (onError) onError(err);
+      if (onEnded) onEnded();
+    });
+  } catch (err) {
+    if (onError) onError(err);
+    if (onEnded) onEnded();
+  }
 }
 
 function drawAsoboGacha() {
@@ -2913,11 +2958,8 @@ function drawAsoboRiddle() {
   const inner = document.getElementById('asoboRiddleResultInner');
   wrap.classList.add('show');
   inner.innerHTML = '<div class="asobo-riddle-thinking">考え中<span>.</span><span>.</span><span>.</span></div>';
-  playAsoboSe(ASOBO_SFX.riddleThinking);
   clearTimeout(asoboRiddleTimeout);
   asoboRiddleTimeout = setTimeout(() => {
-    const se = document.getElementById('asoboSePlayer');
-    try { se.pause(); se.currentTime = 0; } catch (e) {}
     const r = AT_RIDDLE[Math.floor(Math.random() * AT_RIDDLE.length)];
     currentRiddleItem = r;
     inner.innerHTML = `
@@ -2935,7 +2977,23 @@ function drawAsoboRiddle() {
         </div>
       </div>
     </div>`;
+    autoPlayAtRiddleQuestion(r);
   }, 800);
+}
+
+function autoPlayAtRiddleQuestion(r) {
+  const btn = document.querySelector('#asoboRiddleResultInner .at-riddle-play');
+  const setPlaying = (playing) => {
+    if (!btn) return;
+    btn.classList.toggle('playing', playing);
+    btn.textContent = playing ? '⏸' : '▶';
+  };
+  setPlaying(true);
+  if (r && r.audio) {
+    playAsoboVoice(r.audio, () => setPlaying(false));
+  } else {
+    setTimeout(() => setPlaying(false), 3500);
+  }
 }
 
 function toggleRiddleFlip(card) {
@@ -2950,11 +3008,13 @@ function toggleRiddleFlip(card) {
     playAsoboSe(ASOBO_SFX.riddleFlip);
     recordAsoboPlayed();
     if (currentRiddleItem) {
-      setTimeout(() => {
-        try { se.pause(); se.currentTime = 0; } catch (e) {}
-        playAsoboSe(ASOBO_SFX.riddleCorrect);
-        playAsoboVoice(currentRiddleItem.answerAudio);
-      }, 300);
+      playAsoboSe2(ASOBO_SFX.riddleCorrect);
+      const answerSrc = currentRiddleItem.answerAudio;
+      playAsoboVoice(answerSrc, null, (err) => {
+        // デバッグ用：原因特定できたらこのtoast表示は削除してOK
+        console.error('answerAudio再生失敗', answerSrc, err);
+        showToast('音声エラー: ' + (err && err.name ? err.name : 'unknown') + ' / ' + answerSrc.split('/').pop());
+      });
     }
   }
 }
@@ -3907,7 +3967,6 @@ const ASOBO_SFX = {
   gachaDraw: 'audio/asobo_audio/se_gacha_draw.mp3',
   timerBgm: 'audio/asobo_audio/bgm_timer_loop.mp3',
   timerEnd: 'audio/asobo_audio/se_timer_end.mp3',
-  riddleThinking: 'audio/asobo_audio/se_riddle_thinking.mp3',
   riddleFlip: 'audio/asobo_audio/se_riddle_flip.mp3',
   riddleCorrect: 'audio/asobo_audio/se_riddle_correct.mp3',
 };
