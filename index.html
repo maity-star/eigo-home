@@ -3619,7 +3619,10 @@ function updateFtBubble(line, speaker) {
 // ========================
 let ftActiveSpeaker = null; // 'joel' | 'mai' | null
 let ftMouthTimer = null;
-let ftMouthFrameIdx = 0;
+let ftMouthCycleIdx = 0;
+// 喋ってる間ずっと開けっぱなしにせず、closed→open1→closed→open2…と口を閉じる瞬間を挟んで
+// パクパクしてる感じを出す（開いた2コマの往復だけだと「動いてるけど閉じない」不自然さが出るため）。
+const FT_MOUTH_CYCLE = [0, 1, 0, 2];
 
 function setFtMouthFrame(speaker, frameIdx) {
   const frames = FT_MOUTH_FRAMES[speaker];
@@ -3638,16 +3641,17 @@ function setFtActiveSpeaker(speaker) {
     if (s !== speaker) setFtMouthFrame(s, 0);
   });
   ftActiveSpeaker = speaker;
-  ftMouthFrameIdx = 0;
+  ftMouthCycleIdx = 0;
+  if (speaker) setFtMouthFrame(speaker, FT_MOUTH_CYCLE[0]); // 話者が切り替わった瞬間は口閉じから始める
 }
 
-// 200msおきに口の開閉(1↔2番)をループさせる。喋っていない間は何もしない（＝口閉じで静止したまま）。
+// 220msおきに [closed, open1, closed, open2] を順番に回す。喋っていない間は何もしない（＝口閉じで静止したまま）。
 function startFtMouthLoop() {
   stopFtMouthLoop();
   ftMouthTimer = setInterval(() => {
     if (!ftActiveSpeaker) return;
-    ftMouthFrameIdx = ftMouthFrameIdx === 1 ? 2 : 1;
-    setFtMouthFrame(ftActiveSpeaker, ftMouthFrameIdx);
+    ftMouthCycleIdx = (ftMouthCycleIdx + 1) % FT_MOUTH_CYCLE.length;
+    setFtMouthFrame(ftActiveSpeaker, FT_MOUTH_CYCLE[ftMouthCycleIdx]);
   }, 220);
 }
 
