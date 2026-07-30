@@ -1966,7 +1966,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
               <div class="asobo-gacha-en" id="asoboGachaEn"></div>
               <div class="asobo-gacha-ja" id="asoboGachaJa"></div>
               <div class="asobo-gacha-play-row">
-                <button class="asobo-timer-btn" onclick="startAsoboTimer()">
+                <button class="asobo-timer-btn" onclick="toggleAsoboTimer()">
                   <svg class="asobo-timer-ring" viewBox="0 0 64 64">
                     <circle class="asobo-timer-ring-bg" cx="32" cy="32" r="28"/>
                     <circle class="asobo-timer-ring-fg" id="asoboTimerRingFg" cx="32" cy="32" r="28"/>
@@ -2830,8 +2830,11 @@ function drawAsoboGacha() {
   }
 }
 
+let asoboTimerRunning = false;
+
 function resetAsoboTimer() {
   clearTimeout(asoboTimerTimeout);
+  asoboTimerRunning = false;
   const ring = document.getElementById('asoboTimerRingFg');
   const icon = document.getElementById('asoboTimerPlayIcon');
   const joelLine = document.getElementById('asoboJoelLine');
@@ -2847,6 +2850,34 @@ function resetAsoboTimer() {
   try { voice.pause(); voice.onended = null; } catch (e) {}
 }
 
+function toggleAsoboTimer() {
+  if (asoboTimerRunning) {
+    // 再生中に再タップ → 60秒経過を待たず「見つけた」扱いで即完了処理
+    completeAsoboTimer();
+  } else {
+    startAsoboTimer();
+  }
+}
+
+function completeAsoboTimer() {
+  clearTimeout(asoboTimerTimeout);
+  asoboTimerRunning = false;
+  const icon = document.getElementById('asoboTimerPlayIcon');
+  const joelLine = document.getElementById('asoboJoelLine');
+  const bgm = document.getElementById('asoboTimerBgm');
+  const ring = document.getElementById('asoboTimerRingFg');
+  icon.classList.remove('playing');
+  icon.textContent = '▶';
+  joelLine.classList.add('show');
+  try { bgm.pause(); } catch (e) {}
+  // リングは完了扱いで満タン(残り0)にする
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = '0';
+  playAsoboSe(ASOBO_SFX.timerEnd);
+  playAsoboVoice(pickAtFindDoneAudio());
+  recordAsoboPlayed();
+}
+
 function startAsoboTimer() {
   const ring = document.getElementById('asoboTimerRingFg');
   const icon = document.getElementById('asoboTimerPlayIcon');
@@ -2860,18 +2891,14 @@ function startAsoboTimer() {
   ring.style.strokeDashoffset = String(ASOBO_TIMER_CIRCUMFERENCE);
   void ring.offsetWidth;
   clearTimeout(asoboTimerTimeout);
+  asoboTimerRunning = true;
   const startCountdown = () => {
+    if (!asoboTimerRunning) return; // 音声再生中にキャンセルされていたら何もしない
     ring.style.transition = 'stroke-dashoffset 60s linear';
     ring.style.strokeDashoffset = '0';
     try { bgm.src = ASOBO_SFX.timerBgm; bgm.currentTime = 0; bgm.play().catch(() => {}); } catch (e) {}
     asoboTimerTimeout = setTimeout(() => {
-      icon.classList.remove('playing');
-      icon.textContent = '▶';
-      joelLine.classList.add('show');
-      try { bgm.pause(); } catch (e) {}
-      playAsoboSe(ASOBO_SFX.timerEnd);
-      playAsoboVoice(AT_FIND_DONE_AUDIO);
-      recordAsoboPlayed();
+      completeAsoboTimer();
     }, 60000);
   };
   // 先にJoelのミッション音声を再生してからタイマー(BGM)をスタート
@@ -2889,6 +2916,8 @@ function drawAsoboRiddle() {
   playAsoboSe(ASOBO_SFX.riddleThinking);
   clearTimeout(asoboRiddleTimeout);
   asoboRiddleTimeout = setTimeout(() => {
+    const se = document.getElementById('asoboSePlayer');
+    try { se.pause(); se.currentTime = 0; } catch (e) {}
     const r = AT_RIDDLE[Math.floor(Math.random() * AT_RIDDLE.length)];
     currentRiddleItem = r;
     inner.innerHTML = `
@@ -2916,10 +2945,13 @@ function toggleRiddleFlip(card) {
     void card.offsetWidth;
     card.classList.add('at-riddle-flip-ring');
     setTimeout(() => card.classList.remove('at-riddle-flip-ring'), 650);
+    const se = document.getElementById('asoboSePlayer');
+    try { se.pause(); se.currentTime = 0; } catch (e) {}
     playAsoboSe(ASOBO_SFX.riddleFlip);
     recordAsoboPlayed();
     if (currentRiddleItem) {
       setTimeout(() => {
+        try { se.pause(); se.currentTime = 0; } catch (e) {}
         playAsoboSe(ASOBO_SFX.riddleCorrect);
         playAsoboVoice(currentRiddleItem.answerAudio);
       }, 300);
@@ -3851,7 +3883,19 @@ const AT_FIND = [
   { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう', audio: 'audio/asobo_audio/find_wear.mp3' },
   { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう', audio: 'audio/asobo_audio/find_read.mp3' },
 ];
-const AT_FIND_DONE_AUDIO = 'audio/asobo_audio/find_done.mp3';
+// 探し物ミッション完了ボイス(質問系+リアクション系ミックス、ランダム再生)
+// 収録待ち: find_done_1〜6.mp3 (Joel収録リストに追加済み)
+const AT_FIND_DONE_AUDIO = [
+  'audio/asobo_audio/find_done_1.mp3',
+  'audio/asobo_audio/find_done_2.mp3',
+  'audio/asobo_audio/find_done_3.mp3',
+  'audio/asobo_audio/find_done_4.mp3',
+  'audio/asobo_audio/find_done_5.mp3',
+  'audio/asobo_audio/find_done_6.mp3',
+];
+function pickAtFindDoneAudio() {
+  return AT_FIND_DONE_AUDIO[Math.floor(Math.random() * AT_FIND_DONE_AUDIO.length)];
+}
 const AT_RIDDLE = [
   { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？', answer: 'cow', audio: 'audio/asobo_audio/riddle_cow.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_cow.mp3' },
   { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？', answer: 'dog', audio: 'audio/asobo_audio/riddle_dog.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_dog.mp3' },
