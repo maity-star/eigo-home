@@ -32,7 +32,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .journey-pill.opened .journey-pill-stamp { opacity: 1; transform: scale(1) rotate(-8deg); }
 
 .journey-block .journey-full { display: block; }
-.journey-block .journey-mini-card { display: none; }
+.journey-pill.teaser-next { border-color: #F0B93D; box-shadow: 0 0 0 3px rgba(240,185,61,0.18); }
+.journey-pill.teaser-next .journey-pill-label { color: #92650C; }
+.journey-mini-card.teaser-next { border-color: #F0B93D; background: #FFF9EC; }
+.journey-mini-card.teaser-next::after { content: 'もうすぐ'; font-size: 9.5px; font-weight: 700; color: #92650C; background: #FCEBBD; border-radius: 6px; padding: 2px 6px; margin-left: 6px; flex-shrink: 0; }
+.journey-mini-card { display: none; }
 .journey-block.collapsed .journey-full { display: none; }
 .journey-block.collapsed .journey-mini-card { display: flex; }
 .journey-mini-card {
@@ -195,8 +199,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 
 /* タブ（Option A：塗りつぶしピル / セグメントコントロール） */
-.tab-bar { display: flex; gap: 4px; margin: 14px 20px 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
-.tab { flex: 1; text-align: center; padding: 9px 4px; font-size: 12.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-radius: 10px; transition: background .2s ease, color .2s ease, box-shadow .2s ease; }
+.tab-bar { display: flex; gap: 3px; margin: 14px 20px 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
+.tab { flex: 1; text-align: center; padding: 9px 2px; font-size: 11.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-radius: 10px; transition: background .2s ease, color .2s ease, box-shadow .2s ease; white-space: nowrap; }
 .tab.active { background: #6DB88A; color: #fff; box-shadow: 0 2px 6px rgba(109,184,138,0.35); }
 
 /* セクション */
@@ -629,6 +633,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   cursor: pointer;
 }
 
+/* 絵本レベル切り替え（とどらー/きんだー） */
+.book-level-toggle { display: none; gap: 4px; }
+.book-level-pill {
+  font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: 20px;
+  cursor: pointer; border: 1.5px solid transparent; color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.08); transition: all .15s ease;
+}
+.book-level-pill.active[data-level="todler"] { background: #F5D879; color: #6B4B00; }
+.book-level-pill.active[data-level="kinder"] { background: #6DB88A; color: #fff; }
+.month-lesson-top .book-level-toggle { gap: 6px; }
+.month-lesson-top .book-level-pill {
+  color: #6B7280; background: #F1EFE7; border: 1.5px solid #E5E7EB;
+}
+.month-lesson-top .book-level-pill.active[data-level="todler"] { background: #FCEBBD; color: #92650C; border-color: #F0B93D; }
+.month-lesson-top .book-level-pill.active[data-level="kinder"] { background: #EAF4EE; color: #2D6A4F; border-color: #6DB88A; }
+
 /* ページ表示エリア */
 .bv-page-area {
   flex: 1; position: relative; overflow: hidden;
@@ -983,10 +1003,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .asobo-hero-illust { width: 100%; display: block; }
 .asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; padding: 14px 20px 18px; }
 
+.shiru-hero { padding: 20px 20px 4px; }
+.shiru-hero-en { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #9CA3AF; text-transform: uppercase; }
+.shiru-hero-title { font-size: 17px; font-weight: 700; color: #111827; margin-top: 4px; }
+.shiru-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-top: 6px; }
+
 /* セクション見出し（1・2の縦並び） */
 .asobo-section { padding: 0 20px 20px; }
 
-.asobo-coming-soon {
+.asobo-coming-soon, .coming-soon-panel {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -995,9 +1020,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #F3ECDD;
   border-radius: 16px;
 }
-.asobo-coming-soon-avatar { width: 52px; height: auto; flex-shrink: 0; }
-.asobo-coming-soon-main { font-size: 12.5px; font-weight: 700; color: #2D6A4F; line-height: 1.5; }
-.asobo-coming-soon-sub { font-size: 11px; color: #8A9A8F; margin-top: 2px; }
+.asobo-coming-soon-avatar, .coming-soon-avatar { width: 52px; height: auto; flex-shrink: 0; }
+.asobo-coming-soon-main, .coming-soon-main { font-size: 12.5px; font-weight: 700; color: #2D6A4F; line-height: 1.5; }
+.asobo-coming-soon-sub, .coming-soon-sub { font-size: 11px; color: #8A9A8F; margin-top: 2px; }
 .asobo-section-card {
   background: #FCFBF7; border: 1px solid #F0E6D2;
   border-radius: 20px; padding: 18px;
@@ -1483,6 +1508,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 <div class="book-viewer-modal" id="bookViewerModal">
   <div class="bv-header">
     <div class="bv-title" id="bvTitle">Sunny Day!</div>
+    <div class="book-level-toggle" style="display:none;">
+      <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
+      <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
+    </div>
     <button class="bv-close" onclick="closeBookModal()">✕</button>
   </div>
   <div class="bv-page-area" id="bvPageArea">
@@ -1526,6 +1555,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="tab active" onclick="switchTab('home',this)">ホーム</div>
     <div class="tab" onclick="switchTab('playlist',this)">みる</div>
     <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
+    <div class="tab" onclick="switchTab('shiru',this)">しる</div>
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
   </div>
 
@@ -1541,10 +1571,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <span class="journey-pill-num">1</span>
           <span class="journey-pill-label">朝のラジオ</span>
         </div>
-        <div class="journey-pill" data-slot="day" onclick="focusJourneyBlock('day')">
-          <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
+        <div class="journey-pill" data-slot="evening" onclick="focusJourneyBlock('evening')">
+          <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_evening_star.png" alt=""></div>
           <span class="journey-pill-num">2</span>
-          <span class="journey-pill-label">今週のおたのしみ</span>
+          <span class="journey-pill-label">イブニングトーク</span>
         </div>
         <div class="journey-pill" data-slot="night" onclick="focusJourneyBlock('night')">
           <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
@@ -1705,17 +1735,99 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       </div><!-- /journey-full (morning) -->
     </div><!-- /journey-block jblock-morning -->
 
-    <!-- ② Weekly Pick（今週のおすすめ絵本） -->
-    <div class="journey-block" id="jblock-day" data-slot="day">
-      <div class="journey-mini-card" onclick="focusJourneyBlock('day')">
+    <!-- ② Evening Talk（帰宅後の一言＋Did you know?） -->
+    <div class="journey-block" id="jblock-evening" data-slot="evening">
+      <div class="journey-mini-card" onclick="focusJourneyBlock('evening')">
         <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_star.png" alt=""></div>
         <div class="journey-mini-text">
-          <div class="journey-mini-title">今週のおたのしみ</div>
-          <div class="journey-mini-sub">Weekly Pick・Row, Row, Row Your Boat</div>
+          <div class="journey-mini-title">イブニングトーク</div>
+          <div class="journey-mini-sub">今日どうだった？・Did you know?</div>
         </div>
         <div class="journey-mini-chev">▸</div>
       </div>
       <div class="journey-full">
+        <div class="section-header" style="margin:16px 20px 10px;">
+          <div class="section-header-en">Evening Talk</div>
+          <div class="section-header-ja">今日どうだった？</div>
+        </div>
+        <div class="coming-soon-panel">
+          <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
+          <div class="coming-soon-text">
+            <div class="coming-soon-main">まもなく配信予定！</div>
+            <div class="coming-soon-sub">帰ってきたら「今日どうだった？」の一言と、Joelの豆知識コーナー"Did you know?"が届くようになります。もう少しお待ちください♪</div>
+          </div>
+        </div>
+      </div><!-- /journey-full (evening) -->
+    </div><!-- /journey-block jblock-evening -->
+
+
+    <!-- ③ 今月の教材絵本 -->
+    <div class="journey-block" id="jblock-night" data-slot="night">
+      <div class="journey-mini-card" onclick="focusJourneyBlock('night')">
+        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_speak.png" alt=""></div>
+        <div class="journey-mini-text">
+          <div class="journey-mini-title">えほんタイム</div>
+          <div class="journey-mini-sub">Sunny Day!・Water &amp; Sun</div>
+        </div>
+        <div class="journey-mini-chev">▸</div>
+      </div>
+      <div class="journey-full">
+    <div class="month-hero-section">
+      <div class="month-lesson-wrap">
+        <div class="month-lesson-eyebrow">
+          <div class="month-eyebrow-label">
+            <span class="month-eyebrow-en">Monthly Book</span>
+            今月の教材絵本
+          </div>
+          <div class="month-eyebrow-line"></div>
+        </div>
+        <div class="month-lesson-card">
+          <div class="month-lesson-card-hero">
+            <img src="enverly_img.png" alt="Enverly">
+            <div class="month-hero-overlay">
+              <span class="month-hero-label">Joelと一緒に読もう</span>
+            </div>
+          </div>
+          <div class="month-lesson-top" style="padding-bottom:20px;">
+            <div class="month-theme-row">
+              <div class="month-theme-dot"></div>
+              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
+            </div>
+            <div class="month-title">Sunny Day!</div>
+            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
+            <div class="book-level-toggle" style="display:none; margin-bottom:12px;">
+              <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
+              <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
+            </div>
+            <div class="month-read-btn-row">
+              <button class="month-read-btn" onclick="openBookModal('listen')">
+                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Listening</span>
+                  <span class="month-read-btn-ja">聞く</span>
+                </span>
+              </button>
+              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
+                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
+                <span class="month-read-btn-text">
+                  <span class="month-read-btn-en">Talking</span>
+                  <span class="month-read-btn-ja">話す</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /month-hero-section -->
+      </div><!-- /journey-full (night) -->
+    </div><!-- /journey-block jblock-night -->
+
+    <!-- ブラウズエリア（ジャーニーとは独立・常時閲覧可、キュレーション系） -->
+    <div class="browse-area-eyebrow" style="margin:22px 20px 0;">
+      <div class="journey-eyebrow">気になったらのぞいてみる</div>
+    </div>
+
+    <!-- Weekly Pick（今週のおすすめ絵本） -->
     <div class="weekly-pick-standalone">
       <div class="weekly-pick-block">
         <div class="section-header" style="margin-bottom:10px;">
@@ -1785,65 +1897,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         </div>
       </div>
     </div><!-- /weekly-pick-standalone -->
-      </div><!-- /journey-full (day) -->
-    </div><!-- /journey-block jblock-day -->
-
-    <!-- ③ 今月の教材絵本 -->
-    <div class="journey-block" id="jblock-night" data-slot="night">
-      <div class="journey-mini-card" onclick="focusJourneyBlock('night')">
-        <div class="journey-mini-icon"><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_speak.png" alt=""></div>
-        <div class="journey-mini-text">
-          <div class="journey-mini-title">えほんタイム</div>
-          <div class="journey-mini-sub">Sunny Day!・Water &amp; Sun</div>
-        </div>
-        <div class="journey-mini-chev">▸</div>
-      </div>
-      <div class="journey-full">
-    <div class="month-hero-section">
-      <div class="month-lesson-wrap">
-        <div class="month-lesson-eyebrow">
-          <div class="month-eyebrow-label">
-            <span class="month-eyebrow-en">Monthly Book</span>
-            今月の教材絵本
-          </div>
-          <div class="month-eyebrow-line"></div>
-        </div>
-        <div class="month-lesson-card">
-          <div class="month-lesson-card-hero">
-            <img src="enverly_img.png" alt="Enverly">
-            <div class="month-hero-overlay">
-              <span class="month-hero-label">Joelと一緒に読もう</span>
-            </div>
-          </div>
-          <div class="month-lesson-top" style="padding-bottom:20px;">
-            <div class="month-theme-row">
-              <div class="month-theme-dot"></div>
-              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
-            </div>
-            <div class="month-title">Sunny Day!</div>
-            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
-            <div class="month-read-btn-row">
-              <button class="month-read-btn" onclick="openBookModal('listen')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Listening</span>
-                  <span class="month-read-btn-ja">聞く</span>
-                </span>
-              </button>
-              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Talking</span>
-                  <span class="month-read-btn-ja">話す</span>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /month-hero-section -->
-      </div><!-- /journey-full (night) -->
-    </div><!-- /journey-block jblock-night -->
 
     <!-- Monthly Playlist（独立セクション・3曲） -->
     <div class="monthly-playlist-section">
@@ -1854,6 +1907,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップでYouTubeが開きます。かけ流しはスピーカーから流すのがおすすめ。</p>
       <div id="monthlyPlaylist"></div>
     </div>
+
 
     <!-- サブスクバナー -->
     <div class="sub-banner">
@@ -1956,6 +2010,25 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <div class="asobo-coming-soon-text">
         <div class="asobo-coming-soon-main">今後も楽しいあそびを続々追加予定！</div>
         <div class="asobo-coming-soon-sub">お楽しみに♪</div>
+      </div>
+    </div>
+
+    <div style="height:24px;"></div>
+  </div>
+
+  <!-- しるタブ -->
+  <div id="tab-shiru" style="display:none;">
+    <div class="shiru-hero">
+      <div class="shiru-hero-en">Shiru</div>
+      <div class="shiru-hero-title">今日知ったこと、ためていく場所</div>
+      <div class="shiru-hero-sub">イブニングトークの"Did you know?"で出てきた豆知識が、ここにどんどん貯まっていくよ。</div>
+    </div>
+
+    <div class="coming-soon-panel" style="margin:16px 20px 0;">
+      <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
+      <div class="coming-soon-text">
+        <div class="coming-soon-main">今はまだ少ないけど、これからどんどん増えていくよ。</div>
+        <div class="coming-soon-sub">楽しみにしててね♪</div>
       </div>
     </div>
 
@@ -2565,7 +2638,7 @@ function showToast(msg) {
 // タブ
 // ========================
 function switchTab(name, el) {
-  ['home', 'playlist', 'asobo', 'routine'].forEach(t => {
+  ['home', 'playlist', 'asobo', 'shiru', 'routine'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2576,14 +2649,15 @@ function switchTab(name, el) {
 // ========================
 // トップ：今日のジャーニー（①②③ステップ誘導＋時間帯ナビ＋テーマ別スタンプ）
 // ========================
-const JOURNEY_SLOTS = ['morning', 'day', 'night'];
+const JOURNEY_SLOTS = ['morning', 'evening', 'night'];
 let journeyManualFocus = null; // ピル/ミニカードをタップして手動で開いたスロット（時間帯と無関係にいつでも開ける）
 
 function getJourneyTimeSlot() {
   const h = new Date().getHours();
   if (h >= 5 && h < 11) return 'morning';   // 5-11時：Morning Talk
-  if (h >= 11 && h < 17) return 'day';      // 11-17時：Weekly Pick
-  return 'night';                            // 17-5時：Monthly Book
+  if (h >= 11 && h < 17) return 'teaser';   // 11-17時：ジャーニーは空き時間帯（全ピルmini化＋eveningをティーザー強調）
+  if (h >= 17 && h < 19) return 'evening';  // 17-19時：Evening Talk
+  return 'night';                            // 19-5時：Monthly Book
 }
 
 function journeyStorageKey() {
@@ -2606,8 +2680,8 @@ function markJourneyOpened(slot) {
 
 function applyJourneyState() {
   const timeSlot = getJourneyTimeSlot();
-  markJourneyOpened(timeSlot); // 今の時間帯のコンテンツは自動的に「見た」扱い（スタンプ対象）
-  const activeSlot = journeyManualFocus || timeSlot;
+  if (timeSlot !== 'teaser') markJourneyOpened(timeSlot); // 今の時間帯のコンテンツは自動的に「見た」扱い（スタンプ対象）。teaser中は対象コンテンツがないので記録しない
+  const activeSlot = journeyManualFocus || (timeSlot === 'teaser' ? null : timeSlot);
   const opened = getJourneyOpenedSet();
 
   JOURNEY_SLOTS.forEach(slot => {
@@ -2617,7 +2691,11 @@ function applyJourneyState() {
     if (pill) {
       pill.classList.toggle('active', slot === activeSlot);
       pill.classList.toggle('opened', opened.has(slot));
+      // 11-17時・手動フォーカスなし：Evening Talkだけ「もうすぐ」ティーザー強調
+      pill.classList.toggle('teaser-next', !journeyManualFocus && timeSlot === 'teaser' && slot === 'evening');
     }
+    const mini = document.querySelector('.journey-block[data-slot="' + slot + '"] .journey-mini-card');
+    if (mini) mini.classList.toggle('teaser-next', !journeyManualFocus && timeSlot === 'teaser' && slot === 'evening');
   });
 }
 
@@ -2912,6 +2990,7 @@ const MORNING_TALK_WEEKS = {
         // 台本はJoel/Maiが普段書いてる「Joel: ...」「Mai: ...」形式のまま貼るだけでOK。
         // ①②③⑤の英語セリフだけが自動抽出されてカラオケハイライトの対象になる。
         // ④のMai日本語解説（プレフィックスなし）や見出し・ト書きは自然と対象外になる。
+        // 行末に「 | 日本語訳」を付けると、その行の日本語訳としてふきだし・フレーズ一覧の両方に反映される（任意・省略可）。
         rawScript: `
 Joel: Good morning, Mai! | おはよう、マイ！
 Mai: Good morning! Wow, it's already so hot today. | おはよう！わあ、今日はもうこんなに暑いね。
@@ -3960,17 +4039,61 @@ renderRoutineCatGrid();
 // ========================
 const BOOK_DATA = {
   title: 'Sunny Day!',
-  pages: [
-    { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
-    { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot.", talkPhrase: "It's hot.", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
-    { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday/sunnyday_03.mp3' },
-    { img: 'books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', talkPhrase: 'SPLASH!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
-    { img: 'books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", talkPhrase: "It's so fun!", audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
-    { img: 'books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', talkPhrase: 'So Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
-    { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', talkPhrase: null, talkPause: 6000, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
-    { img: 'books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
-  ]
+  levels: ['todler'], // この本が対応するレベル一覧。1つだけなら選択UIは自動的に非表示になる（9月号からtodler/kinderの2つに拡張予定）
+  pagesByLevel: {
+    todler: [
+      { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
+      { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot.", talkPhrase: "It's hot.", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
+      { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday/sunnyday_03.mp3' },
+      { img: 'books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', talkPhrase: 'SPLASH!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
+      { img: 'books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", talkPhrase: "It's so fun!", audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
+      { img: 'books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', talkPhrase: 'So Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
+      { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', talkPhrase: null, talkPause: 6000, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
+      { img: 'books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
+    ]
+  }
 };
+// BOOK_DATA.pages は「現在選択中のレベルのページ配列」を返すgetter。
+// 既存コード（BOOK_DATA.pages[...]・.length・.map など）は変更なしで動く。
+Object.defineProperty(BOOK_DATA, 'pages', {
+  get() {
+    return BOOK_DATA.pagesByLevel[getBookLevel()] || BOOK_DATA.pagesByLevel[BOOK_DATA.levels[0]];
+  }
+});
+
+// ========================
+// 絵本レベル（とどらー/きんだー）：端末単位で記憶、本ごとにlevelsが違っても安全にフォールバック
+// ========================
+const BOOK_LEVEL_LABELS = { todler: { label: 'とどらー', badgeClass: 'book-level-badge-todler' }, kinder: { label: 'きんだー', badgeClass: 'book-level-badge-kinder' } };
+const BOOK_LEVEL_STORAGE_KEY = 'enverly_book_level';
+
+function getBookLevel() {
+  let stored = null;
+  try { stored = localStorage.getItem(BOOK_LEVEL_STORAGE_KEY); } catch (e) {}
+  if (stored && BOOK_DATA.levels.includes(stored)) return stored;
+  return BOOK_DATA.levels[0]; // 記憶がない・非対応レベルの場合は先頭レベルにフォールバック
+}
+function setBookLevel(level) {
+  if (!BOOK_DATA.levels.includes(level)) return;
+  try { localStorage.setItem(BOOK_LEVEL_STORAGE_KEY, level); } catch (e) {}
+  bvCurrentPage = 0; // レベル切り替え時はページ構成が変わりうるので先頭に戻す
+  renderBookLevelToggles();
+  if (document.getElementById('bookViewerModal') && document.getElementById('bookViewerModal').classList.contains('open')) {
+    bvRenderPage();
+    bvBuildIndicator();
+  }
+}
+function renderBookLevelToggles() {
+  document.querySelectorAll('.book-level-toggle').forEach(wrap => {
+    if (BOOK_DATA.levels.length <= 1) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'flex';
+    const current = getBookLevel();
+    wrap.querySelectorAll('.book-level-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.dataset.level === current);
+    });
+  });
+}
+renderBookLevelToggles(); // 初期表示（この時点でBOOK_DATAは定義済み）
 
 // 絵本ビューワー共通の音声プレイヤー（Let's read / Let's talk 兼用）
 const bvAudioEl = new Audio();
