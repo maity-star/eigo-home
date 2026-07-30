@@ -3384,8 +3384,11 @@ Joel: See you next month! Bye bye!
     }
   },
 };
-const MORNING_TALK_WEEK_STARTS = { w1: '2026-08-03', w2: '2026-08-10', w3: '2026-08-17', w4: '2026-08-24' };
-const MORNING_TALK_WEEK_ORDER = ['w1', 'w2', 'w3', 'w4'];
+// 2026-07-30: 公開日を8月中旬に変更したため、配信は「W1(録音済み)→W3」の2週構成に短縮。
+// W2は今回未使用（後日別枠で使う可能性ありデータは残す）、W4は複数週の反復フレーズ回収が前提の
+// まとめ回のためW1単独では文脈が成立せず不使用。9月「Let's Eat!」の開始日はズラさない前提。
+const MORNING_TALK_WEEK_STARTS = { w1: '2026-08-17', w3: '2026-08-24' };
+const MORNING_TALK_WEEK_ORDER = ['w1', 'w3'];
 const DAY_KEY_BY_INDEX = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const DAY_LABEL_JA = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日' };
 const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
@@ -3488,10 +3491,11 @@ function renderMorningTalkContent() {
   const note = document.getElementById('ftReplayNote');
 
   if (info.isPreLaunch) {
-    // 配信開始日（8/3）より前：まだ何も放送していないので「近日公開」表示にする
+    // 配信開始日（内部的にはw1Start=8/17）より前：まだ何も放送していないので「近日公開」表示にする
+    // 外向けの文言はあえて具体日付を出さず「8月中旬予定」に統一（煽り防止・変更耐性のため）
     tag.textContent = '近日公開';
     tag.className = 'ft-status-tag replay';
-    note.textContent = '配信は8月3日（月）から毎朝お届けします';
+    note.textContent = '配信は8月中旬スタート予定です';
     note.style.display = 'block';
     document.getElementById('ftQuestion').textContent = 'Coming soon!';
     document.getElementById('ftQuestionJa').textContent = 'もうすぐ配信スタート';
