@@ -746,6 +746,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-book-overlay { position: absolute; bottom: 12px; left: 14px; right: 14px; z-index: 1; }
 .weekly-book-overlay-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
 .weekly-book-overlay-author { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+/* Weekly Pick 控えめ表示（サムネイル縮小版） */
+.weekly-pick-compact { display: flex; align-items: center; gap: 12px; padding: 12px; }
+.weekly-pick-thumb { position: relative; width: 56px; height: 56px; flex-shrink: 0; border-radius: 10px; overflow: hidden; background: #EDF6F1; }
+.weekly-pick-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+.weekly-pick-info { min-width: 0; }
+.weekly-pick-title { font-size: 13.5px; font-weight: 700; color: #111827; line-height: 1.3; }
+.weekly-pick-sub { font-size: 10.5px; color: #6B7280; margin-top: 2px; }
 .weekly-book-links { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .wbl-item { display: flex; align-items: center; gap: 11px; background: white; border-radius: 10px; padding: 10px 12px; text-decoration: none; border: 0.5px solid #E5E7EB; transition: background 0.15s; cursor: pointer; }
 .wbl-item:hover { background: #F0F5F2; border-color: #BBDAC8; }
@@ -1572,7 +1579,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <span class="journey-pill-label">朝のラジオ</span>
         </div>
         <div class="journey-pill" data-slot="evening" onclick="focusJourneyBlock('evening')">
-          <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_evening_star.png" alt=""></div>
+          <div class="journey-pill-stamp"><img src="illustrations/stamps/stamp_nav_common.png" alt=""></div>
           <span class="journey-pill-num">2</span>
           <span class="journey-pill-label">イブニングトーク</span>
         </div>
@@ -1837,13 +1844,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
         <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">寝る前や日本語の絵本と一緒に取り入れてみてね。毎日歌うと英語フレーズが自然に残っていくよ。</p>
         <div class="content-block" style="padding:0;">
           <div class="weekly-book-card" style="border:none;border-radius:0;background:transparent;">
-            <div class="weekly-book-cover-wrap">
-              <img src="books/aug/weekly_pick/row_row_row_your_boat.png" alt="Row, Row, Row Your Boat">
-              <div class="weekly-book-overlay">
-                <div>
-                  <div class="weekly-book-overlay-title">Row, Row, Row Your Boat</div>
-                  <div class="weekly-book-overlay-author">伝承童謡（Nursery Rhyme） · 1〜5歳 · 約1分</div>
-                </div>
+            <div class="weekly-pick-compact">
+              <div class="weekly-pick-thumb">
+                <img src="books/aug/weekly_pick/row_row_row_your_boat.png" alt="Row, Row, Row Your Boat">
+              </div>
+              <div class="weekly-pick-info">
+                <div class="weekly-pick-title">Row, Row, Row Your Boat</div>
+                <div class="weekly-pick-sub">伝承童謡（Nursery Rhyme） · 1〜5歳 · 約1分</div>
               </div>
             </div>
             <div class="weekly-book-links">
