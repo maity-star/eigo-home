@@ -1757,11 +1757,56 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <div class="section-header-en">Evening Talk</div>
           <div class="section-header-ja">今日どうだった？</div>
         </div>
-        <div class="coming-soon-panel">
-          <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
-          <div class="coming-soon-text">
-            <div class="coming-soon-main">まもなく配信予定！</div>
-            <div class="coming-soon-sub">帰ってきたら「今日どうだった？」の一言と、Joelの豆知識コーナー"Did you know?"が届くようになります。もう少しお待ちください♪</div>
+        <!-- Evening Talk（ポッドキャスト）／エンジンはMorning Talkと共通（parseMorningTalkScript等を再利用）。
+             会話音声の中にMaiの日本語解説・エンディングBGMまで一体化してミックス済みのため、
+             Morning Talkの「再生後に別音源へ自動切替」導線（ftAutoNext相当）はEvening Talkには無い。 -->
+        <div class="ft-wrap" id="etWrap">
+          <div class="ft-today-row">
+            <span class="ft-date-badge" id="etDateBadge"></span>
+            <span class="ft-status-tag" id="etStatusTag"></span>
+          </div>
+          <div class="ft-replay-note" id="etReplayNote" style="display:none;"></div>
+          <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">おかえりなさい。今日の「どうだった？」を、JoelとMaiのおしゃべりと一緒にどうぞ。<br>寝る前のひとときに、ぴったりの長さです。</p>
+          <div class="ft-card">
+            <div class="ft-card-top">
+              <div class="ft-question" id="etQuestion">"How was your day?"</div>
+              <div class="ft-question-ja" id="etQuestionJa">今日どうだった？</div>
+              <div class="ft-dialogue">
+                <div class="ft-avatar joel" id="etAvatarJoel">
+                  <img id="etAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Joel">
+                </div>
+                <div class="ft-bubble-wrap" id="etBubbleWrap">
+                  <div class="ft-bubble" id="etBubble">
+                    <div class="ft-bubble-en" id="etBubbleEn"></div>
+                    <div class="ft-bubble-ja" id="etBubbleJa"></div>
+                  </div>
+                </div>
+                <div class="ft-avatar mai" id="etAvatarMai">
+                  <img id="etAvatarMaiImg" src="illustrations/mai/mai_mouth_closed.png" alt="Mai">
+                </div>
+              </div>
+              <div class="ft-wave" id="etWave"></div>
+            </div>
+            <div class="ft-player-inner">
+              <div class="ft-play-row">
+                <button class="ft-play-btn" id="etPlayBtn" onclick="toggleEveningTalk()">
+                  <span id="etPlayIcon">▶</span>
+                </button>
+                <div class="ft-play-meta">
+                  <div class="ft-play-title" id="etPlayTitle">Mon · How was your day?</div>
+                  <div class="ft-play-len" id="etPlayLen">--:--</div>
+                </div>
+              </div>
+              <div class="ft-prog-row">
+                <div class="ft-prog-bar" onclick="seekEveningTalk(event)"><div class="ft-prog-fill" id="etFill"></div></div>
+                <div class="ft-prog-time" id="etTime">0:00</div>
+              </div>
+            </div>
+            <div class="ft-phrases-toggle" onclick="toggleEtPhrases()">
+              <div class="ft-phrases-label"><span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_bubble.png" alt="フレーズ"></span><span>今日のフレーズ</span></div>
+              <div class="ft-phrases-chevron" id="etPhrasesChevron">▼</div>
+            </div>
+            <div class="ft-phrases-body" id="etPhrasesBody"></div>
           </div>
         </div>
       </div><!-- /journey-full (evening) -->
@@ -3923,6 +3968,392 @@ function toggleFtPhrases() {
 }
 renderFtWave();
 initFtAudio();
+
+// ========================
+// Evening Talk（帰宅後の一言＋Did you know?）
+// エンジンはMorning Talkと共通（parseMorningTalkScript / computeFtPhraseTimings /
+// buildFtLineSegmentsFromStarts / fmtFtTime / FT_MOUTH_FRAMES 等はそのまま再利用）。
+// 会話音声の中にMaiの日本語解説・エンディングBGMまで一体化してミックス済みのため、
+// Morning Talkにあった「再生後に別音源へ自動切替」導線（ftAutoNext相当）はここには無い。
+// 週タイムライン（launch日・週の切り替わり）もMorning Talkと共有する前提（MORNING_TALK_WEEK_STARTS流用）。
+// ========================
+const EVENING_TALK_WEEKS = {
+  w1: {
+    theme: 'プール・暑い日',
+    days: {
+      mon: {
+        title: "How was your day?",
+        phrases: [{ en: "How was your day?", ja: "今日どうだった？" }, { en: "It was fun!", ja: "楽しかった！" }],
+        // Morning Talkと同じ台本形式。Mai:/Joel:の行だけが自動抽出されてカラオケハイライト対象になる。
+        rawScript: `
+Mai: Hey Joel! You're home! How was your day? | ねえJoel！おかえり！今日どうだった？
+Joel: It was great! I went swimming! | 最高だったよ！泳ぎに行ったんだ！
+Mai: Wow! That's perfect on a hot day like this. | わあ！こんな暑い日にはぴったりだね。
+Joel: Yeah. It was a splashy, swimmy kind of day. | うん。水しぶきと水泳の一日だったよ。
+Mai: That's so silly. Was it fun? | もう、おかしいなあ。楽しかった？
+Joel: It was fun! Let's say it together. It was fun! | 楽しかったよ！一緒に言ってみよう。It was fun！
+Joel: So Mai, what did you do today? | それでMai、今日は何したの？
+Mai: I went to the park! | 公園に行ったよ！
+Joel: How was it? | どうだった？
+Mai: It was tooooo hot. Even the ducks looked tired. It was not fun. | 暑すぎたよ〜。アヒルたちも疲れてるみたいだった。楽しくなかったよ。
+Joel: Let's say it together. It was not fun! | 一緒に言ってみよう。It was not fun！
+Joel: But hey Mai, did you know... a duck's feathers never get wet? Isn't that cool? | でもねMai、知ってた？アヒルの羽根って濡れないんだよ？すごくない？
+Mai: That's amazing! I didn't know that. | それはすごい！知らなかったよ。
+Joel: Let's learn more about ducks tomorrow! Quack quack | 明日はもっとアヒルのこと学ぼうね！クワックワッ
+Mai: That's so silly. | もう、おかしいなあ。
+Joel: OK. Time to say goodbye. Have a great night! | よし。そろそろバイバイの時間だね。良い夜を！
+Mai: Bye bye! | バイバイ！
+        `,
+        // ⚠️暫定値（Audition未実測）。会話パート（"Bye bye!"まで）の目安秒数——実測後、下のEVENING_TALK_LINE_TIMINGSに
+        // start秒配列を追加すればそちらが優先され、この値は使われなくなる（Morning Talkと同じ運用）。
+        talkDuration: 65,
+        maiTalk: '今日の会話でJoelが "It was fun!" って言ってたよね。逆にMaiは公園が暑すぎて "It was not fun." って答えてた——同じ"It was..."の形で、楽しかった/楽しくなかったが言えちゃうんだよね。<br><br>あと、アヒルの<strong>feathers</strong>(羽根)って単語も出てきたよ。覚えてる？さっきの"アヒルの羽根は濡れない"って話、面白かったよね。みんなはアヒルのおもちゃ持ってる？Duckのおもちゃを見つけたら、パパやママに"Look! a duck!"って言ってみてね。<br><br>お母さん、お父さん今日も1日お疲れ様です。寝る前に"It was fun!"か"It was not fun."だけ真似してみてください。例えば、『今日は幼稚園楽しかった？ダックのお話面白かった？』てお子さんに聞いて『うん』って答えたら『It was fun』だね！とか伝えてみたら、それだけで十分お子様の耳に英語が届いています。',
+      },
+      // tue/wed/thu/fri/以降はまだ台本・音源が未確定のため未登録。
+      // 追加する時はここにMorning Talkと同じ形式でdays.xxxを足すだけでOK（renderEveningTalkContentが自動対応）。
+    }
+  },
+};
+
+// 命名規則: audio/evening_talk_audio/[週]_[曜日].mp3 （Recording Timing Sheet記載のルールと一致）
+const EVENING_TALK_AUDIO = {
+  w1_mon: 'audio/evening_talk_audio/w1_mon.mp3',
+};
+
+// Morning TalkのMORNING_TALK_LINE_TIMINGSと同じ運用。Auditionで各セリフの開始秒を実測したら
+// ここに配列で追加する（例: w1_mon: [1.2, 6.8, ...]）。未登録の間は文字数比率スケーリングにフォールバックする。
+const EVENING_TALK_LINE_TIMINGS = {
+  // 2026-08-03 Audition実測（Mai計測、Recording Timing Sheetより転記）。
+  // rawScriptは全17行だが、末尾2行（Joel: OK. Time to say goodbye... / Mai: Bye bye!）は
+  // Maiの日本語解説パートと同様にハイライト対象外とする方針のため、あえて15個のみ登録。
+  // resolveEtPhraseTimings側で「配列長 <= セリフ行数」ならOKという判定に変更済みなので、
+  // 余った末尾2行は自動的にハイライトなし（音声だけ流れる）扱いになる。
+  w1_mon: [1.974, 5.664, 9.580, 14.325, 19.385, 22.348, 32.665, 36.255, 38.563, 40.332, 49.106, 58.882, 69.412, 73.554, 79.001],
+};
+
+// 完全一致(===)ではなく「実測データが行数以下ならOK」(<=)にしているのがポイント。
+// これにより、Maiの日本語解説パートや末尾の挨拶など「あえてハイライトさせたくない行」を
+// rawScript末尾に残したまま、実測した分の行だけ精密カラオケハイライトを効かせられる。
+// slice(0, starts.length)で余った末尾行をftCurrentPhrasesから切り離すので、
+// updateFtPhraseHighlight側は自動的にそれ以降を「ハイライトなし」として扱う。
+function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
+  const starts = EVENING_TALK_LINE_TIMINGS[audioKey];
+  if (starts && starts.length > 0 && starts.length <= phrases.length) {
+    return buildFtLineSegmentsFromStarts(starts, totalDuration, phrases.slice(0, starts.length));
+  }
+  return computeFtPhraseTimings(phrases, totalDuration);
+}
+
+// 今日表示すべき回を日付から自動解決（Morning Talkと同じ週タイムラインを共有）。
+// familypreview（?familypreview=w1_mon 等）にも対応——Morning Talkと同じURLパラメータ1つで、
+// Morning/Evening両方を同時にプレビューできる。
+function getTodayEveningTalkInfo() {
+  const now = new Date();
+  if (FAMILY_PREVIEW) {
+    const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
+    const { weekKey, dayKey } = parsed;
+    const weekData = EVENING_TALK_WEEKS[weekKey];
+    const content = (weekData && weekData.days[dayKey]) ? weekData.days[dayKey] : null;
+    const audioKey = content ? `${weekKey}_${dayKey}` : null;
+    const isNew = NEW_DAY_KEYS.includes(dayKey);
+    return { now, dayKey, weekKey, isNew, isWeekend: false, isPreLaunch: false, content, audioKey };
+  }
+  const dayKey = DAY_KEY_BY_INDEX[now.getDay()];
+  const weekKey = resolveMorningTalkWeekKey(now);
+  const isWeekend = (dayKey === 'sat' || dayKey === 'sun');
+  const contentDayKey = isWeekend ? 'fri' : dayKey; // 土日は金曜回の再放送（予定。金曜分が揃うまでは準備中表示）
+  const isNew = NEW_DAY_KEYS.includes(dayKey);
+  const weekData = EVENING_TALK_WEEKS[weekKey];
+  const content = (weekData && weekData.days[contentDayKey]) ? weekData.days[contentDayKey] : null;
+  const audioKey = content ? `${weekKey}_${contentDayKey}` : null;
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const isPreLaunch = now < w1Start;
+  return { now, dayKey, weekKey, isNew, isWeekend, isPreLaunch, content, audioKey };
+}
+
+function renderEveningTalkContent() {
+  const info = getTodayEveningTalkInfo();
+  const dateLabel = `${info.now.getMonth() + 1}/${info.now.getDate()}(${DAY_LABEL_JA[info.dayKey]})`;
+  const dateBadge = document.getElementById('etDateBadge');
+  if (dateBadge) dateBadge.textContent = dateLabel;
+
+  const tag = document.getElementById('etStatusTag');
+  const note = document.getElementById('etReplayNote');
+
+  // 配信開始日より前、またはその曜日の回がまだ用意できていない場合は「準備中」表示にする
+  // （＝丸ごとエラーにせず、日々の台本追加に合わせて自動で表示が切り替わる設計）
+  if (info.isPreLaunch || !info.content) {
+    if (tag) { tag.textContent = info.isPreLaunch ? '近日公開' : '準備中'; tag.className = 'ft-status-tag replay'; }
+    if (note) {
+      note.textContent = info.isPreLaunch ? '配信は8月中旬スタート予定です' : 'この曜日の回は準備中です';
+      note.style.display = 'block';
+    }
+    const q = document.getElementById('etQuestion'); if (q) q.textContent = 'Coming soon!';
+    const qj = document.getElementById('etQuestionJa'); if (qj) qj.textContent = 'もうすぐ配信スタート';
+    const pt = document.getElementById('etPlayTitle'); if (pt) pt.textContent = '配信準備中';
+    const body = document.getElementById('etPhrasesBody'); if (body) body.innerHTML = '';
+    etCurrentPhrases = [];
+    etPhraseTimings = [];
+    return null;
+  }
+
+  if (info.isNew) {
+    tag.textContent = 'NEW'; tag.className = 'ft-status-tag new'; note.style.display = 'none';
+  } else {
+    tag.className = 'ft-status-tag replay';
+    if (info.isWeekend) { tag.textContent = '今週の再放送'; note.textContent = '金曜日の回をもう一度お届け中'; }
+    else { tag.textContent = 'Maiのひとこと'; note.textContent = '会話パートは直近の回を再利用、Maiの新しい解説つき'; }
+    note.style.display = 'block';
+  }
+
+  const c = info.content;
+  document.getElementById('etQuestion').textContent = `"${c.title}"`;
+  document.getElementById('etQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
+  document.getElementById('etPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
+
+  // Morning Talkの共通パーサーをそのまま流用（Mai:/Joel:形式なのでこれで解析できる）
+  const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
+    : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
+
+  const body = document.getElementById('etPhrasesBody');
+  if (body) {
+    const rowsHtml = lines.map((l, i) => {
+      const speakerTag = l.speaker
+        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Joel' : 'Mai'}</span>` : '';
+      const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
+      return `<div class="ft-phrase-row" id="etPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
+    }).join('');
+    const maiTalkHtml = c.maiTalk
+      ? `<div class="ft-maitalk" id="etMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
+      : `<div class="ft-maitalk" id="etMaiTalk" style="display:none;"></div>`;
+    body.innerHTML = rowsHtml + maiTalkHtml;
+  }
+  etCurrentPhrases = lines;
+  etCurrentTalkDuration = c.talkDuration || null;
+  etPhraseTimings = [];
+
+  return info.audioKey;
+}
+
+let etCurrentPhrases = [];
+let etCurrentTalkDuration = null;
+let etPhraseTimings = [];
+let etCurrentAudioKey = null;
+let etActiveSpeaker = null;
+let etMouthTimer = null;
+let etMouthCycleIdx = 0;
+let etPlaying = false, etProg = 0;
+let etPhrasesManualToggle = false;
+
+function updateEtPhraseHighlight(t) {
+  try {
+    if (!etPhraseTimings.length) { setEtActiveSpeaker(null); updateEtBubble(null, null); return; }
+    let activeIdx = -1;
+    for (let i = 0; i < etPhraseTimings.length; i++) {
+      if (t < etPhraseTimings[i].end) { activeIdx = i; break; }
+    }
+    etPhraseTimings.forEach((_, i) => {
+      const row = document.getElementById('etPhraseRow' + i);
+      if (!row) return;
+      row.classList.remove('active', 'done');
+      if (activeIdx === -1 || i < activeIdx) row.classList.add('done');
+      else if (i === activeIdx) row.classList.add('active');
+    });
+    const activeLine = activeIdx !== -1 ? etCurrentPhrases[activeIdx] : null;
+    const speaker = activeLine ? activeLine.speaker : null;
+    setEtActiveSpeaker(speaker);
+    updateEtBubble(activeLine, speaker);
+  } catch (e) {
+    // Morning Talkと同じ方針：ここで落ちるとハイライトが止まって見えるため、握りつぶして次のtimeupdateに賭ける
+  }
+}
+
+function clearEtPhraseHighlight() {
+  etPhraseTimings.forEach((_, i) => {
+    const row = document.getElementById('etPhraseRow' + i);
+    if (row) row.classList.remove('active', 'done');
+  });
+  setEtActiveSpeaker(null);
+  updateEtBubble(null, null);
+}
+
+function updateEtBubble(line, speaker) {
+  const bubble = document.getElementById('etBubble');
+  const enEl = document.getElementById('etBubbleEn');
+  const jaEl = document.getElementById('etBubbleJa');
+  if (!bubble || !enEl || !jaEl) return;
+  if (!line || !speaker) { bubble.classList.remove('show'); return; }
+  enEl.textContent = `"${line.en}"`;
+  if (line.ja) { jaEl.textContent = line.ja; jaEl.style.display = ''; }
+  else { jaEl.textContent = ''; jaEl.style.display = 'none'; }
+  bubble.classList.toggle('from-mai', speaker === 'mai');
+  bubble.classList.remove('compact', 'compact2');
+  const totalLen = (line.en || '').length + (line.ja || '').length;
+  if (totalLen > 70) bubble.classList.add('compact2');
+  else if (totalLen > 45) bubble.classList.add('compact');
+  bubble.classList.add('show');
+}
+
+function setEtMouthFrame(speaker, frameIdx) {
+  const frames = FT_MOUTH_FRAMES[speaker];
+  if (!frames) return;
+  const img = document.getElementById(speaker === 'joel' ? 'etAvatarJoelImg' : 'etAvatarMaiImg');
+  if (img) img.src = frames[frameIdx] || frames[0];
+}
+
+function setEtActiveSpeaker(speaker) {
+  if (speaker !== 'joel' && speaker !== 'mai') speaker = null;
+  if (speaker === etActiveSpeaker) return;
+  ['joel', 'mai'].forEach(s => {
+    const avatarEl = document.getElementById(s === 'joel' ? 'etAvatarJoel' : 'etAvatarMai');
+    if (avatarEl) avatarEl.classList.toggle('speaking', s === speaker);
+    if (s !== speaker) setEtMouthFrame(s, 0);
+  });
+  etActiveSpeaker = speaker;
+  etMouthCycleIdx = 0;
+  if (speaker) setEtMouthFrame(speaker, FT_MOUTH_CYCLE[0]);
+}
+
+function startEtMouthLoop() {
+  stopEtMouthLoop();
+  etMouthTimer = setInterval(() => {
+    if (!etActiveSpeaker) return;
+    etMouthCycleIdx = (etMouthCycleIdx + 1) % FT_MOUTH_CYCLE.length;
+    setEtMouthFrame(etActiveSpeaker, FT_MOUTH_CYCLE[etMouthCycleIdx]);
+  }, 220);
+}
+function stopEtMouthLoop() {
+  if (etMouthTimer) { clearInterval(etMouthTimer); etMouthTimer = null; }
+}
+
+function openEtPhrasesAuto() {
+  if (etPhrasesManualToggle) return;
+  const b = document.getElementById('etPhrasesBody');
+  const c = document.getElementById('etPhrasesChevron');
+  if (!b || !c) return;
+  b.classList.add('open'); c.classList.add('open');
+}
+
+const etAudioEl = new Audio();
+registerAudio(etAudioEl);
+let etAudioLoaded = false;
+
+function initEtAudio() {
+  etCurrentAudioKey = renderEveningTalkContent();
+  const src = EVENING_TALK_AUDIO[etCurrentAudioKey];
+  const playBtn = document.getElementById('etPlayBtn');
+  if (!src) {
+    if (playBtn) { playBtn.disabled = true; playBtn.style.opacity = '0.4'; }
+    const lenEl = document.getElementById('etPlayLen');
+    if (lenEl) lenEl.textContent = '収録準備中';
+    return;
+  }
+  if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  etAudioEl.src = src;
+  etAudioEl.addEventListener('loadedmetadata', () => {
+    etAudioLoaded = true;
+    const lenEl = document.getElementById('etPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(etAudioEl.duration);
+    etPhraseTimings = resolveEtPhraseTimings(etCurrentAudioKey, etCurrentPhrases, etCurrentTalkDuration || etAudioEl.duration);
+  });
+  etAudioEl.addEventListener('durationchange', () => {
+    if (!isFinite(etAudioEl.duration)) return;
+    const lenEl = document.getElementById('etPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(etAudioEl.duration);
+    etPhraseTimings = resolveEtPhraseTimings(etCurrentAudioKey, etCurrentPhrases, etCurrentTalkDuration || etAudioEl.duration);
+  });
+  etAudioEl.addEventListener('timeupdate', () => {
+    if (!etAudioEl.duration) return;
+    etProg = (etAudioEl.currentTime / etAudioEl.duration) * 100;
+    const fill = document.getElementById('etFill'); if (fill) fill.style.width = etProg.toFixed(1) + '%';
+    updateEtWaveProgress(etProg);
+    const timeEl = document.getElementById('etTime'); if (timeEl) timeEl.textContent = fmtFtTime(etAudioEl.currentTime);
+    updateEtPhraseHighlight(etAudioEl.currentTime);
+  });
+  etAudioEl.addEventListener('ended', () => {
+    etPlaying = false;
+    setEtWavePlaying(false);
+    const icon = document.getElementById('etPlayIcon'); if (icon) icon.textContent = '▶';
+    clearEtPhraseHighlight();
+    stopEtMouthLoop();
+    bumpLifetimeStat('eveningTalkPlays');
+  });
+  etAudioEl.addEventListener('error', () => {
+    etPlaying = false;
+    setEtWavePlaying(false);
+    const icon = document.getElementById('etPlayIcon'); if (icon) icon.textContent = '▶';
+    showToast('音声の読み込みに失敗しました');
+  });
+}
+
+function renderEtWave() {
+  const wave = document.getElementById('etWave');
+  if (!wave) return;
+  let bars = '';
+  for (let i = 0; i < 40; i++) {
+    const h = 6 + Math.round(Math.sin(i * 0.7) * 6 + Math.random() * 10);
+    const delay = (Math.random() * 0.9).toFixed(2);
+    bars += `<div class="ft-wave-bar" style="height:${Math.max(4, h)}px; animation-delay:${delay}s;"></div>`;
+  }
+  wave.innerHTML = bars;
+}
+function updateEtWaveProgress(pct) {
+  const wave = document.getElementById('etWave');
+  if (!wave) return;
+  const bars = wave.querySelectorAll('.ft-wave-bar');
+  const playedCount = Math.round((pct / 100) * bars.length);
+  bars.forEach((bar, i) => bar.classList.toggle('played', i < playedCount));
+}
+function setEtWavePlaying(isPlaying) {
+  const wave = document.getElementById('etWave');
+  if (wave) wave.classList.toggle('is-playing', isPlaying);
+}
+
+function toggleEveningTalk() {
+  if (!EVENING_TALK_AUDIO[etCurrentAudioKey]) return; // 未収録は何もしない
+  activeMode = 'eveningtalk';
+  etPlaying = !etPlaying;
+  const icon = document.getElementById('etPlayIcon');
+  setEtWavePlaying(etPlaying);
+  if (etPlaying) {
+    icon.textContent = '⏸';
+    openEtPhrasesAuto();
+    startEtMouthLoop();
+    const p = etAudioEl.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        etPlaying = false;
+        icon.textContent = '▶';
+        setEtWavePlaying(false);
+        stopEtMouthLoop();
+        showToast('再生できませんでした');
+      });
+    }
+  } else {
+    icon.textContent = '▶';
+    etAudioEl.pause();
+    stopEtMouthLoop();
+  }
+}
+
+function seekEveningTalk(e) {
+  if (!EVENING_TALK_AUDIO[etCurrentAudioKey] || !etAudioEl.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+  etAudioEl.currentTime = (pct / 100) * etAudioEl.duration;
+  etProg = pct;
+  const fill = document.getElementById('etFill'); if (fill) fill.style.width = etProg + '%';
+  updateEtWaveProgress(etProg);
+}
+
+function toggleEtPhrases() {
+  etPhrasesManualToggle = true;
+  const b = document.getElementById('etPhrasesBody'); const c = document.getElementById('etPhrasesChevron');
+  const o = b.classList.toggle('open'); c.classList.toggle('open', o);
+}
+
+renderEtWave();
+initEtAudio();
 
 // ========================
 // Active Time（探し物ミッション／なぞなぞクイズ）
