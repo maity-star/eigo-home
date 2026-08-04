@@ -57,30 +57,16 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .joel-line-text .ja { font-size: 11px; color: #9CA3AF; }
 
 /* 週間スタンプカード（紙のスタンプカード風・きょうのとびら直下） */
-.stamp-card-panel {
-  margin: 14px 20px 0;
-  padding: 22px 18px 16px;
+/* スタンプカード：設定＞あゆみ内に常設表示する「今のカード」 */
+.stamp-card-caption { font-size: 11.5px; font-weight: 700; color: #6B7280; margin: 4px 0 8px; }
+.stamp-card-slots-wrap {
   background-color: #F3ECDD;
   background-image:
     radial-gradient(circle at 20% 30%, rgba(0,0,0,0.015) 0%, transparent 40%),
-    radial-gradient(circle at 70% 60%, rgba(0,0,0,0.015) 0%, transparent 40%),
-    radial-gradient(circle at 40% 80%, rgba(0,0,0,0.012) 0%, transparent 35%);
-  border-radius: 18px 20px 17px 19px;
-  box-shadow: 0 8px 20px rgba(61,107,79,0.10), 0 2px 6px rgba(61,107,79,0.06);
-  position: relative;
-}
-.stamp-card-panel::before {
-  content: "スタンプカード";
-  position: absolute;
-  top: -10px;
-  left: 20px;
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #8A9A8F;
-  background: #F7F5F0;
-  padding: 2px 10px;
-  border-radius: 10px;
-  letter-spacing: 0.03em;
+    radial-gradient(circle at 70% 60%, rgba(0,0,0,0.015) 0%, transparent 40%);
+  border-radius: 16px;
+  padding: 16px 14px 12px;
+  margin-bottom: 20px;
 }
 .stamp-card-slots { display: flex; justify-content: center; gap: 10px; }
 .stamp-card-slot {
@@ -99,8 +85,31 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .stamp-card-slot.pop { animation: stampCardPop 0.5s cubic-bezier(.34,1.56,.64,1); }
 @keyframes stampCardPop { 0% { transform: scale(0); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
 .stamp-card-footer { text-align: center; font-size: 10.5px; color: #8A9A8F; margin-top: 10px; letter-spacing: 0.01em; }
-.stamp-card-ayumi-link { text-align: center; font-size: 10.5px; color: #2D6A4F; font-weight: 600; margin-top: 8px; cursor: pointer; opacity: 0.75; }
-.stamp-card-ayumi-link:active { opacity: 1; }
+
+/* スタンプ獲得の瞬間だけ、今いる場所の近くにポンと出て消えるトースト（ご褒美感の主役はこちら） */
+.stamp-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 100px;
+  transform: translate(-50%, 14px);
+  background: #2D6A4F;
+  color: #fff;
+  padding: 8px 20px 8px 8px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.24);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.stamp-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.stamp-toast img { width: 28px; height: 28px; border-radius: 50%; background: #fff; padding: 3px; box-sizing: border-box; flex-shrink: 0; }
 
 /* 5マス達成時のお祝いポップアップ */
 .stamp-celebrate-overlay {
@@ -1586,12 +1595,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       </div>
     </div>
 
-    <!-- 週間スタンプカード -->
-    <div class="stamp-card-panel">
-      <div class="stamp-card-slots" id="stampCardSlots"></div>
-      <div class="stamp-card-footer">絵本のLet's talk・きょうのとびら・あそぼ、どれか1つで1日1つゲット</div>
-      <div class="stamp-card-ayumi-link" onclick="openSettingsModal()">これまでのあゆみを見る ＞</div>
-    </div>
+    <!-- 週間スタンプカードはトップ常設をやめ、設定＞あゆみに移動（獲得の瞬間はstamp-toastで代替） -->
 
     <!-- ① 今日のEnverly（曜日でMorning Talk/Active Time自動切替・週ストリップ内蔵） -->
     <div class="journey-block" id="jblock-morning" data-slot="morning">
@@ -2065,6 +2069,12 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 </div><!-- /mainApp -->
 
+<!-- スタンプ獲得の瞬間トースト（常設カードの代わりに、今いる場所の近くで一瞬だけ知らせる） -->
+<div class="stamp-toast" id="stampToast">
+  <img id="stampToastImg" src="illustrations/stamps/stamp_week_01.png" alt="">
+  <span id="stampToastText">ゲット！</span>
+</div>
+
 <!-- 設定モーダル -->
 <!-- 週間スタンプカード達成お祝い -->
 <div class="stamp-celebrate-overlay" id="stampCelebrateOverlay">
@@ -2088,6 +2098,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     <div class="settings-block-label">あゆみ</div>
     <div class="ayumi-badge" id="ayumiBadge"></div>
+
+    <div class="stamp-card-caption">今のカード（5個で完成）</div>
+    <div class="stamp-card-slots-wrap">
+      <div class="stamp-card-slots" id="stampCardSlots"></div>
+      <div class="stamp-card-footer">絵本のLet's talk・きょうのとびら・あそぼ、どれか1つで1日1つゲット</div>
+    </div>
+
     <div class="ayumi-grid">
       <div class="ayumi-card">
         <div class="ayumi-num" id="lifetimeTotalStamps">0</div>
@@ -2428,6 +2445,7 @@ function earnStamp(category) {
   state.count += 1;
   saveStampCardState(state);
   bumpLifetimeStat('totalStamps');
+  showStampToast(state.count);
   renderStampCard(true);
   if (state.count >= STAMP_CARD_MAX && !state.celebrated) {
     state.celebrated = true;
@@ -2435,6 +2453,19 @@ function earnStamp(category) {
     bumpLifetimeStat('cardsCompleted');
     setTimeout(() => openStampCelebrate(), 550);
   }
+}
+
+let stampToastTimer = null;
+function showStampToast(count) {
+  const el = document.getElementById('stampToast');
+  if (!el) return;
+  const img = document.getElementById('stampToastImg');
+  const text = document.getElementById('stampToastText');
+  if (img) img.src = `illustrations/stamps/stamp_week_0${count}.png`;
+  if (text) text.textContent = count >= STAMP_CARD_MAX ? 'カード完成！' : 'スタンプゲット！';
+  el.classList.add('show');
+  clearTimeout(stampToastTimer);
+  stampToastTimer = setTimeout(() => el.classList.remove('show'), 1600);
 }
 
 // 「次のカードをはじめる」：完成したカードを手動で次に進める（自動リセットはしない）
@@ -2793,6 +2824,7 @@ applyJourneyState();
 // ========================
 function openSettingsModal() {
   renderLifetimeStats();
+  renderStampCard();
   document.getElementById('settingsModal').classList.add('open');
 }
 function closeSettingsModal() {
