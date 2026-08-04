@@ -18,7 +18,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    今日のジャーニー（①②③ステップ誘導＋時間帯ナビ）
 ============================== */
-.journey-nav { margin: 16px 20px 0; }
+.journey-nav {
+  margin: 16px 20px 0;
+  border: 1.5px solid #E7E2D8;
+  border-radius: 20px;
+  background: #FFFFFF;
+  padding: 14px 14px 16px;
+}
 .journey-eyebrow { font-size: 11px; font-weight: 600; color: #9CA3AF; margin-bottom: 8px; letter-spacing: 0.02em; }
 
 /* Now Playing型：大きく見せるカード＝時間帯でMorning/Evening自動交代、タップで手動スワップも可 */
@@ -41,20 +47,20 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* えほんタイムだけはこの仕組みの対象外＝常に展開（collapsedクラス自体を付与しない） */
 
 /* Joelのひとこと（ジャーニーナビ直下） */
-.joel-line-wrap { display: flex; align-items: flex-start; gap: 10px; margin: 14px 20px 0; }
-.joel-line-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1.5px solid #BBDAC8; }
+.joel-line-wrap { display: flex; align-items: center; gap: 8px; margin: 10px 20px 0; }
+.joel-line-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1px solid #BBDAC8; }
 .joel-line-bubble {
   position: relative;
   flex: 1;
-  background: #fff;
-  border: 1.5px solid #E5E7EB;
-  border-radius: 4px 16px 16px 16px;
-  padding: 10px 14px;
-  box-shadow: 0 2px 8px rgba(45,106,79,0.06);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
-.joel-line-text { font-size: 12px; color: #374151; line-height: 1.6; }
-.joel-line-text .en { font-weight: 600; color: #2D6A4F; display: block; margin-bottom: 2px; }
-.joel-line-text .ja { font-size: 11px; color: #9CA3AF; }
+.joel-line-text { font-size: 10.5px; color: #9CA3AF; line-height: 1.4; }
+.joel-line-text .en { font-weight: 600; color: #6B8577; display: block; margin-bottom: 0; }
+.joel-line-text .ja { font-size: 9.5px; color: #C2C7CC; }
 
 /* 週間スタンプカード（紙のスタンプカード風・きょうのとびら直下） */
 /* スタンプカード：設定＞あゆみ内に常設表示する「今のカード」 */
@@ -235,10 +241,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
    Weekly Mission ラッパー＋見出し（絵本セクションと同じ構造）
 ============================== */
 .weekly-mission-wrap { margin: 16px 20px 0; }
-.weekly-mission-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.weekly-mission-label { font-size: 19px; font-weight: 600; color: #2D6A4F; white-space: nowrap; letter-spacing: -0.3px; }
-.weekly-mission-label-ja { font-size: 10px; color: #6DB88A; font-weight: 600; margin-left: 1px; }
-.weekly-mission-line { flex: 1; height: 1px; background: #E5E7EB; }
 /* パネル本体（絵本の month-lesson-card に相当） */
 .weekly-mission-panel {
   background: #F5FAF7;
@@ -261,17 +263,61 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 /* コンテンツエリア */
 .weekly-mission-content { padding: 14px 16px 20px; }
-.weekly-mission-panel .ft-wrap { margin: 20px 0 0; }
+.weekly-mission-panel .ft-wrap { margin: 20px 0 0; border-color: rgba(45,106,79,0.16); }
 .weekly-mission-panel .at-wrap { margin: 20px 0 0; }
-.weekly-mission-panel .ft-eyebrow-label { color: #2D6A4F; }
 .weekly-mission-panel .at-eyebrow-label { color: #2D6A4F; }
-.weekly-mission-panel .ft-eyebrow-line,
 .weekly-mission-panel .at-eyebrow-line { background: rgba(45,106,79,0.18); }
 .weekly-mission-panel .ft-card { box-shadow: 0 6px 18px rgba(45,106,79,0.10); }
 .weekly-mission-panel p { color: #4D7D63 !important; }
+/* standalone文脈（Evening TalkのようにWeekly Missionパネルの外＝白背景のft-wrap内）ではヒーロー下部のフェードを白に合わせる */
+.talk-hero.standalone::after {
+  background: linear-gradient(to bottom, transparent 60%, rgba(255,255,255,0.6) 82%, rgba(255,255,255,1.0) 100%);
+}
 
 /* Weekly Pick ブロック（Weekly Mission内） */
 .weekly-pick-block { margin-top: 22px; padding-top: 20px; border-top: 1px solid #BBDAC8; }
+
+/* ==============================
+   Talk見出し（Morning talk / Evening talk 共通・たたき台デザイン）
+   バナー：逆三角形2枚（各90%不透明度）を重ねてヒーロー画像上に配置。重なった部分が濃くなる
+   日付バッジ：丸2つを重ねたコイン風バッジ（月の小円＋日付の大円）
+============================== */
+.talk-hero-banner { position: absolute; top: 0; left: 0; width: 100%; height: 54%; z-index: 2; overflow: visible; }
+.talk-hero-tri {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: #6AA17F; opacity: 0.9;
+}
+.talk-hero-tri.tri1 { clip-path: polygon(0% 0%, 100% 0%, 0% 88%); }
+.talk-hero-tri.tri2 { clip-path: polygon(0% 0%, 100% 0%, 100% 88%); }
+.talk-hero-banner.evening .talk-hero-tri { background: #3E4F7A; }
+.talk-hero-text {
+  position: relative; z-index: 3;
+  padding: 22px 0 0 20px;
+  max-width: 68%;
+}
+.talk-hero-title { font-family: Georgia, 'Times New Roman', serif; font-size: 25px; font-weight: 600; color: #fff; line-height: 1.2; text-shadow: 0 1px 6px rgba(0,0,0,0.12); }
+.talk-hero-sub { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.88); margin-top: 4px; }
+
+.talk-datehead { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.talk-datebadge { flex-shrink: 0; width: 60px; display: flex; flex-direction: column; align-items: center; }
+.talk-datebadge-month {
+  width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #E5E7EB;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9.5px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.3px;
+  position: relative; z-index: 2; margin-bottom: -10px;
+}
+.talk-datebadge-daycircle {
+  width: 56px; height: 56px; border-radius: 50%; background: #fff; border: 1.5px solid #E5E7EB;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.talk-datebadge.evening .talk-datebadge-month,
+.talk-datebadge.evening .talk-datebadge-daycircle { border-color: rgba(62,79,122,0.28); }
+.talk-datebadge-day { font-size: 21px; font-weight: 800; color: #1F2937; line-height: 1; }
+.talk-datebadge-dow { font-size: 8px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.8px; margin-top: 1px; }
+.talk-datehead-text { flex: 1; min-width: 0; }
+.talk-datehead-title { font-size: 20px; font-weight: 700; color: #1F2937; line-height: 1.3; margin-bottom: 6px; }
+
 
 /* ==============================
    Monthly Playlist セクション（独立）
@@ -385,13 +431,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    Family Talk（ポッドキャスト・プレミアム限定）
 ============================== */
-.ft-wrap { margin: 22px 20px 0; }
-.ft-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.ft-eyebrow-label { font-size: 19px; font-weight: 600; letter-spacing: -0.3px; text-transform: none; color: #B8860B; display: flex; align-items: center; gap: 7px; }
-.ft-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
-.ft-eyebrow-sub { font-size: 11px; color: #9CA3AF; margin: -6px 0 12px; }
-.ft-today-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.ft-date-badge { font-size: 14px; font-weight: 700; color: #4D7D63; }
+.ft-wrap {
+  margin: 22px 20px 0;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 20px;
+  background: #FFFFFF;
+  padding: 16px 16px 18px;
+}
 .ft-status-tag { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
 .ft-status-tag.new { background: #E8A33D; color: #fff; }
 .ft-status-tag.replay { background: rgba(77,125,99,0.12); color: #4D7D63; }
@@ -1571,7 +1617,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="journey-nav">
       <div class="journey-eyebrow">きょうのとびら</div>
       <div class="journey-now-big" id="journeyNowBig" onclick="focusJourneyBlock(journeyBigSlot())">
-        <div class="journey-now-eyebrow"><span class="journey-now-dot"></span><span id="journeyNowBigLabel">朝のラジオ</span></div>
+        <div class="journey-now-eyebrow"><span class="journey-now-dot"></span><span id="journeyNowBigLabel">モーニングトーク</span></div>
         <div class="journey-now-title" id="journeyNowBigTitle"></div>
         <div class="journey-now-sub" id="journeyNowBigSub"></div>
       </div>
@@ -1601,26 +1647,34 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="journey-block" id="jblock-morning" data-slot="morning">
       <div class="journey-full">
     <div class="weekly-mission-wrap">
-      <div class="weekly-mission-eyebrow">
-        <div class="weekly-mission-label">Weekly Mission <span class="weekly-mission-label-ja">今週のプログラム</span></div>
-        <div class="weekly-mission-line"></div>
-      </div>
       <div class="weekly-mission-panel">
-        <div class="weekly-mission-hero">
-          <img src="weekly_mission_hero.png" alt="Weekly Mission">
+        <div class="weekly-mission-hero talk-hero">
+          <img id="ftHeroImg" src="illustrations/talks/morning_talk_hero.png" alt="Morning talk">
+          <div class="talk-hero-banner">
+            <div class="talk-hero-tri tri1"></div>
+            <div class="talk-hero-tri tri2"></div>
+            <div class="talk-hero-text">
+              <div class="talk-hero-title">Morning talk</div>
+              <div class="talk-hero-sub">朝のひとときに</div>
+            </div>
+          </div>
         </div>
         <div class="weekly-mission-content">
 
       <!-- Morning Talk（ポッドキャスト・プレミアム限定）／毎日表示・新作は月・水・金 -->
       <div class="ft-wrap" id="ftWrap">
-        <div class="ft-eyebrow">
-          <div class="ft-eyebrow-label"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_mic.png" alt="マイク"> Morning Talk</div>
-          <div class="ft-eyebrow-line"></div>
-        </div>
-        <div class="ft-eyebrow-sub">朝のラジオ</div>
-        <div class="ft-today-row">
-          <span class="ft-date-badge" id="ftDateBadge"></span>
-          <span class="ft-status-tag" id="ftStatusTag"></span>
+        <div class="talk-datehead">
+          <div class="talk-datebadge">
+            <div class="talk-datebadge-month" id="ftDateMonth">--</div>
+            <div class="talk-datebadge-daycircle">
+              <div class="talk-datebadge-day" id="ftDateDay">--</div>
+              <div class="talk-datebadge-dow" id="ftDateDow">---</div>
+            </div>
+          </div>
+          <div class="talk-datehead-text">
+            <div class="talk-datehead-title" id="ftHeaderTitle">タイトル</div>
+            <span class="ft-status-tag" id="ftStatusTag"></span>
+          </div>
         </div>
         <div class="ft-replay-note" id="ftReplayNote" style="display:none;"></div>
         <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">朝のひととき、ラジオ感覚で流してみてね。<br>ふと出てきたフレーズが、今日の親子の話のきっかけになりますように。</p>
@@ -1728,17 +1782,35 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <!-- ② Evening Talk（帰宅後の一言＋Did you know?） -->
     <div class="journey-block" id="jblock-evening" data-slot="evening">
       <div class="journey-full">
-        <div class="section-header" style="margin:16px 20px 10px;">
-          <div class="section-header-en">Evening Talk</div>
-          <div class="section-header-ja">今日どうだった？</div>
-        </div>
         <!-- Evening Talk（ポッドキャスト）／エンジンはMorning Talkと共通（parseMorningTalkScript等を再利用）。
              会話音声の中にMaiの日本語解説・エンディングBGMまで一体化してミックス済みのため、
              Morning Talkの「再生後に別音源へ自動切替」導線（ftAutoNext相当）はEvening Talkには無い。 -->
         <div class="ft-wrap" id="etWrap">
-          <div class="ft-today-row">
-            <span class="ft-date-badge" id="etDateBadge"></span>
-            <span class="ft-status-tag" id="etStatusTag"></span>
+          <!-- Evening Talk用の夜イラストも、Morning Talkと同じくルート直下ではなくillustrations/talks/配下に固定配置。
+               週替わりではなく、この1枚をずっとデフォルトとして使い続ける運用（Morning Talkと同じ扱い） -->
+          <div class="weekly-mission-hero talk-hero standalone" style="margin:-16px -16px 14px;border-radius:19px 19px 0 0;">
+            <img id="etHeroImg" src="illustrations/talks/evening_talk_hero.png" alt="Evening talk">
+            <div class="talk-hero-banner evening">
+              <div class="talk-hero-tri tri1"></div>
+              <div class="talk-hero-tri tri2"></div>
+              <div class="talk-hero-text">
+                <div class="talk-hero-title">Evening talk</div>
+                <div class="talk-hero-sub">おかえりのひとときに</div>
+              </div>
+            </div>
+          </div>
+          <div class="talk-datehead">
+            <div class="talk-datebadge evening">
+              <div class="talk-datebadge-month" id="etDateMonth">--</div>
+              <div class="talk-datebadge-daycircle">
+                <div class="talk-datebadge-day" id="etDateDay">--</div>
+                <div class="talk-datebadge-dow" id="etDateDow">---</div>
+              </div>
+            </div>
+            <div class="talk-datehead-text">
+              <div class="talk-datehead-title" id="etHeaderTitle">タイトル</div>
+              <span class="ft-status-tag" id="etStatusTag"></span>
+            </div>
           </div>
           <div class="ft-replay-note" id="etReplayNote" style="display:none;"></div>
           <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">おかえりなさい。今日の「どうだった？」を、JoelとMaiのおしゃべりと一緒にどうぞ。<br>寝る前のひとときに、ぴったりの長さです。</p>
@@ -1805,7 +1877,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             <!-- 毎月更新：その月の絵本テーマに合わせたヒーロー画像。4コマグリッド制作時に横長構図のカット
                  を1枚追加で作り、books/<月>/monthly_book/hero.jpg として配置する（本編ページと同じ
                  グリッド内で生成すればキャラの一貫性が保たれる）。未配置の月は旧くまイラストに自動フォールバック -->
-            <img src="books/aug/monthly_book/hero.jpg" alt="Sunny Day! - Enverly" onerror="this.onerror=null;this.src='enverly_img.png';">
+            <img src="books/aug/monthly_book/hero.jpg" alt="Sunny Day! - Enverly" onerror="this.onerror=null;this.src='illustrations/books/monthly_book_default.png';">
             <div class="month-hero-overlay">
               <span class="month-hero-label">Joelと一緒に読もう</span>
             </div>
@@ -1845,12 +1917,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     </div><!-- /journey-block jblock-night -->
 
     <!-- ブラウズエリア（ジャーニーとは独立・常時閲覧可、キュレーション系） -->
-    <div class="browse-area-eyebrow" style="margin:22px 20px 0;">
-      <div class="journey-eyebrow">気になったらのぞいてみる</div>
-    </div>
 
     <!-- Weekly Pick（今週のおすすめ絵本） -->
-    <div class="weekly-pick-standalone">
+    <div class="weekly-pick-standalone" style="margin-top:28px;">
       <div class="weekly-pick-block">
         <div class="section-header" style="margin-bottom:10px;">
           <div class="section-header-en">Weekly Pick</div>
@@ -2779,7 +2848,7 @@ function focusJourneyBlock(slot) {
 // 上部Now Playingカードの文言を、Morning/Evening Talkの実データ（ft/et側の描画結果）から反映する
 // ※ft/etの本文はinitFtAudio()・initEtAudio()側で描画されるため、それらの後にも再実行して最終状態を反映する
 const JOURNEY_TALK_META = {
-  morning: { label: '朝のラジオ', qId: 'ftQuestion', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
+  morning: { label: 'モーニングトーク', qId: 'ftQuestion', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
   evening: { label: 'イブニングトーク', qId: 'etQuestion', titleId: 'etPlayTitle', tagId: 'etStatusTag' }
 };
 function renderJourneyNowPlaying() {
@@ -3487,6 +3556,18 @@ const MORNING_TALK_WEEK_STARTS = { w1: '2026-08-17', w3: '2026-08-24' };
 const MORNING_TALK_WEEK_ORDER = ['w1', 'w3'];
 const DAY_KEY_BY_INDEX = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const DAY_LABEL_JA = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日' };
+const DAY_LABEL_EN = { mon: 'MON', tue: 'TUE', wed: 'WED', thu: 'THU', fri: 'FRI', sat: 'SAT', sun: 'SUN' };
+// 新デザインの日付バッジ（月/日/曜日を個別要素に反映）＋バッジ横の見出しタイトルをまとめて更新
+function setTalkDateHead(prefix, now, dayKey, title) {
+  const monthEl = document.getElementById(prefix + 'DateMonth');
+  const dayEl = document.getElementById(prefix + 'DateDay');
+  const dowEl = document.getElementById(prefix + 'DateDow');
+  const titleEl = document.getElementById(prefix + 'HeaderTitle');
+  if (monthEl) monthEl.textContent = String(now.getMonth() + 1).padStart(2, '0');
+  if (dayEl) dayEl.textContent = String(now.getDate()).padStart(2, '0');
+  if (dowEl) dowEl.textContent = DAY_LABEL_EN[dayKey] || '';
+  if (titleEl) titleEl.textContent = title;
+}
 const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
 
 // 音源マッピング（収録が済んだ分だけ登録。未収録は null＝再生ボタン無効）
@@ -3580,8 +3661,7 @@ function getTodayMorningTalkInfo() {
 // データから今日の表示内容（タイトル・フレーズ・NEW/再放送バッジ）を反映
 function renderMorningTalkContent() {
   const info = getTodayMorningTalkInfo();
-  const dateLabel = `${info.now.getMonth() + 1}/${info.now.getDate()}(${DAY_LABEL_JA[info.dayKey]})`;
-  document.getElementById('ftDateBadge').textContent = dateLabel;
+  setTalkDateHead('ft', info.now, info.dayKey, info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
 
   const tag = document.getElementById('ftStatusTag');
   const note = document.getElementById('ftReplayNote');
@@ -4117,9 +4197,7 @@ function getTodayEveningTalkInfo() {
 
 function renderEveningTalkContent() {
   const info = getTodayEveningTalkInfo();
-  const dateLabel = `${info.now.getMonth() + 1}/${info.now.getDate()}(${DAY_LABEL_JA[info.dayKey]})`;
-  const dateBadge = document.getElementById('etDateBadge');
-  if (dateBadge) dateBadge.textContent = dateLabel;
+  setTalkDateHead('et', info.now, info.dayKey, (info.isPreLaunch || !info.content) ? '配信準備中' : `"${info.content.title}"`);
 
   const tag = document.getElementById('etStatusTag');
   const note = document.getElementById('etReplayNote');
