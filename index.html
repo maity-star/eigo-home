@@ -27,19 +27,34 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .journey-eyebrow { font-size: 11px; font-weight: 600; color: #9CA3AF; margin-bottom: 8px; letter-spacing: 0.02em; }
 
-/* Now Playing型：大きく見せるカード＝時間帯でMorning/Evening自動交代、タップで手動スワップも可 */
-.journey-now-big { position: relative; border-radius: 16px; padding: 14px 16px; border: 1.5px solid #2D6A4F; background: #EAF4EE; cursor: pointer; transition: background .15s; }
-.journey-now-big:active { background: #DFF0E6; }
-.journey-now-eyebrow { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; color: #2D6A4F; margin-bottom: 6px; }
-.journey-now-eyebrow .journey-now-dot { width: 6px; height: 6px; border-radius: 50%; background: #2D6A4F; flex-shrink: 0; }
-.journey-now-title { font-size: 14px; font-weight: 700; color: #111827; line-height: 1.4; }
-.journey-now-sub { font-size: 11px; color: #6B7280; margin-top: 3px; }
+/* Now Playing型：大きく見せるカード＝時間帯でMorning/Evening自動交代、タップで手動スワップも可
+   左に素材（右端だけ丸くカット）、右にMorning talk(大見出し)/朝のひとときに(小見出し)/タイトル(実データ) */
+.journey-now-big {
+  position: relative; display: flex; align-items: stretch;
+  border-radius: 18px; border: 1.5px solid #6AA17F; background: #fff;
+  overflow: hidden; cursor: pointer; transition: background .15s;
+  min-height: 104px;
+}
+.journey-now-big:active { background: #F5FAF7; }
+.journey-now-media { flex-shrink: 0; width: 38%; position: relative; overflow: hidden; border-radius: 0 999px 999px 0; }
+.journey-now-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.journey-now-content { flex: 1; min-width: 0; padding: 14px 16px 14px 14px; display: flex; flex-direction: column; justify-content: center; }
+.journey-now-eyebrow { font-family: Georgia, 'Times New Roman', serif; font-size: 19px; font-weight: 600; color: #1F2937; line-height: 1.15; }
+.journey-now-sub { font-size: 10.5px; font-weight: 600; color: #9CA3AF; margin-top: 3px; }
+.journey-now-title { font-size: 17px; font-weight: 800; color: #1F2937; line-height: 1.3; margin-top: 10px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 .journey-now-small-row { display: flex; gap: 8px; margin-top: 8px; }
-.journey-now-small { flex: 1; min-width: 0; border-radius: 12px; padding: 10px 12px; border: 1px solid #E7E2D8; background: #fff; cursor: pointer; transition: background .15s; }
-.journey-now-small:active { background: #F5F3EC; }
-.journey-now-small-label { font-size: 9.5px; font-weight: 700; color: #9CA3AF; margin-bottom: 3px; }
-.journey-now-small-title { font-size: 11.5px; font-weight: 700; color: #374151; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.journey-now-small {
+  flex: 1; min-width: 0; display: flex; align-items: stretch;
+  border-radius: 14px; border: 1.5px solid #6AA17F; background: #fff;
+  overflow: hidden; cursor: pointer; transition: background .15s; min-height: 74px;
+}
+.journey-now-small:active { background: #F5FAF7; }
+.journey-now-small .journey-now-media { width: 36%; border-radius: 0 999px 999px 0; }
+.journey-now-small .journey-now-content { padding: 8px 10px 8px 9px; justify-content: center; }
+.journey-now-small .journey-now-eyebrow { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.journey-now-small .journey-now-sub { font-size: 8px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.journey-now-small .journey-now-title { font-size: 11px; margin-top: 5px; -webkit-line-clamp: 2; }
 
 /* Morning/Evening：手動フォーカスされていない方はページ上から完全非表示（下に重複ミニカードを残さない） */
 .journey-block .journey-full { display: block; }
@@ -1617,18 +1632,31 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="journey-nav">
       <div class="journey-eyebrow">きょうのとびら</div>
       <div class="journey-now-big" id="journeyNowBig" onclick="focusJourneyBlock(journeyBigSlot())">
-        <div class="journey-now-eyebrow"><span class="journey-now-dot"></span><span id="journeyNowBigLabel">モーニングトーク</span></div>
-        <div class="journey-now-title" id="journeyNowBigTitle"></div>
-        <div class="journey-now-sub" id="journeyNowBigSub"></div>
+        <div class="journey-now-media">
+          <img id="journeyNowBigImg" src="illustrations/talks/morning_talk_hero.png" alt="">
+        </div>
+        <div class="journey-now-content">
+          <div class="journey-now-eyebrow" id="journeyNowBigLabel">Morning talk</div>
+          <div class="journey-now-sub" id="journeyNowBigSub">朝のひとときに</div>
+          <div class="journey-now-title" id="journeyNowBigTitle"></div>
+        </div>
       </div>
       <div class="journey-now-small-row">
         <div class="journey-now-small" id="journeyNowSmall" onclick="focusJourneyBlock(journeyOtherSlot())">
-          <div class="journey-now-small-label" id="journeyNowSmallLabel">イブニングトーク</div>
-          <div class="journey-now-small-title" id="journeyNowSmallTitle"></div>
+          <div class="journey-now-media"><img id="journeyNowSmallImg" src="illustrations/talks/evening_talk_hero.png" alt=""></div>
+          <div class="journey-now-content">
+            <div class="journey-now-eyebrow" id="journeyNowSmallLabel">イブニングトーク</div>
+            <div class="journey-now-sub" id="journeyNowSmallSub"></div>
+            <div class="journey-now-title" id="journeyNowSmallTitle"></div>
+          </div>
         </div>
         <div class="journey-now-small" onclick="focusJourneyBlock('night')">
-          <div class="journey-now-small-label">えほんタイム・いつでも</div>
-          <div class="journey-now-small-title" id="journeyNowBookTitle">Sunny Day!</div>
+          <div class="journey-now-media"><img src="books/aug/monthly_book/hero.jpg" alt="" onerror="this.onerror=null;this.src='illustrations/books/monthly_book_default.png';"></div>
+          <div class="journey-now-content">
+            <div class="journey-now-eyebrow">えほんタイム</div>
+            <div class="journey-now-sub">いつでも</div>
+            <div class="journey-now-title" id="journeyNowBookTitle">Sunny Day!</div>
+          </div>
         </div>
       </div>
     </div>
@@ -2848,8 +2876,8 @@ function focusJourneyBlock(slot) {
 // 上部Now Playingカードの文言を、Morning/Evening Talkの実データ（ft/et側の描画結果）から反映する
 // ※ft/etの本文はinitFtAudio()・initEtAudio()側で描画されるため、それらの後にも再実行して最終状態を反映する
 const JOURNEY_TALK_META = {
-  morning: { label: 'モーニングトーク', qId: 'ftQuestion', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
-  evening: { label: 'イブニングトーク', qId: 'etQuestion', titleId: 'etPlayTitle', tagId: 'etStatusTag' }
+  morning: { label: 'Morning talk', smallLabel: 'モーニングトーク', sub: '朝のひとときに', img: 'illustrations/talks/morning_talk_hero.png', qId: 'ftQuestion', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
+  evening: { label: 'Evening talk', smallLabel: 'イブニングトーク', sub: 'おかえりのひとときに', img: 'illustrations/talks/evening_talk_hero.png', qId: 'etQuestion', titleId: 'etPlayTitle', tagId: 'etStatusTag' }
 };
 function renderJourneyNowPlaying() {
   const big = journeyBigSlot();
@@ -2858,23 +2886,25 @@ function renderJourneyNowPlaying() {
   const otherMeta = JOURNEY_TALK_META[other];
 
   const bigLabelEl = document.getElementById('journeyNowBigLabel');
+  const bigImgEl = document.getElementById('journeyNowBigImg');
   const bigTitleEl = document.getElementById('journeyNowBigTitle');
   const bigSubEl = document.getElementById('journeyNowBigSub');
   const smallLabelEl = document.getElementById('journeyNowSmallLabel');
+  const smallImgEl = document.getElementById('journeyNowSmallImg');
+  const smallSubEl = document.getElementById('journeyNowSmallSub');
   const smallTitleEl = document.getElementById('journeyNowSmallTitle');
   const bookTitleEl = document.getElementById('journeyNowBookTitle');
 
   if (bigLabelEl) bigLabelEl.textContent = bigMeta.label;
+  if (bigSubEl) bigSubEl.textContent = bigMeta.sub;
+  if (bigImgEl) bigImgEl.src = bigMeta.img;
   if (bigTitleEl) {
     const q = document.getElementById(bigMeta.qId);
     if (q && q.textContent) bigTitleEl.textContent = q.textContent;
   }
-  if (bigSubEl) {
-    const tag = document.getElementById(bigMeta.tagId);
-    const t = document.getElementById(bigMeta.titleId);
-    bigSubEl.textContent = [tag ? tag.textContent : '', t ? t.textContent : ''].filter(Boolean).join(' ・ ');
-  }
-  if (smallLabelEl) smallLabelEl.textContent = otherMeta.label;
+  if (smallLabelEl) smallLabelEl.textContent = otherMeta.smallLabel;
+  if (smallSubEl) smallSubEl.textContent = otherMeta.sub;
+  if (smallImgEl) smallImgEl.src = otherMeta.img;
   if (smallTitleEl) {
     const q = document.getElementById(otherMeta.qId);
     if (q && q.textContent) smallTitleEl.textContent = q.textContent;
