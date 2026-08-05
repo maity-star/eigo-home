@@ -30,8 +30,8 @@ function buildTodayMessage() {
   // ①月初：新しいコンテンツのお知らせを最優先
   if (date === 1) {
     return {
-      title: '🌱 今月の新しいコンテンツが届いたよ',
-      body: '今月分のMorning Talk・絵本が更新されました。今日から一緒に始めよう。',
+      title: '【Enverly】🌱 今月の新しいコンテンツが届いたよ',
+      body: '今月分のMorning Talk・絵本が更新されました。',
       tag: 'enverly-daily-month',
       url: '/',
     };
@@ -40,21 +40,22 @@ function buildTodayMessage() {
   // ②週の始まり（月曜）：月初と被らない場合のみ
   if (day === 1) {
     return {
-      title: '📖 今週の新しいトークが始まったよ',
+      title: '【Enverly】📖 今週の新しいトークが始まったよ',
       body: '今週分のMorning Talkが配信されました。',
       tag: 'enverly-daily-week',
       url: '/',
     };
   }
 
-  // ③通常日：Joelのひとこと（クライアント側と同じdayOfYearロジックで同期）
+  // ③通常日：タイトルを主役にして、Joelのひとことは日本語だけの短い添え物にする
+  // （クライアント側と同じdayOfYearロジックで同期）
   const startOfYear = new Date(Date.UTC(jstDate.getUTCFullYear(), 0, 0));
   const dayOfYear = Math.floor((jstDate - startOfYear) / 86400000);
   const line = JOEL_ONE_LINERS[dayOfYear % JOEL_ONE_LINERS.length];
 
   return {
-    title: 'Morning Talkが始まったよ',
-    body: `${line.en}\n${line.ja}`,
+    title: '【Enverly】Morning Talkが始まったよ',
+    body: `Joelから: ${line.ja}`,
     tag: 'enverly-daily',
     url: '/',
   };
