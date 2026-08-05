@@ -61,21 +61,39 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .journey-block.collapsed { display: none; }
 /* えほんタイムだけはこの仕組みの対象外＝常に展開（collapsedクラス自体を付与しない） */
 
-/* Joelのひとこと（ジャーニーナビ直下） */
-.joel-line-wrap { display: flex; align-items: center; gap: 8px; margin: 10px 20px 0; }
-.joel-line-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1px solid #BBDAC8; }
+/* Joelのひとこと（タブバー直下・きょうのとびら直上） */
+.joel-line-wrap { display: flex; align-items: flex-start; gap: 8px; margin: 14px 20px 12px 34px; }
+.joel-line-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1px solid #BBDAC8; margin-top: 4px; }
 .joel-line-bubble {
   position: relative;
   flex: 1;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
+  background: #FFFFFF;
+  border: 1px solid #E4E0D4;
+  border-radius: 14px;
+  padding: 9px 13px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.joel-line-bubble::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 13px;
+  width: 11px;
+  height: 11px;
+  background: #FFFFFF;
+  border-left: 1px solid #E4E0D4;
+  border-bottom: 1px solid #E4E0D4;
+  transform: rotate(45deg);
 }
 .joel-line-text { font-size: 10.5px; color: #9CA3AF; line-height: 1.4; }
-.joel-line-text .en { font-weight: 600; color: #6B8577; display: block; margin-bottom: 0; }
+.joel-line-text .en { font-weight: 600; color: #6B8577; display: block; margin-bottom: 1px; }
 .joel-line-text .ja { font-size: 9.5px; color: #C2C7CC; }
+
+/* Joelが選んだ言葉（キュレーション名言バリエーション） */
+.joel-line-bubble.is-quote { border-left: 3px solid #6AA17F; padding-left: 11px; }
+.joel-line-eyebrow { font-size: 8px; font-weight: 700; color: #6AA17F; letter-spacing: 0.03em; margin-bottom: 3px; }
+.joel-line-bubble.is-quote .joel-line-text .en { font-style: italic; }
+.joel-line-text .author { display: block; font-size: 8.5px; color: #B7BDC4; margin-top: 3px; text-align: right; }
 
 /* 週間スタンプカード（紙のスタンプカード風・きょうのとびら直下） */
 /* スタンプカード：設定＞あゆみ内に常設表示する「今のカード」 */
@@ -821,6 +839,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .wbl-icon.blue { background: #E6F1FB; }
 .wbl-icon.gray { background: #F3F4F6; }
 .wbl-icon.red { background: #FDE8E8; }
+.wbl-icon.rose { background: #FCEEF0; }
+
+/* 毎日の通知トグル（設定＞アカウント） */
+.notify-switch { position: relative; width: 40px; height: 23px; border-radius: 12px; background: #E0E0E0; flex-shrink: 0; transition: background 0.2s; }
+.notify-switch-knob { position: absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: left 0.2s; }
+.notify-switch.on { background: #6AA17F; }
+.notify-switch.on .notify-switch-knob { left: 19px; }
+.notify-switch.pending { opacity: 0.5; }
 .wbl-text { flex: 1; }
 .wbl-title { font-size: 12px; font-weight: 500; color: #111827; }
 .wbl-item.featured .wbl-title { color: white; }
@@ -1628,6 +1654,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <!-- 今週タブ -->
   <div id="tab-home">
 
+    <!-- Joelのひとこと（タブバー直下・きょうのとびら直上） -->
+    <div class="joel-line-wrap">
+      <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Joel">
+      <div class="joel-line-bubble" id="joelLineBubble">
+        <div class="joel-line-text" id="joelLineText"></div>
+      </div>
+    </div>
+
     <!-- 今日のジャーニー（①②③ステップ誘導＋時間帯ナビ） -->
     <div class="journey-nav">
       <div class="journey-eyebrow">きょうのとびら</div>
@@ -1658,14 +1692,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             <div class="journey-now-title" id="journeyNowBookTitle">Sunny Day!</div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Joelのひとこと（きょうのとびら直下） -->
-    <div class="joel-line-wrap">
-      <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Joel">
-      <div class="joel-line-bubble">
-        <div class="joel-line-text" id="joelLineText"></div>
       </div>
     </div>
 
@@ -2231,6 +2257,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
       <div class="settings-account-email" id="settingsEmailLabel">mai@example.com</div>
     </div>
     <div class="settings-rows">
+      <div class="wbl-item" id="notifyToggleRow" onclick="toggleDailyNotification()">
+        <div class="wbl-icon rose">🔔</div>
+        <div class="wbl-text"><div class="wbl-title">毎日の通知</div><div class="wbl-sub" id="notifyToggleSub">朝、Morning Talkの配信をお知らせ</div></div>
+        <div class="notify-switch" id="notifySwitch"><div class="notify-switch-knob"></div></div>
+      </div>
       <a class="wbl-item" href="https://billing.stripe.com/p/login/xxxxxxx" target="_blank">
         <div class="wbl-icon blue">💳</div>
         <div class="wbl-text"><div class="wbl-title">支払い方法の変更・解約</div><div class="wbl-sub">Stripeカスタマーポータルへ</div></div>
@@ -2418,7 +2449,8 @@ const MONTH_PLAYLIST = [
   { videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
 ];
 
-// Joelのひとこと（きょうのとびら直下・日替わり表示）
+// Joelのひとこと（タブバー直下・きょうのとびら直上・日替わり表示）
+// type省略＝Joel自身の言葉。type:'quote'＝Joelが選んだ名言（author必須・出典確認済みのもののみ追加すること）
 const JOEL_ONE_LINERS = [
   { en: "It's okay to make mistakes!", ja: '間違えても大丈夫だよ！' },
   { en: 'One word a day is enough.', ja: '1日1単語でじゅうぶん。' },
@@ -2427,14 +2459,81 @@ const JOEL_ONE_LINERS = [
   { en: 'Have fun today, too!', ja: '今日も楽しんでいこうね！' },
   { en: 'Your voice matters.', ja: '君の声には価値があるよ。' },
   { en: "Let's take it easy today.", ja: '今日はゆっくりいこう。' },
+  { en: 'Every little bit helps.', ja: 'ちょっとずつで大丈夫。' },
+  { en: "It's okay to skip a day.", ja: 'お休みしてもいいんだよ。' },
+  { en: 'No need to rush.', ja: '焦らなくていいんだよ。' },
+  { en: 'Just showing up counts.', ja: '続けているだけで、もう十分だよ。' },
+  { en: 'Laughing together is enough.', ja: '一緒に笑うだけで、もう十分だよ。' },
+  { en: "You know your child best.", ja: '子供のことを一番知ってるのは、あなただよ。' },
+  { en: 'Even five minutes is real.', ja: '5分だって、ちゃんと本物だよ。' },
+  { en: "You're not alone in this.", ja: 'ひとりでがんばらなくていいんだよ。' },
+  { en: 'One smile is enough today.', ja: '今日は笑顔ひとつで十分だよ。' },
+  { en: "You're already doing enough.", ja: 'もう、じゅうぶんやれてるよ。' },
+  { en: "Tomorrow's another chance.", ja: '明日、また新しいチャンスがあるよ。' },
+  { en: "It doesn't have to look perfect.", ja: '見た目がキレイじゃなくていいんだ。' },
+  { en: "You're not a teacher. You're something better.", ja: '先生じゃなくていい。あなたはもっと特別だから。' },
+  { en: "Some days are just quiet, and that's fine.", ja: '静かな日があってもいいんだよ。' },
+  { en: "You showed up. That's the whole thing.", ja: '今日もここに来てくれた。それで十分だよ。' },
+  { en: 'Slow and steady still gets there.', ja: 'ゆっくりでも、ちゃんと進んでるよ。' },
+  { en: 'I\'m proud of you today.', ja: '今日のあなたを、誇りに思うよ。' },
+  // Joelが選んだ言葉（出典確認済み・6個・低頻度で登場）
+  {
+    type: 'quote',
+    en: 'Learning another language is not only learning different words for the same things, but learning another way to think about things.',
+    ja: '外国語を学ぶというのは、同じものを違う単語で言い換えるだけじゃない。ものの考え方そのものを、もうひとつ手に入れることなんだ。',
+    author: 'Flora Lewis',
+    authorJa: 'アメリカのジャーナリスト',
+  },
+  {
+    type: 'quote',
+    en: 'Language is the road map of a culture. It tells you where its people come from and where they are going.',
+    ja: '言語は、文化の地図だ。その言葉を話す人たちが、どこから来て、どこへ向かっているのかを教えてくれる。',
+    author: 'Rita Mae Brown',
+    authorJa: 'アメリカの作家',
+  },
+  {
+    type: 'quote',
+    en: 'Children learn as they play. Most importantly, in play children learn how to learn.',
+    ja: '子供は遊びながら学ぶ。何より大切なのは、遊びの中で「学び方」そのものを学んでいくということ。',
+    author: 'O. Fred Donaldson',
+    authorJa: '遊びの研究者',
+  },
+  {
+    type: 'quote',
+    en: 'The way we talk to our children becomes their inner voice.',
+    ja: '私たちが子供にかける言葉は、そのままその子の心の中の声になる。',
+    author: "Peggy O'Mara",
+    authorJa: '編集者・作家',
+  },
+  {
+    type: 'quote',
+    en: 'A journey of a thousand miles begins with a single step.',
+    ja: '千里の道も、一歩から。',
+    author: 'Lao Tzu',
+    authorJa: '中国の思想家',
+  },
+  {
+    type: 'quote',
+    en: 'The limits of my language mean the limits of my world.',
+    ja: '私の言葉の限界が、私の世界の限界を意味する。',
+    author: 'Ludwig Wittgenstein',
+    authorJa: 'オーストリアの哲学者',
+  },
 ];
 
 function renderJoelLine() {
   const el = document.getElementById('joelLineText');
+  const bubble = document.getElementById('joelLineBubble');
   if (!el) return;
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   const line = JOEL_ONE_LINERS[dayOfYear % JOEL_ONE_LINERS.length];
-  el.innerHTML = `<span class="en">${line.en}</span><span class="ja">${line.ja}</span>`;
+  const isQuote = line.type === 'quote';
+  if (bubble) bubble.classList.toggle('is-quote', isQuote);
+  const eyebrow = isQuote ? `<div class="joel-line-eyebrow">Joelが選んだ言葉</div>` : '';
+  const author = isQuote ? `<span class="author">— ${line.author}${line.authorJa ? `（${line.authorJa}）` : ''}</span>` : '';
+  const enText = isQuote ? `“${line.en}”` : line.en;
+  const jaText = isQuote ? `「${line.ja}」` : line.ja;
+  el.innerHTML = `${eyebrow}<span class="en">${enText}</span><span class="ja">${jaText}</span>${author}`;
 }
 
 // ========================
@@ -2675,8 +2774,100 @@ function initApp() {
   renderMonthlyPlaylist();
   renderJoelLine();
   renderStampCard();
+  initPushNotification();
 }
 initApp();
+
+// ========================
+// 毎日の通知（Web Push）
+// ========================
+// VAPID公開鍵（秘密鍵はサーバー側の環境変数のみに保持。ここは公開して問題ない）
+const VAPID_PUBLIC_KEY = 'BDBTE8D67Pooo2ClU3adPkAWYC9jw7aKFc7CXzTtyQcL2yRtRoFr6JXJAhopiP5rZcUmrRE0RXAu8gqRZCwqCS0';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function initPushNotification() {
+  const switchEl = document.getElementById('notifySwitch');
+  const subEl = document.getElementById('notifyToggleSub');
+  if (!switchEl) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    subEl.textContent = 'このブラウザは通知に対応していません';
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    const existing = await reg.pushManager.getSubscription();
+    setNotifySwitchUI(!!existing && Notification.permission === 'granted');
+  } catch (e) {
+    console.error('SW登録失敗', e);
+  }
+}
+
+function setNotifySwitchUI(on) {
+  const switchEl = document.getElementById('notifySwitch');
+  const subEl = document.getElementById('notifyToggleSub');
+  if (!switchEl) return;
+  switchEl.classList.toggle('on', on);
+  subEl.textContent = on ? '朝、Morning Talkの配信をお知らせ中' : '朝、Morning Talkの配信をお知らせ';
+}
+
+async function toggleDailyNotification() {
+  const switchEl = document.getElementById('notifySwitch');
+  if (!switchEl || switchEl.classList.contains('pending')) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    alert('お使いのブラウザは通知に対応していません。');
+    return;
+  }
+  switchEl.classList.add('pending');
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const existing = await reg.pushManager.getSubscription();
+
+    if (existing && Notification.permission === 'granted') {
+      // OFFにする
+      await fetch('/api/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: existing.endpoint }),
+      }).catch(() => {});
+      await existing.unsubscribe();
+      setNotifySwitchUI(false);
+      return;
+    }
+
+    // ONにする
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      setNotifySwitchUI(false);
+      if (permission === 'denied') {
+        alert('通知がブロックされています。ブラウザの設定から許可してください。');
+      }
+      return;
+    }
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    });
+    await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub }),
+    });
+    setNotifySwitchUI(true);
+  } catch (e) {
+    console.error('通知購読エラー', e);
+    setNotifySwitchUI(false);
+  } finally {
+    switchEl.classList.remove('pending');
+  }
+}
 
 // ========================
 // Monthly Playlist カルーセル
