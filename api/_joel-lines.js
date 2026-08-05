@@ -4,7 +4,7 @@
 // 通知本文は短くしたいので、ここでは type:'quote' の名言は含めず、
 // Joel自身の言葉のみを対象にする（名言はアプリを開いた時のお楽しみとして残す）。
 
-const JOEL_ONE_LINERS = [
+export const JOEL_ONE_LINERS = [
   { en: "It's okay to make mistakes!", ja: '間違えても大丈夫だよ！' },
   { en: 'One word a day is enough.', ja: '1日1単語でじゅうぶん。' },
   { en: "You don't have to be perfect.", ja: '完璧じゃなくていいんだ。' },
@@ -30,5 +30,3 @@ const JOEL_ONE_LINERS = [
   { en: 'Slow and steady still gets there.', ja: 'ゆっくりでも、ちゃんと進んでるよ。' },
   { en: "I'm proud of you today.", ja: '今日のあなたを、誇りに思うよ。' },
 ];
-
-module.exports = { JOEL_ONE_LINERS };
