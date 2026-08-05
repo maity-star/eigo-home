@@ -65,7 +65,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .journey-block.collapsed { display: none; }
 /* えほんタイムだけはこの仕組みの対象外＝常に展開（collapsedクラス自体を付与しない） */
 
-/* Joelのひとこと（タブバー直下・きょうのとびら直上） */
+/* Jayのひとこと（タブバー直下・きょうのとびら直上） */
 .joel-line-wrap { display: flex; align-items: flex-start; gap: 8px; margin: 14px 20px 12px 34px; }
 .joel-line-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1px solid #BBDAC8; margin-top: 4px; }
 .joel-line-bubble {
@@ -93,7 +93,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .joel-line-text .en { font-weight: 600; color: #6B8577; display: block; margin-bottom: 1px; }
 .joel-line-text .ja { font-size: 9.5px; color: #C2C7CC; }
 
-/* Joelが選んだ言葉（キュレーション名言バリエーション） */
+/* Jayが選んだ言葉（キュレーション名言バリエーション） */
 .joel-line-bubble.is-quote { border-left: 3px solid #6AA17F; padding-left: 11px; }
 .joel-line-eyebrow { font-size: 8px; font-weight: 700; color: #6AA17F; letter-spacing: 0.03em; margin-bottom: 3px; }
 .joel-line-bubble.is-quote .joel-line-text .en { font-style: italic; }
@@ -326,24 +326,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .talk-hero-tri.tri1 { clip-path: polygon(0% 0%, 100% 0%, 0% 88%); }
 .talk-hero-tri.tri2 { clip-path: polygon(0% 0%, 100% 0%, 100% 88%); }
-.talk-hero-banner.evening .talk-hero-tri { background: #7484A8; opacity: 0.72; }
+.talk-hero-banner.evening .talk-hero-tri { background: #3E4F7A; }
 .talk-hero-text {
   position: relative; z-index: 3;
   padding: 22px 0 0 20px;
   max-width: 68%;
 }
-.talk-hero-title { font-size: 25px; font-weight: 600; color: #fff; line-height: 1.2; text-shadow: 3px 3px 0 rgba(45,106,79,0.5); }
-.talk-hero-sub { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.88); margin-top: 4px; text-shadow: 2px 2px 0 rgba(45,106,79,0.4); }
-
-/* Evening talkのみ：メインは白でくっきり読ませて、後ろにズラしたシャドーだけグレーで重なり感を出す */
-.talk-hero-banner.evening .talk-hero-title {
-  color: #fff;
-  text-shadow: 3px 3px 0 rgba(55,65,81,0.55);
-}
-.talk-hero-banner.evening .talk-hero-sub {
-  color: rgba(255,255,255,0.92);
-  text-shadow: 2px 2px 0 rgba(55,65,81,0.45);
-}
+.talk-hero-title { font-size: 25px; font-weight: 600; color: #fff; line-height: 1.2; text-shadow: 0 1px 6px rgba(0,0,0,0.12); }
+.talk-hero-sub { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.88); margin-top: 4px; }
 
 .talk-datehead { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
 .talk-datebadge { flex-shrink: 0; width: 60px; display: flex; flex-direction: column; align-items: center; }
@@ -390,7 +380,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-lesson-card-hero { position: relative; height: 220px; overflow: hidden; }
 .month-lesson-card-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; display: block; }
 .month-lesson-card-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(109,184,138,0.0) 0%, rgba(109,184,138,0.0) 50%, rgba(109,184,138,0.7) 85%, rgba(109,184,138,1.0) 100%); }
-/* hero上部オーバーレイ：Joelラベル */
+/* hero上部オーバーレイ：Jayラベル */
 .month-hero-overlay { position: absolute; top: 16px; left: 16px; right: 0; z-index: 2; text-align: left; pointer-events: none; }
 .month-hero-label { display: inline-block; background: rgba(61,120,82,0.25); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 5px 16px; font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: 0.2px; white-space: nowrap; }
 .month-lesson-top { padding: 16px 20px 0; position: relative; z-index: 1; }
@@ -1668,9 +1658,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <!-- 今週タブ -->
   <div id="tab-home">
 
-    <!-- Joelのひとこと（タブバー直下・きょうのとびら直上） -->
+    <!-- Jayのひとこと（タブバー直下・きょうのとびら直上） -->
     <div class="joel-line-wrap">
-      <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Joel">
+      <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Jay">
       <div class="joel-line-bubble" id="joelLineBubble">
         <div class="joel-line-text" id="joelLineText"></div>
       </div>
@@ -1752,7 +1742,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
             <div class="ft-dialogue">
               <div class="ft-avatar joel" id="ftAvatarJoel">
-                <img id="ftAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Joel">
+                <img id="ftAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Jay">
               </div>
               <div class="ft-bubble-wrap" id="ftBubbleWrap">
                 <div class="ft-bubble" id="ftBubble">
@@ -1814,7 +1804,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
           <div class="at-eyebrow-line"></div>
         </div>
         <div class="at-eyebrow-sub">体を動かして英語タイム</div>
-        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">Joelの声に合わせて、お部屋の中で探したり答えたり。動画のお手本は不要、声だけで遊べるよ。</p>
+        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">Jayの声に合わせて、お部屋の中で探したり答えたり。動画のお手本は不要、声だけで遊べるよ。</p>
         <div class="at-card">
           <div class="at-card-top">
             <div class="at-mode-row">
@@ -1829,7 +1819,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             <div class="at-play-row">
               <button class="at-play-btn" id="atPlayBtn" onclick="toggleActiveTime()"><span id="atPlayIcon">▶</span></button>
               <div class="at-play-meta">
-                <div class="at-play-title" id="atPlayTitle">Joelの声を聞く</div>
+                <div class="at-play-title" id="atPlayTitle">Jayの声を聞く</div>
                 <div class="at-play-len">0:08</div>
               </div>
             </div>
@@ -1881,14 +1871,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
             </div>
           </div>
           <div class="ft-replay-note" id="etReplayNote" style="display:none;"></div>
-          <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">おかえりなさい。今日の「どうだった？」を、JoelとMaiのおしゃべりと一緒にどうぞ。<br>寝る前のひとときに、ぴったりの長さです。</p>
+          <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">おかえりなさい。今日の「どうだった？」を、JayとMaiのおしゃべりと一緒にどうぞ。<br>寝る前のひとときに、ぴったりの長さです。</p>
           <div class="ft-card">
             <div class="ft-card-top">
               <div class="ft-question" id="etQuestion">"How was your day?"</div>
               <div class="ft-question-ja" id="etQuestionJa">今日どうだった？</div>
               <div class="ft-dialogue">
                 <div class="ft-avatar joel" id="etAvatarJoel">
-                  <img id="etAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Joel">
+                  <img id="etAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Jay">
                 </div>
                 <div class="ft-bubble-wrap" id="etBubbleWrap">
                   <div class="ft-bubble" id="etBubble">
@@ -1947,7 +1937,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
                  グリッド内で生成すればキャラの一貫性が保たれる）。未配置の月は旧くまイラストに自動フォールバック -->
             <img src="books/aug/monthly_book/hero.jpg" alt="Sunny Day! - Enverly" onerror="this.onerror=null;this.src='illustrations/books/monthly_book_default.png';">
             <div class="month-hero-overlay">
-              <span class="month-hero-label">Joelと一緒に読もう</span>
+              <span class="month-hero-label">Jayと一緒に読もう</span>
             </div>
           </div>
           <div class="month-lesson-top" style="padding-bottom:20px;">
@@ -2104,7 +2094,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     <div class="asobo-hero">
       <img class="asobo-hero-illust" src="illustrations/asobo-hero.png" alt="あそぼ">
-      <div class="asobo-hero-sub">Joelの声に合わせて探したり答えたり。<br>気分でえらんで、何度でも遊べるよ。</div>
+      <div class="asobo-hero-sub">Jayの声に合わせて探したり答えたり。<br>気分でえらんで、何度でも遊べるよ。</div>
     </div>
 
     <!-- 1: 探し物ミッション -->
@@ -2166,7 +2156,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
     <!-- 今後のコンテンツ拡張予告（初期の物量不足による離脱抑制） -->
     <div class="asobo-coming-soon">
-      <img class="asobo-coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
+      <img class="asobo-coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Jay">
       <div class="asobo-coming-soon-text">
         <div class="asobo-coming-soon-main">今後も楽しいあそびを続々追加予定！</div>
         <div class="asobo-coming-soon-sub">お楽しみに♪</div>
@@ -2185,7 +2175,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     </div>
 
     <div class="coming-soon-panel" style="margin:16px 20px 0;">
-      <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Joel">
+      <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Jay">
       <div class="coming-soon-text">
         <div class="coming-soon-main">今はまだ少ないけど、これからどんどん増えていくよ。</div>
         <div class="coming-soon-sub">楽しみにしててね♪</div>
@@ -2216,7 +2206,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 <!-- 週間スタンプカード達成お祝い -->
 <div class="stamp-celebrate-overlay" id="stampCelebrateOverlay">
   <div class="stamp-celebrate-card">
-    <img src="illustrations/joel/joel_banzai_960x640.png" alt="Joel">
+    <img src="illustrations/joel/joel_banzai_960x640.png" alt="Jay">
     <div class="stamp-celebrate-title">スタンプカード、コンプリート！</div>
     <div class="stamp-celebrate-sub">毎日えらいね。<br>このまま眺めていても、新しいカードをはじめてもいいよ。</div>
     <div style="display:flex; gap:8px; justify-content:center;">
@@ -2320,7 +2310,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   <div class="archive-modal-header">
     <div>
       <div class="archive-modal-title">これまでの放送</div>
-      <div class="archive-modal-sub">Joel &amp; Mai Time · Morning Talk</div>
+      <div class="archive-modal-sub">Jay &amp; Mai Time · Morning Talk</div>
     </div>
     <button class="archive-modal-close" onclick="closeArchiveModal()">✕</button>
   </div>
@@ -2438,10 +2428,10 @@ registerAudio(document.getElementById('asoboVoicePlayer'));
 // asoboSePlayer / asoboSePlayer2（探し物ミッション・なぞなぞの短い効果音チャンネル）は
 // あえて登録しない：preload="none"のため実際の再生開始（=playイベント発火）が
 // ネットワーク読み込み待ちで遅れることがあり、その遅延した瞬間に「他の音声を
-// 全部止める」仕様が発動してJoelの本編音声(voice)を巻き込んで中断させる事故
+// 全部止める」仕様が発動してJayの本編音声(voice)を巻き込んで中断させる事故
 // （AbortErrorの原因）があったため。効果音は短く、主役の音声と多少重なっても
 // 実害が小さい一方、主役の音声が止まる方が致命的なので、効果音側を対象外にする。
-// 効果音は答え音声(Joelの声)と重なることがあるため、音量を控えめにして
+// 効果音は答え音声(Jayの声)と重なることがあるため、音量を控えめにして
 // 音声の頭が聞こえなくならないようにする
 (function () {
   const se = document.getElementById('asoboSePlayer');
@@ -2463,8 +2453,8 @@ const MONTH_PLAYLIST = [
   { videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
 ];
 
-// Joelのひとこと（タブバー直下・きょうのとびら直上・日替わり表示）
-// type省略＝Joel自身の言葉。type:'quote'＝Joelが選んだ名言（author必須・出典確認済みのもののみ追加すること）
+// Jayのひとこと（タブバー直下・きょうのとびら直上・日替わり表示）
+// type省略＝Jay自身の言葉。type:'quote'＝Jayが選んだ名言（author必須・出典確認済みのもののみ追加すること）
 const JOEL_ONE_LINERS = [
   { en: "It's okay to make mistakes!", ja: '間違えても大丈夫だよ！' },
   { en: 'One word a day is enough.', ja: '1日1単語でじゅうぶん。' },
@@ -2490,7 +2480,7 @@ const JOEL_ONE_LINERS = [
   { en: "You showed up. That's the whole thing.", ja: '今日もここに来てくれた。それで十分だよ。' },
   { en: 'Slow and steady still gets there.', ja: 'ゆっくりでも、ちゃんと進んでるよ。' },
   { en: 'I\'m proud of you today.', ja: '今日のあなたを、誇りに思うよ。' },
-  // Joelが選んだ言葉（出典確認済み・6個・低頻度で登場）
+  // Jayが選んだ言葉（出典確認済み・6個・低頻度で登場）
   {
     type: 'quote',
     en: 'Learning another language is not only learning different words for the same things, but learning another way to think about things.',
@@ -2543,7 +2533,7 @@ function renderJoelLine() {
   const line = JOEL_ONE_LINERS[dayOfYear % JOEL_ONE_LINERS.length];
   const isQuote = line.type === 'quote';
   if (bubble) bubble.classList.toggle('is-quote', isQuote);
-  const eyebrow = isQuote ? `<div class="joel-line-eyebrow">Joelが選んだ言葉</div>` : '';
+  const eyebrow = isQuote ? `<div class="joel-line-eyebrow">Jayが選んだ言葉</div>` : '';
   const author = isQuote ? `<span class="author">— ${line.author}${line.authorJa ? `（${line.authorJa}）` : ''}</span>` : '';
   const enText = isQuote ? `“${line.en}”` : line.en;
   const jaText = isQuote ? `「${line.ja}」` : line.ja;
@@ -3346,7 +3336,7 @@ function startAsoboTimer() {
       completeAsoboTimer();
     }, 60000);
   };
-  // 先にJoelのミッション音声を再生してからタイマー(BGM)をスタート
+  // 先にJayのミッション音声を再生してからタイマー(BGM)をスタート
   playAsoboVoice(currentFindItem ? currentFindItem.audio : null, startCountdown);
 }
 
@@ -3479,7 +3469,7 @@ const MORNING_TALK_WEEKS = {
       mon: {
         title: "It's hot!",
         phrases: [{ en: "It's hot!", ja: "暑いね！" }, { en: "Let's swim!", ja: "泳ごう！" }],
-        // 台本はJoel/Maiが普段書いてる「Joel: ...」「Mai: ...」形式のまま貼るだけでOK。
+        // 台本はJay/Maiが普段書いてる「Jay: ...」「Mai: ...」形式のまま貼るだけでOK。
         // ①②③⑤の英語セリフだけが自動抽出されてカラオケハイライトの対象になる。
         // ④のMai日本語解説（プレフィックスなし）や見出し・ト書きは自然と対象外になる。
         // 行末に「 | 日本語訳」を付けると、その行の日本語訳としてふきだし・フレーズ一覧の両方に反映される（任意・省略可）。
@@ -3540,19 +3530,19 @@ Joel: See you tomorrow! Bye bye!
         title: 'Splash!',
         phrases: [{ en: 'Splash!', ja: 'バシャッ！' }],
         rawScript: `
-Joel: Good morning, Mai! Ready for Friday?
+Jay: Good morning, Mai! Ready for Friday?
 Mai: Yes! I heard we're going to the pool again today.
-Joel: That's right! It's going to be so fun.
-Joel: Watch this, Mai! Splash!
+Jay: That's right! It's going to be so fun.
+Jay: Watch this, Mai! Splash!
 Mai: Wow, big splash! That was so fun!
-Joel: Splash, splash! Let's make more splashes!
+Jay: Splash, splash! Let's make more splashes!
 Mai: Okay, ready... Splash!
-Joel: Haha, so fun! That was a great splash.
+Jay: Haha, so fun! That was a great splash.
 Mai: This is the best summer day ever!
-Joel: Hey kids, can you say it with me? "Splash!"
-Joel: Great job! Splash, splash!
+Jay: Hey kids, can you say it with me? "Splash!"
+Jay: Great job! Splash, splash!
 Mai: Have a wonderful weekend, everyone!
-Joel: See you next week! Bye bye!
+Jay: See you next week! Bye bye!
         `,
         maiTalk: '今日は "Splash!"（バシャッ！）というフレーズを話したよ。お風呂やプールで水しぶきをあげる時に、ぜひ一緒に言ってみてください。',
       },
@@ -3565,19 +3555,19 @@ Joel: See you next week! Bye bye!
         title: "Let's go!",
         phrases: [{ en: "Let's go!", ja: '行こう！' }],
         rawScript: `
-Joel: Good morning, Mai! Big day today.
+Jay: Good morning, Mai! Big day today.
 Mai: Good morning! I'm so excited, we're going on a trip.
-Joel: Me too! Time to pack the car.
+Jay: Me too! Time to pack the car.
 Mai: Are you ready? Let's go!
-Joel: Yes, let's go! I can't wait to see grandma.
+Jay: Yes, let's go! I can't wait to see grandma.
 Mai: Let's go, let's go! The beach is waiting for us.
-Joel: I packed the swimsuits and the sunscreen.
+Jay: I packed the swimsuits and the sunscreen.
 Mai: Great! Let's go see the ocean!
-Joel: Let's go, everyone!
-Joel: Hey kids, can you say it with me? "Let's go!"
-Joel: Yes! Let's go, let's go!
+Jay: Let's go, everyone!
+Jay: Hey kids, can you say it with me? "Let's go!"
+Jay: Yes! Let's go, let's go!
 Mai: Okay, everyone in the car!
-Joel: See you tomorrow! Bye bye!
+Jay: See you tomorrow! Bye bye!
         `,
         maiTalk: '今日は "Let\'s go!"（行こう！）というフレーズを話したよ。お出かけの時、車に乗る時、ぜひ "Let\'s go!" って声をかけてみてください。',
       },
@@ -3590,19 +3580,19 @@ Joel: See you tomorrow! Bye bye!
         title: "Let's swim!",
         phrases: [{ en: "Let's swim!", ja: '泳ごう！' }],
         rawScript: `
-Joel: Good morning, Mai! We made it to grandma's house.
+Jay: Good morning, Mai! We made it to grandma's house.
 Mai: Good morning! I slept so well after the trip.
-Joel: Me too. Look, the pool is right there!
-Mai: Hey Joel, do you want to go swimming today?
-Joel: Yes! Let's swim! Grandma's pool looks so nice.
+Jay: Me too. Look, the pool is right there!
+Mai: Hey Jay, do you want to go swimming today?
+Jay: Yes! Let's swim! Grandma's pool looks so nice.
 Mai: Let's swim, let's swim! The water looks so cool.
-Joel: Grab your swimsuit, let's go!
+Jay: Grab your swimsuit, let's go!
 Mai: I'm ready! Let's swim together!
-Joel: Yay! Let's swim!
-Joel: Hey kids, can you say it with me? "Let's swim!"
-Joel: Awesome! Let's swim, let's swim!
+Jay: Yay! Let's swim!
+Jay: Hey kids, can you say it with me? "Let's swim!"
+Jay: Awesome! Let's swim, let's swim!
 Mai: Okay, let's grab our swimsuits!
-Joel: See you tomorrow! Bye bye!
+Jay: See you tomorrow! Bye bye!
         `,
         maiTalk: '今日は "Let\'s swim!"（泳ごう！）を話したよ。おばあちゃんの家やプールに行った時、ぜひこのフレーズで誘ってみてください。',
       },
@@ -3615,19 +3605,19 @@ Joel: See you tomorrow! Bye bye!
         title: 'Sunny!',
         phrases: [{ en: 'Sunny!', ja: '晴れてるね！' }],
         rawScript: `
-Joel: Good morning, Mai! Look at that blue sky.
+Jay: Good morning, Mai! Look at that blue sky.
 Mai: Good morning! It's so sunny today.
-Joel: Perfect beach weather!
-Mai: Joel, look up! Sunny, sunny!
-Joel: Yes! It's so sunny, I need my sunglasses.
+Jay: Perfect beach weather!
+Mai: Jay, look up! Sunny, sunny!
+Jay: Yes! It's so sunny, I need my sunglasses.
 Mai: Me too! Sunny days are the best for the beach.
-Joel: Sunny! Let's build a sandcastle.
+Jay: Sunny! Let's build a sandcastle.
 Mai: Great idea! Sunny and warm, just perfect.
-Joel: Sunny, sunny! Best day ever.
-Joel: Hey kids, can you say it with me? "Sunny!"
-Joel: Great! Sunny, sunny!
+Jay: Sunny, sunny! Best day ever.
+Jay: Hey kids, can you say it with me? "Sunny!"
+Jay: Great! Sunny, sunny!
 Mai: Okay, let's put on sunscreen and go outside!
-Joel: See you next week! Bye bye!
+Jay: See you next week! Bye bye!
         `,
         maiTalk: '今日は "Sunny!"（晴れてるね！）というフレーズを話したよ。朝、外を見て晴れてる日は、ぜひお子さんと "Sunny!" って言ってみてください。',
       },
@@ -3640,19 +3630,19 @@ Joel: See you next week! Bye bye!
         title: 'I want ice cream!',
         phrases: [{ en: 'I want ice cream!', ja: 'アイスが欲しい！' }],
         rawScript: `
-Joel: Good morning, Mai! It's so hot again today.
+Jay: Good morning, Mai! It's so hot again today.
 Mai: Good morning! I know, I already want something cold.
-Joel: Same here!
-Mai: Hey Joel, I want ice cream!
-Joel: Me too! I want ice cream so bad.
+Jay: Same here!
+Mai: Hey Jay, I want ice cream!
+Jay: Me too! I want ice cream so bad.
 Mai: I want ice cream, I want ice cream! Chocolate please.
-Joel: I want strawberry ice cream!
+Jay: I want strawberry ice cream!
 Mai: Let's go get some after lunch.
-Joel: Yes! I want ice cream!
-Joel: Hey kids, can you say it with me? "I want ice cream!"
-Joel: Great! I want ice cream, I want ice cream!
+Jay: Yes! I want ice cream!
+Jay: Hey kids, can you say it with me? "I want ice cream!"
+Jay: Great! I want ice cream, I want ice cream!
 Mai: Okay, let's go get some ice cream!
-Joel: See you tomorrow! Bye bye!
+Jay: See you tomorrow! Bye bye!
         `,
         maiTalk: '今日は "I want ice cream!"（アイスが欲しい！）というフレーズを話したよ。暑い日、ぜひお子さんと一緒に言ってみてください。',
       },
@@ -3665,19 +3655,19 @@ Joel: See you tomorrow! Bye bye!
         title: 'So cold!',
         phrases: [{ en: 'So cold!', ja: 'すごく冷たい！' }],
         rawScript: `
-Joel: Good morning, Mai! Guess what I'm eating.
+Jay: Good morning, Mai! Guess what I'm eating.
 Mai: Good morning! Ice cream already?
-Joel: Yes! And it's so cold!
+Jay: Yes! And it's so cold!
 Mai: Ooh, can I try? Wow, so cold!
-Joel: I know! So cold, so cold! But so good.
+Jay: I know! So cold, so cold! But so good.
 Mai: My hands are freezing. So cold!
-Joel: Let's eat it fast before it melts.
+Jay: Let's eat it fast before it melts.
 Mai: Good idea! So cold, so yummy.
-Joel: Best summer treat ever!
-Joel: Hey kids, can you say it with me? "So cold!"
-Joel: Great! So cold, so cold!
+Jay: Best summer treat ever!
+Jay: Hey kids, can you say it with me? "So cold!"
+Jay: Great! So cold, so cold!
 Mai: Okay, let's finish this before it melts!
-Joel: See you tomorrow! Bye bye!
+Jay: See you tomorrow! Bye bye!
         `,
         maiTalk: '今日は "So cold!"（すごく冷たい！）というフレーズを話したよ。アイスや氷を触った時、ぜひ一緒に言ってみてください。',
       },
@@ -3690,19 +3680,19 @@ Joel: See you tomorrow! Bye bye!
         title: "It's hot!（復習）",
         phrases: [{ en: "It's hot!", ja: '暑いね！' }],
         rawScript: `
-Joel: Good morning, Mai! Another hot one today.
+Jay: Good morning, Mai! Another hot one today.
 Mai: Good morning! It's hot!
-Joel: Very hot! Time to stay cool.
+Jay: Very hot! Time to stay cool.
 Mai: It's hot, it's hot! I need some shade.
-Joel: Me too. Let's sit under the tree.
+Jay: Me too. Let's sit under the tree.
 Mai: Good idea. It's so hot outside today.
-Joel: It's hot! Let's drink some cold water.
+Jay: It's hot! Let's drink some cold water.
 Mai: Yes, that sounds perfect.
-Joel: It's hot, but we'll stay cool together!
-Joel: Hey kids, can you say it with me? "It's hot!"
-Joel: Great! It's hot, it's hot!
+Jay: It's hot, but we'll stay cool together!
+Jay: Hey kids, can you say it with me? "It's hot!"
+Jay: Great! It's hot, it's hot!
 Mai: Okay, let's find some shade and cool down!
-Joel: See you next week! Bye bye!
+Jay: See you next week! Bye bye!
         `,
         maiTalk: '今日は "It\'s hot!" をもう一度。暑い夏、何度でも使えるフレーズだから、しっかり覚えておこうね。',
       },
@@ -3715,19 +3705,19 @@ Joel: See you next week! Bye bye!
         title: 'So fun!（復習）',
         phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }],
         rawScript: `
-Joel: Good morning, Mai! Tonight's the summer festival.
+Jay: Good morning, Mai! Tonight's the summer festival.
 Mai: Good morning! I'm so excited!
-Joel: Me too, it's going to be so fun.
+Jay: Me too, it's going to be so fun.
 Mai: The festival is so fun! I love the food stalls.
-Joel: So fun, so fun! I want to play the games.
+Jay: So fun, so fun! I want to play the games.
 Mai: Me too! And later, fireworks!
-Joel: Fireworks are always so fun.
+Jay: Fireworks are always so fun.
 Mai: This is going to be the best night.
-Joel: So fun, so fun!
-Joel: Hey kids, can you say it with me? "So fun!"
-Joel: Great! So fun, so fun!
+Jay: So fun, so fun!
+Jay: Hey kids, can you say it with me? "So fun!"
+Jay: Great! So fun, so fun!
 Mai: Okay, let's get ready for the festival!
-Joel: See you tomorrow! Bye bye!
+Jay: See you tomorrow! Bye bye!
         `,
         maiTalk: '今日は "So fun!" をもう一度話したよ。お祭りや楽しいイベントの時、ぜひこのフレーズを使ってみてください。',
       },
@@ -3740,19 +3730,19 @@ Joel: See you tomorrow! Bye bye!
         title: 'Wow!',
         phrases: [{ en: 'Wow!', ja: 'わあ！' }],
         rawScript: `
-Joel: Good morning, Mai! Wasn't last night amazing?
+Jay: Good morning, Mai! Wasn't last night amazing?
 Mai: Good morning! Yes, the fireworks were beautiful.
-Joel: I know, so many colors!
+Jay: I know, so many colors!
 Mai: Wow! Did you see that big one?
-Joel: Wow! It was huge! So many colors.
+Jay: Wow! It was huge! So many colors.
 Mai: Wow, wow! I loved the golden ones.
-Joel: Me too! Wow, that was amazing.
+Jay: Me too! Wow, that was amazing.
 Mai: I want to see fireworks again.
-Joel: Wow! Best summer night ever.
-Joel: Hey kids, can you say it with me? "Wow!"
-Joel: Great! Wow, wow!
+Jay: Wow! Best summer night ever.
+Jay: Hey kids, can you say it with me? "Wow!"
+Jay: Great! Wow, wow!
 Mai: Okay, let's look at our festival photos!
-Joel: See you tomorrow! Bye bye!
+Jay: See you tomorrow! Bye bye!
         `,
         maiTalk: '今日は "Wow!"（わあ！）というフレーズを話したよ。花火や綺麗なものを見た時、ぜひ一緒に "Wow!" って言ってみてください。',
       },
@@ -3765,19 +3755,19 @@ Joel: See you tomorrow! Bye bye!
         title: 'Splash!（復習）',
         phrases: [{ en: 'Splash!', ja: 'バシャッ！' }],
         rawScript: `
-Joel: Good morning, Mai! Last swim of the summer?
+Jay: Good morning, Mai! Last swim of the summer?
 Mai: Good morning! Let's make it a good one.
-Joel: Definitely!
-Joel: Watch this, Mai! Splash!
+Jay: Definitely!
+Jay: Watch this, Mai! Splash!
 Mai: Splash! Nice one!
-Joel: Splash, splash! One more time!
+Jay: Splash, splash! One more time!
 Mai: Okay, ready... Splash!
-Joel: Haha, great splash! This summer was so much fun.
+Jay: Haha, great splash! This summer was so much fun.
 Mai: The best. Let's remember it forever.
-Joel: Hey kids, can you say it with me? "Splash!"
-Joel: Great job! Splash, splash!
+Jay: Hey kids, can you say it with me? "Splash!"
+Jay: Great job! Splash, splash!
 Mai: Thank you for a wonderful summer, everyone!
-Joel: See you next month! Bye bye!
+Jay: See you next month! Bye bye!
         `,
         maiTalk: '今日は "Splash!" をもう一度。この夏、たくさんの新しいフレーズを一緒に覚えたね。9月からも一緒に頑張ろうね！',
       },
@@ -3822,7 +3812,7 @@ const MORNING_TALK_LINE_TIMINGS = {
   aug_w1_mon: [0.454, 8.188, 13.545, 19.022, 21.969, 23.505, 28.689, 36.105, 40.426, 47.121, 53.720, 59.282, 63.387, 73.166],
 };
 
-// Joel/Maiの口パクアバター画像（トーク系プロファイル）。3コマをループさせて話している間だけ動かす。
+// Jay/Maiの口パクアバター画像（トーク系プロファイル）。3コマをループさせて話している間だけ動かす。
 const FT_MOUTH_FRAMES = {
   joel: [
     'illustrations/joel/joel_mouth_closed.png',
@@ -3948,7 +3938,7 @@ function renderMorningTalkContent() {
   if (body) {
     const rowsHtml = lines.map((l, i) => {
       const speakerTag = l.speaker
-        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Joel' : 'Mai'}</span>` : '';
+        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
       const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
       return `<div class="ft-phrase-row" id="ftPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
     }).join('');
@@ -3964,18 +3954,21 @@ function renderMorningTalkContent() {
   return info.audioKey;
 }
 
-// 台本テキストから「Joel: ...」「Mai: ...」で始まる行だけを抽出してセリフ配列にする。
+// 台本テキストから「Joel: ...」「Jay: ...」「Mai: ...」で始まる行だけを抽出してセリフ配列にする。
 // ④のMai日本語解説（プレフィックスなし）や①②③の見出し・ト書きは、プレフィックスが無いため自然と除外される。
 // ＝台本をそのまま貼るだけでよく、書き起こしや整形作業は発生しない。
 // 行末に「 | 日本語訳」を付けると、その行の日本語訳としてふきだし・フレーズ一覧の両方に反映される（任意・省略可）。
+// 2026-08改名対応: 既存の録音済み回はJoel:表記のまま残り、新規回はJay:表記になるため両方を認識する。
+// 内部の speaker キーは表示名の変更に関わらず 'joel' に正規化（アバター画像・CSSクラス等の既存実装をそのまま使うため）。
 function parseMorningTalkScript(raw) {
   if (!raw) return [];
   return raw.split('\n')
     .map(l => l.trim())
-    .map(l => /^(Joel|Mai)\s*[:：]\s*(.+)$/.exec(l))
+    .map(l => /^(Joel|Jay|Mai)\s*[:：]\s*(.+)$/.exec(l))
     .filter(Boolean)
     .map(m => {
-      const speaker = m[1].toLowerCase();
+      const speakerRaw = m[1].toLowerCase();
+      const speaker = speakerRaw === 'jay' ? 'joel' : speakerRaw;
       const rest = m[2].trim();
       const pipeIdx = rest.indexOf('|');
       if (pipeIdx === -1) return { speaker, en: rest, ja: null };
@@ -4122,7 +4115,7 @@ function updateFtBubble(line, speaker) {
 }
 
 // ========================
-// Joel/Mai 口パクアバター
+// Jay/Mai 口パクアバター
 // ========================
 let ftActiveSpeaker = null; // 'joel' | 'mai' | null
 let ftMouthTimer = null;
@@ -4476,7 +4469,7 @@ function renderEveningTalkContent() {
   if (body) {
     const rowsHtml = lines.map((l, i) => {
       const speakerTag = l.speaker
-        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Joel' : 'Mai'}</span>` : '';
+        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
       const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
       return `<div class="ft-phrase-row" id="etPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
     }).join('');
@@ -4744,7 +4737,7 @@ const AT_FIND = [
   { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう', audio: 'audio/asobo_audio/find_read.mp3' },
 ];
 // 探し物ミッション完了ボイス(質問系+リアクション系ミックス、ランダム再生)
-// 収録待ち: find_done_1〜6.mp3 (Joel収録リストに追加済み)
+// 収録待ち: find_done_1〜6.mp3 (Jay収録リストに追加済み)
 const AT_FIND_DONE_AUDIO = [
   'audio/asobo_audio/find_done_1.mp3',
   'audio/asobo_audio/find_done_2.mp3',
@@ -4809,11 +4802,11 @@ function toggleActiveTime() {
       if (!atPlaying) return;
       atPlaying = false;
       icon.textContent = '▶';
-      title.textContent = 'Joelの声を聞く';
+      title.textContent = 'Jayの声を聞く';
     }, 1800);
   } else {
     icon.textContent = '▶';
-    title.textContent = 'Joelの声を聞く';
+    title.textContent = 'Jayの声を聞く';
   }
 }
 
@@ -4826,7 +4819,7 @@ function completeActiveTime() {
   atDoneToday = true;
   btn.classList.add('done');
   btn.innerHTML = '<span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_check.png" alt="チェック"></span><span>今日もできたね！</span>';
-  showToast('Joelからの褒め声、再生中… 🎉');
+  showToast('Jayからの褒め声、再生中… 🎉');
   // 注：Active Timeはスタンプ独立カウントにせず、絵本のスタンプとは別軸で
   // 「やったら良いことがある」程度の軽い演出（褒め声）のみとする設計
 }
@@ -5233,7 +5226,7 @@ function bvPlaySynthChime() {
     });
   } catch (e) { /* Web Audio非対応環境でも無視して進行 */ }
 }
-// 「もう一度Joelと一緒に」の合図：実音源（Pixabayの効果音）を再生。読み込めない場合は合成音にフォールバック
+// 「もう一度Jayと一緒に」の合図：実音源（Pixabayの効果音）を再生。読み込めない場合は合成音にフォールバック
 function bvPlayReadyChime() {
   try {
     bvSfxEl.pause();
@@ -5267,9 +5260,9 @@ function bvRunTalkStep(token) {
   const page = BOOK_DATA.pages[bvCurrentPage];
   if (!page) return;
 
-  // 全ページ共通：Joel読む→チャイム→Your turn→もう一度→次へ
+  // 全ページ共通：Jay読む→チャイム→Your turn→もう一度→次へ
   document.getElementById('bvTalkPhrase').textContent = page.talkPhrase || page.phrase;
-  document.getElementById('bvTalkStatus').textContent = '🎧 Joelの声を聞いてね';
+  document.getElementById('bvTalkStatus').textContent = '🎧 Jayの声を聞いてね';
   bvUpdateTalkProgress();
 
   bvPlayAudio(page.audio, () => {
@@ -5281,7 +5274,7 @@ function bvRunTalkStep(token) {
       if (token !== bvTalkToken) return;
       // Step 2: 確認読み（同じ音声をもう一度）
       bvPlayReadyChime();
-      document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Joelと一緒に';
+      document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Jayと一緒に';
       if (!bvTalkDone.includes(bvCurrentPage)) bvTalkDone.push(bvCurrentPage);
       bvUpdateTalkProgress();
 
