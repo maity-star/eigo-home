@@ -3552,6 +3552,27 @@ Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました
       tue: {
         title: "「Let's + 動詞」で広げよう",
         phrases: [{ en: "Let's eat!", ja: "一緒に食べよう！" }],
+        // 火は月曜の会話パートをそのまま再利用（MORNING_TALK_REPLAY_OFFSET.aug_w1_tueで頭のMai解説秒数を管理）。
+        // rawScriptは月曜(mon)と完全に同一の内容にすること＝行数・並び順がMORNING_TALK_LINE_TIMINGS.aug_w1_monと
+        // 一致していないと、offsetを足したタイミングが使われずフォールバックに落ちてしまう。
+        rawScript: `
+Joel: Good morning, Mai! | おはよう、マイ！
+Mai: Good morning! Wow, it's already so hot today. | おはよう！わあ、今日はもうこんなに暑いね。
+Joel: I know! It's summer time. | だよね！夏だもん。
+Joel: Hey, did you look outside this morning? | ねえ、今朝外を見た？
+Joel: How is the weather? | お天気どう？
+Mai: Yes! It's so sunny and hot outside. | うん！外はすごく晴れてて暑いよ。
+Joel: It's hot, it's hot! I think we need to drink lots of water today. | 暑い、暑い！今日はたくさん水を飲まなきゃね。
+Mai: Good idea. Maybe we can go swimming later? | いいね。あとでプールに行こうか？
+Joel: Yes! Let's swim! That sounds perfect for a hot day like this. | いいね！泳ごう！こんな暑い日にはぴったりだ。
+Mai: I can't wait. It's hot, but swimming makes it fun. | 待ちきれない。暑いけど、泳ぐと楽しくなるね。
+Joel: Hey kids, can you say it with me? | ねえみんな、一緒に言ってみよう。
+Joel: "How's the weather? | 「お天気どう？
+Joel: It's sunny and hot!" | 晴れてて暑いよ！」
+Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました！暑い、暑い！晴れてて暑い！
+(Mai) Okay, let's go swimming and cool down! — ハイライト対象外（Maiの日本語解説の後に続く、音楽前のクロージング）
+(Joel) See you tomorrow! Bye bye! — ハイライト対象外
+        `,
         maiTalk: '月曜日の会話に出てきた "Let\'s swim!"、覚えてるかな？実はこの "Let\'s"、「一緒に〜しよう」って誘う時に使えるフレーズなんだよ。例えば "Let\'s eat!"（一緒に食べよう！）とか "Let\'s dance!"（一緒に踊ろう！）みたいに、いろんな言葉と組み合わせられるの。今日はぜひお子さんを "Let\'s eat!" って誘ってみてください。',
       },
       wed: {
@@ -3849,10 +3870,12 @@ function setTalkDateHead(prefix, now, dayKey, title) {
 const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
 
 // 音源マッピング（収録が済んだ分だけ登録。未収録は null＝再生ボタン無効）
-// 命名規則: audio/morning_talk/[月]_w[週数]_[曜日].mp3
+// 命名規則: morning_talk/mor_[月]_w[週数]_[曜日].mp3（2026-08-12〜：Evening Talkとファイル名が
+// 同一になる問題を防ぐため mor_ プレフィックスを追加。フォルダ自体は違うので技術的な衝突は無いが、
+// Audition書き出し直後のダウンロード/デスクトップ等、同名ファイルが並ぶ場面での取り違え事故を防ぐため）
 const MORNING_TALK_AUDIO = {
-  aug_w1_mon: 'audio/morning_talk/aug_w1_mon.mp3',
-  aug_w1_tue: null,
+  aug_w1_mon: 'morning_talk/mor_aug_w1_mon.mp3',
+  aug_w1_tue: 'morning_talk/mor_aug_w1_tue.mp3',
 };
 
 // Auditionでクリップマーカーを打ち終えた回だけ、ここに「各セリフの開始秒」を配列で追加する。
@@ -3864,6 +3887,35 @@ const MORNING_TALK_LINE_TIMINGS = {
   // 2026-07-30 Audition実測（Mai計測）。4行目・10行目は台本側も分割して行数を合わせてある。
   aug_w1_mon: [0.454, 8.188, 13.545, 19.022, 21.969, 23.505, 28.689, 36.105, 40.426, 47.121, 53.720, 59.282, 63.387, 73.166],
 };
+
+// 火・木は月・水の会話パートをそのまま再利用し、頭にMaiの新規解説（今日ならではの一言）が付く構成。
+// ここには「その解説が何秒あるか＝再利用した会話が何秒目から始まるか」を回ごとに登録するだけでいい。
+// rawScriptはbase（月/水）のものをそのままコピーして使う前提（＝セリフの中身・行数はbaseと同一）。
+// 登録の仕方：Maiは「w1_thu、オフセット◯秒」とだけ伝えればOK。baseは曜日から自動判定される
+// （火→直前の月、木→直前の水）ので、baseキーを毎回書く必要はない。
+const MORNING_TALK_REPLAY_OFFSET = {
+  aug_w1_tue: 39, // Maiの解説が0〜39秒、39秒から月曜の会話（aug_w1_mon）が再生される
+};
+
+// 火・木のaudioKeyから、再利用元(base)のaudioKeyを曜日ルールで自動算出する。
+// 命名規則 [月]_w[週数]_[曜日] が前提。火→月、木→水。それ以外の曜日は対象外（null）。
+function resolveMorningTalkReplayBaseKey(audioKey) {
+  const m = /^(.+_w\d)_(tue|thu)$/.exec(audioKey);
+  if (!m) return null;
+  const baseDayKey = m[2] === 'tue' ? 'mon' : 'wed';
+  return `${m[1]}_${baseDayKey}`;
+}
+
+// 火・木のように「baseの再利用＋解説オフセット」で解決すべき回なら、baseのLINE_TIMINGSにoffsetを足した
+// 配列を動的に生成して返す。対象外の回はそのまま MORNING_TALK_LINE_TIMINGS[audioKey] を返す（undefinedもあり得る）。
+function resolveMorningTalkLineStarts(audioKey) {
+  const offset = MORNING_TALK_REPLAY_OFFSET[audioKey];
+  if (offset == null) return MORNING_TALK_LINE_TIMINGS[audioKey];
+  const baseKey = resolveMorningTalkReplayBaseKey(audioKey);
+  const baseStarts = baseKey ? MORNING_TALK_LINE_TIMINGS[baseKey] : null;
+  if (!baseStarts) return MORNING_TALK_LINE_TIMINGS[audioKey]; // baseが未登録ならフォールバックに任せる
+  return baseStarts.map(t => t + offset);
+}
 
 // Jay/Maiの口パクアバター画像（トーク系プロファイル）。3コマをループさせて話している間だけ動かす。
 const FT_MOUTH_FRAMES = {
@@ -4072,7 +4124,7 @@ function buildFtLineSegmentsFromStarts(starts, totalDuration, phrases) {
 // 実測データ(MORNING_TALK_LINE_TIMINGS)があればそれを最優先で使い、無ければ／行数が合わなければ
 // 従来の文字数比率スケーリングにフォールバックする。
 function resolveFtPhraseTimings(audioKey, phrases, totalDuration) {
-  const starts = MORNING_TALK_LINE_TIMINGS[audioKey];
+  const starts = resolveMorningTalkLineStarts(audioKey);
   if (starts && starts.length === phrases.length) {
     return buildFtLineSegmentsFromStarts(starts, totalDuration, phrases);
   }
@@ -4420,21 +4472,48 @@ Mai: Bye bye! | バイバイ！
   },
 };
 
-// 命名規則: audio/evening_talk_audio/[週]_[曜日].mp3 （Recording Timing Sheet記載のルールと一致）
+// 命名規則: evening_talk/ev_[月]_[週]_[曜日].mp3（Morning Talkと同じ理由でev_プレフィックスを追加。
+// フォルダは別だが、書き出し直後の一時フォルダで同名ファイルが並ぶ事故を防ぐため）
+const EVENING_TALK_MONTH = 'aug';
 const EVENING_TALK_AUDIO = {
-  w1_mon: 'audio/evening_talk_audio/w1_mon.mp3',
+  aug_w1_mon: 'evening_talk/ev_aug_w1_mon.mp3',
+  aug_w1_tue: 'evening_talk/ev_aug_w1_tue.mp3',
 };
 
 // Morning TalkのMORNING_TALK_LINE_TIMINGSと同じ運用。Auditionで各セリフの開始秒を実測したら
-// ここに配列で追加する（例: w1_mon: [1.2, 6.8, ...]）。未登録の間は文字数比率スケーリングにフォールバックする。
+// ここに配列で追加する（例: aug_w1_mon: [1.2, 6.8, ...]）。未登録の間は文字数比率スケーリングにフォールバックする。
 const EVENING_TALK_LINE_TIMINGS = {
   // 2026-08-03 Audition実測（Mai計測、Recording Timing Sheetより転記）。
   // rawScriptは全17行だが、末尾2行（Joel: OK. Time to say goodbye... / Mai: Bye bye!）は
   // Maiの日本語解説パートと同様にハイライト対象外とする方針のため、あえて15個のみ登録。
   // resolveEtPhraseTimings側で「配列長 <= セリフ行数」ならOKという判定に変更済みなので、
   // 余った末尾2行は自動的にハイライトなし（音声だけ流れる）扱いになる。
-  w1_mon: [1.974, 5.664, 9.580, 14.325, 19.385, 22.348, 32.665, 36.255, 38.563, 40.332, 49.106, 58.882, 69.412, 73.554, 79.001],
+  aug_w1_mon: [1.974, 5.664, 9.580, 14.325, 19.385, 22.348, 32.665, 36.255, 38.563, 40.332, 49.106, 58.882, 69.412, 73.554, 79.001],
 };
+
+// 火・木は月・水の会話パートを再利用し、頭にMaiの新規解説が付く（Morning Talkと同じ構成・同じ運用）。
+// 登録の仕方はMorning Talkと同様「w1_thu、オフセット◯秒」でOK。baseは曜日から自動判定される。
+const EVENING_TALK_REPLAY_OFFSET = {
+  aug_w1_tue: 34, // Maiの解説が0〜34秒、34秒から月曜の会話（aug_w1_mon）が再生される
+};
+
+// 火・木のaudioKeyから再利用元(base)のaudioKeyを曜日ルールで自動算出（Morning Talkの
+// resolveMorningTalkReplayBaseKeyと同一ロジック。EVENING_TALK_MONTHを使う点だけが違う）。
+function resolveEveningTalkReplayBaseKey(audioKey) {
+  const m = /^(.+_w\d)_(tue|thu)$/.exec(audioKey);
+  if (!m) return null;
+  const baseDayKey = m[2] === 'tue' ? 'mon' : 'wed';
+  return `${m[1]}_${baseDayKey}`;
+}
+
+function resolveEveningTalkLineStarts(audioKey) {
+  const offset = EVENING_TALK_REPLAY_OFFSET[audioKey];
+  if (offset == null) return EVENING_TALK_LINE_TIMINGS[audioKey];
+  const baseKey = resolveEveningTalkReplayBaseKey(audioKey);
+  const baseStarts = baseKey ? EVENING_TALK_LINE_TIMINGS[baseKey] : null;
+  if (!baseStarts) return EVENING_TALK_LINE_TIMINGS[audioKey]; // baseが未登録ならフォールバックに任せる
+  return baseStarts.map(t => t + offset);
+}
 
 // 完全一致(===)ではなく「実測データが行数以下ならOK」(<=)にしているのがポイント。
 // これにより、Maiの日本語解説パートや末尾の挨拶など「あえてハイライトさせたくない行」を
@@ -4442,7 +4521,7 @@ const EVENING_TALK_LINE_TIMINGS = {
 // slice(0, starts.length)で余った末尾行をftCurrentPhrasesから切り離すので、
 // updateFtPhraseHighlight側は自動的にそれ以降を「ハイライトなし」として扱う。
 function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
-  const starts = EVENING_TALK_LINE_TIMINGS[audioKey];
+  const starts = resolveEveningTalkLineStarts(audioKey);
   if (starts && starts.length > 0 && starts.length <= phrases.length) {
     return buildFtLineSegmentsFromStarts(starts, totalDuration, phrases.slice(0, starts.length));
   }
@@ -4459,7 +4538,7 @@ function getTodayEveningTalkInfo() {
     const { weekKey, dayKey } = parsed;
     const weekData = EVENING_TALK_WEEKS[weekKey];
     const content = (weekData && weekData.days[dayKey]) ? weekData.days[dayKey] : null;
-    const audioKey = content ? `${weekKey}_${dayKey}` : null;
+    const audioKey = content ? `${EVENING_TALK_MONTH}_${weekKey}_${dayKey}` : null;
     const isNew = NEW_DAY_KEYS.includes(dayKey);
     return { now, dayKey, weekKey, isNew, isWeekend: false, isPreLaunch: false, content, audioKey };
   }
@@ -4470,7 +4549,7 @@ function getTodayEveningTalkInfo() {
   const isNew = NEW_DAY_KEYS.includes(dayKey);
   const weekData = EVENING_TALK_WEEKS[weekKey];
   const content = (weekData && weekData.days[contentDayKey]) ? weekData.days[contentDayKey] : null;
-  const audioKey = content ? `${weekKey}_${contentDayKey}` : null;
+  const audioKey = content ? `${EVENING_TALK_MONTH}_${weekKey}_${contentDayKey}` : null;
   const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
   const isPreLaunch = now < w1Start;
   return { now, dayKey, weekKey, isNew, isWeekend, isPreLaunch, content, audioKey };
