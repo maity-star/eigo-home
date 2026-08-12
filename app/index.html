@@ -3576,49 +3576,68 @@ Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました
         maiTalk: '月曜日の会話に出てきた "Let\'s swim!"、覚えてるかな？実はこの "Let\'s"、「一緒に〜しよう」って誘う時に使えるフレーズなんだよ。例えば "Let\'s eat!"（一緒に食べよう！）とか "Let\'s dance!"（一緒に踊ろう！）みたいに、いろんな言葉と組み合わせられるの。今日はぜひお子さんを "Let\'s eat!" って誘ってみてください。',
       },
       wed: {
-        title: 'So fun!',
-        phrases: [{ en: 'So fun!', ja: 'すごく楽しい！' }],
+        title: 'I like ice cream!',
+        phrases: [{ en: 'I like ice cream!', ja: 'アイスクリームが好き！' }],
+        // 2026-08-12 Timing Sheet(Coding Master)確定版に差し替え（旧「So fun!」placeholderから変更）。
+        // 木は本rawScriptをそのまま流用するため、行数・並び順を変える場合はthuも必ず同時に直すこと。
         rawScript: `
-Joel: Good morning, Mai!
-Mai: Good morning, Joel! I had a great dream about the pool.
-Joel: Ha, me too! I can't wait for today.
-Mai: Hey Joel, remember yesterday at the pool?
-Joel: Yes! It was so fun!
-Mai: So fun, so fun! I want to go again today.
-Joel: Me too! Splashing in the water is so fun.
-Mai: Building sandcastles is so fun too!
-Joel: Everything about summer is so fun!
-Joel: Hey kids, can you say it with me? "So fun!"
-Joel: Yes! So fun, so fun!
-Mai: Okay, let's get ready for another fun day!
-Joel: See you tomorrow! Bye bye!
+Jay: Good morning, Mai!
+Mai: Good morning, Joel! Hey, I had a great dream last night.
+Jay: What was your dream about?
+Mai: It was about ice cream!
+Jay: That's a perfect dream for summer!
+Mai: Yes. And now I want to eat ice cream.
+Jay: Haha that sounds nice. Ice cream is delicious.
+Mai: I like ice cream.
+Jay: I like ice cream, too!
+Jay: Can you say it with me? I like ice cream.
+Mai: Hey Joel, I'm getting hungry.
+Jay: Okay let's eat breakfast and then go get some ice cream.
         `,
-        maiTalk: '今日は "So fun!"（すごく楽しい！）というフレーズを話したよ。楽しいことがあった時、ぜひお子さんと一緒に "So fun!" って言ってみてください。',
+        maiTalk: '今日は私が "I like ice cream!" って言ってたね。好きなものを伝えるときに "I like ○○!" って言うよ。バナナが好きなら "I like bananas!"、車が好きなら "I like cars!" だよ。お父さん、お母さん、朝ご飯の時に "I like ○○!" って好きなものを英語で言ってみるのはいかがですか。それだけで朝から英語が生活の一部になります。',
       },
       thu: {
-        title: "「It's + 形容詞」で広げよう",
-        phrases: [{ en: "It's cold!", ja: '冷たいね！' }],
-        maiTalk: '月曜日に出てきた "It\'s hot!"、覚えてるかな？実はこの "It\'s"、「〜だね」って様子を伝える時に使えるフレーズなんだよ。例えば "It\'s cold!"（冷たいね！）とか "It\'s yummy!"（美味しいね！）みたいに、いろんな言葉と組み合わせられるの。今日は何か冷たいものを触った時に、ぜひ "It\'s cold!" って言ってみてください。',
+        title: '"too" をつけて広げよう',
+        phrases: [{ en: 'I like ice cream, too!', ja: '私もアイスクリームが好き！' }],
+        // 木は水曜の会話パートをそのまま再利用（MORNING_TALK_REPLAY_OFFSET.aug_w1_thuで頭のMai解説秒数を管理）。
+        // rawScriptは水曜(wed)と完全に同一の内容にすること＝行数・並び順がMORNING_TALK_LINE_TIMINGS.aug_w1_wedと
+        // 一致していないと、offsetを足したタイミングが使われずフォールバックに落ちてしまう。
+        rawScript: `
+Jay: Good morning, Mai!
+Mai: Good morning, Joel! Hey, I had a great dream last night.
+Jay: What was your dream about?
+Mai: It was about ice cream!
+Jay: That's a perfect dream for summer!
+Mai: Yes. And now I want to eat ice cream.
+Jay: Haha that sounds nice. Ice cream is delicious.
+Mai: I like ice cream.
+Jay: I like ice cream, too!
+Jay: Can you say it with me? I like ice cream.
+Mai: Hey Joel, I'm getting hungry.
+Jay: Okay let's eat breakfast and then go get some ice cream.
+        `,
+        maiTalk: '水曜日のアイスクリームの夢のお話、覚えてる?私が"I like ice cream!"って言った後に、Jayもアイスクリームが大好きだから"I like ice cream, too!"って言ってたね。もし同じ気持ちだったら最後に"too"をつけるんだよ。例えば"I\'m hungry, too."とか"Me too!"って言うんだよ。',
       },
       fri: {
-        title: 'Splash!',
-        phrases: [{ en: 'Splash!', ja: 'バシャッ！' }],
+        title: 'I am ready!',
+        phrases: [{ en: 'It will be fun!', ja: '楽しくなるはず！' }, { en: 'I am ready!', ja: '準備できた！' }],
+        // 2026-08-12 Timing Sheet(Coding Master)確定版に差し替え（旧「Splash!」placeholderから変更）。
         rawScript: `
-Jay: Good morning, Mai! Ready for Friday?
+Jay: Good morning, Mai! Ready for the day?
 Mai: Yes! I heard we're going to the pool again today.
-Jay: That's right! It's going to be so fun.
-Jay: Watch this, Mai! Splash!
-Mai: Wow, big splash! That was so fun!
-Jay: Splash, splash! Let's make more splashes!
-Mai: Okay, ready... Splash!
-Jay: Haha, so fun! That was a great splash.
-Mai: This is the best summer day ever!
-Jay: Hey kids, can you say it with me? "Splash!"
-Jay: Great job! Splash, splash!
-Mai: Have a wonderful weekend, everyone!
-Jay: See you next week! Bye bye!
+Jay: That's right! It will be fun. Let's say it together: It will be fun!
+Jay: Hey Mai, what should we bring to the pool?
+Mai: Good question. Of course we need towels.
+Jay: Yes, we can't forget to bring a towel. And it's so sunny and hot today
+Jay: so we need to be careful. I'll bring a hat, sunscreen and my water bottle.
+Mai: But Jay, are you forgetting something?
+Jay: Hmmmm I don't think so?
+Mai: What about your swimsuit!
+Jay: Oh that's so silly. Yes, we need to bring our swimsuits.
+Jay: OK I think I'm ready to go. I am ready!
+Jay: Let's say it together. I am ready!
         `,
-        maiTalk: '今日は "Splash!"（バシャッ！）というフレーズを話したよ。お風呂やプールで水しぶきをあげる時に、ぜひ一緒に言ってみてください。',
+        maiTalk: '今日はJayとMaiが「一緒に言ってみよう」ってやってたフレーズ、覚えてるかな？"It will be fun!"（楽しくなるはず！）と、最後の"I am ready!"（準備できた！）の2つだったね。あと、プールに行くのに水着を忘れかけてたJayが面白かったよね。swimsuit（水着）って単語、覚えられたかな？タオルは"towel"、日焼け止めは"sunscreen"も出てきたよ。お父さんお母さん、おはようございます！お出かけ前に「Are you ready?」と聞いてみてください。「うん」って答えたら、「OK! We are ready!」とテンション高めに言ってみてください。それだけでお子様には英語って楽しいという気持ちが芽生えます。',
       },
     }
   },
@@ -3876,6 +3895,9 @@ const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
 const MORNING_TALK_AUDIO = {
   aug_w1_mon: 'morning_talk/mor_aug_w1_mon.mp3',
   aug_w1_tue: 'morning_talk/mor_aug_w1_tue.mp3',
+  aug_w1_wed: 'morning_talk/mor_aug_w1_wed.mp3',
+  aug_w1_thu: 'morning_talk/mor_aug_w1_thu.mp3',
+  aug_w1_fri: 'morning_talk/mor_aug_w1_fri.mp3',
 };
 
 // Auditionでクリップマーカーを打ち終えた回だけ、ここに「各セリフの開始秒」を配列で追加する。
@@ -3886,6 +3908,10 @@ const MORNING_TALK_AUDIO = {
 const MORNING_TALK_LINE_TIMINGS = {
   // 2026-07-30 Audition実測（Mai計測）。4行目・10行目は台本側も分割して行数を合わせてある。
   aug_w1_mon: [0.454, 8.188, 13.545, 19.022, 21.969, 23.505, 28.689, 36.105, 40.426, 47.121, 53.720, 59.282, 63.387, 73.166],
+  // 2026-08-12 Audition実測（Mai計測）。Timing Sheet(Coding Master)より反映。
+  aug_w1_wed: [6.0, 8.782, 14.950, 17.545, 22.024, 25.819, 29.929, 35.793, 38.646, 41.909, 50.510, 54.758],
+  // 2026-08-12 Audition実測（Mai計測）。Timing Sheet(Coding Master)より反映。
+  aug_w1_fri: [4.996, 10.236, 15.630, 29.492, 34.529, 40.417, 49.383, 59.255, 63.813, 68.211, 71.703, 79.124, 86.903],
 };
 
 // 火・木は月・水の会話パートをそのまま再利用し、頭にMaiの新規解説（今日ならではの一言）が付く構成。
@@ -3894,7 +3920,8 @@ const MORNING_TALK_LINE_TIMINGS = {
 // 登録の仕方：Maiは「w1_thu、オフセット◯秒」とだけ伝えればOK。baseは曜日から自動判定される
 // （火→直前の月、木→直前の水）ので、baseキーを毎回書く必要はない。
 const MORNING_TALK_REPLAY_OFFSET = {
-  aug_w1_tue: 39, // Maiの解説が0〜39秒、39秒から月曜の会話（aug_w1_mon）が再生される
+  aug_w1_tue: 37, // Maiの解説が0〜37秒、37秒から月曜の会話（aug_w1_mon）が再生される（2026-08-12 Mai確認・39から修正）
+  aug_w1_thu: 44, // Maiの解説が0〜44秒、44秒から水曜の会話（aug_w1_wed）が再生される（2026-08-12 Mai確認）
 };
 
 // 火・木のaudioKeyから、再利用元(base)のaudioKeyを曜日ルールで自動算出する。
