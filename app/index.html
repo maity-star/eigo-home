@@ -1104,6 +1104,51 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-hero-title { font-size: 17px; font-weight: 700; color: #111827; margin-top: 4px; }
 .shiru-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-top: 6px; }
 
+/* しる：カテゴリーカード（ルーティンと同じ2カラムグリッドを踏襲、4枠目は予告カード） */
+.shiru-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 20px 0; }
+.shiru-cat-card {
+  background: #F9FAFB; border-radius: 14px; padding: 0; cursor: pointer;
+  transition: background 0.15s; border: 1px solid transparent; overflow: hidden;
+  position: relative;
+  -webkit-transform: translateZ(0); transform: translateZ(0);
+}
+.shiru-cat-card:hover { background: #F3F4F6; }
+.shiru-cat-image {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block;
+  background: #F3F4F6; -webkit-transform: translateZ(0); transform: translateZ(0);
+}
+.shiru-cat-body { padding: 12px 14px 14px; }
+.shiru-cat-title { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 3px; }
+.shiru-cat-sub { font-size: 10px; color: #9CA3AF; margin-bottom: 8px; }
+.shiru-cat-count { font-size: 10px; color: #6B7280; display: flex; align-items: center; gap: 4px; }
+.shiru-cat-badge-new {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  background: #E8A33D; color: #fff; font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 10px; box-shadow: 0 2px 6px rgba(184,104,11,0.3);
+}
+/* 予告カード（4枠目・空枚）：グレーアウトでタップ不可、期待値だけ軽く匂わせる */
+.shiru-cat-card.soon { cursor: default; background: #F3F4F6; }
+.shiru-cat-card.soon:hover { background: #F3F4F6; }
+.shiru-cat-card.soon .shiru-cat-image {
+  display: flex; align-items: center; justify-content: center;
+  background: repeating-linear-gradient(135deg, #ECEBE6, #ECEBE6 10px, #F3F2ED 10px, #F3F2ED 20px);
+}
+.shiru-cat-card.soon .shiru-cat-image-mark { font-size: 26px; color: #C6C2B6; font-weight: 700; }
+.shiru-cat-card.soon .shiru-cat-title { color: #9CA3AF; }
+.shiru-cat-card.soon .shiru-cat-sub { color: #B7B3A8; }
+
+/* しる：アーカイブモーダル（ルーティンモーダルと共通クラスを流用しつつ専用要素だけ追加） */
+.shiru-entry-card { background: #F9FAFB; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+.shiru-entry-date { font-size: 10px; color: #9CA3AF; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.shiru-entry-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.shiru-entry-play {
+  width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #E5E7EB;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer;
+  font-size: 11px; color: #6B7280;
+}
+.shiru-entry-title { font-size: 14px; color: #111827; line-height: 1.4; }
+.shiru-entry-ja { font-size: 11px; color: #9CA3AF; padding-left: 42px; line-height: 1.6; }
+
 /* セクション見出し（1・2の縦並び） */
 .asobo-section { padding: 0 20px 20px; }
 
@@ -2171,16 +2216,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="shiru-hero">
       <div class="shiru-hero-en">Shiru</div>
       <div class="shiru-hero-title">今日知ったこと、ためていく場所</div>
-      <div class="shiru-hero-sub">イブニングトークの"Did you know?"で出てきた豆知識が、ここにどんどん貯まっていくよ。</div>
+      <div class="shiru-hero-sub">Jayが動物や食べ物のことなど小さな発見を教えてくれるよ。もっともっと知りたかったらパパやママにどんどん聞いてみてー！</div>
     </div>
 
-    <div class="coming-soon-panel" style="margin:16px 20px 0;">
-      <img class="coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Jay">
-      <div class="coming-soon-text">
-        <div class="coming-soon-main">今はまだ少ないけど、これからどんどん増えていくよ。</div>
-        <div class="coming-soon-sub">楽しみにしててね♪</div>
-      </div>
-    </div>
+    <div class="shiru-cat-grid" id="shiruCatGrid"></div>
+    <div class="hint-box" style="margin:14px 20px 0;"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"> カードをタップすると、そのジャンルで今まで知ったことを見返せるよ。</div>
 
     <div style="height:24px;"></div>
   </div>
@@ -2229,7 +2269,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="stamp-card-caption">今のカード（5個で完成）</div>
     <div class="stamp-card-slots-wrap">
       <div class="stamp-card-slots" id="stampCardSlots"></div>
-      <div class="stamp-card-footer">絵本のLet's talk・きょうのとびら・あそぼ、どれか1つで1日1つゲット</div>
+      <div class="stamp-card-footer">絵本のLet's talk・きょうのとびら・あそぼ・しる、どれか1つで1日1つゲット</div>
     </div>
 
     <div class="ayumi-grid">
@@ -2398,6 +2438,19 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
     <div class="routine-modal-sub" id="routineModalSub">親が言うフレーズ集</div>
   </div>
   <div class="routine-modal-body" id="routineModalBody"></div>
+</div>
+
+<!-- しる・アーカイブモーダル（ルーティンモーダルと同じクラスを流用） -->
+<div class="routine-modal" id="shiruModal">
+  <div class="routine-modal-hero-wrap">
+    <img class="routine-modal-hero" id="shiruModalImage" src="" alt="">
+    <button class="routine-modal-close" onclick="closeShiruModal()">✕</button>
+  </div>
+  <div class="routine-modal-header">
+    <div class="routine-modal-title" id="shiruModalTitle">Animal</div>
+    <div class="routine-modal-sub" id="shiruModalSub">今まで知ったこと</div>
+  </div>
+  <div class="routine-modal-body" id="shiruModalBody"></div>
 </div>
 
 <!-- トースト -->
@@ -2634,7 +2687,7 @@ function saveStampCardState(state) {
   try { localStorage.setItem(STAMP_CARD_KEY, JSON.stringify(state)); } catch (e) {}
 }
 
-// category: 'talk' | 'journey' | 'asobo'（カテゴリごとに1日1回まで、カードが満了したらそれ以上は積み上がらない）
+// category: 'talk' | 'journey' | 'asobo' | 'shiru'（カテゴリごとに1日1回まで、カードが満了したらそれ以上は積み上がらない）
 function earnStamp(category) {
   const state = getStampCardState();
   const todayKey = new Date().toISOString().slice(0, 10);
@@ -4945,6 +4998,163 @@ function playRoutineScene(btn, src) {
 }
 
 renderRoutineCatGrid();
+
+// ========================
+// しる：Jayの発見（Animal / Food / 天気）
+// ========================
+// カードは3ジャンル固定＋予告カード1枠。新着は火・木のみ、日付ベースで個別登録する運用
+// （曜日とジャンルを機械的に固定しない＝前回と同じジャンルが連続しないよう内容側で手動調整する）。
+const SHIRU_CATEGORIES = [
+  { id: 'animal', title: 'Animal', sub: 'どうぶつ', image: 'illustrations/shiru/shiru_animal.png' },
+  { id: 'food', title: 'Food', sub: 'たべもの', image: 'illustrations/shiru/shiru_food.png' },
+  { id: 'weather', title: '天気', sub: 'てんき', image: 'illustrations/shiru/shiru_weather.png' },
+];
+
+// 各回のデータ。dateは新着として表示される日（火・木を想定）。
+// ⚠️ 仮データ。収録が進み次第、日付・タイトル・音声パスを実データに差し替える。
+const SHIRU_ENTRIES = [
+  { date: '2026-08-18', category: 'animal', title: 'Ducks have waterproof feathers!', ja: 'アヒルの羽根は水をはじくから、濡れないんだって。', audio: 'audio/shiru_audio/2026-08-18.mp3' },
+  { date: '2026-08-20', category: 'weather', title: 'Clouds are made of tiny water drops!', ja: '雲は、小さな水のつぶがたくさん集まってできてるよ。', audio: 'audio/shiru_audio/2026-08-20.mp3' },
+];
+
+function getTodayShiruDateKey() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+// カテゴリごとの全エントリを新しい順で返す
+function getShiruEntriesByCategory(catId) {
+  return SHIRU_ENTRIES.filter(e => e.category === catId).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+// 「今日そのカテゴリを開いたか」を日付単位で記録（Newバッジは1日1回開いたら消える）
+const SHIRU_OPENED_KEY_PREFIX = 'enverly_shiru_opened_';
+function getShiruOpenedSet() {
+  const key = SHIRU_OPENED_KEY_PREFIX + getTodayShiruDateKey();
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) { return new Set(); }
+}
+function markShiruOpened(catId) {
+  const key = SHIRU_OPENED_KEY_PREFIX + getTodayShiruDateKey();
+  const set = getShiruOpenedSet();
+  if (set.has(catId)) return;
+  set.add(catId);
+  try { localStorage.setItem(key, JSON.stringify([...set])); } catch (e) {}
+}
+
+function renderShiruCatGrid() {
+  const grid = document.getElementById('shiruCatGrid');
+  if (!grid) return;
+  const todayKey = getTodayShiruDateKey();
+  const opened = getShiruOpenedSet();
+  const cardsHtml = SHIRU_CATEGORIES.map(cat => {
+    const entries = getShiruEntriesByCategory(cat.id);
+    const isNewToday = entries.length > 0 && entries[0].date === todayKey && !opened.has(cat.id);
+    const badge = isNewToday ? '<div class="shiru-cat-badge-new">New</div>' : '';
+    return `
+      <div class="shiru-cat-card" onclick="openShiruModal('${cat.id}')">
+        ${badge}
+        <img class="shiru-cat-image" src="${cat.image}" alt="${cat.title}">
+        <div class="shiru-cat-body">
+          <div class="shiru-cat-title">${cat.title}</div>
+          <div class="shiru-cat-sub">${cat.sub}</div>
+          <div class="shiru-cat-count"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_list.png" alt="リスト"> ${entries.length}個知った</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  // 4枠目：予告カード（空枚・タップ不可、今後のジャンル追加をUI自体で匂わせる）
+  const soonCard = `
+    <div class="shiru-cat-card soon">
+      <div class="shiru-cat-image"><span class="shiru-cat-image-mark">？</span></div>
+      <div class="shiru-cat-body">
+        <div class="shiru-cat-title">また今度</div>
+        <div class="shiru-cat-sub">新しいジャンル、準備中</div>
+      </div>
+    </div>
+  `;
+  grid.innerHTML = cardsHtml + soonCard;
+}
+
+function openShiruModal(catId) {
+  const cat = SHIRU_CATEGORIES.find(c => c.id === catId);
+  if (!cat) return;
+  const entries = getShiruEntriesByCategory(catId);
+  markShiruOpened(catId);
+  renderShiruCatGrid(); // Newバッジを消すため再描画
+  earnStamp('shiru');
+  document.getElementById('shiruModalImage').src = cat.image;
+  document.getElementById('shiruModalImage').alt = cat.title;
+  document.getElementById('shiruModalTitle').textContent = cat.title;
+  document.getElementById('shiruModalSub').textContent = `今まで知ったこと（${entries.length}個）`;
+  document.getElementById('shiruModalBody').innerHTML = entries.length > 0 ? entries.map(e => `
+    <div class="shiru-entry-card">
+      <div class="shiru-entry-date">${formatShiruDate(e.date)}</div>
+      <div class="shiru-entry-row">
+        <div class="shiru-entry-play" onclick="playShiruEntry(this, '${e.audio}')">▶</div>
+        <div class="shiru-entry-title">${e.title}</div>
+      </div>
+      <div class="shiru-entry-ja">${e.ja}</div>
+    </div>
+  `).join('') : `<div class="hint-box">まだこのジャンルの発見はないよ。火・木のお楽しみに。</div>`;
+  document.getElementById('shiruModal').classList.add('open');
+}
+
+function formatShiruDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+function closeShiruModal() {
+  document.getElementById('shiruModal').classList.remove('open');
+  shiruAudioEl.pause();
+  if (shiruActiveBtn) { shiruActiveBtn.textContent = '▶'; shiruActiveBtn.dataset.playing = '0'; shiruActiveBtn = null; }
+}
+
+// しるエントリ用の音声プレイヤー（ルーティンと同じ「同時に1個だけ再生」方式）
+const shiruAudioEl = new Audio();
+registerAudio(shiruAudioEl);
+let shiruActiveBtn = null;
+
+function playShiruEntry(btn, src) {
+  if (shiruActiveBtn && shiruActiveBtn !== btn) {
+    shiruActiveBtn.textContent = '▶';
+    shiruActiveBtn.dataset.playing = '0';
+  }
+  if (btn.dataset.playing === '1') {
+    shiruAudioEl.pause();
+    btn.textContent = '▶';
+    btn.dataset.playing = '0';
+    shiruActiveBtn = null;
+    return;
+  }
+  shiruActiveBtn = btn;
+  btn.dataset.playing = '1';
+  btn.textContent = '⏸';
+  shiruAudioEl.onended = null;
+  shiruAudioEl.onerror = null;
+  shiruAudioEl.pause();
+  shiruAudioEl.src = src;
+  shiruAudioEl.currentTime = 0;
+  const reset = () => {
+    btn.textContent = '▶';
+    btn.dataset.playing = '0';
+    if (shiruActiveBtn === btn) shiruActiveBtn = null;
+  };
+  shiruAudioEl.onended = reset;
+  shiruAudioEl.onerror = reset;
+  try {
+    const p = shiruAudioEl.play();
+    if (p && typeof p.catch === 'function') { p.catch(reset); }
+  } catch (e) { reset(); }
+}
+
+renderShiruCatGrid();
 
 // ========================
 // 絵本ビューワー
