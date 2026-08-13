@@ -3935,13 +3935,24 @@ function resolveMorningTalkReplayBaseKey(audioKey) {
 
 // 火・木のように「baseの再利用＋解説オフセット」で解決すべき回なら、baseのLINE_TIMINGSにoffsetを足した
 // 配列を動的に生成して返す。対象外の回はそのまま MORNING_TALK_LINE_TIMINGS[audioKey] を返す（undefinedもあり得る）。
+//
+// MORNING_TALK_REPLAY_SKIP_FIRST_LINE: 元音源の冒頭にBGM/イントロがあり、1行目の実際の発話開始が
+// 計測値より数秒遅れる（＝1行目のハイライトが早すぎて見える）回を登録する。
+// 該当する回は1行目のstartを2行目のstartと同じ値に上書きし、1行目の区間を実質ゼロ秒にする
+// →ハイライトは1行目を経由せず、いきなり2行目から始まる（2026-08-13 火曜の実機確認より導入）。
+const MORNING_TALK_REPLAY_SKIP_FIRST_LINE = new Set(['aug_w1_tue']);
+
 function resolveMorningTalkLineStarts(audioKey) {
   const offset = MORNING_TALK_REPLAY_OFFSET[audioKey];
   if (offset == null) return MORNING_TALK_LINE_TIMINGS[audioKey];
   const baseKey = resolveMorningTalkReplayBaseKey(audioKey);
   const baseStarts = baseKey ? MORNING_TALK_LINE_TIMINGS[baseKey] : null;
   if (!baseStarts) return MORNING_TALK_LINE_TIMINGS[audioKey]; // baseが未登録ならフォールバックに任せる
-  return baseStarts.map(t => t + offset);
+  const shifted = baseStarts.map(t => t + offset);
+  if (MORNING_TALK_REPLAY_SKIP_FIRST_LINE.has(audioKey) && shifted.length > 1) {
+    shifted[0] = shifted[1];
+  }
+  return shifted;
 }
 
 // Jay/Maiの口パクアバター画像（トーク系プロファイル）。3コマをループさせて話している間だけ動かす。
