@@ -3920,7 +3920,7 @@ const MORNING_TALK_LINE_TIMINGS = {
 // 登録の仕方：Maiは「w1_thu、オフセット◯秒」とだけ伝えればOK。baseは曜日から自動判定される
 // （火→直前の月、木→直前の水）ので、baseキーを毎回書く必要はない。
 const MORNING_TALK_REPLAY_OFFSET = {
-  aug_w1_tue: 41, // Maiの解説が0〜41秒、41秒から月曜の会話（aug_w1_mon）が再生される（2026-08-13 Mai確認・実機ハイライトのズレを踏まえ37→41へ再修正）
+  aug_w1_tue: 33.352, // 2行目のMaiの台詞（月曜音源8.188秒地点）が41.54秒で始まるよう逆算（2026-08-13 ftdebug実測値より算出。1行目はMORNING_TALK_REPLAY_SKIP_FIRST_LINEでハイライト対象外にしているため、1行目自体の秒数は無視してOK）
   aug_w1_thu: 38.218, // 2行目のMaiの台詞（水曜音源8.782秒地点）が47.000秒で始まるよう逆算（2026-08-13 Mai確認・実機ハイライトのズレを踏まえ44→38.218へ再修正）
 };
 
@@ -4173,11 +4173,12 @@ function updateFtPhraseHighlight(t) {
   try {
     if (FT_DEBUG) renderFtDebugOverlay(t);
     if (!ftPhraseTimings.length) { setFtActiveSpeaker(null); updateFtBubble(null, null); return; }
-    // 該当する区間が見つからない(＝最後の行の終了時刻も過ぎた)場合はactiveIdx=-1のまま。
-    // 「最後の行にずっと留まる」のではなく、以降は誰もハイライトしない(ふきだしも隠れる)状態にする。
+    // 該当する区間が見つからない場合はactiveIdx=-1のまま。
+    // ケース1: 最後の行の終了時刻も過ぎた（→以降は誰もハイライトしない、ふきだしも隠れる）
+    // ケース2: まだ最初の行のstartにも達していない（→BGM/イントロ中などハイライトすべき行がまだない）
     let activeIdx = -1;
     for (let i = 0; i < ftPhraseTimings.length; i++) {
-      if (t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+      if (t >= ftPhraseTimings[i].start && t < ftPhraseTimings[i].end) { activeIdx = i; break; }
     }
     ftPhraseTimings.forEach((_, i) => {
       const row = document.getElementById('ftPhraseRow' + i);
@@ -4207,16 +4208,15 @@ function renderFtDebugOverlay(t) {
   el.style.display = 'block';
   let activeIdx = -1;
   if (ftPhraseTimings.length) {
-    activeIdx = ftPhraseTimings.length - 1;
     for (let i = 0; i < ftPhraseTimings.length; i++) {
-      if (t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+      if (t >= ftPhraseTimings[i].start && t < ftPhraseTimings[i].end) { activeIdx = i; break; }
     }
   }
   const lines = [
     `currentTime: ${t.toFixed(2)}s / duration: ${(ftAudioEl.duration || 0).toFixed(2)}s`,
     `ftCurrentPhrases.length: ${ftCurrentPhrases.length} / ftPhraseTimings.length: ${ftPhraseTimings.length}`,
     `activeIdx: ${activeIdx}`,
-    ftPhraseTimings[activeIdx] ? `active row range: ${ftPhraseTimings[activeIdx].start.toFixed(2)} - ${ftPhraseTimings[activeIdx].end.toFixed(2)}` : '',
+    ftPhraseTimings[activeIdx] ? `active row range: ${ftPhraseTimings[activeIdx].start.toFixed(2)} - ${ftPhraseTimings[activeIdx].end.toFixed(2)}` : '(該当区間なし＝イントロ中 or 終了後)',
   ];
   el.textContent = lines.join('\n');
 }
