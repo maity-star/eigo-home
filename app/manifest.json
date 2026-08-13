@@ -1,9 +1,9 @@
 {
   "name": "Enverly",
   "short_name": "Enverly",
-  "description": "英語を教えるのはあなた。Enverlyがするのは、その毎日を少し軽くすることだけ。",
-  "start_url": "/app/",
-  "scope": "/app/",
+  "description": "英語は、日々の中で育つ。Enverlyは、その隣にいます。",
+  "start_url": "/app",
+  "scope": "/app",
   "display": "standalone",
   "background_color": "#F5F0E8",
   "theme_color": "#6AA17F",
