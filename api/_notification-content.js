@@ -79,7 +79,7 @@ export function getMorningSlotMessage(now = new Date()) {
     const line = pickJoelLine(jst);
     return {
       title: '今日のフレーズ、届いたよ🎈',
-      body: `Jayから: ${line.ja}`,
+      body: `Jay: "${line.en}" ${line.ja}`,
       tag: NOTIFICATION_TAG,
       url: '/',
     };
