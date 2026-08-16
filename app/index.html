@@ -1706,7 +1706,14 @@ function setNotifySwitchUI(on) {
 
 async function toggleDailyNotification() {
   const switchEl = document.getElementById('notifySwitch');
-  if (!switchEl || switchEl.classList.contains('pending')) return;
+  if (!switchEl) {
+    alert('診断: notifySwitch要素が見つかりません。設定画面の読み込みに問題がある可能性があります。');
+    return;
+  }
+  if (switchEl.classList.contains('pending')) {
+    alert('診断: 前回の処理が「pending」状態のまま止まっています。一度アプリを閉じて開き直してください。');
+    return;
+  }
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     alert('お使いのブラウザは通知に対応していません。');
     return;
@@ -1720,6 +1727,9 @@ async function toggleDailyNotification() {
     step = 'getSubscription';
     const existing = await reg.pushManager.getSubscription();
 
+    // 診断用: 分岐前の状態を必ず表示する
+    alert('診断: 現在の状態\n既存の購読: ' + (existing ? 'あり' : 'なし') + '\n通知許可(OS): ' + Notification.permission + '\n\n→ ' + ((existing && Notification.permission === 'granted') ? 'OFFにする処理に進みます' : 'ONにする処理に進みます'));
+
     if (existing && Notification.permission === 'granted') {
       // OFFにする
       step = 'unsubscribe fetch';
@@ -1731,6 +1741,7 @@ async function toggleDailyNotification() {
       step = 'unsubscribe';
       await existing.unsubscribe();
       setNotifySwitchUI(false);
+      alert('診断: OFFにしました。既存の購読を解除しました。');
       return;
     }
 
@@ -1741,6 +1752,8 @@ async function toggleDailyNotification() {
       setNotifySwitchUI(false);
       if (permission === 'denied') {
         alert('通知がブロックされています。ブラウザの設定から許可してください。');
+      } else {
+        alert('診断: requestPermissionの結果が"' + permission + '"でした（grantedではない）。');
       }
       return;
     }
@@ -1762,6 +1775,7 @@ async function toggleDailyNotification() {
       throw new Error('subscribe API failed: HTTP ' + res.status + ' ' + bodyText);
     }
     setNotifySwitchUI(true);
+    alert('診断: ONにできました。購読・サーバー登録ともに成功しました。');
   } catch (e) {
     console.error('通知購読エラー [' + step + ']', e);
     // 診断用: 開発者ツールが見れない状況でも原因が分かるよう、画面上に直接表示する
