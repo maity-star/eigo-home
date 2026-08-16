@@ -61,17 +61,14 @@
   .gate-howto {
     width: 100%; max-width: 320px; margin-bottom: 16px;
     background: #fff; border: 1.5px solid #BBDAC8; border-radius: 12px;
-    padding: 4px 14px;
+    padding: 14px 16px;
+    text-align: left;
   }
-  .gate-howto summary {
-    padding: 10px 0; font-size: 13px; font-weight: 700; color: #2D6A4F;
-    cursor: pointer; list-style: none;
+  .gate-howto-title {
+    font-size: 13px; font-weight: 700; color: #2D6A4F; margin-bottom: 8px;
   }
-  .gate-howto summary::-webkit-details-marker { display: none; }
-  .gate-howto summary::after { content: '  ›'; }
-  .gate-howto[open] summary::after { content: '  ﹀'; }
   .gate-howto-body {
-    padding: 4px 0 14px; font-size: 12.5px; line-height: 1.8; color: #3A3A3A; text-align: left;
+    font-size: 12.5px; line-height: 1.8; color: #3A3A3A;
   }
   .gate-howto-body b { display: block; color: #2D6A4F; margin-bottom: 2px; font-size: 12.5px; }
 
@@ -244,8 +241,8 @@
   </div>
   <div class="gate-error" id="gateErrorMsg"></div>
 
-  <details class="gate-howto">
-    <summary>ホーム画面への追加方法</summary>
+  <div class="gate-howto">
+    <div class="gate-howto-title">ホーム画面への追加方法</div>
     <div class="gate-howto-body">
       <b>iPhone・Safariの場合</b>
       ①画面下の共有ボタン（□に↑）をタップ<br>
@@ -258,7 +255,7 @@
       <br>
       追加後、ホーム画面のアイコンから開いたら、もう一度この画面で招待コードを入力してください。
     </div>
-  </details>
+  </div>
 
   <div class="gate-note">
     招待コードについてのお問い合わせは、Instagram（@enverly_english）のDMまでお願いします。
