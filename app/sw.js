@@ -39,7 +39,7 @@ self.addEventListener('push', (event) => {
 // 通知タップ時：既に開いているタブがあればフォーカス、なければ新規タブでアプリを開く
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = (event.notification.data && event.notification.data.url) || '/';
+  const targetUrl = (event.notification.data && event.notification.data.url) || '/app';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
