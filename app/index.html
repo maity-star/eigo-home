@@ -1721,13 +1721,16 @@ async function toggleDailyNotification() {
   switchEl.classList.add('pending');
   var step = 'init';
   try {
+    step = 'serviceWorker.register';
+    // 今までは navigator.serviceWorker.ready（登録済みのSWがactiveになるのを待つだけ）に
+    // 頼っていたが、そもそも register 自体が失敗しているとreadyは永遠に解決しない。
+    // ここで明示的にregisterを呼び、失敗理由を直接キャッチできるようにする。
+    await navigator.serviceWorker.register('/app/sw.js');
+
     step = 'serviceWorker.ready';
-    // navigator.serviceWorker.ready は、SWの登録自体に失敗していると
-    // エラーにもならず永遠に解決しないことがある（＝タップしても無反応に見える原因になりうる）。
-    // そのため5秒でタイムアウトさせ、必ず何かしらの結果が返るようにする。
     const reg = await Promise.race([
       navigator.serviceWorker.ready,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready がタイムアウトしました（5秒待っても解決しませんでした。sw.jsが正しく配置されていない可能性があります）')), 5000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready がタイムアウトしました（5秒待っても解決しませんでした。registerは成功したのにreadyが進まない、珍しいケースです）')), 5000))
     ]);
 
     step = 'getSubscription';
