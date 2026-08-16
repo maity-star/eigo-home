@@ -1688,7 +1688,7 @@ async function initPushNotification() {
     return;
   }
   try {
-    const reg = await navigator.serviceWorker.register('/app/sw.js', { scope: '/app' });
+    const reg = await navigator.serviceWorker.register('/sw.js');
     const existing = await reg.pushManager.getSubscription();
     setNotifySwitchUI(!!existing && Notification.permission === 'granted');
   } catch (e) {
@@ -1737,12 +1737,12 @@ async function toggleDailyNotification() {
     }
 
     step = 'serviceWorker.register';
-    // scopeを明示的に "/app"（末尾スラッシュなし）に指定する。
-    // これを省略すると、sw.jsの設置場所から自動計算されるデフォルトscopeは
-    // "/app/"（末尾スラッシュあり）になり、現在のページURL "/app"（スラッシュなし）が
-    // 文字列として前方一致せず「scope外」と判定されてしまう。
-    // manifest.jsonのscopeも "/app" で統一しているため、ここでも合わせる。
-    await navigator.serviceWorker.register('/app/sw.js', { scope: '/app' });
+    // sw.jsはルート直下（enverly.jp/sw.js）に配置する前提。
+    // /app配下に置くと、その場所を根拠に計算される最大scopeが"/app/"（末尾スラッシュあり）に
+    // 制限され、ページURL"/app"（スラッシュなし）を確実にカバーできない
+    // （実機で "Scope URL should start with the given script URL" エラーとして再現・確認済み）。
+    // ルート直下ならデフォルトscopeが"/"になり、サイト全体を問題なくカバーできる。
+    await navigator.serviceWorker.register('/sw.js');
 
     step = 'serviceWorker.ready';
     const reg = await Promise.race([
