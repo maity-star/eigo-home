@@ -9,8 +9,165 @@
 <link rel="icon" type="image/png" href="/icons/favicon_32.png">
 <meta name="theme-color" content="#6AA17F">
 <link rel="stylesheet" href="/app/style.css">
+
+<!-- ========================
+     招待制アクセスゲート（2026年8月実装）
+     - URLの ?invite=xxxxx-s（モニター個別）/ ?invite=xxxxx-fam（家族共通）を判定
+     - 有効ならlocalStorageに保存し、以降はパラメータなしでもOK
+     - 期限切れ・未認証はロック画面を表示、本体(#mainApp)は隠す
+     ======================== -->
+<style>
+  /* デフォルトは両方非表示。判定スクリプトがhtmlタグにクラスを付けて出し分ける */
+  #accessLockScreen { display: none; }
+  #mainApp { display: none; }
+  html.gate-unlocked #mainApp { display: block; }
+  html.gate-locked #accessLockScreen { display: flex; }
+
+  #accessLockScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    flex-direction: column; align-items: center; justify-content: center;
+    background: #F5FAF7;
+    padding: 32px 24px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+  }
+  .gate-logo { font-size: 26px; font-weight: 800; color: #2D6A4F; margin-bottom: 18px; }
+  .gate-logo span { color: #6AA17F; font-weight: 600; }
+  .gate-message {
+    max-width: 320px; font-size: 14px; line-height: 1.8; color: #3A3A3A;
+    margin-bottom: 24px;
+  }
+  .gate-input-row {
+    display: flex; gap: 8px; width: 100%; max-width: 320px; margin-bottom: 10px;
+  }
+  .gate-input {
+    flex: 1; padding: 12px 14px; border: 1.5px solid #BBDAC8; border-radius: 12px;
+    font-size: 14px; background: #fff; color: #3A3A3A; outline: none;
+  }
+  .gate-input:focus { border-color: #6AA17F; }
+  .gate-submit-btn {
+    padding: 12px 18px; border: none; border-radius: 12px;
+    background: #2D6A4F; color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+  }
+  .gate-submit-btn:active { background: #24543F; }
+  .gate-error {
+    color: #C1443F; font-size: 12.5px; margin-bottom: 14px; min-height: 16px;
+  }
+  .gate-note {
+    font-size: 11.5px; color: #8A8A8A; max-width: 300px; line-height: 1.6;
+  }
+</style>
+
+<script>
+(function () {
+  // ------------------------------------------------------------
+  // 招待コード表
+  //   モニター個別: '5桁ランダム英数字-苗字頭文字'  → autoRenew:false, expiryあり
+  //   家族共通    : '5桁ランダム英数字-fam'         → autoRenew:true,  expiry:null(無期限)
+  // 実際にモニターへ配布する際は、下記を実コードに差し替える。
+  // ------------------------------------------------------------
+  var INVITE_CODES = {
+    'batfx-y':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 矢幡めぐ
+    'yhjx6-u':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 碓井さん
+    'n7n4n-k':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 菊地さん
+    '5s7nz-o':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 岡田さん
+    '86nje-m':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 山口さん
+    'nw9kd-t':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 田島さん
+    'yxtkw-n':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 田中さん
+    'pecku-ka': { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // かねますさん
+    '9vc7j-e':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // えりかちゃん（ロイくんママ）
+    'ct758-oc': { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // おおちゃん
+    '9aq2t-fam':{ type: 'family',  expiry: null,          autoRenew: true  }  // 家族共通・無期限
+  };
+
+  var STORAGE_KEY = 'enverly_access';
+
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function isValidRecord(rec) {
+    if (!rec) return false;
+    if (rec.expiry === null || rec.expiry === undefined) return true; // 無期限
+    return today() <= rec.expiry;
+  }
+
+  function readStoredRecord() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function grantFromCode(code) {
+    var entry = INVITE_CODES[code];
+    if (!entry) return null;
+    var record = {
+      code: code,
+      type: entry.type,
+      expiry: entry.expiry,
+      autoRenew: entry.autoRenew,
+      grantedAt: today()
+    };
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(record)); } catch (e) {}
+    return record;
+  }
+
+  // 1. URLパラメータを最優先でチェック
+  var params = new URLSearchParams(window.location.search);
+  var inviteParam = params.get('invite');
+  var record = null;
+
+  if (inviteParam && INVITE_CODES[inviteParam]) {
+    record = grantFromCode(inviteParam);
+    // コードをURLに残さない（共有スクショ・履歴からの流出防止）
+    try {
+      window.history.replaceState({}, '', window.location.pathname);
+    } catch (e) {}
+  } else {
+    record = readStoredRecord();
+  }
+
+  var unlocked = isValidRecord(record);
+  document.documentElement.classList.add(unlocked ? 'gate-unlocked' : 'gate-locked');
+
+  // ロック画面からの手動コード入力用（bodyのフォームから呼ばれる）
+  window.__enverlyGate = {
+    tryUnlockWithCode: function (code) {
+      var trimmed = (code || '').trim();
+      var rec = grantFromCode(trimmed);
+      if (isValidRecord(rec)) {
+        window.location.reload();
+        return true;
+      }
+      return false;
+    }
+  };
+})();
+</script>
 </head>
 <body>
+
+<!-- ========================
+     招待制アクセスゲート：ロック画面
+     ======================== -->
+<div id="accessLockScreen">
+  <div class="gate-logo">En<span>verly</span></div>
+  <div class="gate-message">
+    只今、招待制でご案内しています。<br>
+    招待コードをお持ちの方は、下に入力してください。
+  </div>
+  <div class="gate-input-row">
+    <input type="text" id="gateCodeInput" class="gate-input" placeholder="招待コード" autocomplete="off" autocapitalize="off">
+    <button class="gate-submit-btn" onclick="handleGateSubmit()">つづける</button>
+  </div>
+  <div class="gate-error" id="gateErrorMsg"></div>
+  <div class="gate-note">
+    招待コードについてのお問い合わせは、Instagram（@enverly_english）のDMまでお願いします。
+  </div>
+</div>
 
 <!-- オンボーディング（興味選択）は2026年7月に廃止・別ファイルへ退避済み
      → enverly_onboarding_interest_module.html を参照 -->
@@ -827,6 +984,28 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ========================
+// 招待制アクセスゲート：ロック画面フォームの送信ハンドラ
+// （判定ロジック本体は<head>のwindow.__enverlyGateに実装済み）
+// ========================
+function handleGateSubmit() {
+  var input = document.getElementById('gateCodeInput');
+  var errorEl = document.getElementById('gateErrorMsg');
+  var code = input ? input.value : '';
+  var ok = window.__enverlyGate && window.__enverlyGate.tryUnlockWithCode(code);
+  if (!ok) {
+    if (errorEl) errorEl.textContent = 'コードが正しくありません。もう一度ご確認ください。';
+  }
+}
+(function () {
+  var input = document.getElementById('gateCodeInput');
+  if (input) {
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') handleGateSubmit();
+    });
+  }
+})();
+
 // ========================
 // グローバル音声マネージャー
 // ========================
