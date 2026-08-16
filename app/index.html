@@ -25,11 +25,13 @@
 
   #accessLockScreen {
     position: fixed; inset: 0; z-index: 9999;
-    flex-direction: column; align-items: center; justify-content: center;
+    flex-direction: column; align-items: center; justify-content: flex-start;
     background: #F5FAF7;
-    padding: 32px 24px;
+    padding: 40px 24px 60px;
     text-align: center;
     font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .gate-logo { font-size: 26px; font-weight: 800; color: #2D6A4F; margin-bottom: 18px; }
   .gate-logo span { color: #6AA17F; font-weight: 600; }
@@ -148,6 +150,8 @@
     padding: 32px 24px;
     text-align: center;
     font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .iab-icon-line { width: 40px; height: 40px; border-radius: 50%; background: var(--iab-icon-bg, #EDF6F1); border: 2px solid #6AA17F; margin-bottom: 16px; }
   .iab-title { font-size: 16px; font-weight: 800; color: #2D6A4F; margin-bottom: 12px; }
