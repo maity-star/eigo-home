@@ -1688,7 +1688,7 @@ async function initPushNotification() {
     return;
   }
   try {
-    const reg = await navigator.serviceWorker.register('/app/sw.js');
+    const reg = await navigator.serviceWorker.register('/app/sw.js', { scope: '/app' });
     const existing = await reg.pushManager.getSubscription();
     setNotifySwitchUI(!!existing && Notification.permission === 'granted');
   } catch (e) {
@@ -1721,11 +1721,28 @@ async function toggleDailyNotification() {
   switchEl.classList.add('pending');
   var step = 'init';
   try {
+    step = 'getRegistrations（既存の登録を確認）';
+    const allRegs = await navigator.serviceWorker.getRegistrations();
+    const scopeList = allRegs.map(function (r) {
+      return r.scope + '（state: ' + (r.active ? 'active' : (r.installing ? 'installing' : (r.waiting ? 'waiting' : '不明'))) + '）';
+    }).join('\n') || '（登録なし）';
+
+    if (allRegs.length > 0) {
+      // 古い登録（特に以前の間違ったパスで登録されてしまったもの等）が残っていると
+      // 新しい登録の妨げになることがあるため、一旦すべて解除してから登録し直す。
+      alert('診断: 既存のSW登録が見つかりました。一旦すべて解除してから登録し直します。\n\n' + scopeList);
+      for (const r of allRegs) {
+        await r.unregister();
+      }
+    }
+
     step = 'serviceWorker.register';
-    // 今までは navigator.serviceWorker.ready（登録済みのSWがactiveになるのを待つだけ）に
-    // 頼っていたが、そもそも register 自体が失敗しているとreadyは永遠に解決しない。
-    // ここで明示的にregisterを呼び、失敗理由を直接キャッチできるようにする。
-    await navigator.serviceWorker.register('/app/sw.js');
+    // scopeを明示的に "/app"（末尾スラッシュなし）に指定する。
+    // これを省略すると、sw.jsの設置場所から自動計算されるデフォルトscopeは
+    // "/app/"（末尾スラッシュあり）になり、現在のページURL "/app"（スラッシュなし）が
+    // 文字列として前方一致せず「scope外」と判定されてしまう。
+    // manifest.jsonのscopeも "/app" で統一しているため、ここでも合わせる。
+    await navigator.serviceWorker.register('/app/sw.js', { scope: '/app' });
 
     step = 'serviceWorker.ready';
     const reg = await Promise.race([
