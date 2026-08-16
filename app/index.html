@@ -1712,23 +1712,30 @@ async function toggleDailyNotification() {
     return;
   }
   switchEl.classList.add('pending');
+  var step = 'init';
   try {
+    step = 'serviceWorker.ready';
     const reg = await navigator.serviceWorker.ready;
+
+    step = 'getSubscription';
     const existing = await reg.pushManager.getSubscription();
 
     if (existing && Notification.permission === 'granted') {
       // OFFにする
+      step = 'unsubscribe fetch';
       await fetch('/api/unsubscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ endpoint: existing.endpoint }),
       }).catch(() => {});
+      step = 'unsubscribe';
       await existing.unsubscribe();
       setNotifySwitchUI(false);
       return;
     }
 
     // ONにする
+    step = 'requestPermission';
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       setNotifySwitchUI(false);
@@ -1737,18 +1744,28 @@ async function toggleDailyNotification() {
       }
       return;
     }
+    step = 'pushManager.subscribe';
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     });
-    await fetch('/api/subscribe', {
+    step = 'subscribe fetch';
+    const res = await fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription: sub }),
     });
+    if (!res.ok) {
+      // サーバー側が失敗を返してきた場合もここで検知できるようにする
+      var bodyText = '';
+      try { bodyText = await res.text(); } catch (e2) {}
+      throw new Error('subscribe API failed: HTTP ' + res.status + ' ' + bodyText);
+    }
     setNotifySwitchUI(true);
   } catch (e) {
-    console.error('通知購読エラー', e);
+    console.error('通知購読エラー [' + step + ']', e);
+    // 診断用: 開発者ツールが見れない状況でも原因が分かるよう、画面上に直接表示する
+    alert('通知の設定に失敗しました。\n\n失敗した処理: ' + step + '\nエラー内容: ' + (e && e.message ? e.message : e));
     setNotifySwitchUI(false);
   } finally {
     switchEl.classList.remove('pending');
