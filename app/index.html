@@ -1688,7 +1688,7 @@ async function initPushNotification() {
     return;
   }
   try {
-    const reg = await navigator.serviceWorker.register('/sw.js');
+    const reg = await navigator.serviceWorker.register('/app/sw.js');
     const existing = await reg.pushManager.getSubscription();
     setNotifySwitchUI(!!existing && Notification.permission === 'granted');
   } catch (e) {
@@ -1722,7 +1722,13 @@ async function toggleDailyNotification() {
   var step = 'init';
   try {
     step = 'serviceWorker.ready';
-    const reg = await navigator.serviceWorker.ready;
+    // navigator.serviceWorker.ready は、SWの登録自体に失敗していると
+    // エラーにもならず永遠に解決しないことがある（＝タップしても無反応に見える原因になりうる）。
+    // そのため5秒でタイムアウトさせ、必ず何かしらの結果が返るようにする。
+    const reg = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready がタイムアウトしました（5秒待っても解決しませんでした。sw.jsが正しく配置されていない可能性があります）')), 5000))
+    ]);
 
     step = 'getSubscription';
     const existing = await reg.pushManager.getSubscription();
