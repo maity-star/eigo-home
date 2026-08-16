@@ -72,6 +72,68 @@
   }
   .gate-howto-body b { display: block; color: #2D6A4F; margin-bottom: 2px; font-size: 12.5px; }
 
+  /* ホーム画面追加のデモアニメーション（LPのはじめかたセクションを移植） */
+  .gate-demo-wrap { display: flex; justify-content: center; margin: 14px 0 4px; }
+  .gate-demo-frame {
+    width: 190px; background: #111827; border-radius: 26px; padding: 6px;
+  }
+  .gate-demo-screen {
+    background: #FFFDF8; border-radius: 20px; overflow: hidden; position: relative; height: 340px;
+  }
+  .gate-demo-topbar { padding: 10px 12px 4px; display: flex; align-items: center; }
+  .gate-demo-logo { font-size: 12px; font-weight: 700; color: #111827; }
+  .gate-demo-logo span { color: #2D6A4F; }
+  .gate-demo-hero { margin: 4px 10px 0; height: 100px; border-radius: 12px; background: #EDF6F1; border: 1px solid #BBDAC8; }
+  .gate-demo-toolbar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 10px 12px;
+  }
+  .gate-demo-pill {
+    background: #FFFDF8; border: 1px solid #BBDAC8; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; align-items: center; justify-content: center; font-size: 9px; color: #6B7280;
+  }
+  .gate-demo-pill-back { width: 30px; height: 30px; border-radius: 50%; font-size: 13px; flex-shrink: 0; }
+  .gate-demo-pill-url { flex: 1; height: 30px; border-radius: 999px; gap: 4px; padding: 0 10px; }
+  .gate-demo-dots {
+    width: 30px; height: 30px; border-radius: 50%; border: 1px solid #BBDAC8; background: #FFFDF8;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #6B7280; flex-shrink: 0;
+  }
+  .gate-demo-popup {
+    position: absolute; right: 8px; bottom: 40px; width: 140px;
+    background: #FFFDF8; border: 1px solid #BBDAC8; border-radius: 12px; padding: 4px 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: scale(0.85); transform-origin: bottom right;
+    opacity: 0; transition: all 0.25s ease;
+  }
+  .gate-demo-popup.show { opacity: 1; transform: scale(1); }
+  .gate-demo-popup-item { display: flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 10.5px; color: #3A3A36; }
+  .gate-demo-sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; background: #262626; color: #fff;
+    border-radius: 16px 16px 0 0; padding: 14px 16px 18px; min-height: 140px;
+    transform: translateY(100%); transition: transform 0.4s ease;
+  }
+  .gate-demo-sheet.show { transform: translateY(0%); }
+  .gate-demo-sheet.tall { min-height: 220px; }
+  .gate-demo-share-head { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #444; }
+  .gate-demo-share-icon { width: 28px; height: 28px; border-radius: 8px; background: #6DB88A; }
+  .gate-demo-share-actions { display: flex; justify-content: space-between; padding: 12px 2px 0; }
+  .gate-demo-share-actions div { text-align: center; font-size: 8px; color: #ccc; width: 46px; }
+  .gate-demo-share-actions .accent { color: #9FE1CB; }
+  .gate-demo-extra-list { border-top: 1px solid #444; margin-top: 8px; padding-top: 6px; }
+  .gate-demo-extra-item { display: flex; align-items: center; gap: 8px; padding: 7px 2px; font-size: 10.5px; color: #eee; }
+  .gate-demo-extra-item.accent { background: rgba(159,225,203,0.18); border-radius: 8px; padding: 7px 8px; color: #9FE1CB; font-weight: 700; }
+  .gate-demo-addscreen-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .gate-demo-addscreen-head .add-btn { color: #9FE1CB; font-weight: 700; font-size: 11px; }
+  .gate-demo-addscreen-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; font-size: 11px; }
+  .gate-demo-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; font-size: 9.5px; color: #ddd; }
+  .gate-demo-toggle { width: 28px; height: 16px; border-radius: 8px; background: #4caf50; position: relative; }
+  .gate-demo-toggle::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #fff; position: absolute; right: 2px; top: 2px; }
+  .gate-demo-dot {
+    position: absolute; width: 18px; height: 18px; border-radius: 50%; background: rgba(74,157,90,0.35);
+    opacity: 0; pointer-events: none; transition: opacity 0.35s, transform 0.35s;
+  }
+  .gate-demo-caption { text-align: center; font-size: 11px; color: #6B7280; margin-top: 10px; min-height: 15px; }
+
   /* LINE等のアプリ内ブラウザで開いた場合の警告バナー
      （ホーム画面への追加ができない・ストレージが別扱いになるため、外部ブラウザに誘導する） */
   #inAppBrowserWarning { display: none; }
@@ -245,9 +307,10 @@
     <div class="gate-howto-title">ホーム画面への追加方法</div>
     <div class="gate-howto-body">
       <b>iPhone・Safariの場合</b>
-      ①画面下の共有ボタン（□に↑）をタップ<br>
-      ②「ホーム画面に追加」を選ぶ<br>
-      ③右上の「追加」をタップ<br>
+      ①画面の一番下にある「…」のボタンをタップ<br>
+      ②「共有」を選ぶ<br>
+      ③下部の小さいボタンが並んだ中から「ホーム画面に追加」を選ぶ（なければ「表示を増やす」をタップするとあります）<br>
+      ④右上の「追加」をタップして完了<br>
       <br>
       <b>Android・Chromeの場合</b>
       ①右上の「⋮」メニューをタップ<br>
@@ -255,6 +318,26 @@
       <br>
       追加後、ホーム画面のアイコンから開いたら、もう一度この画面で招待コードを入力してください。
     </div>
+
+    <div class="gate-demo-wrap">
+      <div class="gate-demo-frame">
+        <div class="gate-demo-screen" id="gateDemoScreen">
+          <div class="gate-demo-topbar">
+            <div class="gate-demo-logo">En<span>verly</span></div>
+          </div>
+          <div class="gate-demo-hero"></div>
+          <div class="gate-demo-toolbar">
+            <span class="gate-demo-pill gate-demo-pill-back">‹</span>
+            <span class="gate-demo-pill gate-demo-pill-url">🔒 enverly.jp ↻</span>
+            <span id="gateDemoDots" class="gate-demo-dots">•••</span>
+          </div>
+          <div class="gate-demo-popup" id="gateDemoPopup"></div>
+          <div class="gate-demo-sheet" id="gateDemoSheet"></div>
+          <div class="gate-demo-dot" id="gateDemoDot"></div>
+        </div>
+      </div>
+    </div>
+    <p class="gate-demo-caption" id="gateDemoCaption">画面下の「…」をタップ</p>
   </div>
 
   <div class="gate-note">
@@ -1097,6 +1180,101 @@ function handleGateSubmit() {
       if (e.key === 'Enter') handleGateSubmit();
     });
   }
+})();
+
+// ========================
+// ホーム画面追加デモアニメーション（start.htmlのガイドページと同一ロジックを移植）
+// ========================
+(function () {
+  var screenEl = document.getElementById('gateDemoScreen');
+  var popup = document.getElementById('gateDemoPopup');
+  var sheet = document.getElementById('gateDemoSheet');
+  var dot = document.getElementById('gateDemoDot');
+  var caption = document.getElementById('gateDemoCaption');
+  var dotsIcon = document.getElementById('gateDemoDots');
+  if (!screenEl || !popup || !sheet || !dot || !caption || !dotsIcon) return;
+
+  var shareHead = '<div class="gate-demo-share-head"><div class="gate-demo-share-icon"></div><div><div style="font-size:11px;font-weight:700;">Enverly</div><div style="font-size:9px;color:#aaa;">enverly.jp</div></div></div>';
+
+  var actionsMore = '<div class="gate-demo-share-actions"><div>📄<br>コピー</div><div>🔖<br>ブックマーク</div><div>👓<br>リーディング</div><div class="accent" id="gateSheetMoreBtn">⌄<br>表示を増やす</div></div>';
+
+  var actionsLess = '<div class="gate-demo-share-actions"><div>📄<br>コピー</div><div>🔖<br>ブックマーク</div><div>👓<br>リーディング</div><div class="accent">⌃<br>表示を減らす</div></div>' +
+    '<div class="gate-demo-extra-list">' +
+    '<div class="gate-demo-extra-item">🔖&nbsp; ブックマークの追加先</div>' +
+    '<div class="gate-demo-extra-item">☆&nbsp; お気に入りに追加</div>' +
+    '<div class="gate-demo-extra-item accent" id="gateSheetHomeItem">➕&nbsp; ホーム画面に追加</div>' +
+    '</div>';
+
+  var addScreen = '<div class="gate-demo-addscreen-head"><span>✕</span><span style="font-size:11px;font-weight:700;">ホーム画面に追加</span><span class="add-btn" id="gateSheetAddBtn">追加</span></div>' +
+    '<div class="gate-demo-addscreen-row"><div class="gate-demo-share-icon"></div><div>Enverly</div></div>' +
+    '<div class="gate-demo-toggle-row"><span>Webアプリとして開く</span><div class="gate-demo-toggle"></div></div>';
+
+  var shareSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><rect x="4" y="13" width="16" height="8" rx="2"/></svg>';
+
+  var popupList = '<div class="gate-demo-popup-item" id="gatePopupShareItem" style="color:#2D6A4F;font-weight:700;">' + shareSvg + '&nbsp; 共有</div>' +
+    '<div class="gate-demo-popup-item">🔖&nbsp; ブックマークに追加</div>' +
+    '<div class="gate-demo-popup-item">＋&nbsp; 新規タブ</div>';
+
+  var steps = [
+    { cap: '画面下の「…」をタップ', popup: false, sheet: false, targetEl: function(){ return dotsIcon; } },
+    { cap: '「共有」を選択', popup: true, sheet: false, html: popupList, targetId: 'gatePopupShareItem' },
+    { cap: '「表示を増やす」をタップ', popup: false, sheet: true, html: shareHead + actionsMore, targetId: 'gateSheetMoreBtn' },
+    { cap: '「ホーム画面に追加」を選択', popup: false, sheet: true, html: shareHead + actionsLess, targetId: 'gateSheetHomeItem' },
+    { cap: '右上の「追加」をタップして完了', popup: false, sheet: true, tall: true, html: addScreen, targetId: 'gateSheetAddBtn' },
+    { cap: 'ホーム画面から、いつでも開けます', popup: false, sheet: false, done: true }
+  ];
+
+  var timers = [];
+  var STEP_DURATION = 2600;
+  var TALL_STEP_DURATION = 3200;
+  var REVEAL_DELAY = 480;
+
+  function placeDotOn(el) {
+    if (!el) return;
+    var screenRect = screenEl.getBoundingClientRect();
+    var elRect = el.getBoundingClientRect();
+    var cx = elRect.left - screenRect.left + elRect.width / 2;
+    var cy = elRect.top - screenRect.top + elRect.height / 2;
+    dot.style.left = (cx - 9) + 'px';
+    dot.style.top = (cy - 9) + 'px';
+  }
+
+  function showDotOnTarget(s) {
+    var target = s.targetEl ? s.targetEl() : (s.targetId ? document.getElementById(s.targetId) : null);
+    if (!target) return;
+    placeDotOn(target);
+    dot.style.opacity = '1';
+    dot.style.transform = 'scale(1)';
+    timers.push(setTimeout(function () {
+      dot.style.transform = 'scale(1.7)';
+      dot.style.opacity = '0';
+    }, 450));
+  }
+
+  function playStep(i) {
+    var s = steps[i];
+    caption.textContent = s.cap;
+    popup.classList.toggle('show', s.popup);
+    if (s.popup) popup.innerHTML = s.html;
+    sheet.classList.toggle('show', s.sheet);
+    sheet.classList.toggle('tall', !!s.tall);
+    if (s.sheet) sheet.innerHTML = s.html; else sheet.innerHTML = '';
+
+    if (s.done) {
+      dot.style.opacity = '0';
+    } else if (s.targetEl) {
+      showDotOnTarget(s);
+    } else {
+      dot.style.opacity = '0';
+      timers.push(setTimeout(function () { showDotOnTarget(s); }, REVEAL_DELAY));
+    }
+
+    var duration = s.tall ? TALL_STEP_DURATION : STEP_DURATION;
+    var next = (i + 1) % steps.length;
+    timers.push(setTimeout(function () { playStep(next); }, duration));
+  }
+
+  playStep(0);
 })();
 
 // ========================
