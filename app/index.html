@@ -1784,7 +1784,19 @@ async function toggleDailyNotification() {
       return;
     }
     step = 'pushManager.subscribe';
-    const sub = await reg.pushManager.subscribe({
+    // readyが解決した直後でも、実機（特に通知許可を切替した直後など）では
+    // reg.active が一瞬まだ空のことがあるらしく、それが原因で
+    // 「Subscribing for push requires an active service worker」が出るケースがある。
+    // ここで数百ms待ちながら最大5回、activeになるのを確認してから進める。
+    var activeReg = reg;
+    for (var i = 0; i < 5 && !activeReg.active; i++) {
+      await new Promise(function (r) { setTimeout(r, 400); });
+      activeReg = await navigator.serviceWorker.getRegistration('/') || activeReg;
+    }
+    if (!activeReg.active) {
+      throw new Error('サービスワーカーがactiveになりませんでした（2秒待っても）。');
+    }
+    const sub = await activeReg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     });
