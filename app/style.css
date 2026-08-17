@@ -171,7 +171,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .logo { font-size: 18px; font-weight: 500; color: #111827; letter-spacing: -0.3px; }
 .logo span { color: #6DB88A; }
-.week-badge { font-size: 11px; background: #EDF6F1; color: #4D7D63; padding: 3px 10px; border-radius: 20px; }
 .header-sub { font-size: 12px; color: #6B7280; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .header-top-right { display: flex; align-items: center; gap: 8px; }
 .settings-gear-btn {
@@ -601,6 +600,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 12px; font-weight: 600; color: #4D7D63;
   cursor: pointer; background: none; border: none; width: 100%;
 }
+.ft-archive-back { color: #B8860B; margin-top: 0; padding-top: 4px; }
+.archive-ep-row { cursor: pointer; }
+.archive-empty { font-size: 12px; color: #9CA3AF; text-align: center; padding: 40px 0; }
 .ft-auto-next { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #E5E7EB; }
 .ft-auto-next.show { display: block; }
 .ft-auto-next-label { font-size: 11px; color: #6B7280; display: flex; align-items: center; gap: 5px; }
