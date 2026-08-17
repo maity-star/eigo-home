@@ -1706,14 +1706,8 @@ function setNotifySwitchUI(on) {
 
 async function toggleDailyNotification() {
   const switchEl = document.getElementById('notifySwitch');
-  if (!switchEl) {
-    alert('診断: notifySwitch要素が見つかりません。設定画面の読み込みに問題がある可能性があります。');
-    return;
-  }
-  if (switchEl.classList.contains('pending')) {
-    alert('診断: 前回の処理が「pending」状態のまま止まっています。一度アプリを閉じて開き直してください。');
-    return;
-  }
+  if (!switchEl) return;
+  if (switchEl.classList.contains('pending')) return;
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     alert('お使いのブラウザは通知に対応していません。');
     return;
@@ -1723,14 +1717,10 @@ async function toggleDailyNotification() {
   try {
     step = 'getRegistrations（既存の登録を確認）';
     const allRegs = await navigator.serviceWorker.getRegistrations();
-    const scopeList = allRegs.map(function (r) {
-      return r.scope + '（state: ' + (r.active ? 'active' : (r.installing ? 'installing' : (r.waiting ? 'waiting' : '不明'))) + '）';
-    }).join('\n') || '（登録なし）';
-
     if (allRegs.length > 0) {
-      // 古い登録（特に以前の間違ったパスで登録されてしまったもの等）が残っていると
-      // 新しい登録の妨げになることがあるため、一旦すべて解除してから登録し直す。
-      alert('診断: 既存のSW登録が見つかりました。一旦すべて解除してから登録し直します。\n\n' + scopeList);
+      // 古い登録（誤ったパスで登録されてしまったもの等）が残っていると
+      // 新しい登録の妨げになることがあるため、念のため毎回すべて解除してから登録し直す。
+      console.log('既存のSW登録を解除:', allRegs.map(function (r) { return r.scope; }));
       for (const r of allRegs) {
         await r.unregister();
       }
@@ -1747,14 +1737,11 @@ async function toggleDailyNotification() {
     step = 'serviceWorker.ready';
     const reg = await Promise.race([
       navigator.serviceWorker.ready,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready がタイムアウトしました（5秒待っても解決しませんでした。registerは成功したのにreadyが進まない、珍しいケースです）')), 5000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready がタイムアウトしました（5秒待っても解決しませんでした）')), 5000))
     ]);
 
     step = 'getSubscription';
     const existing = await reg.pushManager.getSubscription();
-
-    // 診断用: 分岐前の状態を必ず表示する
-    alert('診断: 現在の状態\n既存の購読: ' + (existing ? 'あり' : 'なし') + '\n通知許可(OS): ' + Notification.permission + '\n\n→ ' + ((existing && Notification.permission === 'granted') ? 'OFFにする処理に進みます' : 'ONにする処理に進みます'));
 
     if (existing && Notification.permission === 'granted') {
       // OFFにする
@@ -1767,7 +1754,6 @@ async function toggleDailyNotification() {
       step = 'unsubscribe';
       await existing.unsubscribe();
       setNotifySwitchUI(false);
-      alert('診断: OFFにしました。既存の購読を解除しました。');
       return;
     }
 
@@ -1778,8 +1764,6 @@ async function toggleDailyNotification() {
       setNotifySwitchUI(false);
       if (permission === 'denied') {
         alert('通知がブロックされています。ブラウザの設定から許可してください。');
-      } else {
-        alert('診断: requestPermissionの結果が"' + permission + '"でした（grantedではない）。');
       }
       return;
     }
@@ -1813,10 +1797,11 @@ async function toggleDailyNotification() {
       throw new Error('subscribe API failed: HTTP ' + res.status + ' ' + bodyText);
     }
     setNotifySwitchUI(true);
-    alert('診断: ONにできました。購読・サーバー登録ともに成功しました。');
   } catch (e) {
     console.error('通知購読エラー [' + step + ']', e);
-    // 診断用: 開発者ツールが見れない状況でも原因が分かるよう、画面上に直接表示する
+    // モニター期間中の暫定対応: 開発者ツールを見れない相手からも
+    // 原因を報告してもらえるよう、失敗時のみ画面上に直接表示する。
+    // （一般公開時はこのalertを削除し、サイレントな失敗+サポート導線に置き換える想定）
     alert('通知の設定に失敗しました。\n\n失敗した処理: ' + step + '\nエラー内容: ' + (e && e.message ? e.message : e));
     setNotifySwitchUI(false);
   } finally {
