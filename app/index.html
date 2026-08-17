@@ -395,7 +395,6 @@
     <div class="header-top">
       <div class="logo">En<span>verly</span></div>
       <div class="header-top-right">
-        <div class="week-badge">Week 1 · August</div>
         <button class="settings-gear-btn" onclick="openSettingsModal()" aria-label="設定">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
@@ -541,6 +540,7 @@
         </div>
 
         <button class="ft-archive-link" onclick="openArchiveModal()">これまでの放送 →</button>
+        <button class="ft-archive-link ft-archive-back" id="ftArchiveBackBtn" onclick="returnToTodayMorningTalk()" style="display:none;">← 今日の放送にもどる</button>
 
         <!-- Morning Talk終了後、自動で朝の音楽に切り替わる導線（プロトタイプ：視覚状態のみ再現。
              実音源チェーンは著作権フリー音源ライブラリ選定後に実装） -->
@@ -1066,76 +1066,9 @@
     </div>
     <button class="archive-modal-close" onclick="closeArchiveModal()">✕</button>
   </div>
-  <div class="archive-body">
-
-    <div class="archive-section-label"><span>⭐ Best Of</span><div class="archive-section-line"></div></div>
-    <div class="archive-best-scroll">
-      <div class="archive-best-card">
-        <div class="archive-best-star">⭐</div>
-        <div class="archive-best-q">"What's your favorite color?"</div>
-        <div class="archive-best-meta">5月 · 3:05</div>
-      </div>
-      <div class="archive-best-card">
-        <div class="archive-best-star">⭐</div>
-        <div class="archive-best-q">"Did you make a new friend today?"</div>
-        <div class="archive-best-meta">5月 · 3:50</div>
-      </div>
-      <div class="archive-best-card">
-        <div class="archive-best-star">⭐</div>
-        <div class="archive-best-q">"What did you dream about?"</div>
-        <div class="archive-best-meta">4月 · 3:20</div>
-      </div>
-    </div>
-
-    <div class="archive-section-label"><span>すべての放送</span><div class="archive-section-line"></div></div>
-
-    <div class="archive-month-group">
-      <div class="archive-month-title">6月 · Colors &amp; Animals</div>
-      <div class="archive-ep-row">
-        <div class="archive-ep-date">6/4</div>
-        <div class="archive-ep-q">What color is your favorite animal?</div>
-        <div class="archive-ep-play">▶</div>
-      </div>
-      <div class="archive-ep-row">
-        <div class="archive-ep-date">6/6</div>
-        <div class="archive-ep-q">What animal did you see today?</div>
-        <div class="archive-ep-play">▶</div>
-      </div>
-    </div>
-
-    <div class="archive-month-group">
-      <div class="archive-month-title">5月 · Family &amp; Friends</div>
-      <div class="archive-ep-row">
-        <div class="archive-ep-date">5/28</div>
-        <div class="archive-ep-q">Did you make a new friend today?</div>
-        <div class="archive-ep-play">▶</div>
-      </div>
-      <div class="archive-ep-row">
-        <div class="archive-ep-date">5/26</div>
-        <div class="archive-ep-q">What's your favorite color?</div>
-        <div class="archive-ep-play">▶</div>
-      </div>
-      <div class="archive-ep-row">
-        <div class="archive-ep-date">5/23</div>
-        <div class="archive-ep-q">Who did you play with at school?</div>
-        <div class="archive-ep-play">▶</div>
-      </div>
-    </div>
-
-    <div class="archive-month-group">
-      <div class="archive-month-title">4月 · Dreams &amp; Imagination</div>
-      <div class="archive-ep-row">
-        <div class="archive-ep-date">4/30</div>
-        <div class="archive-ep-q">What did you dream about?</div>
-        <div class="archive-ep-play">▶</div>
-      </div>
-      <div class="archive-ep-row">
-        <div class="archive-ep-date">4/28</div>
-        <div class="archive-ep-q">If you could fly, where would you go?</div>
-        <div class="archive-ep-play">▶</div>
-      </div>
-    </div>
-
+  <div class="archive-body" id="archiveBody">
+    <!-- 中身はrenderArchiveModalBody()がMORNING_TALK_WEEKS/MORNING_TALK_AUDIOの実データから動的生成する。
+         「⭐ Best Of」は放送本数がまだ少なくキュレーションできないため一旦保留（W2以降、蓄積を見て再検討）。 -->
   </div>
 </div>
 
@@ -2745,8 +2678,29 @@ function parseFamilyPreviewKey(param) {
   return { weekKey, dayKey };
 }
 
+// 「これまでの放送」から特定の回を選んで再生中かどうか（{weekKey, dayKey} | null）。
+// セッション内だけの一時状態＝ページ再読み込みや翌日アクセスでは自動的に「今日」に戻る。
+let ftArchiveOverride = null;
+const MORNING_TALK_DAY_OFFSET = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4 };
+// weekKey×dayKeyから実際の放送カレンダー日を逆算（アーカイブ一覧の日付表示・「まだ放送していない回」の判定に使う）
+function dateForMorningTalkDay(weekKey, dayKey) {
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const weekIdx = Math.max(0, MORNING_TALK_WEEK_ORDER.indexOf(weekKey));
+  const daysSinceStart = weekIdx * 7 + (MORNING_TALK_DAY_OFFSET[dayKey] || 0);
+  return new Date(w1Start.getTime() + daysSinceStart * 86400000);
+}
+
 function getTodayMorningTalkInfo() {
   const now = new Date();
+  if (ftArchiveOverride) {
+    const { weekKey, dayKey } = ftArchiveOverride;
+    const content = MORNING_TALK_WEEKS[weekKey].days[dayKey];
+    const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+    return {
+      now: dateForMorningTalkDay(weekKey, dayKey), dayKey, weekKey,
+      isNew: false, isWeekend: false, isPreLaunch: false, content, audioKey, isArchive: true,
+    };
+  }
   if (FAMILY_PREVIEW) {
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
     const { weekKey, dayKey } = parsed;
@@ -2772,6 +2726,9 @@ function renderMorningTalkContent() {
   const info = getTodayMorningTalkInfo();
   setTalkDateHead('ft', info.now, info.dayKey, info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
 
+  const backBtn = document.getElementById('ftArchiveBackBtn');
+  if (backBtn) backBtn.style.display = info.isArchive ? 'flex' : 'none';
+
   const tag = document.getElementById('ftStatusTag');
   const note = document.getElementById('ftReplayNote');
 
@@ -2792,7 +2749,12 @@ function renderMorningTalkContent() {
     return null; // 音源キーなし＝再生ボタンは無効のまま
   }
 
-  if (info.isNew) {
+  if (info.isArchive) {
+    tag.textContent = 'アーカイブ再生中';
+    tag.className = 'ft-status-tag replay';
+    note.textContent = `${DAY_LABEL_JA[info.dayKey]}曜日の放送をもう一度お届け中`;
+    note.style.display = 'block';
+  } else if (info.isNew) {
     tag.textContent = 'NEW';
     tag.className = 'ft-status-tag new';
     note.style.display = 'none';
@@ -3202,6 +3164,129 @@ function toggleFtPhrases() {
   const b = document.getElementById('ftPhrasesBody'); const c = document.getElementById('ftPhrasesChevron');
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
 }
+
+// ========================
+// 放送アーカイブ（これまでの放送）
+// 今週すでに公開済みの回だけを実データ(MORNING_TALK_WEEKS / MORNING_TALK_AUDIO)から一覧化する。
+// 「Best Of」（お気に入りの回のキュレーション）は放送本数が貯まってから改めて実装する。
+// ========================
+function getAiredMorningTalkDays() {
+  const order = ['mon', 'tue', 'wed', 'thu', 'fri'];
+  let weekKey, previewUptoIdx = null;
+  if (FAMILY_PREVIEW) {
+    // ?familypreview=w1_fri のような裏口で見ている間は、公開日を待たずに
+    // 「その回までは放送済み」とみなしてアーカイブも動作確認できるようにする（本番ロジックには影響しない）。
+    const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
+    weekKey = parsed.weekKey;
+    previewUptoIdx = order.indexOf(parsed.dayKey);
+  } else {
+    const now = new Date();
+    const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+    if (now < w1Start) return []; // 配信開始前は何もアーカイブされていない
+    weekKey = resolveMorningTalkWeekKey(now);
+  }
+  const now = new Date();
+  const days = [];
+  order.forEach((dayKey, idx) => {
+    if (previewUptoIdx !== null && idx > previewUptoIdx) return; // プレビュー中の回より後の曜日は除外
+    const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+    const dayDate = dateForMorningTalkDay(weekKey, dayKey);
+    if (previewUptoIdx === null && dayDate > now) return; // 本番では未来日を除外
+    if (MORNING_TALK_AUDIO[audioKey] && MORNING_TALK_WEEKS[weekKey].days[dayKey]) {
+      days.push({ weekKey, dayKey, content: MORNING_TALK_WEEKS[weekKey].days[dayKey], date: dayDate });
+    }
+  });
+  return days.reverse(); // 新しい順（今日/プレビュー中の回に近いほど上に）
+}
+
+function renderArchiveModalBody() {
+  const body = document.getElementById('archiveBody');
+  if (!body) return;
+  const days = getAiredMorningTalkDays();
+  if (!days.length) {
+    body.innerHTML = `<div class="archive-empty">まだ配信された放送がありません</div>`;
+    return;
+  }
+  const theme = MORNING_TALK_WEEKS[days[0].weekKey].theme || '';
+  const rowsHtml = days.map(d => `
+    <div class="archive-ep-row" onclick="playArchivedMorningTalk('${d.weekKey}','${d.dayKey}')">
+      <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
+      <div class="archive-ep-q">${d.content.title}</div>
+      <div class="archive-ep-play">▶</div>
+    </div>
+  `).join('');
+  body.innerHTML = `
+    <div class="archive-section-label"><span>すべての放送</span><div class="archive-section-line"></div></div>
+    <div class="archive-month-group">
+      <div class="archive-month-title">${theme}</div>
+      ${rowsHtml}
+    </div>
+  `;
+}
+
+function openArchiveModal() {
+  renderArchiveModalBody();
+  document.getElementById('archiveModal').classList.add('open');
+}
+function closeArchiveModal() {
+  document.getElementById('archiveModal').classList.remove('open');
+}
+
+// 過去の回をMorning Talkプレイヤーに読み込んで自動再生する（今日の回と同じプレイヤーを使い回す）
+function playArchivedMorningTalk(weekKey, dayKey) {
+  const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+  if (!MORNING_TALK_AUDIO[audioKey]) return;
+  if (ftPlaying) {
+    ftAudioEl.pause();
+    ftPlaying = false;
+    stopFtMouthLoop();
+    setFtWavePlaying(false);
+  }
+  ftArchiveOverride = { weekKey, dayKey };
+  ftCurrentAudioKey = renderMorningTalkContent();
+  ftAudioEl.src = MORNING_TALK_AUDIO[ftCurrentAudioKey];
+  ftAudioEl.currentTime = 0;
+  ftProg = 0;
+  document.getElementById('ftFill').style.width = '0%';
+  document.getElementById('ftTime').textContent = '0:00';
+  clearFtPhraseHighlight();
+  const playBtn = document.getElementById('ftPlayBtn');
+  if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  closeArchiveModal();
+  toggleFamilyTalk(); // すぐ再生開始
+  const wrapEl = document.getElementById('ftWrap');
+  if (wrapEl && typeof wrapEl.scrollIntoView === 'function') {
+    wrapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// アーカイブ再生を終えて「今日」の回に戻る
+function returnToTodayMorningTalk() {
+  if (ftPlaying) {
+    ftAudioEl.pause();
+    ftPlaying = false;
+    const icon = document.getElementById('ftPlayIcon');
+    if (icon) icon.textContent = '▶';
+    setFtWavePlaying(false);
+    stopFtMouthLoop();
+  }
+  ftArchiveOverride = null;
+  ftCurrentAudioKey = renderMorningTalkContent();
+  const src = MORNING_TALK_AUDIO[ftCurrentAudioKey];
+  const playBtn = document.getElementById('ftPlayBtn');
+  if (src) {
+    ftAudioEl.src = src;
+    if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  } else if (playBtn) {
+    playBtn.disabled = true; playBtn.style.opacity = '0.4';
+  }
+  ftAudioEl.currentTime = 0;
+  ftProg = 0;
+  document.getElementById('ftFill').style.width = '0%';
+  document.getElementById('ftTime').textContent = '0:00';
+  clearFtPhraseHighlight();
+}
+
 renderFtWave();
 initFtAudio();
 
