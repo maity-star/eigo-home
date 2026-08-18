@@ -3330,8 +3330,91 @@ Mai: Bye bye! | バイバイ！
         talkDuration: 65,
         maiTalk: '今日の会話でJoelが "It was fun!" って言ってたよね。逆にMaiは公園が暑すぎて "It was not fun." って答えてた——同じ"It was..."の形で、楽しかった/楽しくなかったが言えちゃうんだよね。<br><br>あと、アヒルの<strong>feathers</strong>(羽根)って単語も出てきたよ。覚えてる？さっきの"アヒルの羽根は濡れない"って話、面白かったよね。みんなはアヒルのおもちゃ持ってる？Duckのおもちゃを見つけたら、パパやママに"Look! a duck!"って言ってみてね。<br><br>お母さん、お父さん今日も1日お疲れ様です。寝る前に"It was fun!"か"It was not fun."だけ真似してみてください。例えば、『今日は幼稚園楽しかった？ダックのお話面白かった？』てお子さんに聞いて『うん』って答えたら『It was fun』だね！とか伝えてみたら、それだけで十分お子様の耳に英語が届いています。',
       },
-      // tue/wed/thu/fri/以降はまだ台本・音源が未確定のため未登録。
-      // 追加する時はここにMorning Talkと同じ形式でdays.xxxを足すだけでOK（renderEveningTalkContentが自動対応）。
+      // 火・木は会話パートを直近のNEW回から再利用（Morning Talkと同じ運用）。
+      // rawScriptはmon/wedと完全に同一の内容にすること＝行数・並び順がEVENING_TALK_LINE_TIMINGSの
+      // ベース日と一致していないと、EVENING_TALK_REPLAY_OFFSETのオフセットが使われずフォールバックに落ちる。
+      tue: {
+        title: "It was amazing!",
+        phrases: [{ en: "It was amazing!", ja: "すごく良かった！" }],
+        rawScript: `
+Mai: Hey Joel! You're home! How was your day? | ねえJoel！おかえり！今日どうだった？
+Joel: It was great! I went swimming! | 最高だったよ！泳ぎに行ったんだ！
+Mai: Wow! That's perfect on a hot day like this. | わあ！こんな暑い日にはぴったりだね。
+Joel: Yeah. It was a splashy, swimmy kind of day. | うん。水しぶきと水泳の一日だったよ。
+Mai: That's so silly. Was it fun? | もう、おかしいなあ。楽しかった？
+Joel: It was fun! Let's say it together. It was fun! | 楽しかったよ！一緒に言ってみよう。It was fun！
+Joel: So Mai, what did you do today? | それでMai、今日は何したの？
+Mai: I went to the park! | 公園に行ったよ！
+Joel: How was it? | どうだった？
+Mai: It was tooooo hot. Even the ducks looked tired. It was not fun. | 暑すぎたよ〜。アヒルたちも疲れてるみたいだった。楽しくなかったよ。
+Joel: Let's say it together. It was not fun! | 一緒に言ってみよう。It was not fun！
+Joel: But hey Mai, did you know... a duck's feathers never get wet? Isn't that cool? | でもねMai、知ってた？アヒルの羽根って濡れないんだよ？すごくない？
+Mai: That's amazing! I didn't know that. | それはすごい！知らなかったよ。
+Joel: Let's learn more about ducks tomorrow! Quack quack | 明日はもっとアヒルのこと学ぼうね！クワックワッ
+Mai: That's so silly. | もう、おかしいなあ。
+Joel: OK. Time to say goodbye. Have a great night! | よし。そろそろバイバイの時間だね。良い夜を！
+Mai: Bye bye! | バイバイ！
+        `,
+        maiTalk: 'みんな昨日のアヒルのお話、覚えてる？Joelが教えてくれたね、アヒルの<strong>feathers</strong>(羽根)は水に濡れないんだったよね。<br><br>今日はもう一つ、"It was fun!"の仲間の言葉をお伝えするね。すごく良かったなって時は "It was amazing!" って言うんだよ。<br><br>それじゃ、昨日の会話をもう一回聞いてみよう！',
+      },
+      wed: {
+        title: "It was messy!",
+        phrases: [{ en: "It was messy!", ja: "ぐちゃぐちゃになった！" }],
+        rawScript: `
+Mai: Hey Joel! Let's tell everyone about our day. | ねえJoel！今日のこと、みんなに教えてあげよう。
+Joel: It was great! It was hot but we found some shade under a big tree. | 楽しかったよ！暑かったけど、大きな木の下に日陰を見つけたんだ。
+Mai: Yeah that was smart. | うん。あれは賢かった。
+Joel: It was hot! Let's say it together. It was hot! | 暑かった！一緒に言ってみよう。It was hot！
+Joel: So Mai, what did we eat today? | ねえMai、今日は何を食べたっけ？
+Mai: We had ice cream! | アイスクリームを食べたよ！
+Joel: It was so delicious. But we had a little problem. | すごくおいしかったね。でも、ちょっと困ったことがあったんだ。
+Mai: The ice cream was so quick to melt! | アイスクリームがあっという間にとけちゃったよね。
+Joel: It was messy! | ぐちゃぐちゃになっちゃった！
+Joel: But hey, did you know... ice cream melts faster in the sun than in the shade? Isn't that cool? | ねえ、知ってた？アイスクリームって日なたの方が日陰より溶けるのが早いんだよ。すごくない？
+Mai: That's amazing! I didn't know that. Let's eat in the shade again next time! | すごい！知らなかった。今度はまた日陰で食べようね！
+Joel: Good idea, Mai. | いいアイデアだね、Mai。
+        `,
+        maiTalk: '今日は少し難しい単語がたくさん出てきたね。<strong>shade</strong>は日陰、<strong>problem</strong>は困ったこと、<strong>melt</strong>は溶ける、<strong>messy</strong>はぐっちゃぐちゃ、この4つ、一緒にチェックしておこうね。<br><br>今日はJoelが "It was messy!" って言ってたよね。アイスクリームが溶けてぐちゃぐちゃになっちゃった時とか、お部屋が遊びすぎて汚くなっちゃった時に使う言葉だよ。<br><br>あと、JoelがDid you knowで言ってた「アイスクリームって、温かいところに置いておくと溶けるのが早くなっちゃう」ってみんな知ってた？今度アイスクリームを食べてる時に溶けてきたら、パパやママに"It\'s melting!"って教えてあげてね。<br><br>お母さん、お父さん今日も1日お疲れ様です。今日のDid you know?は、大人からしたら当たり前な話なんですけど、あえてお子さん目線の豆知識として挟んでみました。もしお子さんが"It\'s melting!"って教えてくれたら、発音は気にせず一緒に『あ、本当だ、溶けてる！It\'s melting!』って共感してあげてください。共感することで、お子さんの記憶にちゃんと残ります。',
+      },
+      thu: {
+        title: "It's melting!",
+        phrases: [{ en: "It's melting!", ja: "溶けてる！" }, { en: "It's frozen!", ja: "凍ってる！" }],
+        rawScript: `
+Mai: Hey Joel! Let's tell everyone about our day. | ねえJoel！今日のこと、みんなに教えてあげよう。
+Joel: It was great! It was hot but we found some shade under a big tree. | 楽しかったよ！暑かったけど、大きな木の下に日陰を見つけたんだ。
+Mai: Yeah that was smart. | うん。あれは賢かった。
+Joel: It was hot! Let's say it together. It was hot! | 暑かった！一緒に言ってみよう。It was hot！
+Joel: So Mai, what did we eat today? | ねえMai、今日は何を食べたっけ？
+Mai: We had ice cream! | アイスクリームを食べたよ！
+Joel: It was so delicious. But we had a little problem. | すごくおいしかったね。でも、ちょっと困ったことがあったんだ。
+Mai: The ice cream was so quick to melt! | アイスクリームがあっという間にとけちゃったよね。
+Joel: It was messy! | ぐちゃぐちゃになっちゃった！
+Joel: But hey, did you know... ice cream melts faster in the sun than in the shade? Isn't that cool? | ねえ、知ってた？アイスクリームって日なたの方が日陰より溶けるのが早いんだよ。すごくない？
+Mai: That's amazing! I didn't know that. Let's eat in the shade again next time! | すごい！知らなかった。今度はまた日陰で食べようね！
+Joel: Good idea, Mai. | いいアイデアだね、Mai。
+        `,
+        maiTalk: 'みんな水曜日のアイスクリームのお話、覚えてる？shadeに置いてたら溶けるのがゆっくりなんだよね。<br><br>今日はもう一つ——アイスクリームが溶けたら"It\'s melting!" って言うんだったよね。逆に凍ってる時は "It\'s frozen!" って言うんだよ。<br><br>OK、それじゃ、水曜日の会話をもう一回聞いてみよう！',
+      },
+      fri: {
+        title: "I feel tired!",
+        phrases: [{ en: "I feel tired!", ja: "疲れた！" }, { en: "I like watermelon", ja: "すいかが好き" }],
+        rawScript: `
+Mai: We are home! What a great day at the pool! | ただいま！プールで、最高の一日だったね！
+Joel: I love swimming. It's so fun to swim on a hot summer day. | 泳ぐの大好き。暑い夏の日に泳ぐのって最高に楽しいね。
+Mai: Let's go again soon! | また近いうちに行こうね！
+Joel: That was a busy day. How do you feel? | 忙しい一日だったね。今どんな気分？
+Mai: I feel tired! | 疲れた！
+Joel: Me too! I feel tired. Let's say it together. I feel tired! | 僕も！疲れた。一緒に言ってみよう。I feel tired！
+Mai: But Jay, swimming makes me hungry. What should we eat? | でもJay、泳ぐとお腹すくよね。何食べようか？
+Joel: We ate ice cream at the pool, so how about watermelon? | プールでアイスクリーム食べたから、すいかはどう？
+Mai: I like watermelon. | すいかが好き。
+Joel: Let's say it together. I like watermelon | 一緒に言ってみよう。I like watermelon
+Mai: After such a busy day, I feel so sleepy. | こんなに忙しい一日の後は、すごく眠くなっちゃう。
+Joel: I'm sleepy too. I think it's time for bed. Goodnight! | 僕も眠いよ。もう寝る時間だね。おやすみ！
+Mai: Goodnight! | おやすみ！
+        `,
+        maiTalk: '今日は「一緒に言ってみよう」のフレーズが2つあったね。プールで疲れちゃった時の"I feel tired!"（疲れた！）と、すいかを食べたくなった時の"I like watermelon"（すいかが好き）だったね。<br><br>すいかは英語で<strong>watermelon</strong>。「水（water）のmelon」って意味なんだけど、実はすいかってメロンの仲間じゃないんだよね。それでも"watermelon"って呼ばれてるの、ちょっと不思議で面白くない？<br><br>お父さん、お母さん今日もお疲れ様です。今日は疲れた？「Are you tired?」って寝る前に聞いてみてください。お子様の回答に対して「ママは I feel tired」と返してあげてください。それだけで英語のシャワーを浴びられました。',
+      },
     }
   },
   w2: {
@@ -3376,6 +3459,9 @@ const EVENING_TALK_MONTH = 'aug';
 const EVENING_TALK_AUDIO = {
   aug_w1_mon: 'evening_talk/ev_aug_w1_mon.mp3',
   aug_w1_tue: 'evening_talk/ev_aug_w1_tue.mp3',
+  aug_w1_wed: 'evening_talk/ev_aug_w1_wed.mp3',
+  aug_w1_thu: 'evening_talk/ev_aug_w1_thu.mp3',
+  aug_w1_fri: 'evening_talk/ev_aug_w1_fri.mp3',
   // aug_w2_mon: 収録は完了しているが結合・編集がまだのため未登録。
   // 命名規則はw1と同じ（例: evening_talk/ev_aug_w2_mon.mp3）。編集完了後に追加すること。
 };
@@ -3389,12 +3475,16 @@ const EVENING_TALK_LINE_TIMINGS = {
   // resolveEtPhraseTimings側で「配列長 <= セリフ行数」ならOKという判定に変更済みなので、
   // 余った末尾2行は自動的にハイライトなし（音声だけ流れる）扱いになる。
   aug_w1_mon: [1.974, 5.664, 9.580, 14.325, 19.385, 22.348, 32.665, 36.255, 38.563, 40.332, 49.106, 58.882, 69.412, 73.554, 79.001],
+  // 2026-08-17 Audition実測（Mai計測、Recording Timing Sheetより転記）。
+  aug_w1_wed: [1.484, 7.123, 16.199, 20.165, 30.261, 35.075, 38.726, 46.658, 53.302, 56.671, 68.997, 77.371],
+  aug_w1_fri: [1.734, 6.403, 14.199, 17.192, 22.494, 25.096, 38.737, 45.769, 53.154, 56.544, 65.025, 71.914, 80.824],
 };
 
 // 火・木は月・水の会話パートを再利用し、頭にMaiの新規解説が付く（Morning Talkと同じ構成・同じ運用）。
 // 登録の仕方はMorning Talkと同様「w1_thu、オフセット◯秒」でOK。baseは曜日から自動判定される。
 const EVENING_TALK_REPLAY_OFFSET = {
   aug_w1_tue: 34, // Maiの解説が0〜34秒、34秒から月曜の会話（aug_w1_mon）が再生される
+  aug_w1_thu: 32, // Maiの解説が0〜32秒、32秒から水曜の会話（aug_w1_wed）が再生される
 };
 
 // 火・木のaudioKeyから再利用元(base)のaudioKeyを曜日ルールで自動算出（Morning Talkの
