@@ -405,10 +405,10 @@
   <!-- タブバー -->
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('home',this)">ホーム</div>
-    <div class="tab" onclick="switchTab('playlist',this)">みる</div>
-    <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
     <div class="tab" onclick="switchTab('shiru',this)">しる</div>
+    <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
+    <div class="tab" onclick="switchTab('playlist',this)">みる</div>
   </div>
 
   <!-- 今週タブ -->
@@ -2013,7 +2013,7 @@ function showToast(msg) {
 // タブ
 // ========================
 function switchTab(name, el) {
-  ['home', 'playlist', 'asobo', 'shiru', 'routine'].forEach(t => {
+  ['home', 'shiru', 'asobo', 'routine', 'playlist'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
