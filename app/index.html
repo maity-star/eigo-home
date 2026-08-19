@@ -1292,10 +1292,15 @@ registerAudio(document.getElementById('asoboVoicePlayer'));
 // 今週の曲データ（興味別）
 // 今月のテーマ（Colors & Animals）に合わせて編集部が選んだ固定プレイリスト
 // オンボーディングの興味には連動しない（興味別の出し分けはYouTubeかけ流し側で行う）
+// type:'audio' = 自前ホスティングの商用フリー音源（Morning Talkのエンディングで使用中の曲）。タップでアプリ内再生。
+// type:'youtube'（省略時デフォルト） = 従来通りタップでYouTubeを開く。
 const MONTH_PLAYLIST = [
-  { videoId:'KbrSWbuWtmc', title:'The Ice Cream Song', sub:'ice cream・scoopなど夏らしい単語がいっぱい。数を数えながら歌える定番曲。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=KbrSWbuWtmc' },
-  { videoId:'hlzvrEfyL2Y', title:'Mr. Sun, Sun, Mr. Golden Sun', sub:'太陽に呼びかけるやさしいメロディ。今月のテーマ「Water &amp; Sun」にぴったりの一曲。', age:'1〜4歳', ytUrl:'https://www.youtube.com/watch?v=hlzvrEfyL2Y' },
-  { videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
+  { type:'audio', title:"Swingin' From a Rainbow", sub:'Morning Talkのエンディングで使用中の曲。ゆったり揺れるようなリズムが心地いい一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_swingin_rainbow.mp3' },
+  { type:'audio', title:'Little Dolphin', sub:'Morning Talkのエンディングで使用中の曲。海を泳ぐイルカをイメージした、やさしいメロディ。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_little_dolphin.mp3' },
+  { type:'audio', title:'Alphabet Song', sub:'Morning Talkのエンディングで使用中の曲。アルファベットを楽しく覚えられる定番ソング。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_alphabet_song.mp3' },
+  { type:'youtube', videoId:'KbrSWbuWtmc', title:'The Ice Cream Song', sub:'ice cream・scoopなど夏らしい単語がいっぱい。数を数えながら歌える定番曲。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=KbrSWbuWtmc' },
+  { type:'youtube', videoId:'hlzvrEfyL2Y', title:'Mr. Sun, Sun, Mr. Golden Sun', sub:'太陽に呼びかけるやさしいメロディ。今月のテーマ「Water &amp; Sun」にぴったりの一曲。', age:'1〜4歳', ytUrl:'https://www.youtube.com/watch?v=hlzvrEfyL2Y' },
+  { type:'youtube', videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
 ];
 
 // Jayのひとこと（タブバー直下・きょうのとびら直上・日替わり表示）
@@ -1783,18 +1788,35 @@ function renderMonthlyPlaylist() {
     <div class="carousel-outer" id="carouselOuter">
       <div class="carousel-track" id="carouselTrack">
         ${MONTH_PLAYLIST.map((s, i) => `
-          <div class="carousel-card${i === 0 ? ' active' : ''}" data-index="${i}" onclick="handleCarouselCardTap(${i})">
-            <div class="carousel-thumb-area">
-              <img src="https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg" alt="${s.title}">
-            </div>
-            <div class="carousel-card-info">
-              <div class="carousel-card-title">${s.title}</div>
-              <div class="carousel-card-age">${s.age}</div>
-              <div class="carousel-card-sub">${s.sub}</div>
-              <div class="carousel-card-yt">
-                <span>▶</span>見る
+          <div class="carousel-card${i === 0 ? ' active' : ''}${s.type === 'audio' ? ' audio-card' : ''}" data-index="${i}" id="carouselCard${i}" onclick="handleCarouselCardTap(${i})">
+            ${s.type === 'audio' ? `
+              <div class="carousel-thumb-area audio-thumb audio-thumb-${i % 3}">
+                <div class="audio-thumb-play" id="audioThumbPlay${i}">
+                  <svg class="audio-thumb-icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg class="audio-thumb-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+                </div>
               </div>
-            </div>
+              <div class="carousel-card-info">
+                <div class="carousel-card-title">${s.title}</div>
+                <div class="carousel-card-age carousel-card-tag-audio">${s.tag}</div>
+                <div class="carousel-card-sub">${s.sub}</div>
+                <div class="carousel-card-yt carousel-card-listen">
+                  <span>♪</span>きく
+                </div>
+              </div>
+            ` : `
+              <div class="carousel-thumb-area">
+                <img src="https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg" alt="${s.title}">
+              </div>
+              <div class="carousel-card-info">
+                <div class="carousel-card-title">${s.title}</div>
+                <div class="carousel-card-age">${s.age}</div>
+                <div class="carousel-card-sub">${s.sub}</div>
+                <div class="carousel-card-yt">
+                  <span>▶</span>見る
+                </div>
+              </div>
+            `}
           </div>
         `).join('')}
       </div>
@@ -1813,8 +1835,59 @@ function renderMonthlyPlaylist() {
 function handleCarouselCardTap(idx) {
   if (carouselSwipeGuard) return;
   const item = MONTH_PLAYLIST[idx];
-  if (item && item.ytUrl) window.open(item.ytUrl, '_blank', 'noopener');
+  if (!item) return;
+  if (item.type === 'audio') {
+    toggleMonthlyAudio(idx);
+    return;
+  }
+  if (item.ytUrl) window.open(item.ytUrl, '_blank', 'noopener');
 }
+
+// Monthly Playlist内の自前音源（Morning Talk使用曲）再生用
+const monthlyPlaylistAudioEl = new Audio();
+registerAudio(monthlyPlaylistAudioEl);
+let monthlyPlayingIndex = null;
+
+function setMonthlyCardPlayingUI(idx, playing) {
+  const playIcon = document.querySelector(`#audioThumbPlay${idx} .audio-thumb-icon-play`);
+  const pauseIcon = document.querySelector(`#audioThumbPlay${idx} .audio-thumb-icon-pause`);
+  const card = document.getElementById(`carouselCard${idx}`);
+  if (playIcon) playIcon.style.display = playing ? 'none' : '';
+  if (pauseIcon) pauseIcon.style.display = playing ? '' : 'none';
+  if (card) card.classList.toggle('playing', playing);
+}
+
+function toggleMonthlyAudio(idx) {
+  const item = MONTH_PLAYLIST[idx];
+  if (!item || item.type !== 'audio') return;
+
+  const isSameTrack = monthlyPlayingIndex === idx &&
+    monthlyPlaylistAudioEl.currentSrc &&
+    monthlyPlaylistAudioEl.currentSrc.indexOf(item.src) !== -1;
+
+  if (isSameTrack && !monthlyPlaylistAudioEl.paused) {
+    monthlyPlaylistAudioEl.pause();
+    return;
+  }
+
+  if (!isSameTrack) {
+    monthlyPlaylistAudioEl.src = item.src;
+    monthlyPlaylistAudioEl.currentTime = 0;
+  }
+  monthlyPlayingIndex = idx;
+  try { monthlyPlaylistAudioEl.play().catch(() => {}); } catch (e) {}
+}
+
+monthlyPlaylistAudioEl.addEventListener('play', () => {
+  if (monthlyPlayingIndex !== null) setMonthlyCardPlayingUI(monthlyPlayingIndex, true);
+});
+monthlyPlaylistAudioEl.addEventListener('pause', () => {
+  if (monthlyPlayingIndex !== null) setMonthlyCardPlayingUI(monthlyPlayingIndex, false);
+});
+monthlyPlaylistAudioEl.addEventListener('ended', () => {
+  if (monthlyPlayingIndex !== null) setMonthlyCardPlayingUI(monthlyPlayingIndex, false);
+  monthlyPlayingIndex = null;
+});
 
 function initCarousel() {
   const outer = document.getElementById('carouselOuter');
