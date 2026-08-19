@@ -1006,6 +1006,24 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .carousel-card-yt:hover { background: #F9FAFB; }
 .carousel-card-yt span { color: #E24B4A; font-size: 10px; }
+
+/* Monthly Playlist内の自前音源カード（Morning Talk使用曲） */
+.audio-thumb {
+  display: flex; align-items: center; justify-content: center;
+}
+.audio-thumb-0 { background: #FFF1E6; }
+.audio-thumb-1 { background: #EAF6EC; }
+.audio-thumb-2 { background: #F2ECFB; }
+.audio-thumb-play {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+}
+.audio-thumb-play svg { width: 22px; height: 22px; color: #E24B4A; }
+.carousel-card.playing .audio-thumb-play { background: #E24B4A; }
+.carousel-card.playing .audio-thumb-play svg { color: #fff; }
+.carousel-card-tag-audio { background: #FDEDE9; color: #C0392B; }
+.carousel-card-listen span { color: #E24B4A; font-size: 11px; }
 .carousel-dots {
   display: flex; align-items: center; justify-content: center;
   gap: 7px; margin-top: 18px;
