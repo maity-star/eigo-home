@@ -4010,32 +4010,34 @@ renderRoutineCatGrid();
 // ========================
 // カードは3ジャンル固定＋予告カード1枠。新着は火・木のみ、日付ベースで個別登録する運用
 // （曜日とジャンルを機械的に固定しない＝前回と同じジャンルが連続しないよう内容側で手動調整する）。
+// フォルダ構成：shiru_book/audio/{category}/{topicId}.mp3、shiru_book/illustration/covers/（本の表紙、既存ファイル名のまま移動）、
+// shiru_book/illustration/topics/{topicId}.png（中身のイラスト）。カテゴリが増えても同じ規則で置ける。
 const SHIRU_CATEGORIES = [
-  { id: 'animal', title: 'Animal', sub: 'どうぶつ', image: 'illustrations/shiru/shiru_animal.png' },
-  { id: 'food', title: 'Food', sub: 'たべもの', image: 'illustrations/shiru/shiru_food.png' },
-  { id: 'weather', title: '天気', sub: 'てんき', image: 'illustrations/shiru/shiru_weather.png' },
+  { id: 'animal', title: 'Animal', sub: 'どうぶつ', image: 'shiru_book/illustration/covers/shiru_animal.png' },
+  { id: 'food', title: 'Food', sub: 'たべもの', image: 'shiru_book/illustration/covers/shiru_food.png' },
+  { id: 'weather', title: '天気', sub: 'てんき', image: 'shiru_book/illustration/covers/shiru_weather.png' },
 ];
 
-// トピック（本の中の1ページ＝1テーマ）。台本は1トピック=1本の連続録音のまま。
-// 事実ごとに切り出し編集はせず、factsの start（秒）で再生位置を指定するだけでよい
-// （Audition markerでの物理分割は不要。既存のタイムスタンプ運用と同じやり方でOK）。
+// トピック（本の中の1ページ＝1テーマ）。事実ごとの音声は2通りに対応：
+// ①fact.audio に個別ファイルを指定（切り出し済みの場合）②未指定ならtopic.audio+fact.start秒から自動再生
+// （②なら切り出し作業が丸ごと不要。次のトピックからはこちらを推奨）。
 // ⚠️ 仮データ。イラスト生成・実収録が済み次第、image/audio/startを実データに差し替える。
 const SHIRU_TOPICS = [
   {
     id: 'duck', category: 'animal', title: 'アヒル', dateAdded: '2026-08-18',
-    image: 'illustrations/shiru/shiru_animal.png', // TODO: トピック専用イラストに差し替え
-    audio: 'audio/shiru_audio/animal_duck.mp3',
+    image: 'shiru_book/illustration/topics/duck.png',
+    audio: 'shiru_book/audio/animal/duck.mp3',
     facts: [
-      { en: "A duck's feathers never get wet.", ja: 'アヒルの羽根は、水に濡れないんだって。', start: 0 },
-      { en: 'Ducks can swim and fly really fast.', ja: 'アヒルは泳げるし、すごく速く飛べるんだって。', start: 11 },
-      { en: 'Ducks eat grass, leaves, bugs, and even small fish!', ja: 'アヒルは草や葉っぱ、虫や小さな魚まで食べるんだって。', start: 22 },
-      { en: 'A duck says "Quack, Quack."', ja: 'アヒルは「クワッ、クワッ」って鳴くよ。', start: 34 },
+      { en: "A duck's feathers never get wet.", ja: 'アヒルの羽根は、水に濡れないんだって。', start: 6.558 },
+      { en: 'Ducks can swim and fly really fast.', ja: 'アヒルは泳げるし、すごく速く飛べるんだって。', start: 17.050 },
+      { en: 'Ducks eat grass, leaves, bugs, and even small fish!', ja: 'アヒルは草や葉っぱ、虫や小さな魚まで食べるんだって。', start: 28.394 },
+      { en: 'A duck says "Quack, Quack."', ja: 'アヒルは「クワッ、クワッ」って鳴くよ。', start: 38.929 },
     ],
   },
   {
     id: 'turtle', category: 'animal', title: 'カメ', dateAdded: '2026-08-25',
-    image: 'illustrations/shiru/shiru_animal.png',
-    audio: 'audio/shiru_audio/animal_turtle.mp3',
+    image: 'shiru_book/illustration/topics/turtle.png',
+    audio: 'shiru_book/audio/animal/turtle.mp3',
     facts: [
       { en: 'Turtles come in many different sizes.', ja: 'カメには小さい子も、すごく大きい子もいるんだって。', start: 0 },
       { en: 'Turtles can live for up to 150 years!', ja: 'カメは150歳まで生きることもあるんだって。', start: 10 },
@@ -4044,8 +4046,8 @@ const SHIRU_TOPICS = [
   },
   {
     id: 'icecream', category: 'food', title: 'アイスクリーム', dateAdded: '2026-08-20',
-    image: 'illustrations/shiru/shiru_food.png',
-    audio: 'audio/shiru_audio/food_icecream.mp3',
+    image: 'shiru_book/illustration/topics/icecream.png',
+    audio: 'shiru_book/audio/food/icecream.mp3',
     facts: [
       { en: 'It takes about 50 licks to finish one scoop.', ja: 'アイス1スクープを食べ終わるまで、なめる回数は約50回なんだって。', start: 0 },
       { en: "Eat it too fast and your head might hurt!", ja: '急いで食べると頭が痛くなっちゃうから気をつけて。', start: 10 },
@@ -4258,8 +4260,6 @@ function revealShiruFact(topicId, factIndex, cardEl) {
   if (!topic) return;
   const fact = topic.facts[factIndex];
   const factKey = `${topicId}_${factIndex}`;
-  const nextFact = topic.facts[factIndex + 1];
-  const endTime = fact.end || (nextFact ? nextFact.start : null);
 
   markShiruFactRevealed(factKey);
   cardEl.classList.add('revealed');
@@ -4268,12 +4268,22 @@ function revealShiruFact(topicId, factIndex, cardEl) {
   shiruAudioEl.onerror = null;
   shiruAudioEl.ontimeupdate = null;
   shiruAudioEl.pause();
-  shiruAudioEl.src = topic.audio;
-  shiruAudioEl.currentTime = fact.start;
-  if (endTime) {
-    shiruAudioEl.ontimeupdate = () => {
-      if (shiruAudioEl.currentTime >= endTime) { shiruAudioEl.pause(); shiruAudioEl.ontimeupdate = null; }
-    };
+
+  // 事実ごとに切り出し済みの音声ファイルがあればそれを優先（fact.audio）。
+  // なければトピック丸ごと1本の録音を start秒から次のstartまで再生する（切り出し不要方式）。
+  if (fact.audio) {
+    shiruAudioEl.src = fact.audio;
+    shiruAudioEl.currentTime = 0;
+  } else {
+    const nextFact = topic.facts[factIndex + 1];
+    const endTime = fact.end || (nextFact ? nextFact.start : null);
+    shiruAudioEl.src = topic.audio;
+    shiruAudioEl.currentTime = fact.start || 0;
+    if (endTime) {
+      shiruAudioEl.ontimeupdate = () => {
+        if (shiruAudioEl.currentTime >= endTime) { shiruAudioEl.pause(); shiruAudioEl.ontimeupdate = null; }
+      };
+    }
   }
   try {
     const p = shiruAudioEl.play();
