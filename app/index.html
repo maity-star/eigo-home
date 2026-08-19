@@ -1096,8 +1096,11 @@
 
     <div class="shiru-grid-screen" id="shiruGridScreen">
       <div class="shiru-grid-header">
-        <div class="shiru-grid-back" onclick="backToShiruToc()"><i>‹</i>戻る</div>
-        <div class="shiru-grid-title" id="shiruGridTitle">アヒル</div>
+        <div class="shiru-grid-back" onclick="backToShiruToc()">← Back</div>
+        <div class="shiru-grid-title-wrap">
+          <div class="shiru-grid-title" id="shiruGridTitle">Duck</div>
+          <div class="shiru-grid-title-ja" id="shiruGridTitleJa">アヒル</div>
+        </div>
       </div>
       <div class="shiru-fact-grid" id="shiruFactGrid"></div>
       <div class="shiru-fact-note">カードをタップすると、めくれて答えが聞こえるよ</div>
@@ -4024,7 +4027,7 @@ const SHIRU_CATEGORIES = [
 // ⚠️ 仮データ。イラスト生成・実収録が済み次第、image/audio/startを実データに差し替える。
 const SHIRU_TOPICS = [
   {
-    id: 'duck', category: 'animal', title: 'アヒル', dateAdded: '2026-08-18',
+    id: 'duck', category: 'animal', titleEn: 'Duck', titleJa: 'アヒル', dateAdded: '2026-08-18',
     image: 'shiru_book/illustration/topics/duck.png',
     audio: 'shiru_book/audio/animal/duck.mp3',
     facts: [
@@ -4035,7 +4038,7 @@ const SHIRU_TOPICS = [
     ],
   },
   {
-    id: 'turtle', category: 'animal', title: 'カメ', dateAdded: '2026-08-25',
+    id: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-08-25',
     image: 'shiru_book/illustration/topics/turtle.png',
     audio: 'shiru_book/audio/animal/turtle.mp3',
     facts: [
@@ -4045,7 +4048,7 @@ const SHIRU_TOPICS = [
     ],
   },
   {
-    id: 'icecream', category: 'food', title: 'アイスクリーム', dateAdded: '2026-08-20',
+    id: 'icecream', category: 'food', titleEn: 'Ice Cream', titleJa: 'アイスクリーム', dateAdded: '2026-08-20',
     image: 'shiru_book/illustration/topics/icecream.png',
     audio: 'shiru_book/audio/food/icecream.mp3',
     facts: [
@@ -4189,17 +4192,31 @@ function openShiruBookModal(catId) {
   });
 }
 
+// トピック（または中の事実）が今日追加されたものかどうか。新しいDid you knowが増えた回もこれで拾える
+function topicHasNewToday(topic) {
+  const todayKey = getTodayShiruDateKey();
+  if (topic.dateAdded === todayKey) return true;
+  return topic.facts.some(f => f.dateAdded === todayKey);
+}
+
 function renderShiruToc(cat) {
   const topics = getShiruTopicsByCategory(cat.id);
+  const opened = getShiruOpenedSet();
   document.getElementById('shiruTocTitle').textContent = `${cat.title} のもくじ`;
   const listEl = document.getElementById('shiruTocList');
-  listEl.innerHTML = topics.length > 0 ? topics.map(t => `
+  listEl.innerHTML = topics.length > 0 ? topics.map(t => {
+    const isNew = topicHasNewToday(t) && !opened.has(cat.id + '_' + t.id);
+    return `
     <div class="shiru-toc-item" onclick="openShiruTopic('${t.id}')">
-      <div class="shiru-toc-icon">🌿</div>
-      <div class="shiru-toc-text">${t.title}</div>
+      <div class="shiru-toc-text-wrap">
+        <div class="shiru-toc-text">${t.titleEn}</div>
+        <div class="shiru-toc-text-ja">${t.titleJa}</div>
+      </div>
+      ${isNew ? '<div class="shiru-toc-new">New</div>' : ''}
       <div class="shiru-toc-count">${t.facts.length}個</div>
     </div>
-  `).join('') : `<div class="hint-box">まだこのジャンルの発見はないよ。火・木のお楽しみに。</div>`;
+  `;
+  }).join('') : `<div class="hint-box">まだこのジャンルの発見はないよ。火・木のお楽しみに。</div>`;
   const tocEl = document.getElementById('shiruTocScreen');
   tocEl.style.opacity = '1';
   tocEl.style.pointerEvents = 'auto';
@@ -4210,10 +4227,12 @@ function openShiruTopic(topicId) {
   const topic = SHIRU_TOPICS.find(t => t.id === topicId);
   if (!topic) return;
   shiruCurrentTopic = topic;
+  markShiruOpened(topic.category + '_' + topic.id); // トピック単位のNewバッジも1日1回開いたら消える
   const tocEl = document.getElementById('shiruTocScreen');
   const gridEl = document.getElementById('shiruGridScreen');
   tocEl.style.opacity = '0'; tocEl.style.pointerEvents = 'none';
-  document.getElementById('shiruGridTitle').textContent = topic.title;
+  document.getElementById('shiruGridTitle').textContent = topic.titleEn;
+  document.getElementById('shiruGridTitleJa').textContent = topic.titleJa;
   renderShiruFactGrid(topic);
   setTimeout(() => {
     gridEl.style.opacity = '1';
