@@ -1163,13 +1163,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-riffle-page {
   position: absolute; inset: 12px; border-radius: 4px;
   transform-origin: left center; transform: rotateY(0deg);
-  transition: transform 0.34s ease-out;
+  transition: transform 0.62s cubic-bezier(.45,.05,.35,1);
   box-shadow: 1px 0 4px rgba(74,58,30,0.15);
 }
 .shiru-cover-page {
   position: absolute; inset: 12px; border-radius: 4px 10px 10px 4px; overflow: visible;
   background: #F7F2E4; border: 0.5px solid #D9CDAE; transform-origin: left center;
-  transform: rotateY(0deg); transition: transform 0.5s ease; box-shadow: 0 2px 6px rgba(74,58,30,0.2);
+  transform: rotateY(0deg); transition: transform 1.05s cubic-bezier(.45,.05,.35,1); box-shadow: 0 2px 6px rgba(74,58,30,0.2);
 }
 .shiru-cover-spine {
   position: absolute; top: 0; left: 0; bottom: 0; width: 13px; border-radius: 4px 0 0 4px;
@@ -1185,20 +1185,27 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   position: absolute; inset: 12px; padding: 18px; opacity: 0; pointer-events: none;
   transition: opacity 0.3s ease; overflow-y: auto;
 }
-.shiru-toc-title { font-size: 14px; font-weight: 700; color: #3E2F1C; font-family: Georgia, serif; font-style: italic; margin-bottom: 14px; }
+.shiru-toc-title { font-size: 14px; font-weight: 700; color: #3E2F1C; margin-bottom: 14px; }
 .shiru-toc-item {
   display: flex; align-items: center; gap: 10px; padding: 13px 4px;
   border-bottom: 0.5px dashed #C9A25C; cursor: pointer;
 }
-.shiru-toc-icon { width: 20px; font-size: 18px; color: #7C9A5E; text-align: center; }
-.shiru-toc-text { font-size: 14px; color: #3E2F1C; font-family: Georgia, serif; }
-.shiru-toc-count { margin-left: auto; font-size: 10px; color: #9C8E6E; }
-.shiru-grid-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
-.shiru-grid-back {
-  width: 26px; height: 26px; border-radius: 50%; background: #EFE9D8; display: flex;
-  align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: #3E2F1C; flex-shrink: 0;
+.shiru-toc-text-wrap { display: flex; align-items: baseline; gap: 6px; }
+.shiru-toc-text { font-size: 14px; font-weight: 700; color: #3E2F1C; }
+.shiru-toc-text-ja { font-size: 10px; color: #9C8E6E; }
+.shiru-toc-new {
+  font-size: 9px; font-weight: 700; color: #fff; background: #B5471F;
+  padding: 2px 7px; border-radius: 8px; letter-spacing: 0.02em;
 }
-.shiru-grid-title { font-size: 14px; font-weight: 700; color: #3E2F1C; font-family: Georgia, serif; }
+.shiru-toc-count { margin-left: auto; font-size: 10px; color: #9C8E6E; }
+.shiru-grid-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.shiru-grid-back {
+  display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 13px; color: #7A6B4D;
+  flex-shrink: 0; padding: 4px 2px;
+}
+.shiru-grid-title-wrap { display: flex; align-items: baseline; gap: 6px; }
+.shiru-grid-title { font-size: 15px; font-weight: 700; color: #3E2F1C; }
+.shiru-grid-title-ja { font-size: 10px; color: #9C8E6E; }
 .shiru-fact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .shiru-fact-card {
   position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; cursor: pointer;
