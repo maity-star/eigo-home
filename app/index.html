@@ -786,7 +786,7 @@
                 <div class="wbl-text"><div class="wbl-title">YouTubeで聴く</div><div class="wbl-sub">Super Simple Songs · 定番チャンネル</div></div>
                 <div class="wbl-arr">↗</div>
               </a>
-              <a class="wbl-item" href="https://www.amazon.co.jp/dp/0744560276?tag=enverly-22" target="_blank">
+              <a class="wbl-item" href="https://www.amazon.co.jp/dp/0744560276?tag=enverly-22" target="_blank" onclick="trackEvent('amazon_click', '0744560276')">
                 <div class="wbl-icon gray"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_box.png" alt="Amazon"></div>
                 <div class="wbl-text"><div class="wbl-title">手元に置く（Amazon）</div><div class="wbl-sub">Mother Gooseまとめ絵本 · ¥3,300〜</div></div>
                 <div class="wbl-arr">↗</div>
@@ -1617,6 +1617,53 @@ let musicProg = 0, musicTimer = null;
 let activeMode = null;
 
 // ========================
+// モニター利用ログ（Google Apps Script Webhook → スプレッドシート）
+// ========================
+// デプロイ後のGAS Web App URL（/exec）に差し替えること。未設定（プレースホルダのまま）の間は送信をスキップする。
+const TRACKING_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxCqYkySVMwhrrFUt_uAQYV-0V1HXm7VXMw6WHzM8qV2xYap1Ujo4qUc_DrC9PWK_ET/exec';
+
+let trackingSessionId = null;
+function getTrackingSessionId() {
+  if (trackingSessionId) return trackingSessionId;
+  try {
+    trackingSessionId = sessionStorage.getItem('enverly_session_id');
+    if (!trackingSessionId) {
+      trackingSessionId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      sessionStorage.setItem('enverly_session_id', trackingSessionId);
+    }
+  } catch (e) {
+    trackingSessionId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  return trackingSessionId;
+}
+
+// eventName: 'app_open' | 'tab_view' など。extraは補足情報（タブ名等）。
+// 招待コード未認証（ロック画面等）の状態では送信しない。GAS未設定時も送信しない。
+function trackEvent(eventName, extra) {
+  try {
+    if (!TRACKING_ENDPOINT || TRACKING_ENDPOINT.indexOf('PASTE_') === 0) return;
+    var raw = localStorage.getItem('enverly_access');
+    var access = raw ? JSON.parse(raw) : null;
+    if (!access || !access.code) return;
+    var payload = {
+      code: access.code,
+      type: access.type || '',
+      event: eventName,
+      extra: extra || '',
+      session: getTrackingSessionId(),
+      ts: new Date().toISOString(),
+      ua: navigator.userAgent
+    };
+    var body = JSON.stringify(payload);
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(TRACKING_ENDPOINT, new Blob([body], { type: 'text/plain;charset=UTF-8' }));
+    } else {
+      fetch(TRACKING_ENDPOINT, { method: 'POST', mode: 'no-cors', body: body }).catch(() => {});
+    }
+  } catch (e) {}
+}
+
+// ========================
 // アプリ初期化
 // ========================
 // オンボーディング（興味選択）は廃止し、「今日のEnverly」おまかせ型に統一。
@@ -1629,6 +1676,7 @@ function initApp() {
   renderJoelLine();
   renderStampCard();
   initPushNotification();
+  trackEvent('app_open');
 }
 initApp();
 
@@ -1971,6 +2019,7 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   if (name === 'asobo') renderAsoboContent();
+  trackEvent('tab_view', name);
 }
 
 // ========================
@@ -3126,6 +3175,12 @@ let ftCurrentAudioKey = null;
 const ftAudioEl = new Audio();
 registerAudio(ftAudioEl);
 let ftAudioLoaded = false;
+let ftTrackedPlayKey = null;
+ftAudioEl.addEventListener('play', () => {
+  if (ftTrackedPlayKey === ftCurrentAudioKey) return; // 同じ回の再開（一時停止→再生）は重複計測しない
+  ftTrackedPlayKey = ftCurrentAudioKey;
+  trackEvent('morning_talk_play', ftCurrentAudioKey || '');
+});
 
 function fmtFtTime(sec) {
   if (!isFinite(sec) || sec < 0) sec = 0;
@@ -3722,6 +3777,12 @@ function openEtPhrasesAuto() {
 const etAudioEl = new Audio();
 registerAudio(etAudioEl);
 let etAudioLoaded = false;
+let etTrackedPlayKey = null;
+etAudioEl.addEventListener('play', () => {
+  if (etTrackedPlayKey === etCurrentAudioKey) return;
+  etTrackedPlayKey = etCurrentAudioKey;
+  trackEvent('evening_talk_play', etCurrentAudioKey || '');
+});
 
 function initEtAudio() {
   etCurrentAudioKey = renderEveningTalkContent();
@@ -4489,6 +4550,7 @@ function openBookModal(mode) {
   document.getElementById('bookViewerModal').classList.add('open');
   bvRenderPage();
   bvBuildIndicator();
+  trackEvent('book_open', mode);
   if (mode === 'talk') {
     setTimeout(() => bvStartTalk(), 300);
   } else {
@@ -4604,6 +4666,8 @@ function bvPlayPageThenAdvance(token) {
         bvRenderPage();
         bvPlayPageThenAdvance(token);
       }, 700); // ページ間の間（ページめくりアニメーションの余白）
+    } else {
+      trackEvent('book_complete', 'read'); // 最後のページの音声再生が終わった＝最後まで聞いた
     }
   });
 }
@@ -4734,6 +4798,7 @@ function bvAdvanceTalkPage(token) {
     document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
     document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
     document.getElementById('bvIetaBtn').classList.add('show');
+    trackEvent('book_complete', 'talk');
     return;
   }
   bvCurrentPage++;
