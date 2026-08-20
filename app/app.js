@@ -1,0 +1,3440 @@
+// ========================
+// 招待制アクセスゲート：ロック画面フォームの送信ハンドラ
+// （判定ロジック本体は<head>のwindow.__enverlyGateに実装済み）
+// ========================
+function handleGateSubmit() {
+  var input = document.getElementById('gateCodeInput');
+  var errorEl = document.getElementById('gateErrorMsg');
+  var code = input ? input.value : '';
+  var ok = window.__enverlyGate && window.__enverlyGate.tryUnlockWithCode(code);
+  if (!ok) {
+    if (errorEl) errorEl.textContent = 'コードが正しくありません。もう一度ご確認ください。';
+  }
+}
+(function () {
+  var input = document.getElementById('gateCodeInput');
+  if (input) {
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') handleGateSubmit();
+    });
+  }
+})();
+
+// ========================
+// ホーム画面追加デモアニメーション（start.htmlのガイドページと同一ロジックを移植）
+// ========================
+(function () {
+  var screenEl = document.getElementById('gateDemoScreen');
+  var popup = document.getElementById('gateDemoPopup');
+  var sheet = document.getElementById('gateDemoSheet');
+  var dot = document.getElementById('gateDemoDot');
+  var caption = document.getElementById('gateDemoCaption');
+  var dotsIcon = document.getElementById('gateDemoDots');
+  if (!screenEl || !popup || !sheet || !dot || !caption || !dotsIcon) return;
+
+  var shareHead = '<div class="gate-demo-share-head"><div class="gate-demo-share-icon"></div><div><div style="font-size:11px;font-weight:700;">Enverly</div><div style="font-size:9px;color:#aaa;">enverly.jp</div></div></div>';
+
+  var actionsMore = '<div class="gate-demo-share-actions"><div>📄<br>コピー</div><div>🔖<br>ブックマーク</div><div>👓<br>リーディング</div><div class="accent" id="gateSheetMoreBtn">⌄<br>表示を増やす</div></div>';
+
+  var actionsLess = '<div class="gate-demo-share-actions"><div>📄<br>コピー</div><div>🔖<br>ブックマーク</div><div>👓<br>リーディング</div><div class="accent">⌃<br>表示を減らす</div></div>' +
+    '<div class="gate-demo-extra-list">' +
+    '<div class="gate-demo-extra-item">🔖&nbsp; ブックマークの追加先</div>' +
+    '<div class="gate-demo-extra-item">☆&nbsp; お気に入りに追加</div>' +
+    '<div class="gate-demo-extra-item accent" id="gateSheetHomeItem">➕&nbsp; ホーム画面に追加</div>' +
+    '</div>';
+
+  var addScreen = '<div class="gate-demo-addscreen-head"><span>✕</span><span style="font-size:11px;font-weight:700;">ホーム画面に追加</span><span class="add-btn" id="gateSheetAddBtn">追加</span></div>' +
+    '<div class="gate-demo-addscreen-row"><div class="gate-demo-share-icon"></div><div>Enverly</div></div>' +
+    '<div class="gate-demo-toggle-row"><span>Webアプリとして開く</span><div class="gate-demo-toggle"></div></div>';
+
+  var shareSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><rect x="4" y="13" width="16" height="8" rx="2"/></svg>';
+
+  var popupList = '<div class="gate-demo-popup-item" id="gatePopupShareItem" style="color:#2D6A4F;font-weight:700;">' + shareSvg + '&nbsp; 共有</div>' +
+    '<div class="gate-demo-popup-item">🔖&nbsp; ブックマークに追加</div>' +
+    '<div class="gate-demo-popup-item">＋&nbsp; 新規タブ</div>';
+
+  var steps = [
+    { cap: '画面下の「…」をタップ', popup: false, sheet: false, targetEl: function(){ return dotsIcon; } },
+    { cap: '「共有」を選択', popup: true, sheet: false, html: popupList, targetId: 'gatePopupShareItem' },
+    { cap: '「表示を増やす」をタップ', popup: false, sheet: true, html: shareHead + actionsMore, targetId: 'gateSheetMoreBtn' },
+    { cap: '「ホーム画面に追加」を選択', popup: false, sheet: true, html: shareHead + actionsLess, targetId: 'gateSheetHomeItem' },
+    { cap: '右上の「追加」をタップして完了', popup: false, sheet: true, tall: true, html: addScreen, targetId: 'gateSheetAddBtn' },
+    { cap: 'ホーム画面から、いつでも開けます', popup: false, sheet: false, done: true }
+  ];
+
+  var timers = [];
+  var STEP_DURATION = 2600;
+  var TALL_STEP_DURATION = 3200;
+  var REVEAL_DELAY = 480;
+
+  function placeDotOn(el) {
+    if (!el) return;
+    var screenRect = screenEl.getBoundingClientRect();
+    var elRect = el.getBoundingClientRect();
+    var cx = elRect.left - screenRect.left + elRect.width / 2;
+    var cy = elRect.top - screenRect.top + elRect.height / 2;
+    dot.style.left = (cx - 9) + 'px';
+    dot.style.top = (cy - 9) + 'px';
+  }
+
+  function showDotOnTarget(s) {
+    var target = s.targetEl ? s.targetEl() : (s.targetId ? document.getElementById(s.targetId) : null);
+    if (!target) return;
+    placeDotOn(target);
+    dot.style.opacity = '1';
+    dot.style.transform = 'scale(1)';
+    timers.push(setTimeout(function () {
+      dot.style.transform = 'scale(1.7)';
+      dot.style.opacity = '0';
+    }, 450));
+  }
+
+  function playStep(i) {
+    var s = steps[i];
+    caption.textContent = s.cap;
+    popup.classList.toggle('show', s.popup);
+    if (s.popup) popup.innerHTML = s.html;
+    sheet.classList.toggle('show', s.sheet);
+    sheet.classList.toggle('tall', !!s.tall);
+    if (s.sheet) sheet.innerHTML = s.html; else sheet.innerHTML = '';
+
+    if (s.done) {
+      dot.style.opacity = '0';
+    } else if (s.targetEl) {
+      showDotOnTarget(s);
+    } else {
+      dot.style.opacity = '0';
+      timers.push(setTimeout(function () { showDotOnTarget(s); }, REVEAL_DELAY));
+    }
+
+    var duration = s.tall ? TALL_STEP_DURATION : STEP_DURATION;
+    var next = (i + 1) % steps.length;
+    timers.push(setTimeout(function () { playStep(next); }, duration));
+  }
+
+  playStep(0);
+})();
+
+// ========================
+// グローバル音声マネージャー
+// ========================
+const AUDIO_REGISTRY = [];
+function registerAudio(el) {
+  if (!el || AUDIO_REGISTRY.includes(el)) return;
+  AUDIO_REGISTRY.push(el);
+  el.addEventListener('play', () => {
+    AUDIO_REGISTRY.forEach(other => {
+      if (other !== el && !other.paused) {
+        try { other.pause(); } catch (e) {}
+      }
+    });
+  });
+}
+registerAudio(document.getElementById('asoboTimerBgm'));
+registerAudio(document.getElementById('asoboVoicePlayer'));
+(function () {
+  const se = document.getElementById('asoboSePlayer');
+  const se2 = document.getElementById('asoboSePlayer2');
+  if (se) se.volume = 0.45;
+  if (se2) se2.volume = 0.5;
+})();
+
+// ========================
+// データ
+// ========================
+const MONTH_PLAYLIST = [
+  { type:'audio', title:"Swingin' From a Rainbow", sub:'Morning Talkのエンディングで使用中の曲。ゆったり揺れるようなリズムが心地いい一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_swingin_rainbow.mp3' },
+  { type:'audio', title:'Little Dolphin', sub:'Morning Talkのエンディングで使用中の曲。海を泳ぐイルカをイメージした、やさしいメロディ。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_little_dolphin.mp3' },
+  { type:'audio', title:'Alphabet Song', sub:'Morning Talkのエンディングで使用中の曲。アルファベットを楽しく覚えられる定番ソング。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_alphabet_song.mp3' },
+  { type:'youtube', videoId:'KbrSWbuWtmc', title:'The Ice Cream Song', sub:'ice cream・scoopなど夏らしい単語がいっぱい。数を数えながら歌える定番曲。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=KbrSWbuWtmc' },
+  { type:'youtube', videoId:'hlzvrEfyL2Y', title:'Mr. Sun, Sun, Mr. Golden Sun', sub:'太陽に呼びかけるやさしいメロディ。今月のテーマ「Water &amp; Sun」にぴったりの一曲。', age:'1〜4歳', ytUrl:'https://www.youtube.com/watch?v=hlzvrEfyL2Y' },
+  { type:'youtube', videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
+];
+
+const JOEL_ONE_LINERS = [
+  { en: "It's okay to make mistakes!", ja: '間違えても大丈夫だよ！' },
+  { en: 'One word a day is enough.', ja: '1日1単語でじゅうぶん。' },
+  { en: "You don't have to be perfect.", ja: '完璧じゃなくていいんだ。' },
+  { en: 'Small steps still count.', ja: '小さな一歩も、ちゃんと前進だよ。' },
+  { en: 'Have fun today, too!', ja: '今日も楽しんでいこうね！' },
+  { en: 'Your voice matters.', ja: '君の声には価値があるよ。' },
+  { en: "Let's take it easy today.", ja: '今日はゆっくりいこう。' },
+  { en: 'Every little bit helps.', ja: 'ちょっとずつで大丈夫。' },
+  { en: "It's okay to skip a day.", ja: 'お休みしてもいいんだよ。' },
+  { en: 'No need to rush.', ja: '焦らなくていいんだよ。' },
+  { en: 'Just showing up counts.', ja: '続けているだけで、もう十分だよ。' },
+  { en: 'Laughing together is enough.', ja: '一緒に笑うだけで、もう十分だよ。' },
+  { en: "You know your child best.", ja: '子供のことを一番知ってるのは、あなただよ。' },
+  { en: 'Even five minutes is real.', ja: '5分だって、ちゃんと本物だよ。' },
+  { en: "You're not alone in this.", ja: 'ひとりでがんばらなくていいんだよ。' },
+  { en: 'One smile is enough today.', ja: '今日は笑顔ひとつで十分だよ。' },
+  { en: "You're already doing enough.", ja: 'もう、じゅうぶんやれてるよ。' },
+  { en: "Tomorrow's another chance.", ja: '明日、また新しいチャンスがあるよ。' },
+  { en: "It doesn't have to look perfect.", ja: '見た目がキレイじゃなくていいんだ。' },
+  { en: "You're not a teacher. You're something better.", ja: '先生じゃなくていい。あなたはもっと特別だから。' },
+  { en: "Some days are just quiet, and that's fine.", ja: '静かな日があってもいいんだよ。' },
+  { en: "You showed up. That's the whole thing.", ja: '今日もここに来てくれた。それで十分だよ。' },
+  { en: 'Slow and steady still gets there.', ja: 'ゆっくりでも、ちゃんと進んでるよ。' },
+  { en: 'I\'m proud of you today.', ja: '今日のあなたを、誇りに思うよ。' },
+  {
+    type: 'quote',
+    en: 'Learning another language is not only learning different words for the same things, but learning another way to think about things.',
+    ja: '外国語を学ぶというのは、同じものを違う単語で言い換えるだけじゃない。ものの考え方そのものを、もうひとつ手に入れることなんだ。',
+    author: 'Flora Lewis',
+    authorJa: 'アメリカのジャーナリスト',
+  },
+  {
+    type: 'quote',
+    en: 'Language is the road map of a culture. It tells you where its people come from and where they are going.',
+    ja: '言語は、文化の地図だ。その言葉を話す人たちが、どこから来て、どこへ向かっているのかを教えてくれる。',
+    author: 'Rita Mae Brown',
+    authorJa: 'アメリカの作家',
+  },
+  {
+    type: 'quote',
+    en: 'Children learn as they play. Most importantly, in play children learn how to learn.',
+    ja: '子供は遊びながら学ぶ。何より大切なのは、遊びの中で「学び方」そのものを学んでいくということ。',
+    author: 'O. Fred Donaldson',
+    authorJa: '遊びの研究者',
+  },
+  {
+    type: 'quote',
+    en: 'The way we talk to our children becomes their inner voice.',
+    ja: '私たちが子供にかける言葉は、そのままその子の心の中の声になる。',
+    author: "Peggy O'Mara",
+    authorJa: '編集者・作家',
+  },
+  {
+    type: 'quote',
+    en: 'A journey of a thousand miles begins with a single step.',
+    ja: '千里の道も、一歩から。',
+    author: 'Lao Tzu',
+    authorJa: '中国の思想家',
+  },
+  {
+    type: 'quote',
+    en: 'The limits of my language mean the limits of my world.',
+    ja: '私の言葉の限界が、私の世界の限界を意味する。',
+    author: 'Ludwig Wittgenstein',
+    authorJa: 'オーストリアの哲学者',
+  },
+];
+
+function renderJoelLine() {
+  const el = document.getElementById('joelLineText');
+  const bubble = document.getElementById('joelLineBubble');
+  if (!el) return;
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const line = JOEL_ONE_LINERS[dayOfYear % JOEL_ONE_LINERS.length];
+  const isQuote = line.type === 'quote';
+  if (bubble) bubble.classList.toggle('is-quote', isQuote);
+  const eyebrow = isQuote ? `<div class="joel-line-eyebrow">Jayが選んだ言葉</div>` : '';
+  const author = isQuote ? `<span class="author">— ${line.author}${line.authorJa ? `（${line.authorJa}）` : ''}</span>` : '';
+  const enText = isQuote ? `"${line.en}"` : line.en;
+  const jaText = isQuote ? `「${line.ja}」` : line.ja;
+  el.innerHTML = `${eyebrow}<span class="en">${enText}</span><span class="ja">${jaText}</span>${author}`;
+}
+
+// ========================
+// 通算のあゆみ（累計スタッツ・カードのリセットとは無関係に積み上がる）
+// ========================
+const LIFETIME_STATS_KEY = 'enverly_lifetime_stats';
+
+function getLifetimeStats() {
+  let s = null;
+  try {
+    const raw = localStorage.getItem(LIFETIME_STATS_KEY);
+    s = raw ? JSON.parse(raw) : null;
+  } catch (e) { s = null; }
+  if (!s) {
+    s = { totalStamps: 0, cardsCompleted: 0, talkCount: 0, morningTalkPlays: 0, asoboPlays: 0, journeyOpens: 0 };
+    saveLifetimeStats(s);
+  }
+  return s;
+}
+function saveLifetimeStats(s) {
+  try { localStorage.setItem(LIFETIME_STATS_KEY, JSON.stringify(s)); } catch (e) {}
+}
+function bumpLifetimeStat(key, amount) {
+  const s = getLifetimeStats();
+  s[key] = (s[key] || 0) + (amount || 1);
+  saveLifetimeStats(s);
+}
+
+const STAMP_BADGES = [
+  { min: 0,  img: 'illustrations/stamps/stamp_week_01.png', name: 'めがでたよ' },
+  { min: 5,  img: 'illustrations/stamps/stamp_week_02.png', name: 'ふたばになったよ' },
+  { min: 15, img: 'illustrations/stamps/stamp_week_03.png', name: 'はっぱもりもり' },
+  { min: 30, img: 'illustrations/stamps/stamp_week_04.png', name: 'つぼみふくらんだ' },
+  { min: 60, img: 'illustrations/stamps/stamp_week_05.png', name: 'はなさいたよ！' },
+];
+function getStampBadge(total) {
+  let badge = STAMP_BADGES[0];
+  for (const b of STAMP_BADGES) {
+    if (total >= b.min) badge = b;
+  }
+  return badge;
+}
+
+function renderLifetimeStats() {
+  const s = getLifetimeStats();
+  const map = {
+    lifetimeTotalStamps: s.totalStamps,
+    lifetimeCardsCompleted: s.cardsCompleted,
+    lifetimeTalkCount: s.talkCount,
+    lifetimeMorningTalkPlays: s.morningTalkPlays,
+    lifetimeAsoboPlays: s.asoboPlays,
+  };
+  Object.keys(map).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = map[id];
+  });
+
+  const badgeEl = document.getElementById('ayumiBadge');
+  if (badgeEl) {
+    const badge = getStampBadge(s.totalStamps);
+    badgeEl.innerHTML = `
+      <img src="${badge.img}" alt="${badge.name}">
+      <div>
+        <div class="ayumi-badge-name">${badge.name}</div>
+        <div class="ayumi-badge-sub">通算${s.totalStamps}スタンプ</div>
+      </div>
+    `;
+  }
+}
+
+
+const STAMP_CARD_KEY = 'enverly_stamp_card';
+const STAMP_CARD_MAX = 5;
+
+function getStampCardState() {
+  let state = null;
+  try {
+    const raw = localStorage.getItem(STAMP_CARD_KEY);
+    state = raw ? JSON.parse(raw) : null;
+  } catch (e) { state = null; }
+  if (!state) {
+    state = { count: 0, days: {}, celebrated: false };
+    saveStampCardState(state);
+  }
+  return state;
+}
+
+function saveStampCardState(state) {
+  try { localStorage.setItem(STAMP_CARD_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+function earnStamp(category) {
+  const state = getStampCardState();
+  const todayKey = new Date().toISOString().slice(0, 10);
+  if (!state.days[todayKey]) state.days[todayKey] = {};
+  if (state.days[todayKey][category]) return;
+  if (state.count >= STAMP_CARD_MAX) return;
+  state.days[todayKey][category] = true;
+  state.count += 1;
+  saveStampCardState(state);
+  bumpLifetimeStat('totalStamps');
+  showStampToast(state.count);
+  renderStampCard(true);
+  if (state.count >= STAMP_CARD_MAX && !state.celebrated) {
+    state.celebrated = true;
+    saveStampCardState(state);
+    bumpLifetimeStat('cardsCompleted');
+    setTimeout(() => openStampCelebrate(), 550);
+  }
+}
+
+let stampToastTimer = null;
+function showStampToast(count) {
+  const el = document.getElementById('stampToast');
+  if (!el) return;
+  const img = document.getElementById('stampToastImg');
+  const text = document.getElementById('stampToastText');
+  if (img) img.src = `illustrations/stamps/stamp_week_0${count}.png`;
+  if (text) text.textContent = count >= STAMP_CARD_MAX ? 'カード完成！' : 'スタンプゲット！';
+  el.classList.add('show');
+  clearTimeout(stampToastTimer);
+  stampToastTimer = setTimeout(() => el.classList.remove('show'), 1600);
+}
+
+function advanceStampCard() {
+  const state = { count: 0, days: {}, celebrated: false };
+  saveStampCardState(state);
+  renderStampCard();
+  closeStampCelebrate();
+}
+
+function renderStampCard(justEarned) {
+  const wrap = document.getElementById('stampCardSlots');
+  if (!wrap) return;
+  const state = getStampCardState();
+  const slotsHtml = [];
+  for (let i = 1; i <= STAMP_CARD_MAX; i++) {
+    const filled = i <= state.count;
+    const isNew = justEarned && i === state.count;
+    const cls = ['stamp-card-slot'];
+    if (filled) cls.push('filled');
+    if (i === STAMP_CARD_MAX) cls.push('slot-5');
+    if (isNew) cls.push('pop');
+    const img = filled
+      ? `<img src="illustrations/stamps/stamp_week_0${i}.png" alt="スタンプ${i}">`
+      : '';
+    slotsHtml.push(`<div class="${cls.join(' ')}">${img}</div>`);
+  }
+  wrap.innerHTML = slotsHtml.join('');
+}
+
+function openStampCelebrate() {
+  const el = document.getElementById('stampCelebrateOverlay');
+  if (el) el.classList.add('show');
+}
+function closeStampCelebrate() {
+  const el = document.getElementById('stampCelebrateOverlay');
+  if (el) el.classList.remove('show');
+}
+
+function recordIeta() {
+  bumpLifetimeStat('talkCount');
+  earnStamp('talk');
+}
+
+function recordAsoboPlayed() {
+  bumpLifetimeStat('asoboPlays');
+  earnStamp('asobo');
+}
+
+const YT_DATA = [
+  { icon:'talk', videoId:'zwL2o4jZxbc', title:'Ms. Rachel', when:'発語・語りかけ', age:'0〜4歳', interest:'ことば・発話', tip:'一番のお気に入り。うちの子はこれを見て育ちました。ゆったりした発音と、子どもの反応を引き出す間の取り方が心地いい。', url:'https://www.youtube.com/@msrachel' },
+  { icon:'music', videoId:'9UasekNr8KI', title:'Super Simple Songs', when:'いつでも・BGMに', age:'0〜4歳', interest:'うた・音楽', tip:'小さい頃からずっとお世話になってる定番。CGに頼らない、良質な英語の歌がたくさん。', url:'https://www.youtube.com/channel/UCLsooMJoIpl_7ux2jvdPB-Q' },
+  { icon:'search', videoId:'2Rd-QIj91FU', title:'Blippi', when:'おでかけ気分・知育タイム', age:'2〜6歳', interest:'たんけん・知育', tip:'正直、最初は「うるさいお兄さん」だと思ってました。でも4歳を過ぎた娘が夢中になって、内容をちゃんと見たら教育的な部分が多いことに気づいた一本。', url:'https://www.youtube.com/channel/UC5PYHgAzJ1wLEidB58SK6Xw' },
+  { icon:'run', videoId:'DsUPVERZFlI', title:'Danny Go', when:'体を動かしたい時', age:'3〜6歳', interest:'からだを動かす', tip:'体を動かしながら英語に触れられるチャンネル。音楽の質もよくて、うちの4歳はこれしか見ません。', url:'https://www.youtube.com/@DannyGo' },
+];
+
+const SCENE_DATA = [
+  { tag:'寝る前', color:'night', channel:'Ms. Rachel', videoId:'fqINYZwVXV4', note:'静かな語りかけとねんねルーティンで、そのまま眠りに向かえる。', age:'0〜3歳', url:'https://www.youtube.com/watch?v=fqINYZwVXV4' },
+  { tag:'朝の支度中', color:'morning', channel:'Super Simple Songs', videoId:'K53J44ioDxI', note:'元気が出る定番ソングをかけ流して、支度のテンションを上げる。', age:'1〜5歳', url:'https://www.youtube.com/watch?v=K53J44ioDxI' },
+  { tag:'おでかけ・車の中', color:'out', channel:'Blippi', videoId:'DhJ5Ld-LpUE', note:'乗り物を実況しながら紹介。移動中の暇つぶしにもぴったり。', age:'2〜6歳', url:'https://www.youtube.com/watch?v=DhJ5Ld-LpUE' },
+  { tag:'食事中', color:'meal', channel:'Super Simple Songs', videoId:'frN3nvhIHUk', note:'子どもが好きな定番の食べ物ソング。食卓のBGMに。', age:'1〜5歳', url:'https://www.youtube.com/watch?v=frN3nvhIHUk' },
+];
+
+const SCENE_COLORS = {
+  night: { bg:'#EEEDFE', text:'#4C3F8C' },
+  morning: { bg:'#FAEEDA', text:'#92400E' },
+  out: { bg:'#EDF6F1', text:'#3B6D11' },
+  meal: { bg:'#FDE8E8', text:'#9C3131' },
+};
+
+function renderScenes() {
+  const container = document.getElementById('sceneCards');
+  if (!container) return;
+  container.innerHTML = SCENE_DATA.map(s => {
+    const c = SCENE_COLORS[s.color];
+    return `
+    <a class="scene-card" href="${s.url}" target="_blank" rel="noopener">
+      <div class="scene-card-thumb"><img src="https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg" alt="${s.tag}"></div>
+      <div class="scene-card-tag" style="background:${c.bg};color:${c.text};">${s.tag}</div>
+      <div class="scene-card-channel">${s.channel}</div>
+      <div class="scene-card-note">${s.note}</div>
+      <div class="scene-card-cta"><span>▶</span>見る</div>
+    </a>
+  `;
+  }).join('');
+}
+
+// ========================
+// 状態
+// ========================
+let carouselIndex = 0;
+let carouselSwipeGuard = false;
+const CAROUSEL_CARD_W = 268;
+const CAROUSEL_GAP = 12;
+let musicProg = 0, musicTimer = null;
+let activeMode = null;
+
+// ========================
+// モニター利用ログ（Google Apps Script Webhook → スプレッドシート）
+// ========================
+const TRACKING_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxCqYkySVMwhrrFUt_uAQYV-0V1HXm7VXMw6WHzM8qV2xYap1Ujo4qUc_DrC9PWK_ET/exec';
+
+let trackingSessionId = null;
+function getTrackingSessionId() {
+  if (trackingSessionId) return trackingSessionId;
+  try {
+    trackingSessionId = sessionStorage.getItem('enverly_session_id');
+    if (!trackingSessionId) {
+      trackingSessionId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      sessionStorage.setItem('enverly_session_id', trackingSessionId);
+    }
+  } catch (e) {
+    trackingSessionId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  return trackingSessionId;
+}
+
+function trackEvent(eventName, extra) {
+  try {
+    if (!TRACKING_ENDPOINT || TRACKING_ENDPOINT.indexOf('PASTE_') === 0) return;
+    var raw = localStorage.getItem('enverly_access');
+    var access = raw ? JSON.parse(raw) : null;
+    if (!access || !access.code) return;
+    var payload = {
+      code: access.code,
+      type: access.type || '',
+      event: eventName,
+      extra: extra || '',
+      session: getTrackingSessionId(),
+      ts: new Date().toISOString(),
+      ua: navigator.userAgent
+    };
+    var body = JSON.stringify(payload);
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(TRACKING_ENDPOINT, new Blob([body], { type: 'text/plain;charset=UTF-8' }));
+    } else {
+      fetch(TRACKING_ENDPOINT, { method: 'POST', mode: 'no-cors', body: body }).catch(() => {});
+    }
+  } catch (e) {}
+}
+
+// ========================
+// アプリ初期化
+// ========================
+function initApp() {
+  renderYT();
+  renderScenes();
+  renderMonthlyPlaylist();
+  renderJoelLine();
+  renderStampCard();
+  initPushNotification();
+  trackEvent('app_open');
+}
+initApp();
+
+// ========================
+// 毎日の通知（Web Push）
+// ========================
+const VAPID_PUBLIC_KEY = 'BDBTE8D67Pooo2ClU3adPkAWYC9jw7aKFc7CXzTtyQcL2yRtRoFr6JXJAhopiP5rZcUmrRE0RXAu8gqRZCwqCS0';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function initPushNotification() {
+  const switchEl = document.getElementById('notifySwitch');
+  const subEl = document.getElementById('notifyToggleSub');
+  if (!switchEl) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    subEl.textContent = 'このブラウザは通知に対応していません';
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    const existing = await reg.pushManager.getSubscription();
+    setNotifySwitchUI(!!existing && Notification.permission === 'granted');
+  } catch (e) {
+    console.error('SW登録失敗', e);
+  }
+}
+
+function setNotifySwitchUI(on) {
+  const switchEl = document.getElementById('notifySwitch');
+  const subEl = document.getElementById('notifyToggleSub');
+  if (!switchEl) return;
+  switchEl.classList.toggle('on', on);
+  subEl.textContent = on ? '朝、Morning Talkの配信をお知らせ中' : '朝、Morning Talkの配信をお知らせ';
+}
+
+async function toggleDailyNotification() {
+  const switchEl = document.getElementById('notifySwitch');
+  if (!switchEl) return;
+  if (switchEl.classList.contains('pending')) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    alert('お使いのブラウザは通知に対応していません。');
+    return;
+  }
+  switchEl.classList.add('pending');
+  var step = 'init';
+  try {
+    step = 'getRegistrations（既存の登録を確認）';
+    const allRegs = await navigator.serviceWorker.getRegistrations();
+    if (allRegs.length > 0) {
+      console.log('既存のSW登録を解除:', allRegs.map(function (r) { return r.scope; }));
+      for (const r of allRegs) {
+        await r.unregister();
+      }
+    }
+
+    step = 'serviceWorker.register';
+    await navigator.serviceWorker.register('/sw.js');
+
+    step = 'serviceWorker.ready';
+    const reg = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready がタイムアウトしました（5秒待っても解決しませんでした）')), 5000))
+    ]);
+
+    step = 'getSubscription';
+    const existing = await reg.pushManager.getSubscription();
+
+    if (existing && Notification.permission === 'granted') {
+      step = 'unsubscribe fetch';
+      await fetch('/api/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: existing.endpoint }),
+      }).catch(() => {});
+      step = 'unsubscribe';
+      await existing.unsubscribe();
+      setNotifySwitchUI(false);
+      return;
+    }
+
+    step = 'requestPermission';
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      setNotifySwitchUI(false);
+      if (permission === 'denied') {
+        alert('通知がブロックされています。ブラウザの設定から許可してください。');
+      }
+      return;
+    }
+    step = 'pushManager.subscribe';
+    var activeReg = reg;
+    for (var i = 0; i < 5 && !activeReg.active; i++) {
+      await new Promise(function (r) { setTimeout(r, 400); });
+      activeReg = await navigator.serviceWorker.getRegistration('/') || activeReg;
+    }
+    if (!activeReg.active) {
+      throw new Error('サービスワーカーがactiveになりませんでした（2秒待っても）。');
+    }
+    const sub = await activeReg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    });
+    step = 'subscribe fetch';
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub }),
+    });
+    if (!res.ok) {
+      var bodyText = '';
+      try { bodyText = await res.text(); } catch (e2) {}
+      throw new Error('subscribe API failed: HTTP ' + res.status + ' ' + bodyText);
+    }
+    setNotifySwitchUI(true);
+  } catch (e) {
+    console.error('通知購読エラー [' + step + ']', e);
+    alert('通知の設定に失敗しました。\n\n失敗した処理: ' + step + '\nエラー内容: ' + (e && e.message ? e.message : e));
+    setNotifySwitchUI(false);
+  } finally {
+    switchEl.classList.remove('pending');
+  }
+}
+
+// ========================
+// Monthly Playlist カルーセル
+// ========================
+function renderMonthlyPlaylist() {
+  const container = document.getElementById('monthlyPlaylist');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="carousel-outer" id="carouselOuter">
+      <div class="carousel-track" id="carouselTrack">
+        ${MONTH_PLAYLIST.map((s, i) => `
+          <div class="carousel-card${i === 0 ? ' active' : ''}${s.type === 'audio' ? ' audio-card' : ''}" data-index="${i}" id="carouselCard${i}" onclick="handleCarouselCardTap(${i})">
+            ${s.type === 'audio' ? `
+              <div class="carousel-thumb-area audio-thumb audio-thumb-${i % 3}">
+                <div class="audio-thumb-play" id="audioThumbPlay${i}">
+                  <svg class="audio-thumb-icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg class="audio-thumb-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+                </div>
+              </div>
+              <div class="carousel-card-info">
+                <div class="carousel-card-title">${s.title}</div>
+                <div class="carousel-card-age carousel-card-tag-audio">${s.tag}</div>
+                <div class="carousel-card-sub">${s.sub}</div>
+                <div class="carousel-card-yt carousel-card-listen">
+                  <span>♪</span>きく
+                </div>
+              </div>
+            ` : `
+              <div class="carousel-thumb-area">
+                <img src="https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg" alt="${s.title}">
+              </div>
+              <div class="carousel-card-info">
+                <div class="carousel-card-title">${s.title}</div>
+                <div class="carousel-card-age">${s.age}</div>
+                <div class="carousel-card-sub">${s.sub}</div>
+                <div class="carousel-card-yt">
+                  <span>▶</span>見る
+                </div>
+              </div>
+            `}
+          </div>
+        `).join('')}
+      </div>
+      <div class="carousel-dots">
+        ${MONTH_PLAYLIST.map((_, i) => `
+          <div class="carousel-dot${i === 0 ? ' active' : ''}" onclick="goCarousel(${i})"></div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  carouselIndex = 0;
+  setTimeout(() => initCarousel(), 0);
+}
+
+function handleCarouselCardTap(idx) {
+  if (carouselSwipeGuard) return;
+  const item = MONTH_PLAYLIST[idx];
+  if (!item) return;
+  if (item.type === 'audio') {
+    toggleMonthlyAudio(idx);
+    return;
+  }
+  if (item.ytUrl) window.open(item.ytUrl, '_blank', 'noopener');
+}
+
+const monthlyPlaylistAudioEl = new Audio();
+registerAudio(monthlyPlaylistAudioEl);
+let monthlyPlayingIndex = null;
+
+function setMonthlyCardPlayingUI(idx, playing) {
+  const playIcon = document.querySelector(`#audioThumbPlay${idx} .audio-thumb-icon-play`);
+  const pauseIcon = document.querySelector(`#audioThumbPlay${idx} .audio-thumb-icon-pause`);
+  const card = document.getElementById(`carouselCard${idx}`);
+  if (playIcon) playIcon.style.display = playing ? 'none' : '';
+  if (pauseIcon) pauseIcon.style.display = playing ? '' : 'none';
+  if (card) card.classList.toggle('playing', playing);
+}
+
+function toggleMonthlyAudio(idx) {
+  const item = MONTH_PLAYLIST[idx];
+  if (!item || item.type !== 'audio') return;
+
+  const isSameTrack = monthlyPlayingIndex === idx &&
+    monthlyPlaylistAudioEl.currentSrc &&
+    monthlyPlaylistAudioEl.currentSrc.indexOf(item.src) !== -1;
+
+  if (isSameTrack && !monthlyPlaylistAudioEl.paused) {
+    monthlyPlaylistAudioEl.pause();
+    return;
+  }
+
+  if (!isSameTrack) {
+    monthlyPlaylistAudioEl.src = item.src;
+    monthlyPlaylistAudioEl.currentTime = 0;
+  }
+  monthlyPlayingIndex = idx;
+  try { monthlyPlaylistAudioEl.play().catch(() => {}); } catch (e) {}
+}
+
+monthlyPlaylistAudioEl.addEventListener('play', () => {
+  if (monthlyPlayingIndex !== null) setMonthlyCardPlayingUI(monthlyPlayingIndex, true);
+});
+monthlyPlaylistAudioEl.addEventListener('pause', () => {
+  if (monthlyPlayingIndex !== null) setMonthlyCardPlayingUI(monthlyPlayingIndex, false);
+});
+monthlyPlaylistAudioEl.addEventListener('ended', () => {
+  if (monthlyPlayingIndex !== null) setMonthlyCardPlayingUI(monthlyPlayingIndex, false);
+  monthlyPlayingIndex = null;
+});
+
+function initCarousel() {
+  const outer = document.getElementById('carouselOuter');
+  const track = document.getElementById('carouselTrack');
+  if (!outer || !track) return;
+
+  const containerW = outer.offsetWidth;
+  const offset = (containerW - CAROUSEL_CARD_W) / 2;
+  track.style.paddingLeft = offset + 'px';
+  track.style.paddingRight = offset + 'px';
+
+  updateCarousel(0, false);
+
+  let startX = 0, startY = 0, moved = false;
+  track.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    moved = false;
+  }, { passive: true });
+  track.addEventListener('touchmove', e => { moved = true; }, { passive: true });
+  track.addEventListener('touchend', e => {
+    if (!moved) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 38) {
+      goCarousel(carouselIndex + (dx < 0 ? 1 : -1));
+    }
+    carouselSwipeGuard = true;
+    setTimeout(() => { carouselSwipeGuard = false; }, 350);
+  }, { passive: true });
+}
+
+function goCarousel(idx) {
+  idx = Math.max(0, Math.min(idx, MONTH_PLAYLIST.length - 1));
+  updateCarousel(idx, true);
+}
+
+function updateCarousel(idx, animate) {
+  carouselIndex = idx;
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+
+  if (!animate) {
+    track.style.transition = 'none';
+  } else {
+    track.style.transition = 'transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)';
+  }
+  track.style.transform = `translateX(${-(idx * (CAROUSEL_CARD_W + CAROUSEL_GAP))}px)`;
+  if (!animate) {
+    track.offsetHeight;
+    track.style.transition = '';
+  }
+
+  document.querySelectorAll('.carousel-card').forEach((c, i) => {
+    c.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+// ========================
+// トースト
+// ========================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ========================
+// タブ
+// ========================
+function switchTab(name, el) {
+  ['home', 'shiru', 'asobo', 'routine', 'playlist'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (name === 'asobo') renderAsoboContent();
+  trackEvent('tab_view', name);
+}
+
+// ========================
+// トップ：今日のジャーニー（Now Playing型／Morning・Eveningは時間帯で主役交代、えほんタイムは常時展開）
+// ========================
+const JOURNEY_SLOTS = ['morning', 'evening', 'night'];
+let journeyManualFocus = null;
+
+function getJourneyTimeSlot() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 11) return 'morning';
+  if (h >= 11 && h < 17) return 'teaser';
+  if (h >= 17 && h < 19) return 'evening';
+  return 'night';
+}
+
+function getBigSlot(h) {
+  return (h >= 5 && h < 13) ? 'morning' : 'evening';
+}
+function journeyBigSlot() {
+  if (journeyManualFocus === 'morning' || journeyManualFocus === 'evening') return journeyManualFocus;
+  return getBigSlot(new Date().getHours());
+}
+function journeyOtherSlot() {
+  return journeyBigSlot() === 'morning' ? 'evening' : 'morning';
+}
+
+function journeyStorageKey() {
+  return 'enverly_journey_opened_' + new Date().toISOString().slice(0, 10);
+}
+function getJourneyOpenedSet() {
+  try {
+    const raw = localStorage.getItem(journeyStorageKey());
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) { return new Set(); }
+}
+function markJourneyOpened(slot) {
+  const set = getJourneyOpenedSet();
+  if (set.has(slot)) return;
+  set.add(slot);
+  try { localStorage.setItem(journeyStorageKey(), JSON.stringify([...set])); } catch (e) {}
+  bumpLifetimeStat('journeyOpens');
+  earnStamp('journey');
+}
+
+function applyJourneyState() {
+  const timeSlot = getJourneyTimeSlot();
+  if (timeSlot !== 'teaser') markJourneyOpened(timeSlot);
+
+  const big = journeyBigSlot();
+  ['morning', 'evening'].forEach(slot => {
+    const block = document.getElementById('jblock-' + slot);
+    if (block) block.classList.toggle('collapsed', slot !== big);
+  });
+
+  renderJourneyNowPlaying();
+}
+
+function focusJourneyBlock(slot) {
+  if (slot === 'morning' || slot === 'evening') journeyManualFocus = slot;
+  markJourneyOpened(slot);
+  applyJourneyState();
+  const block = document.getElementById('jblock-' + slot);
+  if (block && typeof block.scrollIntoView === 'function') block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+const JOURNEY_TALK_META = {
+  morning: { label: 'Morning talk', smallLabel: 'モーニングトーク', sub: '朝のひとときに', img: 'illustrations/talks/morning_talk_hero.png', qId: 'ftQuestion', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
+  evening: { label: 'Evening talk', smallLabel: 'イブニングトーク', sub: 'おかえりのひとときに', img: 'illustrations/talks/evening_talk_hero.png', qId: 'etQuestion', titleId: 'etPlayTitle', tagId: 'etStatusTag' }
+};
+function renderJourneyNowPlaying() {
+  const big = journeyBigSlot();
+  const other = journeyOtherSlot();
+  const bigMeta = JOURNEY_TALK_META[big];
+  const otherMeta = JOURNEY_TALK_META[other];
+
+  const bigLabelEl = document.getElementById('journeyNowBigLabel');
+  const bigImgEl = document.getElementById('journeyNowBigImg');
+  const bigTitleEl = document.getElementById('journeyNowBigTitle');
+  const bigSubEl = document.getElementById('journeyNowBigSub');
+  const smallLabelEl = document.getElementById('journeyNowSmallLabel');
+  const smallImgEl = document.getElementById('journeyNowSmallImg');
+  const smallSubEl = document.getElementById('journeyNowSmallSub');
+  const smallTitleEl = document.getElementById('journeyNowSmallTitle');
+  const bookTitleEl = document.getElementById('journeyNowBookTitle');
+
+  if (bigLabelEl) bigLabelEl.textContent = bigMeta.label;
+  if (bigSubEl) bigSubEl.textContent = bigMeta.sub;
+  if (bigImgEl) bigImgEl.src = bigMeta.img;
+  if (bigTitleEl) {
+    const q = document.getElementById(bigMeta.qId);
+    if (q && q.textContent) bigTitleEl.textContent = q.textContent;
+  }
+  if (smallLabelEl) smallLabelEl.textContent = otherMeta.smallLabel;
+  if (smallSubEl) smallSubEl.textContent = otherMeta.sub;
+  if (smallImgEl) smallImgEl.src = otherMeta.img;
+  if (smallTitleEl) {
+    const q = document.getElementById(otherMeta.qId);
+    if (q && q.textContent) smallTitleEl.textContent = q.textContent;
+  }
+  if (bookTitleEl) {
+    const mt = document.querySelector('.month-title');
+    if (mt && mt.textContent) bookTitleEl.textContent = mt.textContent;
+  }
+}
+
+applyJourneyState();
+
+
+// ========================
+// 設定モーダル
+// ========================
+function openSettingsModal() {
+  renderLifetimeStats();
+  renderStampCard();
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettingsModal() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+function logoutEnverly() {
+  alert('ログアウト機能は認証実装後に接続予定です');
+}
+
+
+// ========================
+// あそぼタブ
+// ========================
+let asoboOpenAxis = null;
+
+const AXIS_META = {
+  'カラー': { cls: 'tile-color', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.3c1.8 0 3.2-1.4 3.2-3.2C20.5 6.6 16.7 3 12 3Z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8" r="1" fill="currentColor" stroke="none"/></svg>' },
+  'カウント': { cls: 'tile-count', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="18" x2="6" y2="14"/><line x1="12" y1="18" x2="12" y2="10"/><line x1="18" y1="18" x2="18" y2="6"/></svg>' },
+  'サウンド': { cls: 'tile-sound', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M17 9a4 4 0 0 1 0 6"/><path d="M19.5 6.5a8 8 0 0 1 0 11"/></svg>' },
+  'ロケーション': { cls: 'tile-location', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.6 7-11.5A7 7 0 0 0 5 9.5C5 14.4 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg>' },
+  'テクスチャー': { cls: 'tile-texture', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11"/><path d="M10 10.5V5a1.5 1.5 0 0 1 3 0v5.5"/><path d="M13 10.5V6a1.5 1.5 0 0 1 3 0v7"/><path d="M16 12v-1a1.5 1.5 0 0 1 3 0v4a5.5 5.5 0 0 1-5.5 5.5h-2A6 6 0 0 1 6 15l-1.6-3a1.4 1.4 0 0 1 2.4-1.4"/></svg>' },
+  'カテゴリー': { cls: 'tile-category', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5L12 12 3.5 7.5Z"/><path d="M3.5 7.5V16L12 20.5V12"/><path d="M20.5 7.5V16L12 20.5"/></svg>' }
+};
+const ICON_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+function renderAsoboContent() {
+  renderAsoboAxisList();
+}
+
+function renderAsoboAxisList() {
+  const wrap = document.getElementById('asoboAxisList');
+  if (!wrap) return;
+  const axes = Object.keys(AXIS_META);
+  wrap.innerHTML = axes.map(axis => {
+    const meta = AXIS_META[axis];
+    const missions = AT_FIND.filter(d => d.axis === axis);
+    const cards = missions.map(m => `
+        <div class="at-archive-card">
+          <button class="at-archive-play" onclick="playAtArchiveItem(this); event.stopPropagation();">▶</button>
+          <div class="at-archive-body">
+            <div class="at-archive-en">${m.en}</div>
+            <div class="at-archive-ja">${m.ja}</div>
+          </div>
+        </div>`).join('');
+    return `
+    <div class="asobo-axis-frame ${meta.cls}" id="axisFrame-${meta.cls}" data-axis="${axis}">
+      <div class="asobo-axis-frame-head" onclick="toggleAxisFrame('${axis}')">
+        <div class="asobo-axis-icon">${meta.icon}</div>
+        <div class="asobo-axis-info">
+          <div class="asobo-axis-label">${axis}</div>
+          <div class="asobo-axis-count">${missions.length}このミッション</div>
+        </div>
+        <div class="asobo-axis-chevron">${ICON_CHEVRON}</div>
+      </div>
+      <div class="asobo-axis-body-wrap">
+        <div class="asobo-axis-body">
+          <div class="asobo-axis-body-inner">${cards}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAxisFrame(axis) {
+  const isOpen = asoboOpenAxis === axis;
+  document.querySelectorAll('.asobo-axis-frame.open').forEach(f => f.classList.remove('open'));
+  asoboOpenAxis = isOpen ? null : axis;
+  if (!isOpen) {
+    const meta = AXIS_META[axis];
+    const frame = document.getElementById('axisFrame-' + meta.cls);
+    if (frame) frame.classList.add('open');
+  }
+}
+
+let asoboTimerTimeout = null;
+const ASOBO_TIMER_CIRCUMFERENCE = 175.9;
+let currentFindItem = null;
+
+function playAsoboSe(src) {
+  const se = document.getElementById('asoboSePlayer');
+  if (!se || !src) return;
+  try {
+    let isSameSrc = false;
+    try { isSameSrc = se.src === new URL(src, window.location.href).href; } catch (e2) {}
+    if (isSameSrc) { se.currentTime = 0; } else { se.src = src; }
+    se.play().catch(() => {});
+  } catch (e) {}
+}
+
+function playAsoboSe2(src) {
+  const se = document.getElementById('asoboSePlayer2');
+  if (!se || !src) return;
+  try {
+    let isSameSrc = false;
+    try { isSameSrc = se.src === new URL(src, window.location.href).href; } catch (e2) {}
+    if (isSameSrc) { se.currentTime = 0; } else { se.src = src; }
+    se.play().catch(() => {});
+  } catch (e) {}
+}
+
+function playAsoboVoice(src, onEnded, onError) {
+  const voice = document.getElementById('asoboVoicePlayer');
+  if (!voice || !src) { if (onEnded) onEnded(); return; }
+  voice.onended = null;
+  try {
+    if (onEnded) voice.onended = onEnded;
+    let isSameSrc = false;
+    try { isSameSrc = voice.src === new URL(src, window.location.href).href; } catch (e2) {}
+    if (isSameSrc) {
+      voice.currentTime = 0;
+    } else {
+      voice.src = src;
+    }
+    voice.play().catch((err) => {
+      if (onError) onError(err);
+      if (onEnded) onEnded();
+    });
+  } catch (err) {
+    if (onError) onError(err);
+    if (onEnded) onEnded();
+  }
+}
+
+function drawAsoboGacha() {
+  const pick = AT_FIND[Math.floor(Math.random() * AT_FIND.length)];
+  currentFindItem = pick;
+  playAsoboSe(ASOBO_SFX.gachaDraw);
+  document.getElementById('asoboGachaEn').textContent = pick.en;
+  document.getElementById('asoboGachaJa').textContent = pick.ja;
+  document.getElementById('asoboGachaResult').classList.add('show');
+  resetAsoboTimer();
+  const meta = AXIS_META[pick.axis];
+  const frame = document.getElementById('axisFrame-' + meta.cls);
+  if (frame) {
+    frame.classList.remove('asobo-axis-frame-ring');
+    void frame.offsetWidth;
+    frame.classList.add('asobo-axis-frame-ring');
+    setTimeout(() => frame.classList.remove('asobo-axis-frame-ring'), 650);
+  }
+}
+
+let asoboTimerRunning = false;
+
+function resetAsoboTimer() {
+  clearTimeout(asoboTimerTimeout);
+  asoboTimerRunning = false;
+  const ring = document.getElementById('asoboTimerRingFg');
+  const icon = document.getElementById('asoboTimerPlayIcon');
+  const joelLine = document.getElementById('asoboJoelLine');
+  const bgm = document.getElementById('asoboTimerBgm');
+  if (!ring) return;
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = String(ASOBO_TIMER_CIRCUMFERENCE);
+  icon.classList.remove('playing');
+  icon.textContent = '▶';
+  joelLine.classList.remove('show');
+  try { bgm.pause(); } catch (e) {}
+  const voice = document.getElementById('asoboVoicePlayer');
+  try { voice.pause(); voice.onended = null; } catch (e) {}
+}
+
+function toggleAsoboTimer() {
+  if (asoboTimerRunning) {
+    completeAsoboTimer();
+  } else {
+    startAsoboTimer();
+  }
+}
+
+function completeAsoboTimer() {
+  clearTimeout(asoboTimerTimeout);
+  asoboTimerRunning = false;
+  const icon = document.getElementById('asoboTimerPlayIcon');
+  const joelLine = document.getElementById('asoboJoelLine');
+  const bgm = document.getElementById('asoboTimerBgm');
+  const ring = document.getElementById('asoboTimerRingFg');
+  icon.classList.remove('playing');
+  icon.textContent = '▶';
+  joelLine.classList.add('show');
+  try { bgm.pause(); } catch (e) {}
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = '0';
+  playAsoboSe(ASOBO_SFX.timerEnd);
+  playAsoboVoice(pickAtFindDoneAudio());
+  recordAsoboPlayed();
+}
+
+function startAsoboTimer() {
+  const ring = document.getElementById('asoboTimerRingFg');
+  const icon = document.getElementById('asoboTimerPlayIcon');
+  const joelLine = document.getElementById('asoboJoelLine');
+  const bgm = document.getElementById('asoboTimerBgm');
+  if (!ring) return;
+  joelLine.classList.remove('show');
+  icon.classList.add('playing');
+  icon.textContent = '⏸';
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = String(ASOBO_TIMER_CIRCUMFERENCE);
+  void ring.offsetWidth;
+  clearTimeout(asoboTimerTimeout);
+  asoboTimerRunning = true;
+  const startCountdown = () => {
+    if (!asoboTimerRunning) return;
+    ring.style.transition = 'stroke-dashoffset 60s linear';
+    ring.style.strokeDashoffset = '0';
+    try { bgm.src = ASOBO_SFX.timerBgm; bgm.currentTime = 0; bgm.play().catch(() => {}); } catch (e) {}
+    asoboTimerTimeout = setTimeout(() => {
+      completeAsoboTimer();
+    }, 60000);
+  };
+  playAsoboVoice(currentFindItem ? currentFindItem.audio : null, startCountdown);
+}
+
+let asoboRiddleTimeout = null;
+let currentRiddleItem = null;
+
+function drawAsoboRiddle() {
+  const wrap = document.getElementById('asoboRiddleResult');
+  const inner = document.getElementById('asoboRiddleResultInner');
+  wrap.classList.add('show');
+  inner.innerHTML = '<div class="asobo-riddle-thinking">考え中<span>.</span><span>.</span><span>.</span></div>';
+  clearTimeout(asoboRiddleTimeout);
+  asoboRiddleTimeout = setTimeout(() => {
+    const r = AT_RIDDLE[Math.floor(Math.random() * AT_RIDDLE.length)];
+    currentRiddleItem = r;
+    inner.innerHTML = `
+    <div class="at-riddle-flip" onclick="toggleRiddleFlip(this)">
+      <div class="at-riddle-flip-inner">
+        <div class="at-riddle-face front">
+          <div class="at-riddle-q">${r.en}</div>
+          <div class="at-riddle-ja">${r.ja}</div>
+          <div class="at-riddle-hint">タップしてこたえを見る</div>
+          <button class="at-riddle-play" onclick="playAtRiddle(this,event)">▶</button>
+        </div>
+        <div class="at-riddle-face back">
+          <div class="at-riddle-answer-label">こたえ</div>
+          <div class="at-riddle-answer">${r.answer}</div>
+        </div>
+      </div>
+    </div>`;
+    autoPlayAtRiddleQuestion(r);
+  }, 800);
+}
+
+function autoPlayAtRiddleQuestion(r) {
+  const btn = document.querySelector('#asoboRiddleResultInner .at-riddle-play');
+  const setPlaying = (playing) => {
+    if (!btn) return;
+    btn.classList.toggle('playing', playing);
+    btn.textContent = playing ? '⏸' : '▶';
+  };
+  setPlaying(true);
+  if (r && r.audio) {
+    playAsoboVoice(r.audio, () => setPlaying(false));
+  } else {
+    setTimeout(() => setPlaying(false), 3500);
+  }
+}
+
+function toggleRiddleFlip(card) {
+  card.classList.toggle('flipped');
+  if (card.classList.contains('flipped')) {
+    card.classList.remove('at-riddle-flip-ring');
+    void card.offsetWidth;
+    card.classList.add('at-riddle-flip-ring');
+    setTimeout(() => card.classList.remove('at-riddle-flip-ring'), 650);
+    const se = document.getElementById('asoboSePlayer');
+    try { se.pause(); se.currentTime = 0; } catch (e) {}
+    playAsoboSe(ASOBO_SFX.riddleFlip);
+    recordAsoboPlayed();
+    if (currentRiddleItem) {
+      playAsoboSe2(ASOBO_SFX.riddleCorrect);
+      const answerSrc = currentRiddleItem.answerAudio;
+      playAsoboVoice(answerSrc, null, (err) => {
+        console.error('answerAudio再生失敗', answerSrc, err);
+        showToast('音声エラー: ' + (err && err.name ? err.name : 'unknown') + ' / ' + answerSrc.split('/').pop());
+      });
+    }
+  }
+}
+
+function playAtArchiveItem(btn) {
+  const wasPlaying = btn.classList.contains('playing');
+  document.querySelectorAll('.at-archive-play.playing, .at-riddle-play.playing').forEach(b => {
+    b.classList.remove('playing'); b.textContent = '▶';
+  });
+  if (!wasPlaying) {
+    btn.classList.add('playing'); btn.textContent = '⏸';
+    setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶'; }, 4000);
+  }
+}
+
+function playAtRiddle(btn, evt) {
+  if (evt) evt.stopPropagation();
+  const wasPlaying = btn.classList.contains('playing');
+  document.querySelectorAll('.at-archive-play.playing, .at-riddle-play.playing').forEach(b => {
+    b.classList.remove('playing'); b.textContent = '▶';
+  });
+  const voice = document.getElementById('asoboVoicePlayer');
+  if (wasPlaying) {
+    try { voice.pause(); voice.onended = null; } catch (e) {}
+    return;
+  }
+  btn.classList.add('playing'); btn.textContent = '⏸';
+  const reset = () => { btn.classList.remove('playing'); btn.textContent = '▶'; };
+  const src = currentRiddleItem ? currentRiddleItem.audio : null;
+  if (src) {
+    playAsoboVoice(src, reset);
+  } else {
+    setTimeout(reset, 3500);
+  }
+}
+
+// ========================
+// アコーディオン
+// ========================
+function toggleWhy() {
+  const b = document.getElementById('whyBody'); const c = document.getElementById('whyChevron');
+  const o = b.classList.toggle('open'); c.classList.toggle('open', o);
+}
+function toggleLyrics() {
+  const b = document.getElementById('lyricsBody'); const c = document.getElementById('lyricsChevron');
+  const o = b.classList.toggle('open');
+  c.style.transform = o ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+// ========================
+// Family Talk（ポッドキャスト＝Morning Talk）
+// ========================
+let ftPlaying = false, ftProg = 0;
+
+const MORNING_TALK_MONTH = 'aug';
+const MORNING_TALK_WEEKS = {
+  w1: {
+    theme: '基本｜暑い日・プール開き',
+    days: {
+      mon: {
+        title: "It's hot!",
+        phrases: [{ en: "It's hot!", ja: "暑いね！" }, { en: "Let's swim!", ja: "泳ごう！" }],
+        rawScript: `
+Joel: Good morning, Mai! | おはよう、マイ！
+Mai: Good morning! Wow, it's already so hot today. | おはよう！わあ、今日はもうこんなに暑いね。
+Joel: I know! It's summer time. | だよね！夏だもん。
+Joel: Hey, did you look outside this morning? | ねえ、今朝外を見た？
+Joel: How is the weather? | お天気どう？
+Mai: Yes! It's so sunny and hot outside. | うん！外はすごく晴れてて暑いよ。
+Joel: It's hot, it's hot! I think we need to drink lots of water today. | 暑い、暑い！今日はたくさん水を飲まなきゃね。
+Mai: Good idea. Maybe we can go swimming later? | いいね。あとでプールに行こうか？
+Joel: Yes! Let's swim! That sounds perfect for a hot day like this. | いいね！泳ごう！こんな暑い日にはぴったりだ。
+Mai: I can't wait. It's hot, but swimming makes it fun. | 待ちきれない。暑いけど、泳ぐと楽しくなるね。
+Joel: Hey kids, can you say it with me? | ねえみんな、一緒に言ってみよう。
+Joel: "How's the weather? | 「お天気どう？
+Joel: It's sunny and hot!" | 晴れてて暑いよ！」
+Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました！暑い、暑い！晴れてて暑い！
+(Mai) Okay, let's go swimming and cool down! — ハイライト対象外（Maiの日本語解説の後に続く、音楽前のクロージング）
+(Joel) See you tomorrow! Bye bye! — ハイライト対象外
+        `,
+        talkDuration: 150,
+        maiTalk: '今日は "It\'s hot!"（暑いね！）というフレーズを話したよ。あと "Let\'s swim!"（泳ごう！）も出てきたね。夏はお子さんが「暑い！」って感じる場面、結構多いと思うから、そんな時にぜひ真似して言ってみてください。',
+      },
+      tue: {
+        title: "「Let's + 動詞」で広げよう",
+        phrases: [{ en: "Let's eat!", ja: "一緒に食べよう！" }],
+        rawScript: `
+Joel: Good morning, Mai! | おはよう、マイ！
+Mai: Good morning! Wow, it's already so hot today. | おはよう！わあ、今日はもうこんなに暑いね。
+Joel: I know! It's summer time. | だよね！夏だもん。
+Joel: Hey, did you look outside this morning? | ねえ、今朝外を見た？
+Joel: How is the weather? | お天気どう？
+Mai: Yes! It's so sunny and hot outside. | うん！外はすごく晴れてて暑いよ。
+Joel: It's hot, it's hot! I think we need to drink lots of water today. | 暑い、暑い！今日はたくさん水を飲まなきゃね。
+Mai: Good idea. Maybe we can go swimming later? | いいね。あとでプールに行こうか？
+Joel: Yes! Let's swim! That sounds perfect for a hot day like this. | いいね！泳ごう！こんな暑い日にはぴったりだ。
+Mai: I can't wait. It's hot, but swimming makes it fun. | 待ちきれない。暑いけど、泳ぐと楽しくなるね。
+Joel: Hey kids, can you say it with me? | ねえみんな、一緒に言ってみよう。
+Joel: "How's the weather? | 「お天気どう？
+Joel: It's sunny and hot!" | 晴れてて暑いよ！」
+Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました！暑い、暑い！晴れてて暑い！
+(Mai) Okay, let's go swimming and cool down! — ハイライト対象外（Maiの日本語解説の後に続く、音楽前のクロージング）
+(Joel) See you tomorrow! Bye bye! — ハイライト対象外
+        `,
+        maiTalk: '月曜日の会話に出てきた "Let\'s swim!"、覚えてるかな？実はこの "Let\'s"、「一緒に〜しよう」って誘う時に使えるフレーズなんだよ。例えば "Let\'s eat!"（一緒に食べよう！）とか "Let\'s dance!"（一緒に踊ろう！）みたいに、いろんな言葉と組み合わせられるの。今日はぜひお子さんを "Let\'s eat!" って誘ってみてください。',
+      },
+      wed: {
+        title: 'I like ice cream!',
+        phrases: [{ en: 'I like ice cream!', ja: 'アイスクリームが好き！' }],
+        rawScript: `
+Jay: Good morning, Mai! | おはよう、Mai！
+Mai: Good morning, Joel! Hey, I had a great dream last night. | おはよう、Jay！ねえ、昨日の夜すごくいい夢を見たんだ。
+Jay: What was your dream about? | どんな夢だったの？
+Mai: It was about ice cream! | アイスクリームの夢だったよ！
+Jay: That's a perfect dream for summer! | 夏にぴったりの夢だね！
+Mai: Yes. And now I want to eat ice cream. | うん。それで今アイスクリームが食べたくなっちゃった。
+Jay: Haha that sounds nice. Ice cream is delicious. | ははは、いいね。アイスクリームっておいしいよね。
+Mai: I like ice cream. | アイスクリームが好き。
+Jay: I like ice cream, too! | 僕もアイスクリームが好きだよ！
+Jay: Can you say it with me? I like ice cream. | 一緒に言ってみよう。I like ice cream。
+Mai: Hey Joel, I'm getting hungry. | ねえJay、お腹すいてきた。
+Jay: Okay let's eat breakfast and then go get some ice cream. | よし、朝ごはん食べてからアイスクリーム買いに行こう。
+        `,
+        maiTalk: '今日は私が "I like ice cream!" って言ってたね。好きなものを伝えるときに "I like ○○!" って言うよ。バナナが好きなら "I like bananas!"、車が好きなら "I like cars!" だよ。お父さん、お母さん、朝ご飯の時に "I like ○○!" って好きなものを英語で言ってみるのはいかがですか。それだけで朝から英語が生活の一部になります。',
+      },
+      thu: {
+        title: '"too" をつけて広げよう',
+        phrases: [{ en: 'I like ice cream, too!', ja: '私もアイスクリームが好き！' }],
+        rawScript: `
+Jay: Good morning, Mai! | おはよう、Mai！
+Mai: Good morning, Joel! Hey, I had a great dream last night. | おはよう、Jay！ねえ、昨日の夜すごくいい夢を見たんだ。
+Jay: What was your dream about? | どんな夢だったの？
+Mai: It was about ice cream! | アイスクリームの夢だったよ！
+Jay: That's a perfect dream for summer! | 夏にぴったりの夢だね！
+Mai: Yes. And now I want to eat ice cream. | うん。それで今アイスクリームが食べたくなっちゃった。
+Jay: Haha that sounds nice. Ice cream is delicious. | ははは、いいね。アイスクリームっておいしいよね。
+Mai: I like ice cream. | アイスクリームが好き。
+Jay: I like ice cream, too! | 僕もアイスクリームが好きだよ！
+Jay: Can you say it with me? I like ice cream. | 一緒に言ってみよう。I like ice cream。
+Mai: Hey Joel, I'm getting hungry. | ねえJay、お腹すいてきた。
+Jay: Okay let's eat breakfast and then go get some ice cream. | よし、朝ごはん食べてからアイスクリーム買いに行こう。
+        `,
+        maiTalk: '水曜日のアイスクリームの夢のお話、覚えてる?私が"I like ice cream!"って言った後に、Jayもアイスクリームが大好きだから"I like ice cream, too!"って言ってたね。もし同じ気持ちだったら最後に"too"をつけるんだよ。例えば"I\'m hungry, too."とか"Me too!"って言うんだよ。',
+      },
+      fri: {
+        title: 'I am ready!',
+        phrases: [{ en: 'It will be fun!', ja: '楽しくなるはず！' }, { en: 'I am ready!', ja: '準備できた！' }],
+        rawScript: `
+Jay: Good morning, Mai! Ready for the day? | おはよう、Mai！今日の準備はいい？
+Mai: Yes! I heard we're going to the pool again today. | うん！今日もプールに行くって聞いたよ。
+Jay: That's right! It will be fun. Let's say it together: It will be fun! | そうだよ！楽しくなるはず。一緒に言ってみよう。It will be fun！
+Jay: Hey Mai, what should we bring to the pool? | ねえMai、プールに何を持っていく？
+Mai: Good question. Of course we need towels. | いい質問だね。もちろんタオルはいるね。
+Jay: Yes, we can't forget to bring a towel. And it's so sunny and hot today | うん、タオルは忘れちゃいけないね。それに今日はすごく晴れてて暑いから
+Jay: so we need to be careful. I'll bring a hat, sunscreen and my water bottle. | 気をつけないと。帽子と日焼け止めと水筒を持っていくよ。
+Mai: But Jay, are you forgetting something? | でもJay、何か忘れてない？
+Jay: Hmmmm I don't think so? | うーん、そんなことないと思うけど？
+Mai: What about your swimsuit! | 水着は！？
+Jay: Oh that's so silly. Yes, we need to bring our swimsuits. | あ、しまった。そうだ、水着を持っていかなきゃ。
+Jay: OK I think I'm ready to go. I am ready! | よし、準備できたと思う。I am ready！
+Jay: Let's say it together. I am ready! | 一緒に言ってみよう。I am ready！
+        `,
+        maiTalk: '今日はJayとMaiが「一緒に言ってみよう」ってやってたフレーズ、覚えてるかな？"It will be fun!"（楽しくなるはず！）と、最後の"I am ready!"（準備できた！）の2つだったね。あと、プールに行くのに水着を忘れかけてたJayが面白かったよね。swimsuit（水着）って単語、覚えられたかな？タオルは"towel"、日焼け止めは"sunscreen"も出てきたよ。お父さんお母さん、おはようございます！お出かけ前に「Are you ready?」と聞いてみてください。「うん」って答えたら、「OK! We are ready!」とテンション高めに言ってみてください。それだけでお子様には英語って楽しいという気持ちが芽生えます。',
+      },
+    }
+  },
+  w2: {
+    theme: '夏の締めくくり｜ビーチ・雨の日',
+    days: {
+      mon: {
+        title: "It's a big day today!",
+        phrases: [{ en: "It's a big day today!", ja: '今日は特別な日！' }],
+        rawScript: `
+Jay: Good morning, Mai! It's a big day today. | おはよう、Mai！今日は特別な日だね。
+Mai: Good morning! I'm so excited. We're going to the beach! | おはよう！すごくワクワクしてる。海に行くんだもん！
+Jay: It's sunny and hot today. Let's say it together, it's sunny and hot. | 今日は晴れてて暑いね。一緒に言ってみよう、It's sunny and hot。
+Jay: OK, time to get ready. It's a long drive to the beach. | よし、準備の時間だ。海までは長いドライブになるよ。
+Mai: Let's listen to music on the way. | 道中は音楽を聴こうよ。
+Jay: Perfect! I have my towel, sunscreen and hat. Let's go! | いいね！タオルと日焼け止めと帽子、準備できたよ。行こう！
+Mai: But Jay, are you forgetting something? | でもJay、何か忘れてない？
+Jay: That's so silly. I forgot my swimsuit! | やだ、水着を忘れてた！
+Mai: Again! OK, we are ready for the beach. | また！？よし、これで海に行く準備できたね。
+Jay: Let's go! Now it's your turn. 1, 2, 3…Let's go! | 行こう！今度は君の番だよ。1、2、3…Let's go!
+Mai: OK everyone, we'll see you later. | それじゃあみんな、また後でね。
+Jay: Bye bye! | バイバイ！
+Mai: Bye bye! | バイバイ！
+        `,
+        maiTalk: null,
+      },
+      tue: {
+        title: "It's a big day today!（仮・要文言追加）",
+        phrases: [{ en: "It's a big day today!", ja: '今日は特別な日！' }],
+        maiTalk: null,
+      },
+      wed: {
+        title: "It's so rainy today!",
+        phrases: [{ en: "It's so rainy today!", ja: '雨が降ってるね！' }],
+        rawScript: `
+Jay: Good morning, Mai! How's the weather today? | おはよう、Mai！今日の天気はどう？
+Mai: It's so rainy and windy today! | 今日はすごく雨風が強いよ！
+Jay: I know. What should we do on a rainy day? | だよね。雨の日は何しようか？
+Mai: It's a great day to stay inside. Let's do a puzzle! | おうちで過ごすのにぴったりの日だね。パズルしよう！
+Jay: That's a great idea. I like puzzles. Let's say it together. I like puzzles. | いいアイデアだね。パズル好きなんだ。一緒に言ってみよう、I like puzzles。
+Jay: After the puzzle, let's go outside and jump in the puddles! | パズルが終わったら、外に出て水たまりでジャンプしよう！
+Mai: That's a nice idea. But it's pretty rainy… | いいね。でも結構降ってるよ…
+Jay: Don't worry. We can wear our raincoats and rainboots. | 大丈夫。レインコートと長靴を履けばいいよ。
+Mai: Perfect! That way we won't get wet. | いいね！それなら濡れないね。
+Jay: Just like a duck's feathers! | アヒルの羽根と同じだね！
+Mai: Haha that's silly. | ふふ、おもしろい。
+Jay: Okay let's have fun in the rain! | よし、雨の日を楽しもう！
+Jay: Bye bye! | バイバイ！
+Mai: Bye bye! | バイバイ！
+        `,
+        maiTalk: null,
+      },
+      thu: {
+        title: "It's so rainy today!（仮・要文言追加）",
+        phrases: [{ en: "It's so rainy today!", ja: '雨が降ってるね！' }],
+        maiTalk: null,
+      },
+      fri: {
+        title: "It's so sunny today!",
+        phrases: [{ en: "It's so sunny today!", ja: '晴れてるね！' }],
+        rawScript: `
+Jay: Good morning, Mai! Look at that blue sky. | おはよう、Mai！見て、青い空だよ。
+Mai: Good morning! It's so sunny today. | おはよう！今日はすごく晴れてるね。
+Jay: It's great to see the sun again after a rainy, gloomy day. | 雨の暗い日の後に太陽が見えるとうれしいね。
+Mai: It's so bright! | すごく明るいね！
+Jay: Yes! It's so sunny, I need my sunglasses. | うん！すごく晴れてるからサングラスがいるよ。
+Mai: Me too! Sunny days are the best for the beach. Can we go to the beach again? | 私も！晴れの日は海に行くのに最高だね。また海に行ける？
+Jay: Sorry, I can't go today. I have a soccer game. | ごめん、今日は行けないんだ。サッカーの試合があるから。
+Mai: That's too bad! I hope you have fun. | 残念！楽しんできてね。
+Jay: Thank you! I will do my best. Let's say it together. I will do my best! | ありがとう！がんばるよ。一緒に言ってみよう、I will do my best!
+Jay: Mai, I hope you have fun at the beach. | Mai、海楽しんできてね。
+Mai: I'm excited to swim in the ocean again! | また海で泳げるの楽しみ！
+Jay: See you later! | またあとでね！
+Mai: Bye for now! | それじゃあね！
+        `,
+        maiTalk: null,
+      },
+    }
+  },
+};
+const MORNING_TALK_WEEK_STARTS = { w1: '2026-08-24' };
+const MORNING_TALK_WEEK_ORDER = ['w1', 'w2'];
+const DAY_KEY_BY_INDEX = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const DAY_LABEL_JA = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日' };
+const DAY_LABEL_EN = { mon: 'MON', tue: 'TUE', wed: 'WED', thu: 'THU', fri: 'FRI', sat: 'SAT', sun: 'SUN' };
+function setTalkDateHead(prefix, now, dayKey, title) {
+  const monthEl = document.getElementById(prefix + 'DateMonth');
+  const dayEl = document.getElementById(prefix + 'DateDay');
+  const dowEl = document.getElementById(prefix + 'DateDow');
+  const titleEl = document.getElementById(prefix + 'HeaderTitle');
+  if (monthEl) monthEl.textContent = String(now.getMonth() + 1).padStart(2, '0');
+  if (dayEl) dayEl.textContent = String(now.getDate()).padStart(2, '0');
+  if (dowEl) dowEl.textContent = DAY_LABEL_EN[dayKey] || '';
+  if (titleEl) titleEl.textContent = title;
+}
+const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
+
+const MORNING_TALK_AUDIO = {
+  aug_w1_mon: 'morning_talk/mor_aug_w1_mon.mp3',
+  aug_w1_tue: 'morning_talk/mor_aug_w1_tue.mp3',
+  aug_w1_wed: 'morning_talk/mor_aug_w1_wed.mp3',
+  aug_w1_thu: 'morning_talk/mor_aug_w1_thu.mp3',
+  aug_w1_fri: 'morning_talk/mor_aug_w1_fri.mp3',
+};
+
+const MORNING_TALK_LINE_TIMINGS = {
+  aug_w1_mon: [0.454, 8.188, 13.545, 19.022, 21.969, 23.505, 28.689, 36.105, 40.426, 47.121, 53.720, 59.282, 63.387, 73.166],
+  aug_w1_wed: [6.0, 8.782, 14.950, 17.545, 22.024, 25.819, 29.929, 35.793, 38.646, 41.909, 50.510, 54.758],
+  aug_w1_fri: [4.996, 10.236, 15.630, 29.492, 34.529, 40.417, 49.383, 59.255, 63.813, 68.211, 71.703, 79.124, 86.903],
+};
+
+const MORNING_TALK_REPLAY_OFFSET = {
+  aug_w1_tue: 33.352,
+  aug_w1_thu: 38.218,
+};
+
+function resolveMorningTalkReplayBaseKey(audioKey) {
+  const m = /^(.+_w\d)_(tue|thu)$/.exec(audioKey);
+  if (!m) return null;
+  const baseDayKey = m[2] === 'tue' ? 'mon' : 'wed';
+  return `${m[1]}_${baseDayKey}`;
+}
+
+const MORNING_TALK_REPLAY_SKIP_FIRST_LINE = new Set(['aug_w1_tue']);
+
+function resolveMorningTalkLineStarts(audioKey) {
+  const offset = MORNING_TALK_REPLAY_OFFSET[audioKey];
+  if (offset == null) return MORNING_TALK_LINE_TIMINGS[audioKey];
+  const baseKey = resolveMorningTalkReplayBaseKey(audioKey);
+  const baseStarts = baseKey ? MORNING_TALK_LINE_TIMINGS[baseKey] : null;
+  if (!baseStarts) return MORNING_TALK_LINE_TIMINGS[audioKey];
+  const shifted = baseStarts.map(t => t + offset);
+  if (MORNING_TALK_REPLAY_SKIP_FIRST_LINE.has(audioKey) && shifted.length > 1) {
+    shifted[0] = shifted[1];
+  }
+  return shifted;
+}
+
+const FT_MOUTH_FRAMES = {
+  joel: [
+    'illustrations/joel/joel_mouth_closed.png',
+    'illustrations/joel/joel_mouth_open1.png',
+    'illustrations/joel/joel_mouth_open2.png',
+  ],
+  mai: [
+    'illustrations/mai/mai_mouth_closed.png',
+    'illustrations/mai/mai_mouth_open1.png',
+    'illustrations/mai/mai_mouth_open2.png',
+  ],
+};
+
+function resolveMorningTalkWeekKey(date) {
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const daysSince = Math.floor((date - w1Start) / 86400000);
+  let idx = Math.floor(daysSince / 7);
+  if (idx < 0) idx = 0;
+  if (idx > MORNING_TALK_WEEK_ORDER.length - 1) idx = MORNING_TALK_WEEK_ORDER.length - 1;
+  return MORNING_TALK_WEEK_ORDER[idx];
+}
+
+const FAMILY_PREVIEW_PARAM = (typeof window !== 'undefined' && window.location)
+  ? new URLSearchParams(window.location.search).get('familypreview')
+  : null;
+const FAMILY_PREVIEW = !!FAMILY_PREVIEW_PARAM;
+
+const FT_DEBUG = (typeof window !== 'undefined' && window.location)
+  ? new URLSearchParams(window.location.search).get('ftdebug') === '1'
+  : false;
+
+function parseFamilyPreviewKey(param) {
+  if (!param) return null;
+  if (param === '1') return { weekKey: 'w1', dayKey: 'mon' };
+  const m = /^(w[1-4])_(mon|tue|wed|thu|fri)$/.exec(param);
+  if (!m) return null;
+  const weekKey = m[1], dayKey = m[2];
+  if (!MORNING_TALK_WEEKS[weekKey] || !MORNING_TALK_WEEKS[weekKey].days[dayKey]) return null;
+  return { weekKey, dayKey };
+}
+
+let ftArchiveOverride = null;
+const MORNING_TALK_DAY_OFFSET = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4 };
+function dateForMorningTalkDay(weekKey, dayKey) {
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const weekIdx = Math.max(0, MORNING_TALK_WEEK_ORDER.indexOf(weekKey));
+  const daysSinceStart = weekIdx * 7 + (MORNING_TALK_DAY_OFFSET[dayKey] || 0);
+  return new Date(w1Start.getTime() + daysSinceStart * 86400000);
+}
+
+function getTodayMorningTalkInfo() {
+  const now = new Date();
+  if (ftArchiveOverride) {
+    const { weekKey, dayKey } = ftArchiveOverride;
+    const content = MORNING_TALK_WEEKS[weekKey].days[dayKey];
+    const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+    return {
+      now: dateForMorningTalkDay(weekKey, dayKey), dayKey, weekKey,
+      isNew: false, isWeekend: false, isPreLaunch: false, content, audioKey, isArchive: true,
+    };
+  }
+  if (FAMILY_PREVIEW) {
+    const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
+    const { weekKey, dayKey } = parsed;
+    const content = MORNING_TALK_WEEKS[weekKey].days[dayKey];
+    const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+    const isNew = NEW_DAY_KEYS.includes(dayKey);
+    return { now, dayKey, weekKey, isNew, isWeekend: false, isPreLaunch: false, content, audioKey };
+  }
+  const dayKey = DAY_KEY_BY_INDEX[now.getDay()];
+  const weekKey = resolveMorningTalkWeekKey(now);
+  const isWeekend = (dayKey === 'sat' || dayKey === 'sun');
+  const contentDayKey = isWeekend ? 'fri' : dayKey;
+  const isNew = NEW_DAY_KEYS.includes(dayKey);
+  const content = MORNING_TALK_WEEKS[weekKey].days[contentDayKey];
+  const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${contentDayKey}`;
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const isPreLaunch = now < w1Start;
+  return { now, dayKey, weekKey, isNew, isWeekend, isPreLaunch, content, audioKey };
+}
+
+function renderMorningTalkContent() {
+  const info = getTodayMorningTalkInfo();
+  setTalkDateHead('ft', info.now, info.dayKey, info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
+
+  const backBtn = document.getElementById('ftArchiveBackBtn');
+  if (backBtn) backBtn.style.display = info.isArchive ? 'flex' : 'none';
+
+  const tag = document.getElementById('ftStatusTag');
+  const note = document.getElementById('ftReplayNote');
+
+  if (info.isPreLaunch) {
+    tag.textContent = '近日公開';
+    tag.className = 'ft-status-tag replay';
+    note.textContent = '配信は8月中旬スタート予定です';
+    note.style.display = 'block';
+    document.getElementById('ftQuestion').textContent = 'Coming soon!';
+    document.getElementById('ftQuestionJa').textContent = 'もうすぐ配信スタート';
+    document.getElementById('ftPlayTitle').textContent = '配信準備中';
+    const body = document.getElementById('ftPhrasesBody');
+    if (body) body.innerHTML = '';
+    ftCurrentPhrases = [];
+    ftPhraseTimings = [];
+    return null;
+  }
+
+  if (info.isArchive) {
+    tag.textContent = 'アーカイブ再生中';
+    tag.className = 'ft-status-tag replay';
+    note.textContent = `${DAY_LABEL_JA[info.dayKey]}曜日の放送をもう一度お届け中`;
+    note.style.display = 'block';
+  } else if (info.isNew) {
+    tag.textContent = 'NEW';
+    tag.className = 'ft-status-tag new';
+    note.style.display = 'none';
+  } else {
+    tag.className = 'ft-status-tag replay';
+    if (info.isWeekend) {
+      tag.textContent = '今週の再放送';
+      note.textContent = '金曜日の回をもう一度お届け中';
+    } else {
+      tag.textContent = 'Maiのひとこと';
+      note.textContent = '会話パートは直近の回を再利用、Maiの新しい解説つき';
+    }
+    note.style.display = 'block';
+  }
+
+  const c = info.content;
+  document.getElementById('ftQuestion').textContent = `"${c.title}"`;
+  document.getElementById('ftQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
+  document.getElementById('ftPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
+
+  const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
+    : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
+
+  const body = document.getElementById('ftPhrasesBody');
+  if (body) {
+    const rowsHtml = lines.map((l, i) => {
+      const speakerTag = l.speaker
+        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
+      const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
+      return `<div class="ft-phrase-row" id="ftPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
+    }).join('');
+    const maiTalkHtml = c.maiTalk
+      ? `<div class="ft-maitalk" id="ftMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
+      : `<div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>`;
+    body.innerHTML = rowsHtml + maiTalkHtml;
+  }
+  ftCurrentPhrases = lines;
+  ftCurrentTalkDuration = c.talkDuration || null;
+  ftPhraseTimings = [];
+
+  return info.audioKey;
+}
+
+function parseMorningTalkScript(raw) {
+  if (!raw) return [];
+  return raw.split('\n')
+    .map(l => l.trim())
+    .map(l => /^(Joel|Jay|Mai)\s*[:：]\s*(.+)$/.exec(l))
+    .filter(Boolean)
+    .map(m => {
+      const speakerRaw = m[1].toLowerCase();
+      const speaker = speakerRaw === 'jay' ? 'joel' : speakerRaw;
+      const rest = m[2].trim();
+      const pipeIdx = rest.indexOf('|');
+      if (pipeIdx === -1) return { speaker, en: rest, ja: null };
+      return { speaker, en: rest.slice(0, pipeIdx).trim(), ja: rest.slice(pipeIdx + 1).trim() };
+    });
+}
+
+// ========================
+// Morning Talk カラオケハイライト
+// ========================
+let ftCurrentPhrases = [];
+let ftCurrentTalkDuration = null;
+let ftPhraseTimings = [];
+const FT_MIN_PHRASE_SEC = 1.6;
+const FT_CHARS_PER_SEC = 9;
+
+function computeFtPhraseTimings(phrases, totalDuration) {
+  if (!phrases || !phrases.length || !totalDuration || !isFinite(totalDuration)) return [];
+  const rawDurations = phrases.map(p => Math.max(FT_MIN_PHRASE_SEC, (p.en || '').length / FT_CHARS_PER_SEC));
+  const rawTotal = rawDurations.reduce((a, b) => a + b, 0);
+  const scale = rawTotal ? totalDuration / rawTotal : 1;
+  let acc = 0;
+  return rawDurations.map(d => {
+    const scaled = d * scale;
+    const seg = { start: acc, end: acc + scaled };
+    acc += scaled;
+    return seg;
+  });
+}
+
+function buildFtLineSegmentsFromStarts(starts, totalDuration, phrases) {
+  return starts.map((s, i) => {
+    if (i < starts.length - 1) return { start: s, end: starts[i + 1] };
+    const lastText = (phrases && phrases[i] && phrases[i].en) || '';
+    const estimated = Math.max(FT_MIN_PHRASE_SEC, lastText.length / FT_CHARS_PER_SEC);
+    const end = isFinite(totalDuration) && totalDuration > s ? Math.min(totalDuration, s + estimated) : s + estimated;
+    return { start: s, end };
+  });
+}
+
+function resolveFtPhraseTimings(audioKey, phrases, totalDuration) {
+  const starts = resolveMorningTalkLineStarts(audioKey);
+  if (starts && starts.length === phrases.length) {
+    return buildFtLineSegmentsFromStarts(starts, totalDuration, phrases);
+  }
+  return computeFtPhraseTimings(phrases, totalDuration);
+}
+
+function updateFtPhraseHighlight(t) {
+  try {
+    if (FT_DEBUG) renderFtDebugOverlay(t);
+    if (!ftPhraseTimings.length) { setFtActiveSpeaker(null); updateFtBubble(null, null); return; }
+    let activeIdx = -1;
+    for (let i = 0; i < ftPhraseTimings.length; i++) {
+      if (t >= ftPhraseTimings[i].start && t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+    }
+    ftPhraseTimings.forEach((_, i) => {
+      const row = document.getElementById('ftPhraseRow' + i);
+      if (!row) return;
+      row.classList.remove('active', 'done');
+      if (activeIdx === -1 || i < activeIdx) row.classList.add('done');
+      else if (i === activeIdx) row.classList.add('active');
+    });
+    const activeLine = activeIdx !== -1 ? ftCurrentPhrases[activeIdx] : null;
+    const speaker = activeLine ? activeLine.speaker : null;
+    setFtActiveSpeaker(speaker);
+    updateFtBubble(activeLine, speaker);
+  } catch (e) {
+    if (FT_DEBUG) {
+      const el = document.getElementById('ftDebugOverlay');
+      if (el) el.textContent = 'updateFtPhraseHighlight ERROR: ' + (e && e.message);
+    }
+  }
+}
+
+function renderFtDebugOverlay(t) {
+  const el = document.getElementById('ftDebugOverlay');
+  if (!el) return;
+  el.style.display = 'block';
+  let activeIdx = -1;
+  if (ftPhraseTimings.length) {
+    for (let i = 0; i < ftPhraseTimings.length; i++) {
+      if (t >= ftPhraseTimings[i].start && t < ftPhraseTimings[i].end) { activeIdx = i; break; }
+    }
+  }
+  const lines = [
+    `currentTime: ${t.toFixed(2)}s / duration: ${(ftAudioEl.duration || 0).toFixed(2)}s`,
+    `ftCurrentPhrases.length: ${ftCurrentPhrases.length} / ftPhraseTimings.length: ${ftPhraseTimings.length}`,
+    `activeIdx: ${activeIdx}`,
+    ftPhraseTimings[activeIdx] ? `active row range: ${ftPhraseTimings[activeIdx].start.toFixed(2)} - ${ftPhraseTimings[activeIdx].end.toFixed(2)}` : '(該当区間なし＝イントロ中 or 終了後)',
+  ];
+  el.textContent = lines.join('\n');
+}
+
+function clearFtPhraseHighlight() {
+  ftPhraseTimings.forEach((_, i) => {
+    const row = document.getElementById('ftPhraseRow' + i);
+    if (row) row.classList.remove('active', 'done');
+  });
+  setFtActiveSpeaker(null);
+  updateFtBubble(null, null);
+}
+
+function updateFtBubble(line, speaker) {
+  const bubble = document.getElementById('ftBubble');
+  const enEl = document.getElementById('ftBubbleEn');
+  const jaEl = document.getElementById('ftBubbleJa');
+  if (!bubble || !enEl || !jaEl) return;
+  if (!line || !speaker) {
+    bubble.classList.remove('show');
+    return;
+  }
+  enEl.textContent = `"${line.en}"`;
+  if (line.ja) {
+    jaEl.textContent = line.ja;
+    jaEl.style.display = '';
+  } else {
+    jaEl.textContent = '';
+    jaEl.style.display = 'none';
+  }
+  bubble.classList.toggle('from-mai', speaker === 'mai');
+  bubble.classList.remove('compact', 'compact2');
+  const totalLen = (line.en || '').length + (line.ja || '').length;
+  if (totalLen > 70) bubble.classList.add('compact2');
+  else if (totalLen > 45) bubble.classList.add('compact');
+  bubble.classList.add('show');
+}
+
+// ========================
+// Jay/Mai 口パクアバター
+// ========================
+let ftActiveSpeaker = null;
+let ftMouthTimer = null;
+let ftMouthCycleIdx = 0;
+const FT_MOUTH_CYCLE = [0, 1, 0, 2];
+
+function setFtMouthFrame(speaker, frameIdx) {
+  const frames = FT_MOUTH_FRAMES[speaker];
+  if (!frames) return;
+  const img = document.getElementById(speaker === 'joel' ? 'ftAvatarJoelImg' : 'ftAvatarMaiImg');
+  if (img) img.src = frames[frameIdx] || frames[0];
+}
+
+function setFtActiveSpeaker(speaker) {
+  if (speaker !== 'joel' && speaker !== 'mai') speaker = null;
+  if (speaker === ftActiveSpeaker) return;
+  ['joel', 'mai'].forEach(s => {
+    const avatarEl = document.getElementById(s === 'joel' ? 'ftAvatarJoel' : 'ftAvatarMai');
+    if (avatarEl) avatarEl.classList.toggle('speaking', s === speaker);
+    if (s !== speaker) setFtMouthFrame(s, 0);
+  });
+  ftActiveSpeaker = speaker;
+  ftMouthCycleIdx = 0;
+  if (speaker) setFtMouthFrame(speaker, FT_MOUTH_CYCLE[0]);
+}
+
+function startFtMouthLoop() {
+  stopFtMouthLoop();
+  ftMouthTimer = setInterval(() => {
+    if (!ftActiveSpeaker) return;
+    ftMouthCycleIdx = (ftMouthCycleIdx + 1) % FT_MOUTH_CYCLE.length;
+    setFtMouthFrame(ftActiveSpeaker, FT_MOUTH_CYCLE[ftMouthCycleIdx]);
+  }, 220);
+}
+
+function stopFtMouthLoop() {
+  if (ftMouthTimer) { clearInterval(ftMouthTimer); ftMouthTimer = null; }
+}
+
+let ftPhrasesManualToggle = false;
+function openFtPhrasesAuto() {
+  if (ftPhrasesManualToggle) return;
+  const b = document.getElementById('ftPhrasesBody');
+  const c = document.getElementById('ftPhrasesChevron');
+  if (!b || !c) return;
+  b.classList.add('open');
+  c.classList.add('open');
+}
+
+let ftCurrentAudioKey = null;
+
+const ftAudioEl = new Audio();
+registerAudio(ftAudioEl);
+let ftAudioLoaded = false;
+let ftTrackedPlayKey = null;
+ftAudioEl.addEventListener('play', () => {
+  if (ftTrackedPlayKey === ftCurrentAudioKey) return;
+  ftTrackedPlayKey = ftCurrentAudioKey;
+  trackEvent('morning_talk_play', ftCurrentAudioKey || '');
+});
+
+function fmtFtTime(sec) {
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const s = Math.floor(sec);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+function initFtAudio() {
+  ftCurrentAudioKey = renderMorningTalkContent();
+  const src = MORNING_TALK_AUDIO[ftCurrentAudioKey];
+  const playBtn = document.getElementById('ftPlayBtn');
+  if (!src) {
+    if (playBtn) { playBtn.disabled = true; playBtn.style.opacity = '0.4'; }
+    const lenEl = document.getElementById('ftPlayLen');
+    if (lenEl) lenEl.textContent = '収録準備中';
+    return;
+  }
+  if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  ftAudioEl.src = src;
+  ftAudioEl.addEventListener('loadedmetadata', () => {
+    ftAudioLoaded = true;
+    const lenEl = document.getElementById('ftPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
+    ftPhraseTimings = resolveFtPhraseTimings(ftCurrentAudioKey, ftCurrentPhrases, ftCurrentTalkDuration || ftAudioEl.duration);
+  });
+  ftAudioEl.addEventListener('durationchange', () => {
+    if (!isFinite(ftAudioEl.duration)) return;
+    const lenEl = document.getElementById('ftPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
+    ftPhraseTimings = resolveFtPhraseTimings(ftCurrentAudioKey, ftCurrentPhrases, ftCurrentTalkDuration || ftAudioEl.duration);
+  });
+  ftAudioEl.addEventListener('timeupdate', () => {
+    if (!ftAudioEl.duration) return;
+    ftProg = (ftAudioEl.currentTime / ftAudioEl.duration) * 100;
+    document.getElementById('ftFill').style.width = ftProg.toFixed(1) + '%';
+    updateFtWaveProgress(ftProg);
+    document.getElementById('ftTime').textContent = fmtFtTime(ftAudioEl.currentTime);
+    updateFtPhraseHighlight(ftAudioEl.currentTime);
+  });
+  ftAudioEl.addEventListener('ended', () => {
+    ftPlaying = false;
+    setFtWavePlaying(false);
+    document.getElementById('ftPlayIcon').textContent = '▶';
+    clearFtPhraseHighlight();
+    stopFtMouthLoop();
+    bumpLifetimeStat('morningTalkPlays');
+    showFtAutoNext();
+  });
+  ftAudioEl.addEventListener('error', () => {
+    ftPlaying = false;
+    setFtWavePlaying(false);
+    const icon = document.getElementById('ftPlayIcon');
+    if (icon) icon.textContent = '▶';
+    showToast('音声の読み込みに失敗しました');
+  });
+}
+
+function renderFtWave() {
+  const wave = document.getElementById('ftWave');
+  if (!wave) return;
+  let bars = '';
+  for (let i = 0; i < 40; i++) {
+    const h = 6 + Math.round(Math.sin(i * 0.7) * 6 + Math.random() * 10);
+    const delay = (Math.random() * 0.9).toFixed(2);
+    bars += `<div class="ft-wave-bar" style="height:${Math.max(4, h)}px; animation-delay:${delay}s;"></div>`;
+  }
+  wave.innerHTML = bars;
+}
+
+function updateFtWaveProgress(pct) {
+  const wave = document.getElementById('ftWave');
+  if (!wave) return;
+  const bars = wave.querySelectorAll('.ft-wave-bar');
+  const playedCount = Math.round((pct / 100) * bars.length);
+  bars.forEach((bar, i) => bar.classList.toggle('played', i < playedCount));
+}
+
+function setFtWavePlaying(isPlaying) {
+  const wave = document.getElementById('ftWave');
+  if (wave) wave.classList.toggle('is-playing', isPlaying);
+}
+
+function toggleFamilyTalk() {
+  if (!MORNING_TALK_AUDIO[ftCurrentAudioKey]) return;
+  activeMode = 'familytalk';
+  ftPlaying = !ftPlaying;
+  const icon = document.getElementById('ftPlayIcon');
+  setFtWavePlaying(ftPlaying);
+  if (ftPlaying) {
+    icon.textContent = '⏸';
+    openFtPhrasesAuto();
+    startFtMouthLoop();
+    const p = ftAudioEl.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        ftPlaying = false;
+        icon.textContent = '▶';
+        setFtWavePlaying(false);
+        stopFtMouthLoop();
+        showToast('再生できませんでした');
+      });
+    }
+  } else {
+    icon.textContent = '▶';
+    ftAudioEl.pause();
+    stopFtMouthLoop();
+  }
+}
+function showFtAutoNext() {
+  const el = document.getElementById('ftAutoNext');
+  if (!el) return;
+  el.classList.add('show');
+  showToast('🎵 そのまま朝の音楽に切り替わります');
+}
+function stopFtAutoNext() {
+  const el = document.getElementById('ftAutoNext');
+  if (!el) return;
+  el.classList.remove('show');
+}
+function seekFamilyTalk(e) {
+  if (!MORNING_TALK_AUDIO[ftCurrentAudioKey] || !ftAudioEl.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+  ftAudioEl.currentTime = (pct / 100) * ftAudioEl.duration;
+  ftProg = pct;
+  document.getElementById('ftFill').style.width = ftProg + '%';
+  updateFtWaveProgress(ftProg);
+}
+function toggleFtPhrases() {
+  ftPhrasesManualToggle = true;
+  const b = document.getElementById('ftPhrasesBody'); const c = document.getElementById('ftPhrasesChevron');
+  const o = b.classList.toggle('open'); c.classList.toggle('open', o);
+}
+
+// ========================
+// 放送アーカイブ（これまでの放送）
+// ========================
+function getAiredMorningTalkDays() {
+  const order = ['mon', 'tue', 'wed', 'thu', 'fri'];
+  let weekKey, previewUptoIdx = null;
+  if (FAMILY_PREVIEW) {
+    const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
+    weekKey = parsed.weekKey;
+    previewUptoIdx = order.indexOf(parsed.dayKey);
+  } else {
+    const now = new Date();
+    const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+    if (now < w1Start) return [];
+    weekKey = resolveMorningTalkWeekKey(now);
+  }
+  const now = new Date();
+  const days = [];
+  order.forEach((dayKey, idx) => {
+    if (previewUptoIdx !== null && idx > previewUptoIdx) return;
+    const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+    const dayDate = dateForMorningTalkDay(weekKey, dayKey);
+    if (previewUptoIdx === null && dayDate > now) return;
+    if (MORNING_TALK_AUDIO[audioKey] && MORNING_TALK_WEEKS[weekKey].days[dayKey]) {
+      days.push({ weekKey, dayKey, content: MORNING_TALK_WEEKS[weekKey].days[dayKey], date: dayDate });
+    }
+  });
+  return days.reverse();
+}
+
+function renderArchiveModalBody() {
+  const body = document.getElementById('archiveBody');
+  if (!body) return;
+  const days = getAiredMorningTalkDays();
+  if (!days.length) {
+    body.innerHTML = `<div class="archive-empty">まだ配信された放送がありません</div>`;
+    return;
+  }
+  const theme = MORNING_TALK_WEEKS[days[0].weekKey].theme || '';
+  const rowsHtml = days.map(d => `
+    <div class="archive-ep-row" onclick="playArchivedMorningTalk('${d.weekKey}','${d.dayKey}')">
+      <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
+      <div class="archive-ep-q">${d.content.title}</div>
+      <div class="archive-ep-play">▶</div>
+    </div>
+  `).join('');
+  body.innerHTML = `
+    <div class="archive-section-label"><span>すべての放送</span><div class="archive-section-line"></div></div>
+    <div class="archive-month-group">
+      <div class="archive-month-title">${theme}</div>
+      ${rowsHtml}
+    </div>
+  `;
+}
+
+function openArchiveModal() {
+  renderArchiveModalBody();
+  document.getElementById('archiveModal').classList.add('open');
+}
+function closeArchiveModal() {
+  document.getElementById('archiveModal').classList.remove('open');
+}
+
+function playArchivedMorningTalk(weekKey, dayKey) {
+  const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+  if (!MORNING_TALK_AUDIO[audioKey]) return;
+  if (ftPlaying) {
+    ftAudioEl.pause();
+    ftPlaying = false;
+    stopFtMouthLoop();
+    setFtWavePlaying(false);
+  }
+  ftArchiveOverride = { weekKey, dayKey };
+  ftCurrentAudioKey = renderMorningTalkContent();
+  ftAudioEl.src = MORNING_TALK_AUDIO[ftCurrentAudioKey];
+  ftAudioEl.currentTime = 0;
+  ftProg = 0;
+  document.getElementById('ftFill').style.width = '0%';
+  document.getElementById('ftTime').textContent = '0:00';
+  clearFtPhraseHighlight();
+  const playBtn = document.getElementById('ftPlayBtn');
+  if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  closeArchiveModal();
+  toggleFamilyTalk();
+  const wrapEl = document.getElementById('ftWrap');
+  if (wrapEl && typeof wrapEl.scrollIntoView === 'function') {
+    wrapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function returnToTodayMorningTalk() {
+  if (ftPlaying) {
+    ftAudioEl.pause();
+    ftPlaying = false;
+    const icon = document.getElementById('ftPlayIcon');
+    if (icon) icon.textContent = '▶';
+    setFtWavePlaying(false);
+    stopFtMouthLoop();
+  }
+  ftArchiveOverride = null;
+  ftCurrentAudioKey = renderMorningTalkContent();
+  const src = MORNING_TALK_AUDIO[ftCurrentAudioKey];
+  const playBtn = document.getElementById('ftPlayBtn');
+  if (src) {
+    ftAudioEl.src = src;
+    if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  } else if (playBtn) {
+    playBtn.disabled = true; playBtn.style.opacity = '0.4';
+  }
+  ftAudioEl.currentTime = 0;
+  ftProg = 0;
+  document.getElementById('ftFill').style.width = '0%';
+  document.getElementById('ftTime').textContent = '0:00';
+  clearFtPhraseHighlight();
+}
+
+renderFtWave();
+initFtAudio();
+
+// ========================
+// Evening Talk（帰宅後の一言＋Did you know?）
+// ========================
+const EVENING_TALK_WEEKS = {
+  w1: {
+    theme: 'プール・暑い日',
+    days: {
+      mon: {
+        title: "How was your day?",
+        phrases: [{ en: "How was your day?", ja: "今日どうだった？" }, { en: "It was fun!", ja: "楽しかった！" }],
+        rawScript: `
+Mai: Hey Joel! You're home! How was your day? | ねえJoel！おかえり！今日どうだった？
+Joel: It was great! I went swimming! | 最高だったよ！泳ぎに行ったんだ！
+Mai: Wow! That's perfect on a hot day like this. | わあ！こんな暑い日にはぴったりだね。
+Joel: Yeah. It was a splashy, swimmy kind of day. | うん。水しぶきと水泳の一日だったよ。
+Mai: That's so silly. Was it fun? | もう、おかしいなあ。楽しかった？
+Joel: It was fun! Let's say it together. It was fun! | 楽しかったよ！一緒に言ってみよう。It was fun！
+Joel: So Mai, what did you do today? | それでMai、今日は何したの？
+Mai: I went to the park! | 公園に行ったよ！
+Joel: How was it? | どうだった？
+Mai: It was tooooo hot. Even the ducks looked tired. It was not fun. | 暑すぎたよ〜。アヒルたちも疲れてるみたいだった。楽しくなかったよ。
+Joel: Let's say it together. It was not fun! | 一緒に言ってみよう。It was not fun！
+Joel: But hey Mai, did you know... a duck's feathers never get wet? Isn't that cool? | でもねMai、知ってた？アヒルの羽根って濡れないんだよ？すごくない？
+Mai: That's amazing! I didn't know that. | それはすごい！知らなかったよ。
+Joel: Let's learn more about ducks tomorrow! Quack quack | 明日はもっとアヒルのこと学ぼうね！クワックワッ
+Mai: That's so silly. | もう、おかしいなあ。
+Joel: OK. Time to say goodbye. Have a great night! | よし。そろそろバイバイの時間だね。良い夜を！
+Mai: Bye bye! | バイバイ！
+        `,
+        talkDuration: 65,
+        maiTalk: '今日の会話でJoelが "It was fun!" って言ってたよね。逆にMaiは公園が暑すぎて "It was not fun." って答えてた——同じ"It was..."の形で、楽しかった/楽しくなかったが言えちゃうんだよね。<br><br>あと、アヒルの<strong>feathers</strong>(羽根)って単語も出てきたよ。覚えてる？さっきの"アヒルの羽根は濡れない"って話、面白かったよね。みんなはアヒルのおもちゃ持ってる？Duckのおもちゃを見つけたら、パパやママに"Look! a duck!"って言ってみてね。<br><br>お母さん、お父さん今日も1日お疲れ様です。寝る前に"It was fun!"か"It was not fun."だけ真似してみてください。例えば、『今日は幼稚園楽しかった？ダックのお話面白かった？』てお子さんに聞いて『うん』って答えたら『It was fun』だね！とか伝えてみたら、それだけで十分お子様の耳に英語が届いています。',
+      },
+    }
+  },
+  w2: {
+    theme: 'ビーチ・雨の日',
+    days: {
+      mon: {
+        title: "What a great day!",
+        phrases: [{ en: "I saw a turtle!", ja: "カメを見たよ！" }],
+        rawScript: `
+Joel: Phew. What a great day at the beach! | ふう。海で最高の一日だったね！
+Mai: It was so fun! | すごく楽しかった！
+Joel: I know. We went swimming and made a sandcastle. I like swimming in the ocean. | だよね。泳いで、砂のお城も作ったね。海で泳ぐの好きなんだ。
+Mai: Me too! Did you see any fish? | 私も！魚見た？
+Joel: Yes, I saw so many fish. | うん、たくさん魚を見たよ。
+Mai: Wow that's great. | わあ、すごいね。
+Joel: And I saw a turtle! | それにカメも見たよ！
+Mai: Amazing! | すごい！
+Joel: Let's say it together. I saw a turtle. | 一緒に言ってみよう。I saw a turtle。
+Joel: Turtles are really great swimmers. | カメって泳ぐの本当に上手なんだよ。
+Mai: I wish I could swim like a turtle. | カメみたいに泳げたらいいのに。
+Joel: Me too. I wish I could fly like a bird! | 僕も。鳥みたいに飛べたらいいな！
+Mai: That would be so cool! | それすごくかっこいいね！
+Joel: Hey, what should we do tomorrow? | ねえ、明日は何しようか？
+Mai: I think it will rain tomorrow. Maybe we should go to the beach again! | 明日は雨が降ると思う。また海に行こうか！
+Joel: No way! It's not fun to go to the beach on a rainy day. Let's say it together. It's not fun! | え〜！雨の日に海に行っても楽しくないよ。一緒に言ってみよう。It's not fun!
+Mai: I'm tired. It's time for bed. | 疲れたな。もう寝る時間だね。
+Mai: Goodnight! | おやすみ！
+        `,
+        maiTalk: null,
+      },
+    }
+  },
+};
+
+const EVENING_TALK_MONTH = 'aug';
+const EVENING_TALK_AUDIO = {
+  aug_w1_mon: 'evening_talk/ev_aug_w1_mon.mp3',
+  aug_w1_tue: 'evening_talk/ev_aug_w1_tue.mp3',
+};
+
+const EVENING_TALK_LINE_TIMINGS = {
+  aug_w1_mon: [1.974, 5.664, 9.580, 14.325, 19.385, 22.348, 32.665, 36.255, 38.563, 40.332, 49.106, 58.882, 69.412, 73.554, 79.001],
+};
+
+const EVENING_TALK_REPLAY_OFFSET = {
+  aug_w1_tue: 34,
+};
+
+function resolveEveningTalkReplayBaseKey(audioKey) {
+  const m = /^(.+_w\d)_(tue|thu)$/.exec(audioKey);
+  if (!m) return null;
+  const baseDayKey = m[2] === 'tue' ? 'mon' : 'wed';
+  return `${m[1]}_${baseDayKey}`;
+}
+
+function resolveEveningTalkLineStarts(audioKey) {
+  const offset = EVENING_TALK_REPLAY_OFFSET[audioKey];
+  if (offset == null) return EVENING_TALK_LINE_TIMINGS[audioKey];
+  const baseKey = resolveEveningTalkReplayBaseKey(audioKey);
+  const baseStarts = baseKey ? EVENING_TALK_LINE_TIMINGS[baseKey] : null;
+  if (!baseStarts) return EVENING_TALK_LINE_TIMINGS[audioKey];
+  return baseStarts.map(t => t + offset);
+}
+
+function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
+  const starts = resolveEveningTalkLineStarts(audioKey);
+  if (starts && starts.length > 0 && starts.length <= phrases.length) {
+    return buildFtLineSegmentsFromStarts(starts, totalDuration, phrases.slice(0, starts.length));
+  }
+  return computeFtPhraseTimings(phrases, totalDuration);
+}
+
+function getTodayEveningTalkInfo() {
+  const now = new Date();
+  if (FAMILY_PREVIEW) {
+    const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
+    const { weekKey, dayKey } = parsed;
+    const weekData = EVENING_TALK_WEEKS[weekKey];
+    const content = (weekData && weekData.days[dayKey]) ? weekData.days[dayKey] : null;
+    const audioKey = content ? `${EVENING_TALK_MONTH}_${weekKey}_${dayKey}` : null;
+    const isNew = NEW_DAY_KEYS.includes(dayKey);
+    return { now, dayKey, weekKey, isNew, isWeekend: false, isPreLaunch: false, content, audioKey };
+  }
+  const dayKey = DAY_KEY_BY_INDEX[now.getDay()];
+  const weekKey = resolveMorningTalkWeekKey(now);
+  const isWeekend = (dayKey === 'sat' || dayKey === 'sun');
+  const contentDayKey = isWeekend ? 'fri' : dayKey;
+  const isNew = NEW_DAY_KEYS.includes(dayKey);
+  const weekData = EVENING_TALK_WEEKS[weekKey];
+  const content = (weekData && weekData.days[contentDayKey]) ? weekData.days[contentDayKey] : null;
+  const audioKey = content ? `${EVENING_TALK_MONTH}_${weekKey}_${contentDayKey}` : null;
+  const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+  const isPreLaunch = now < w1Start;
+  return { now, dayKey, weekKey, isNew, isWeekend, isPreLaunch, content, audioKey };
+}
+
+function renderEveningTalkContent() {
+  const info = getTodayEveningTalkInfo();
+  setTalkDateHead('et', info.now, info.dayKey, (info.isPreLaunch || !info.content) ? '配信準備中' : `"${info.content.title}"`);
+
+  const tag = document.getElementById('etStatusTag');
+  const note = document.getElementById('etReplayNote');
+
+  if (info.isPreLaunch || !info.content) {
+    if (tag) { tag.textContent = info.isPreLaunch ? '近日公開' : '準備中'; tag.className = 'ft-status-tag replay'; }
+    if (note) {
+      note.textContent = info.isPreLaunch ? '配信は8月中旬スタート予定です' : 'この曜日の回は準備中です';
+      note.style.display = 'block';
+    }
+    const q = document.getElementById('etQuestion'); if (q) q.textContent = 'Coming soon!';
+    const qj = document.getElementById('etQuestionJa'); if (qj) qj.textContent = 'もうすぐ配信スタート';
+    const pt = document.getElementById('etPlayTitle'); if (pt) pt.textContent = '配信準備中';
+    const body = document.getElementById('etPhrasesBody'); if (body) body.innerHTML = '';
+    etCurrentPhrases = [];
+    etPhraseTimings = [];
+    return null;
+  }
+
+  if (info.isNew) {
+    tag.textContent = 'NEW'; tag.className = 'ft-status-tag new'; note.style.display = 'none';
+  } else {
+    tag.className = 'ft-status-tag replay';
+    if (info.isWeekend) { tag.textContent = '今週の再放送'; note.textContent = '金曜日の回をもう一度お届け中'; }
+    else { tag.textContent = 'Maiのひとこと'; note.textContent = '会話パートは直近の回を再利用、Maiの新しい解説つき'; }
+    note.style.display = 'block';
+  }
+
+  const c = info.content;
+  document.getElementById('etQuestion').textContent = `"${c.title}"`;
+  document.getElementById('etQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
+  document.getElementById('etPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
+
+  const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
+    : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
+
+  const body = document.getElementById('etPhrasesBody');
+  if (body) {
+    const rowsHtml = lines.map((l, i) => {
+      const speakerTag = l.speaker
+        ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
+      const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
+      return `<div class="ft-phrase-row" id="etPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
+    }).join('');
+    const maiTalkHtml = c.maiTalk
+      ? `<div class="ft-maitalk" id="etMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
+      : `<div class="ft-maitalk" id="etMaiTalk" style="display:none;"></div>`;
+    body.innerHTML = rowsHtml + maiTalkHtml;
+  }
+  etCurrentPhrases = lines;
+  etCurrentTalkDuration = c.talkDuration || null;
+  etPhraseTimings = [];
+
+  return info.audioKey;
+}
+
+let etCurrentPhrases = [];
+let etCurrentTalkDuration = null;
+let etPhraseTimings = [];
+let etCurrentAudioKey = null;
+let etActiveSpeaker = null;
+let etMouthTimer = null;
+let etMouthCycleIdx = 0;
+let etPlaying = false, etProg = 0;
+let etPhrasesManualToggle = false;
+
+function updateEtPhraseHighlight(t) {
+  try {
+    if (!etPhraseTimings.length) { setEtActiveSpeaker(null); updateEtBubble(null, null); return; }
+    let activeIdx = -1;
+    for (let i = 0; i < etPhraseTimings.length; i++) {
+      if (t < etPhraseTimings[i].end) { activeIdx = i; break; }
+    }
+    etPhraseTimings.forEach((_, i) => {
+      const row = document.getElementById('etPhraseRow' + i);
+      if (!row) return;
+      row.classList.remove('active', 'done');
+      if (activeIdx === -1 || i < activeIdx) row.classList.add('done');
+      else if (i === activeIdx) row.classList.add('active');
+    });
+    const activeLine = activeIdx !== -1 ? etCurrentPhrases[activeIdx] : null;
+    const speaker = activeLine ? activeLine.speaker : null;
+    setEtActiveSpeaker(speaker);
+    updateEtBubble(activeLine, speaker);
+  } catch (e) {}
+}
+
+function clearEtPhraseHighlight() {
+  etPhraseTimings.forEach((_, i) => {
+    const row = document.getElementById('etPhraseRow' + i);
+    if (row) row.classList.remove('active', 'done');
+  });
+  setEtActiveSpeaker(null);
+  updateEtBubble(null, null);
+}
+
+function updateEtBubble(line, speaker) {
+  const bubble = document.getElementById('etBubble');
+  const enEl = document.getElementById('etBubbleEn');
+  const jaEl = document.getElementById('etBubbleJa');
+  if (!bubble || !enEl || !jaEl) return;
+  if (!line || !speaker) { bubble.classList.remove('show'); return; }
+  enEl.textContent = `"${line.en}"`;
+  if (line.ja) { jaEl.textContent = line.ja; jaEl.style.display = ''; }
+  else { jaEl.textContent = ''; jaEl.style.display = 'none'; }
+  bubble.classList.toggle('from-mai', speaker === 'mai');
+  bubble.classList.remove('compact', 'compact2');
+  const totalLen = (line.en || '').length + (line.ja || '').length;
+  if (totalLen > 70) bubble.classList.add('compact2');
+  else if (totalLen > 45) bubble.classList.add('compact');
+  bubble.classList.add('show');
+}
+
+function setEtMouthFrame(speaker, frameIdx) {
+  const frames = FT_MOUTH_FRAMES[speaker];
+  if (!frames) return;
+  const img = document.getElementById(speaker === 'joel' ? 'etAvatarJoelImg' : 'etAvatarMaiImg');
+  if (img) img.src = frames[frameIdx] || frames[0];
+}
+
+function setEtActiveSpeaker(speaker) {
+  if (speaker !== 'joel' && speaker !== 'mai') speaker = null;
+  if (speaker === etActiveSpeaker) return;
+  ['joel', 'mai'].forEach(s => {
+    const avatarEl = document.getElementById(s === 'joel' ? 'etAvatarJoel' : 'etAvatarMai');
+    if (avatarEl) avatarEl.classList.toggle('speaking', s === speaker);
+    if (s !== speaker) setEtMouthFrame(s, 0);
+  });
+  etActiveSpeaker = speaker;
+  etMouthCycleIdx = 0;
+  if (speaker) setEtMouthFrame(speaker, FT_MOUTH_CYCLE[0]);
+}
+
+function startEtMouthLoop() {
+  stopEtMouthLoop();
+  etMouthTimer = setInterval(() => {
+    if (!etActiveSpeaker) return;
+    etMouthCycleIdx = (etMouthCycleIdx + 1) % FT_MOUTH_CYCLE.length;
+    setEtMouthFrame(etActiveSpeaker, FT_MOUTH_CYCLE[etMouthCycleIdx]);
+  }, 220);
+}
+function stopEtMouthLoop() {
+  if (etMouthTimer) { clearInterval(etMouthTimer); etMouthTimer = null; }
+}
+
+function openEtPhrasesAuto() {
+  if (etPhrasesManualToggle) return;
+  const b = document.getElementById('etPhrasesBody');
+  const c = document.getElementById('etPhrasesChevron');
+  if (!b || !c) return;
+  b.classList.add('open'); c.classList.add('open');
+}
+
+const etAudioEl = new Audio();
+registerAudio(etAudioEl);
+let etAudioLoaded = false;
+let etTrackedPlayKey = null;
+etAudioEl.addEventListener('play', () => {
+  if (etTrackedPlayKey === etCurrentAudioKey) return;
+  etTrackedPlayKey = etCurrentAudioKey;
+  trackEvent('evening_talk_play', etCurrentAudioKey || '');
+});
+
+function initEtAudio() {
+  etCurrentAudioKey = renderEveningTalkContent();
+  const src = EVENING_TALK_AUDIO[etCurrentAudioKey];
+  const playBtn = document.getElementById('etPlayBtn');
+  if (!src) {
+    if (playBtn) { playBtn.disabled = true; playBtn.style.opacity = '0.4'; }
+    const lenEl = document.getElementById('etPlayLen');
+    if (lenEl) lenEl.textContent = '収録準備中';
+    return;
+  }
+  if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  etAudioEl.src = src;
+  etAudioEl.addEventListener('loadedmetadata', () => {
+    etAudioLoaded = true;
+    const lenEl = document.getElementById('etPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(etAudioEl.duration);
+    etPhraseTimings = resolveEtPhraseTimings(etCurrentAudioKey, etCurrentPhrases, etCurrentTalkDuration || etAudioEl.duration);
+  });
+  etAudioEl.addEventListener('durationchange', () => {
+    if (!isFinite(etAudioEl.duration)) return;
+    const lenEl = document.getElementById('etPlayLen');
+    if (lenEl) lenEl.textContent = fmtFtTime(etAudioEl.duration);
+    etPhraseTimings = resolveEtPhraseTimings(etCurrentAudioKey, etCurrentPhrases, etCurrentTalkDuration || etAudioEl.duration);
+  });
+  etAudioEl.addEventListener('timeupdate', () => {
+    if (!etAudioEl.duration) return;
+    etProg = (etAudioEl.currentTime / etAudioEl.duration) * 100;
+    const fill = document.getElementById('etFill'); if (fill) fill.style.width = etProg.toFixed(1) + '%';
+    updateEtWaveProgress(etProg);
+    const timeEl = document.getElementById('etTime'); if (timeEl) timeEl.textContent = fmtFtTime(etAudioEl.currentTime);
+    updateEtPhraseHighlight(etAudioEl.currentTime);
+  });
+  etAudioEl.addEventListener('ended', () => {
+    etPlaying = false;
+    setEtWavePlaying(false);
+    const icon = document.getElementById('etPlayIcon'); if (icon) icon.textContent = '▶';
+    clearEtPhraseHighlight();
+    stopEtMouthLoop();
+    bumpLifetimeStat('eveningTalkPlays');
+  });
+  etAudioEl.addEventListener('error', () => {
+    etPlaying = false;
+    setEtWavePlaying(false);
+    const icon = document.getElementById('etPlayIcon'); if (icon) icon.textContent = '▶';
+    showToast('音声の読み込みに失敗しました');
+  });
+}
+
+function renderEtWave() {
+  const wave = document.getElementById('etWave');
+  if (!wave) return;
+  let bars = '';
+  for (let i = 0; i < 40; i++) {
+    const h = 6 + Math.round(Math.sin(i * 0.7) * 6 + Math.random() * 10);
+    const delay = (Math.random() * 0.9).toFixed(2);
+    bars += `<div class="ft-wave-bar" style="height:${Math.max(4, h)}px; animation-delay:${delay}s;"></div>`;
+  }
+  wave.innerHTML = bars;
+}
+function updateEtWaveProgress(pct) {
+  const wave = document.getElementById('etWave');
+  if (!wave) return;
+  const bars = wave.querySelectorAll('.ft-wave-bar');
+  const playedCount = Math.round((pct / 100) * bars.length);
+  bars.forEach((bar, i) => bar.classList.toggle('played', i < playedCount));
+}
+function setEtWavePlaying(isPlaying) {
+  const wave = document.getElementById('etWave');
+  if (wave) wave.classList.toggle('is-playing', isPlaying);
+}
+
+function toggleEveningTalk() {
+  if (!EVENING_TALK_AUDIO[etCurrentAudioKey]) return;
+  activeMode = 'eveningtalk';
+  etPlaying = !etPlaying;
+  const icon = document.getElementById('etPlayIcon');
+  setEtWavePlaying(etPlaying);
+  if (etPlaying) {
+    icon.textContent = '⏸';
+    openEtPhrasesAuto();
+    startEtMouthLoop();
+    const p = etAudioEl.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        etPlaying = false;
+        icon.textContent = '▶';
+        setEtWavePlaying(false);
+        stopEtMouthLoop();
+        showToast('再生できませんでした');
+      });
+    }
+  } else {
+    icon.textContent = '▶';
+    etAudioEl.pause();
+    stopEtMouthLoop();
+  }
+}
+
+function seekEveningTalk(e) {
+  if (!EVENING_TALK_AUDIO[etCurrentAudioKey] || !etAudioEl.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+  etAudioEl.currentTime = (pct / 100) * etAudioEl.duration;
+  etProg = pct;
+  const fill = document.getElementById('etFill'); if (fill) fill.style.width = etProg + '%';
+  updateEtWaveProgress(etProg);
+}
+
+function toggleEtPhrases() {
+  etPhrasesManualToggle = true;
+  const b = document.getElementById('etPhrasesBody'); const c = document.getElementById('etPhrasesChevron');
+  const o = b.classList.toggle('open'); c.classList.toggle('open', o);
+}
+
+renderEtWave();
+initEtAudio();
+renderJourneyNowPlaying();
+
+// ========================
+// Active Time（探し物ミッション／なぞなぞクイズ）
+// ========================
+const AT_FIND = [
+  { axis: 'カラー', en: 'Find something red!', ja: '赤いものを探してみよう', audio: 'audio/asobo_audio/find_red.mp3' },
+  { axis: 'カラー', en: 'Find something blue!', ja: '青いものを探してみよう', audio: 'audio/asobo_audio/find_blue.mp3' },
+  { axis: 'カラー', en: 'Find something yellow!', ja: '黄色いものを探してみよう', audio: 'audio/asobo_audio/find_yellow.mp3' },
+  { axis: 'カラー', en: 'Find something green!', ja: '緑のものを探してみよう', audio: 'audio/asobo_audio/find_green.mp3' },
+  { axis: 'カウント', en: 'Find three round things!', ja: '丸いものを3つ探してみよう', audio: 'audio/asobo_audio/find_three_round.mp3' },
+  { axis: 'カウント', en: 'Find two little things!', ja: '小さいものを2つ探してみよう', audio: 'audio/asobo_audio/find_two_little.mp3' },
+  { axis: 'カウント', en: 'Find one big thing!', ja: '大きいものを1つ探してみよう', audio: 'audio/asobo_audio/find_one_big.mp3' },
+  { axis: 'サウンド', en: 'Find something that makes a sound!', ja: '音が出るものを探してみよう', audio: 'audio/asobo_audio/find_sound.mp3' },
+  { axis: 'サウンド', en: 'Find something loud!', ja: '大きな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_loud.mp3' },
+  { axis: 'サウンド', en: 'Find something quiet!', ja: '小さな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_quiet.mp3' },
+  { axis: 'ロケーション', en: 'Find something under the table!', ja: 'テーブルの下にあるものを探してみよう', audio: 'audio/asobo_audio/find_under_table.mp3' },
+  { axis: 'ロケーション', en: 'Find something near the window!', ja: '窓のそばにあるものを探してみよう', audio: 'audio/asobo_audio/find_near_window.mp3' },
+  { axis: 'ロケーション', en: 'Find something on the floor!', ja: '床の上にあるものを探してみよう', audio: 'audio/asobo_audio/find_floor.mp3' },
+  { axis: 'テクスチャー', en: 'Find something soft!', ja: 'やわらかいものを探してみよう', audio: 'audio/asobo_audio/find_soft.mp3' },
+  { axis: 'テクスチャー', en: 'Find something hard!', ja: 'かたいものを探してみよう', audio: 'audio/asobo_audio/find_hard.mp3' },
+  { axis: 'テクスチャー', en: 'Find something smooth!', ja: 'つるつるしているものを探してみよう', audio: 'audio/asobo_audio/find_smooth.mp3' },
+  { axis: 'カテゴリー', en: 'Find something you can eat!', ja: '食べられるものを探してみよう', audio: 'audio/asobo_audio/find_eat.mp3' },
+  { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう', audio: 'audio/asobo_audio/find_wear.mp3' },
+  { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう', audio: 'audio/asobo_audio/find_read.mp3' },
+];
+const AT_FIND_DONE_AUDIO = [
+  'audio/asobo_audio/find_done_1.mp3',
+  'audio/asobo_audio/find_done_2.mp3',
+  'audio/asobo_audio/find_done_3.mp3',
+  'audio/asobo_audio/find_done_4.mp3',
+  'audio/asobo_audio/find_done_5.mp3',
+  'audio/asobo_audio/find_done_6.mp3',
+];
+function pickAtFindDoneAudio() {
+  return AT_FIND_DONE_AUDIO[Math.floor(Math.random() * AT_FIND_DONE_AUDIO.length)];
+}
+const AT_RIDDLE = [
+  { axis: 'なぞなぞ', en: 'I say moo. What am I?', ja: 'モーって鳴くよ。私は誰？', answer: 'cow', audio: 'audio/asobo_audio/riddle_cow.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_cow.mp3' },
+  { axis: 'なぞなぞ', en: 'I say woof. What am I?', ja: 'ワンって鳴くよ。私は誰？', answer: 'dog', audio: 'audio/asobo_audio/riddle_dog.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_dog.mp3' },
+  { axis: 'なぞなぞ', en: 'I am yellow and I can fly. I also say bzzz. What am I?', ja: '黄色くて飛べるよ。ブーンって鳴くよ。私は誰？', answer: 'bee', audio: 'audio/asobo_audio/riddle_bee.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_bee.mp3' },
+  { axis: 'なぞなぞ', en: 'I am big and gray. I have a long nose. What am I?', ja: '大きくて灰色。長いお鼻があるよ。私は誰？', answer: 'elephant', audio: 'audio/asobo_audio/riddle_elephant.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_elephant.mp3' },
+  { axis: 'なぞなぞ', en: 'I am orange with black stripes. What am I?', ja: 'オレンジ色に黒いしましまがあるよ。私は誰？', answer: 'tiger', audio: 'audio/asobo_audio/riddle_tiger.mp3', answerAudio: 'audio/asobo_audio/riddle_ans_tiger.mp3' },
+];
+const ASOBO_SFX = {
+  gachaDraw: 'audio/asobo_audio/se_gacha_draw.mp3',
+  timerBgm: 'audio/asobo_audio/bgm_timer_loop.mp3',
+  timerEnd: 'audio/asobo_audio/se_timer_end.mp3',
+  riddleFlip: 'audio/asobo_audio/se_riddle_flip.mp3',
+  riddleCorrect: 'audio/asobo_audio/se_riddle_correct.mp3',
+};
+let atMode = 'find';
+let atIndex = 0;
+let atPlaying = false;
+let atDoneToday = false;
+
+function getAtData() { return atMode === 'find' ? AT_FIND : AT_RIDDLE; }
+
+function renderAtQuestion() {
+  const data = getAtData();
+  const item = data[atIndex % data.length];
+  document.getElementById('atAxisTag').textContent = item.axis;
+  document.getElementById('atQuestion').textContent = item.en;
+  document.getElementById('atQuestionJa').textContent = item.ja;
+}
+
+function switchAtMode(mode) {
+  atMode = mode;
+  atIndex = 0;
+  document.getElementById('atModeFind').classList.toggle('active', mode === 'find');
+  document.getElementById('atModeRiddle').classList.toggle('active', mode === 'riddle');
+  renderAtQuestion();
+}
+
+function nextAtQuestion() {
+  atIndex++;
+  renderAtQuestion();
+}
+
+function toggleActiveTime() {
+  atPlaying = !atPlaying;
+  const icon = document.getElementById('atPlayIcon');
+  const title = document.getElementById('atPlayTitle');
+  if (atPlaying) {
+    icon.textContent = '⏸';
+    title.textContent = '再生中…';
+    setTimeout(() => {
+      if (!atPlaying) return;
+      atPlaying = false;
+      icon.textContent = '▶';
+      title.textContent = 'Jayの声を聞く';
+    }, 1800);
+  } else {
+    icon.textContent = '▶';
+    title.textContent = 'Jayの声を聞く';
+  }
+}
+
+function completeActiveTime() {
+  const btn = document.getElementById('atDoneBtn');
+  if (atDoneToday) {
+    showToast('また明日も遊んでね！');
+    return;
+  }
+  atDoneToday = true;
+  btn.classList.add('done');
+  btn.innerHTML = '<span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_check.png" alt="チェック"></span><span>今日もできたね！</span>';
+  showToast('Jayからの褒め声、再生中… 🎉');
+}
+
+// ========================
+// ルーティン：困った時のフレーズ集
+// ========================
+const ROUTINE_CATEGORIES = [
+  {
+    id: 'morning', icon: '🌅', image: 'routine_images/routine_morning.jpg', title: 'Morning Time', sub: '朝の支度タイムに使うフレーズ',
+    scenes: [
+      { label: '起床直後', en: 'Good morning! Did you sleep well?', reply: '"Yes!" / "I\'m sleepy."', audio: 'audio/routine_audio/morning_01.mp3' },
+      { label: '着替え中', en: "Let's get dressed! Where's your shirt?", reply: '"Here!" / "I found it!"', audio: 'audio/routine_audio/morning_02.mp3' },
+      { label: '朝ごはん中', en: 'Are you hungry? What do you want to eat?', reply: '"Yes!" / "Eggs, please!"', audio: 'audio/routine_audio/morning_03.mp3' },
+      { label: '歯磨き・洗顔', en: 'Time to brush your teeth!', reply: '"Okay!" / "I don\'t want to!"', audio: 'audio/routine_audio/morning_04.mp3' },
+      { label: '出発前のあいさつ', en: 'Have a good day! See you later!', reply: '"See you!" / "Bye bye!"', audio: 'audio/routine_audio/morning_05.mp3' },
+    ],
+  },
+  {
+    id: 'beforebed', icon: '🌙', image: 'routine_images/routine_bedtime.jpg', title: 'Before Bed', sub: '寝る前の時間に使うフレーズ',
+    scenes: [
+      { label: '絵本を読む前', en: 'Let\'s read a book together!', reply: '"Yay!" / "This one!"', audio: 'audio/routine_audio/beforebed_01.mp3' },
+      { label: '歯磨き確認', en: 'Did you brush your teeth?', reply: '"Yes!" / "Not yet!"', audio: 'audio/routine_audio/beforebed_02.mp3' },
+      { label: 'おやすみのあいさつ', en: 'Good night! Sweet dreams!', reply: '"Good night!" / "Love you!"', audio: 'audio/routine_audio/beforebed_03.mp3' },
+    ],
+  },
+  {
+    id: 'afterschool', icon: '🎒', image: 'routine_images/routine_homecoming.jpg', title: 'おかえり', sub: '保育園・幼稚園から帰った後に使うフレーズ',
+    scenes: [
+      { label: 'ただいまのあいさつ', en: 'Welcome home! How was your day?', reply: '"Good!" / "Fun!"', audio: 'audio/routine_audio/afterschool_01.mp3' },
+      { label: '今日は何した？', en: 'What did you do today?', reply: '"I played!" / "We sang songs!"', audio: 'audio/routine_audio/afterschool_02.mp3' },
+      { label: 'おやつ前', en: 'Do you want a snack?', reply: '"Yes please!" / "I\'m hungry!"', audio: 'audio/routine_audio/afterschool_03.mp3' },
+    ],
+  },
+  {
+    id: 'mealtime', icon: '🍽', image: 'routine_images/routine_mealtime.jpg', title: '食事タイム', sub: '食事の時間に使うフレーズ',
+    scenes: [
+      { label: '食事前のあいさつ', en: "Let's eat!", reply: '"Yay!" / "I\'m hungry!"', audio: 'audio/routine_audio/mealtime_01.mp3' },
+      { label: 'もっと食べる？', en: 'Do you want more?', reply: '"Yes please!" / "No, thank you!"', audio: 'audio/routine_audio/mealtime_02.mp3' },
+      { label: 'ごちそうさま', en: 'All done! Great job eating!', reply: '"All done!" / "Yummy!"', audio: 'audio/routine_audio/mealtime_03.mp3' },
+    ],
+  },
+];
+
+function renderRoutineCatGrid() {
+  const grid = document.getElementById('routineCatGrid');
+  if (!grid) return;
+  grid.innerHTML = ROUTINE_CATEGORIES.map(cat => `
+    <div class="routine-cat-card" onclick="openRoutineModal('${cat.id}')">
+      <img class="routine-cat-image" src="${cat.image}" alt="${cat.title}">
+      <div class="routine-cat-body">
+        <div class="routine-cat-title">${cat.title}</div>
+        <div class="routine-cat-sub">${cat.sub}</div>
+        <div class="routine-cat-count"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_list.png" alt="リスト"> ${cat.scenes.length}フレーズ</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openRoutineModal(catId) {
+  const cat = ROUTINE_CATEGORIES.find(c => c.id === catId);
+  if (!cat) return;
+  document.getElementById('routineModalImage').src = cat.image;
+  document.getElementById('routineModalImage').alt = cat.title;
+  document.getElementById('routineModalTitle').textContent = cat.title;
+  document.getElementById('routineModalSub').textContent = cat.sub;
+  document.getElementById('routineModalBody').innerHTML = cat.scenes.map(s => `
+    <div class="routine-scene-card">
+      <div class="routine-scene-label">${s.label}</div>
+      <div class="routine-scene-row">
+        <div class="routine-scene-play" onclick="playRoutineScene(this, '${s.audio}')">▶</div>
+        <div class="routine-scene-phrase">${s.en}</div>
+      </div>
+      <div class="routine-scene-reply">キッズの返答例：<span>${s.reply}</span></div>
+    </div>
+  `).join('');
+  document.getElementById('routineModal').classList.add('open');
+}
+
+function closeRoutineModal() {
+  document.getElementById('routineModal').classList.remove('open');
+  routineAudioEl.pause();
+  if (routineActiveBtn) { routineActiveBtn.textContent = '▶'; routineActiveBtn.dataset.playing = '0'; routineActiveBtn = null; }
+}
+
+const routineAudioEl = new Audio();
+registerAudio(routineAudioEl);
+let routineActiveBtn = null;
+
+function playRoutineScene(btn, src) {
+  if (routineActiveBtn && routineActiveBtn !== btn) {
+    routineActiveBtn.textContent = '▶';
+    routineActiveBtn.dataset.playing = '0';
+  }
+  if (btn.dataset.playing === '1') {
+    routineAudioEl.pause();
+    btn.textContent = '▶';
+    btn.dataset.playing = '0';
+    routineActiveBtn = null;
+    return;
+  }
+  routineActiveBtn = btn;
+  btn.dataset.playing = '1';
+  btn.textContent = '⏸';
+  routineAudioEl.onended = null;
+  routineAudioEl.onerror = null;
+  routineAudioEl.pause();
+  routineAudioEl.src = src;
+  routineAudioEl.currentTime = 0;
+  const reset = () => {
+    btn.textContent = '▶';
+    btn.dataset.playing = '0';
+    if (routineActiveBtn === btn) routineActiveBtn = null;
+  };
+  routineAudioEl.onended = reset;
+  routineAudioEl.onerror = reset;
+  try {
+    const p = routineAudioEl.play();
+    if (p && typeof p.catch === 'function') { p.catch(reset); }
+  } catch (e) { reset(); }
+}
+
+renderRoutineCatGrid();
+
+// ========================
+// しる：Jayの発見（Animal / Food / 天気）本のUI
+// ========================
+// フォルダ構成：shiru_book/audio/{category}/{topicId}.mp3、shiru_book/illustration/covers/（本の表紙、既存ファイル名のまま移動）、
+// shiru_book/illustration/topics/{topicId}/{topicId}_cover.png（トピック表紙・カード用フォールバック）、
+// shiru_book/illustration/topics/{topicId}/{topicId}_1.png〜（各Did you know？のイラスト、factsの並び順と対応）。
+// カテゴリが増えても同じ規則で置ける。イラストが未整備のトピックはtopic.imageのみでOK（fact.imageは省略可、topic.imageにフォールバックする）。
+const SHIRU_CATEGORIES = [
+  { id: 'animal', title: 'Animal', sub: 'どうぶつ', image: 'shiru_book/illustration/covers/shiru_animal.png' },
+  { id: 'food', title: 'Food', sub: 'たべもの', image: 'shiru_book/illustration/covers/shiru_food.png' },
+  { id: 'weather', title: '天気', sub: 'てんき', image: 'shiru_book/illustration/covers/shiru_weather.png' },
+];
+
+const SHIRU_TOPICS = [
+  {
+    id: 'duck', category: 'animal', titleEn: 'Duck', titleJa: 'アヒル', dateAdded: '2026-08-18',
+    image: 'shiru_book/illustration/topics/duck/duck_cover.png',
+    audio: 'shiru_book/audio/animal/duck.mp3',
+    facts: [
+      { en: "A duck's feathers never get wet.", ja: 'アヒルの羽根は、水に濡れないんだって。', start: 6.558, image: 'shiru_book/illustration/topics/duck/duck_1.png' },
+      { en: 'Ducks can swim and fly really fast.', ja: 'アヒルは泳げるし、すごく速く飛べるんだって。', start: 17.050, image: 'shiru_book/illustration/topics/duck/duck_2.png' },
+      { en: 'Ducks eat grass, leaves, bugs, and even small fish!', ja: 'アヒルは草や葉っぱ、虫や小さな魚まで食べるんだって。', start: 28.394, image: 'shiru_book/illustration/topics/duck/duck_3.png' },
+      { en: 'A duck says "Quack, Quack."', ja: 'アヒルは「クワッ、クワッ」って鳴くよ。', start: 38.929, image: 'shiru_book/illustration/topics/duck/duck_4.png' },
+    ],
+  },
+  {
+    id: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-08-25',
+    image: 'shiru_book/illustration/topics/turtle.png',
+    audio: 'shiru_book/audio/animal/turtle.mp3',
+    facts: [
+      { en: 'Turtles come in many different sizes.', ja: 'カメには小さい子も、すごく大きい子もいるんだって。', start: 0 },
+      { en: 'Turtles can live for up to 150 years!', ja: 'カメは150歳まで生きることもあるんだって。', start: 10 },
+      { en: 'Turtles love vegetables, small fish, and worms.', ja: 'カメは野菜や小さな魚、ミミズが好きなんだって。', start: 20 },
+    ],
+  },
+  {
+    id: 'icecream', category: 'food', titleEn: 'Ice Cream', titleJa: 'アイスクリーム', dateAdded: '2026-08-20',
+    image: 'shiru_book/illustration/topics/icecream.png',
+    audio: 'shiru_book/audio/food/icecream.mp3',
+    facts: [
+      { en: 'It takes about 50 licks to finish one scoop.', ja: 'アイス1スクープを食べ終わるまで、なめる回数は約50回なんだって。', start: 0 },
+      { en: "Eat it too fast and your head might hurt!", ja: '急いで食べると頭が痛くなっちゃうから気をつけて。', start: 10 },
+      { en: 'Some people even eat bacon ice cream!', ja: 'ベーコン味のアイスを食べる人もいるんだって。', start: 20 },
+    ],
+  },
+];
+
+function getTodayShiruDateKey() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function getShiruTopicsByCategory(catId) {
+  return SHIRU_TOPICS.filter(t => t.category === catId).sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
+}
+
+const SHIRU_OPENED_KEY_PREFIX = 'enverly_shiru_opened_';
+function getShiruOpenedSet() {
+  const key = SHIRU_OPENED_KEY_PREFIX + getTodayShiruDateKey();
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) { return new Set(); }
+}
+function markShiruOpened(catId) {
+  const key = SHIRU_OPENED_KEY_PREFIX + getTodayShiruDateKey();
+  const set = getShiruOpenedSet();
+  if (set.has(catId)) return;
+  set.add(catId);
+  try { localStorage.setItem(key, JSON.stringify([...set])); } catch (e) {}
+}
+
+const SHIRU_REVEALED_KEY = 'enverly_shiru_revealed';
+function getShiruRevealedSet() {
+  try {
+    const raw = localStorage.getItem(SHIRU_REVEALED_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) { return new Set(); }
+}
+function markShiruFactRevealed(factKey) {
+  const set = getShiruRevealedSet();
+  if (set.has(factKey)) return;
+  set.add(factKey);
+  try { localStorage.setItem(SHIRU_REVEALED_KEY, JSON.stringify([...set])); } catch (e) {}
+}
+
+function renderShiruCatGrid() {
+  const grid = document.getElementById('shiruCatGrid');
+  if (!grid) return;
+  const todayKey = getTodayShiruDateKey();
+  const opened = getShiruOpenedSet();
+  const cardsHtml = SHIRU_CATEGORIES.map(cat => {
+    const topics = getShiruTopicsByCategory(cat.id);
+    const factCount = topics.reduce((sum, t) => sum + t.facts.length, 0);
+    const isNewToday = topics.length > 0 && topics[0].dateAdded === todayKey && !opened.has(cat.id);
+    const ribbon = isNewToday ? '<div class="shiru-cat-ribbon"></div>' : '';
+    return `
+      <div class="shiru-cat-card" onclick="openShiruBookModal('${cat.id}')">
+        <div class="shiru-cat-spine spine-${cat.id}"></div>
+        ${ribbon}
+        <div class="shiru-cat-frame">
+          <div class="shiru-cat-frame-inner">
+            <img class="shiru-cat-image" src="${cat.image}" alt="${cat.title}">
+          </div>
+        </div>
+        <div class="shiru-cat-body">
+          <div class="shiru-cat-title">${cat.title}</div>
+          <div class="shiru-cat-sub">${cat.sub}</div>
+          <div class="shiru-cat-count"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_list.png" alt="リスト"> ${factCount}個知った</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  const soonCard = `
+    <div class="shiru-cat-card soon">
+      <div class="shiru-cat-spine"></div>
+      <div class="shiru-cat-frame">
+        <div class="shiru-cat-frame-inner">
+          <div class="shiru-cat-image"><span class="shiru-cat-image-mark">？</span></div>
+        </div>
+      </div>
+      <div class="shiru-cat-body">
+        <div class="shiru-cat-title">また今度</div>
+        <div class="shiru-cat-sub">新しいジャンル準備中</div>
+      </div>
+    </div>
+  `;
+  grid.innerHTML = cardsHtml + soonCard;
+}
+
+let shiruCurrentCategory = null;
+let shiruCurrentTopic = null;
+
+function openShiruBookModal(catId) {
+  const cat = SHIRU_CATEGORIES.find(c => c.id === catId);
+  if (!cat) return;
+  shiruCurrentCategory = cat;
+  markShiruOpened(catId);
+  renderShiruCatGrid();
+  earnStamp('shiru');
+
+  document.getElementById('shiruBookHeaderTitle').textContent = cat.title;
+  document.getElementById('shiruCoverImage').src = cat.image;
+  document.getElementById('shiruCoverTitle').textContent = cat.title;
+  document.getElementById('shiruCoverSub').textContent = cat.sub;
+  document.getElementById('shiruCoverSpine').className = 'shiru-cover-spine spine-' + catId;
+
+  ['shiruCoverPage', 'shiruPage1', 'shiruPage2', 'shiruPage3', 'shiruPage4', 'shiruPage5'].forEach(id => {
+    document.getElementById(id).style.transform = 'rotateY(0deg)';
+  });
+  const tocEl = document.getElementById('shiruTocScreen');
+  const gridEl = document.getElementById('shiruGridScreen');
+  tocEl.style.opacity = '0'; tocEl.style.pointerEvents = 'none';
+  gridEl.style.opacity = '0'; gridEl.style.pointerEvents = 'none';
+
+  document.getElementById('shiruBookModal').classList.add('open');
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.getElementById('shiruCoverPage').style.transform = 'rotateY(-170deg)';
+      ['shiruPage1', 'shiruPage2', 'shiruPage3', 'shiruPage4', 'shiruPage5'].forEach((id, i) => {
+        setTimeout(() => {
+          document.getElementById(id).style.transform = `rotateY(${-160 - i * 4}deg)`;
+        }, i * 90);
+      });
+      setTimeout(() => renderShiruToc(cat), 560);
+    }, 80);
+  });
+}
+
+function topicHasNewToday(topic) {
+  const todayKey = getTodayShiruDateKey();
+  if (topic.dateAdded === todayKey) return true;
+  return topic.facts.some(f => f.dateAdded === todayKey);
+}
+
+function renderShiruToc(cat) {
+  const topics = getShiruTopicsByCategory(cat.id);
+  const opened = getShiruOpenedSet();
+  document.getElementById('shiruTocTitle').textContent = `${cat.title} のもくじ`;
+  const listEl = document.getElementById('shiruTocList');
+  listEl.innerHTML = topics.length > 0 ? topics.map(t => {
+    const isNew = topicHasNewToday(t) && !opened.has(cat.id + '_' + t.id);
+    return `
+    <div class="shiru-toc-item" onclick="openShiruTopic('${t.id}')">
+      <div class="shiru-toc-text-wrap">
+        <div class="shiru-toc-text">${t.titleEn}</div>
+        <div class="shiru-toc-text-ja">${t.titleJa}</div>
+      </div>
+      ${isNew ? '<div class="shiru-toc-new">New</div>' : ''}
+      <div class="shiru-toc-count">${t.facts.length}個</div>
+    </div>
+  `;
+  }).join('') : `<div class="hint-box">まだこのジャンルの発見はないよ。火・木のお楽しみに。</div>`;
+  const tocEl = document.getElementById('shiruTocScreen');
+  tocEl.style.opacity = '1';
+  tocEl.style.pointerEvents = 'auto';
+}
+
+function openShiruTopic(topicId) {
+  const topic = SHIRU_TOPICS.find(t => t.id === topicId);
+  if (!topic) return;
+  shiruCurrentTopic = topic;
+  markShiruOpened(topic.category + '_' + topic.id);
+  const tocEl = document.getElementById('shiruTocScreen');
+  const gridEl = document.getElementById('shiruGridScreen');
+  tocEl.style.opacity = '0'; tocEl.style.pointerEvents = 'none';
+  document.getElementById('shiruGridTitle').textContent = topic.titleEn;
+  document.getElementById('shiruGridTitleJa').textContent = topic.titleJa;
+  renderShiruFactGrid(topic);
+  setTimeout(() => {
+    gridEl.style.opacity = '1';
+    gridEl.style.pointerEvents = 'auto';
+  }, 220);
+}
+
+function renderShiruFactGrid(topic) {
+  const revealed = getShiruRevealedSet();
+  const gridEl = document.getElementById('shiruFactGrid');
+  gridEl.innerHTML = topic.facts.map((f, i) => {
+    const factKey = `${topic.id}_${i}`;
+    const isRevealed = revealed.has(factKey);
+    return `
+      <div class="shiru-fact-card ${isRevealed ? 'revealed' : ''}" data-fact-key="${factKey}" onclick="revealShiruFact('${topic.id}', ${i}, this)">
+        <img src="${f.image || topic.image}" alt="">
+        <div class="shiru-fact-card-play">▶</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function backToShiruToc() {
+  document.getElementById('shiruGridScreen').style.opacity = '0';
+  document.getElementById('shiruGridScreen').style.pointerEvents = 'none';
+  shiruAudioEl.pause();
+  setTimeout(() => {
+    document.getElementById('shiruTocScreen').style.opacity = '1';
+    document.getElementById('shiruTocScreen').style.pointerEvents = 'auto';
+  }, 220);
+}
+
+function closeShiruBookModal() {
+  document.getElementById('shiruBookModal').classList.remove('open');
+  shiruAudioEl.pause();
+}
+
+const shiruAudioEl = new Audio();
+registerAudio(shiruAudioEl);
+
+function revealShiruFact(topicId, factIndex, cardEl) {
+  const topic = SHIRU_TOPICS.find(t => t.id === topicId);
+  if (!topic) return;
+  const fact = topic.facts[factIndex];
+  const factKey = `${topicId}_${factIndex}`;
+
+  markShiruFactRevealed(factKey);
+  cardEl.classList.add('revealed');
+
+  shiruAudioEl.onended = null;
+  shiruAudioEl.onerror = null;
+  shiruAudioEl.ontimeupdate = null;
+  shiruAudioEl.pause();
+
+  if (fact.audio) {
+    shiruAudioEl.src = fact.audio;
+    shiruAudioEl.currentTime = 0;
+  } else {
+    const nextFact = topic.facts[factIndex + 1];
+    const endTime = fact.end || (nextFact ? nextFact.start : null);
+    shiruAudioEl.src = topic.audio;
+    shiruAudioEl.currentTime = fact.start || 0;
+    if (endTime) {
+      shiruAudioEl.ontimeupdate = () => {
+        if (shiruAudioEl.currentTime >= endTime) { shiruAudioEl.pause(); shiruAudioEl.ontimeupdate = null; }
+      };
+    }
+  }
+  try {
+    const p = shiruAudioEl.play();
+    if (p && typeof p.catch === 'function') { p.catch(() => {}); }
+  } catch (e) {}
+}
+
+renderShiruCatGrid();
+
+// ========================
+// 絵本ビューワー
+// ========================
+const BOOK_DATA = {
+  title: 'Sunny Day!',
+  levels: ['todler'],
+  pagesByLevel: {
+    todler: [
+      { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
+      { img: 'books/aug/monthly_book/p2.jpg', phrase: "It's hot.", talkPhrase: "It's hot.", audio: 'audio/book_audio/sunnyday/sunnyday_02.mp3' },
+      { img: 'books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: 'audio/book_audio/sunnyday/sunnyday_03.mp3' },
+      { img: 'books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', talkPhrase: 'SPLASH!', audio: 'audio/book_audio/sunnyday/sunnyday_04.mp3' },
+      { img: 'books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", talkPhrase: "It's so fun!", audio: 'audio/book_audio/sunnyday/sunnyday_05.mp3' },
+      { img: 'books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', talkPhrase: 'So Sunny!', audio: 'audio/book_audio/sunnyday/sunnyday_06.mp3' },
+      { img: 'books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', talkPhrase: null, talkPause: 6000, audio: 'audio/book_audio/sunnyday/sunnyday_07.mp3' },
+      { img: 'books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_08.mp3' },
+    ]
+  }
+};
+Object.defineProperty(BOOK_DATA, 'pages', {
+  get() {
+    return BOOK_DATA.pagesByLevel[getBookLevel()] || BOOK_DATA.pagesByLevel[BOOK_DATA.levels[0]];
+  }
+});
+
+// ========================
+// 絵本レベル（とどらー/きんだー）
+// ========================
+const BOOK_LEVEL_LABELS = { todler: { label: 'とどらー', badgeClass: 'book-level-badge-todler' }, kinder: { label: 'きんだー', badgeClass: 'book-level-badge-kinder' } };
+const BOOK_LEVEL_STORAGE_KEY = 'enverly_book_level';
+
+function getBookLevel() {
+  let stored = null;
+  try { stored = localStorage.getItem(BOOK_LEVEL_STORAGE_KEY); } catch (e) {}
+  if (stored && BOOK_DATA.levels.includes(stored)) return stored;
+  return BOOK_DATA.levels[0];
+}
+function setBookLevel(level) {
+  if (!BOOK_DATA.levels.includes(level)) return;
+  try { localStorage.setItem(BOOK_LEVEL_STORAGE_KEY, level); } catch (e) {}
+  bvCurrentPage = 0;
+  renderBookLevelToggles();
+  if (document.getElementById('bookViewerModal') && document.getElementById('bookViewerModal').classList.contains('open')) {
+    bvRenderPage();
+    bvBuildIndicator();
+  }
+}
+function renderBookLevelToggles() {
+  document.querySelectorAll('.book-level-toggle').forEach(wrap => {
+    if (BOOK_DATA.levels.length <= 1) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'flex';
+    const current = getBookLevel();
+    wrap.querySelectorAll('.book-level-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.dataset.level === current);
+    });
+  });
+}
+renderBookLevelToggles();
+
+const bvAudioEl = new Audio();
+registerAudio(bvAudioEl);
+function bvPlayAudio(src, onEnded) {
+  bvAudioEl.onended = null;
+  bvAudioEl.onerror = null;
+  try { bvAudioEl.pause(); } catch (e) {}
+  if (!src) { if (onEnded) onEnded(); return; }
+  bvAudioEl.src = src;
+  bvAudioEl.currentTime = 0;
+  bvAudioEl.onended = () => { if (onEnded) onEnded(); };
+  bvAudioEl.onerror = () => {
+    console.warn('[Enverly] 絵本の音声読み込みに失敗:', src);
+    if (onEnded) onEnded();
+  };
+  try {
+    const p = bvAudioEl.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => { if (onEnded) onEnded(); });
+    }
+  } catch (e) {
+    if (onEnded) onEnded();
+  }
+}
+function bvStopAudio() {
+  bvAudioEl.onended = null;
+  bvAudioEl.onerror = null;
+  bvAudioEl.pause();
+}
+
+let bvCurrentPage = 0;
+let bvMode = null;
+let bvTalkTimer = null;
+let bvTalkDone = [];
+let bvTalkToken = 0;
+
+function openBookModal(mode) {
+  bvCurrentPage = 0;
+  bvMode = mode;
+  bvTalkDone = [];
+  document.getElementById('bookViewerModal').classList.add('open');
+  bvRenderPage();
+  bvBuildIndicator();
+  trackEvent('book_open', mode);
+  if (mode === 'talk') {
+    setTimeout(() => bvStartTalk(), 300);
+  } else {
+    setTimeout(() => bvStartRead(), 300);
+  }
+}
+
+function closeBookModal() {
+  document.getElementById('bookViewerModal').classList.remove('open');
+  if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvStopAudio();
+  bvReadToken++;
+  bvTalkToken++;
+  document.getElementById('bvTalkBar').classList.remove('active');
+  document.getElementById('bvIetaBtn').classList.remove('show');
+  document.getElementById('bvModeRow').style.display = 'flex';
+}
+
+function bvRenderPage() {
+  const page = BOOK_DATA.pages[bvCurrentPage];
+  if (!page) return;
+  const img = document.getElementById('bvPageImg');
+  img.src = page.img;
+  document.getElementById('bvTitle').textContent = `Sunny Day!  ${bvCurrentPage + 1} / ${BOOK_DATA.pages.length}`;
+  document.getElementById('bvPrev').disabled = bvCurrentPage === 0;
+  document.getElementById('bvNext').disabled = bvCurrentPage === BOOK_DATA.pages.length - 1;
+  document.querySelectorAll('.bv-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === bvCurrentPage);
+  });
+  bvSyncNavToImage(img);
+}
+
+function bvSyncNavToImage(img) {
+  const area = document.getElementById('bvPageArea');
+  if (!img || !area) return;
+  const apply = () => {
+    if (!img.naturalWidth || !img.naturalHeight) return;
+    const areaW = area.clientWidth, areaH = area.clientHeight;
+    const containerRatio = areaW / areaH;
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    let top = 0, bottom = 0;
+    if (imgRatio > containerRatio) {
+      const renderedH = areaW / imgRatio;
+      top = bottom = Math.max(0, (areaH - renderedH) / 2);
+    }
+    document.querySelectorAll('.bv-nav').forEach(btn => {
+      btn.style.top = top + 'px';
+      btn.style.bottom = bottom + 'px';
+    });
+  };
+  if (img.complete && img.naturalWidth) { apply(); }
+  else { img.onload = apply; }
+}
+window.addEventListener('resize', () => bvSyncNavToImage(document.getElementById('bvPageImg')));
+
+function bvBuildIndicator() {
+  const ind = document.getElementById('bvIndicator');
+  ind.innerHTML = BOOK_DATA.pages.map((_, i) =>
+    `<div class="bv-dot${i === 0 ? ' active' : ''}"></div>`
+  ).join('');
+}
+
+function bvChangePage(dir) {
+  const next = bvCurrentPage + dir;
+  if (next < 0 || next >= BOOK_DATA.pages.length) return;
+  bvCurrentPage = next;
+  bvRenderPage();
+  if (bvMode === 'read') {
+    if (bvTalkTimer) clearTimeout(bvTalkTimer);
+    bvReadToken++;
+    bvPlayPageThenAdvance(bvReadToken);
+  }
+}
+
+let bvTouchStartX = 0;
+document.getElementById('bvPageArea').addEventListener('touchstart', e => {
+  bvTouchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.getElementById('bvPageArea').addEventListener('touchend', e => {
+  const diff = bvTouchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 40) bvChangePage(diff > 0 ? 1 : -1);
+});
+
+let bvReadToken = 0;
+
+function bvStartRead() {
+  bvMode = 'read';
+  bvCurrentPage = 0;
+  bvRenderPage();
+  document.getElementById('bvTalkBar').classList.remove('active');
+  document.getElementById('bvIetaBtn').classList.remove('show');
+  document.getElementById('bvModeRow').style.display = 'flex';
+  if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvReadToken++;
+  bvPlayPageThenAdvance(bvReadToken);
+}
+
+function bvPlayPageThenAdvance(token) {
+  const page = BOOK_DATA.pages[bvCurrentPage];
+  if (!page) return;
+  bvPlayAudio(page.audio, () => {
+    if (bvMode !== 'read' || token !== bvReadToken) return;
+    if (bvCurrentPage < BOOK_DATA.pages.length - 1) {
+      bvTalkTimer = setTimeout(() => {
+        if (token !== bvReadToken) return;
+        bvCurrentPage++;
+        bvRenderPage();
+        bvPlayPageThenAdvance(token);
+      }, 700);
+    } else {
+      trackEvent('book_complete', 'read');
+    }
+  });
+}
+
+function bvStartTalk() {
+  bvMode = 'talk';
+  bvTalkDone = [];
+  if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvStopAudio();
+  document.getElementById('bvModeRow').style.display = 'none';
+  document.getElementById('bvTalkBar').classList.add('active');
+  document.getElementById('bvIetaBtn').classList.remove('show');
+  bvCurrentPage = 0;
+  bvRenderPage();
+  bvTalkToken++;
+  bvUpdateTalkProgress();
+  bvRunTalkStep(bvTalkToken);
+}
+
+let bvAudioCtx = null;
+function bvGetAudioCtx() {
+  if (!bvAudioCtx) bvAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (bvAudioCtx.state === 'suspended') bvAudioCtx.resume();
+  return bvAudioCtx;
+}
+const bvSfxEl = new Audio();
+registerAudio(bvSfxEl);
+function bvPlayChime() {
+  try {
+    bvSfxEl.pause();
+    bvSfxEl.src = 'audio/sfx/talking_start.mp3';
+    bvSfxEl.currentTime = 0;
+    bvSfxEl.onerror = () => bvPlaySynthChime();
+    const p = bvSfxEl.play();
+    if (p && typeof p.catch === 'function') p.catch(() => bvPlaySynthChime());
+  } catch (e) { bvPlaySynthChime(); }
+}
+function bvPlaySynthChime() {
+  try {
+    const ctx = bvGetAudioCtx();
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      const start = now + i * 0.1;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.32, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.25);
+    });
+  } catch (e) {}
+}
+function bvPlayReadyChime() {
+  try {
+    bvSfxEl.pause();
+    bvSfxEl.src = 'audio/sfx/joel_again.mp3';
+    bvSfxEl.currentTime = 0;
+    bvSfxEl.onerror = () => bvPlaySynthReadyChime();
+    const p = bvSfxEl.play();
+    if (p && typeof p.catch === 'function') p.catch(() => bvPlaySynthReadyChime());
+  } catch (e) { bvPlaySynthReadyChime(); }
+}
+function bvPlaySynthReadyChime() {
+  try {
+    const ctx = bvGetAudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(660, now);
+    osc.frequency.exponentialRampToValueAtTime(440, now + 0.18);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.32);
+  } catch (e) {}
+}
+
+function bvRunTalkStep(token) {
+  const page = BOOK_DATA.pages[bvCurrentPage];
+  if (!page) return;
+
+  document.getElementById('bvTalkPhrase').textContent = page.talkPhrase || page.phrase;
+  document.getElementById('bvTalkStatus').textContent = '🎧 Jayの声を聞いてね';
+  bvUpdateTalkProgress();
+
+  bvPlayAudio(page.audio, () => {
+    if (bvMode !== 'talk' || token !== bvTalkToken) return;
+    bvPlayChime();
+    document.getElementById('bvTalkStatus').textContent = '🎤 Your turn! 言ってみよう';
+    bvTalkTimer = setTimeout(() => {
+      if (token !== bvTalkToken) return;
+      bvPlayReadyChime();
+      document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Jayと一緒に';
+      if (!bvTalkDone.includes(bvCurrentPage)) bvTalkDone.push(bvCurrentPage);
+      bvUpdateTalkProgress();
+
+      bvPlayAudio(page.audio, () => {
+        if (bvMode !== 'talk' || token !== bvTalkToken) return;
+        bvTalkTimer = setTimeout(() => {
+          if (token !== bvTalkToken) return;
+          bvAdvanceTalkPage(token);
+        }, 900);
+      });
+    }, page.talkPause || 4000);
+  });
+}
+
+function bvAdvanceTalkPage(token) {
+  if (bvCurrentPage >= BOOK_DATA.pages.length - 1) {
+    document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
+    document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
+    document.getElementById('bvIetaBtn').classList.add('show');
+    trackEvent('book_complete', 'talk');
+    return;
+  }
+  bvCurrentPage++;
+  bvRenderPage();
+  bvRunTalkStep(token);
+}
+
+function bvUpdateTalkProgress() {
+  const prog = document.getElementById('bvTalkProgress');
+  prog.innerHTML = BOOK_DATA.pages.map((_, i) => {
+    const cls = bvTalkDone.includes(i) ? 'done' : i === bvCurrentPage ? 'current' : '';
+    return `<div class="bv-talk-dot ${cls}"></div>`;
+  }).join('');
+}
+
+function bvIeta() {
+  const btn = document.getElementById('bvIetaBtn');
+  btn.textContent = '✅ 記録したよ！';
+  btn.disabled = true;
+  if (typeof recordIeta === 'function') recordIeta();
+  setTimeout(() => closeBookModal(), 1500);
+}
+
+// ========================
+// YouTubeキュレーション
+// ========================
+function renderYT() {
+  const container = document.getElementById('ytCards');
+  if (!container) return;
+  container.innerHTML = YT_DATA.map(d => `
+    <div class="yt-card">
+      <div class="yt-card-top">
+        <div class="yt-thumb">
+          <img src="https://img.youtube.com/vi/${d.videoId}/hqdefault.jpg" alt="${d.title}">
+        </div>
+        <div class="yt-body">
+          <div class="yt-title">${d.title}</div>
+          <div class="yt-channel">${d.when} ・ ${d.age}</div>
+        </div>
+        <a class="yt-cta" href="${d.url}" target="_blank" rel="noopener">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#E24B4A"><path d="M8 5v14l11-7z"/></svg>
+          <span>見る</span>
+        </a>
+      </div>
+      <div class="yt-tip"><img class="icon-img" style="width:16px;height:16px;flex-shrink:0;" src="icons/icon_func_idea.png" alt="ヒント">${d.tip}</div>
+    </div>
+  `).join('');
+}
