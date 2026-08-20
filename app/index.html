@@ -1134,6 +1134,23 @@
 <script src="/app/app-core.js"></script>
 <script src="/app/app-tabs.js"></script>
 <script src="/app/app-talk-content.js"></script>
+<script>
+  // ブートストラップ：app-core.js / app-tabs.js / app-talk-content.js
+  // 3ファイル全部の関数定義が揃った後に、実際の初期化呼び出しをここでまとめて実行する。
+  // （各ファイルの中に initApp() 等の呼び出しをバラバラに置いていると、
+  //   ファイルの読み込み順を変えたときに「まだ定義されてない関数を呼んでしまう」
+  //   事故が起きやすいため、呼び出しだけは全部ここに集約している）
+  initApp();
+  applyJourneyState();
+  renderRoutineCatGrid();
+  renderShiruCatGrid();
+  renderBookLevelToggles();
+  renderFtWave();
+  initFtAudio();
+  renderEtWave();
+  initEtAudio();
+  renderJourneyNowPlaying();
+</script>
 
 <!--
 ==================================================
