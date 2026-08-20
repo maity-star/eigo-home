@@ -1226,36 +1226,32 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-grid-title-ja { font-size: 10px; color: #9C8E6E; }
 .shiru-fact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .shiru-fact-card {
-  position: relative; aspect-ratio: 1 / 1; border-radius: 8px; cursor: pointer;
-  background: #EEE8D6; perspective: 900px;
-}
-.shiru-fact-card-inner {
-  position: relative; width: 100%; height: 100%;
-  transition: transform 0.6s cubic-bezier(.45,.05,.35,1);
-  transform-style: preserve-3d;
-}
-.shiru-fact-card.revealed .shiru-fact-card-inner { transform: rotateY(180deg); }
-.shiru-fact-card-face {
-  position: absolute; inset: 0; border-radius: 8px; overflow: hidden;
-  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; cursor: pointer;
   border: 0.5px solid #C9A25C; background: #EEE8D6;
 }
-.shiru-fact-card-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.shiru-fact-card-front img { filter: grayscale(1) brightness(1.2) contrast(0.55) blur(0.6px); opacity: 0.5; transform: scale(1.04); }
-.shiru-fact-card-front::after {
-  content: ''; position: absolute; inset: 0; background: rgba(238,232,214,0.5); pointer-events: none;
-}
-.shiru-fact-card-back { transform: rotateY(180deg); }
-.shiru-fact-card-back img { filter: none; opacity: 1; }
+.shiru-fact-card img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0) opacity(0.72); transition: filter 0.4s ease; }
+.shiru-fact-card.revealed img { filter: none; }
 .shiru-fact-card-play {
   position: absolute; bottom: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
   background: rgba(247,242,228,0.9); display: flex; align-items: center; justify-content: center;
-  font-size: 10px; color: #3E2F1C; z-index: 2; pointer-events: none;
+  font-size: 10px; color: #3E2F1C;
 }
-.shiru-fact-card.revealed .shiru-fact-card-play { display: none; }
 .shiru-fact-note {
   font-size: 10px; color: #8C8368; text-align: center; margin-top: 12px; line-height: 1.6;
 }
+
+/* しる：カードめくり後に英語・日本語の文章を表示（音声だけだと英語が読めない親には内容が分からないため） */
+.shiru-fact-card-text { display: none; }
+.shiru-fact-card.revealed .shiru-fact-card-text {
+  display: block;
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(20,30,24,0.82) 0%, rgba(20,30,24,0.55) 65%, rgba(20,30,24,0) 100%);
+  padding: 22px 10px 8px;
+  text-align: left;
+}
+.shiru-fact-card.revealed .shiru-fact-card-play { display: none; }
+.shiru-fact-card-text-en { color: #fff; font-size: 12px; font-weight: 700; line-height: 1.45; }
+.shiru-fact-card-text-ja { color: #D9EFE2; font-size: 11px; line-height: 1.5; margin-top: 3px; }
 
 /* しる：アーカイブモーダル（ルーティンモーダルと共通クラスを流用しつつ専用要素だけ追加） */
 .shiru-entry-card { background: #F9FAFB; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
