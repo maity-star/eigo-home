@@ -862,8 +862,6 @@ function returnToTodayMorningTalk() {
   clearFtPhraseHighlight();
 }
 
-renderFtWave();
-initFtAudio();
 
 // ========================
 // Evening Talk（帰宅後の一言＋Did you know?）
@@ -1273,8 +1271,5 @@ function toggleEtPhrases() {
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
 }
 
-renderEtWave();
-initEtAudio();
-renderJourneyNowPlaying();
 
 // ========================
