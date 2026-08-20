@@ -536,7 +536,6 @@ function playRoutineScene(btn, src) {
   } catch (e) { reset(); }
 }
 
-renderRoutineCatGrid();
 
 // ========================
 // しる：Jayの発見（Animal / Food / 天気）本のUI
@@ -832,7 +831,6 @@ function revealShiruFact(topicId, factIndex, cardEl) {
   } catch (e) {}
 }
 
-renderShiruCatGrid();
 
 // ========================
 // 絵本ビューワー
@@ -891,7 +889,6 @@ function renderBookLevelToggles() {
     });
   });
 }
-renderBookLevelToggles();
 
 const bvAudioEl = new Audio();
 registerAudio(bvAudioEl);
