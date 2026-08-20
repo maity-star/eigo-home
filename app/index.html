@@ -1252,9 +1252,6 @@ function handleGateSubmit() {
 // ========================
 // グローバル音声マネージャー
 // ========================
-// アプリ内には複数の独立したAudio要素が存在する（Morning Talk / ルーティンフレーズ / 絵本ナレーション・効果音 /
-// Active TimeのBGM・ミッション音声・効果音等）。どれか1つが再生を始めたら、他の音声は自動的に止める（二重再生防止）。
-// 使い方：Audio要素を作成/取得した直後に registerAudio(要素) を呼ぶだけ。個別のplay()呼び出し側の変更は不要。
 const AUDIO_REGISTRY = [];
 function registerAudio(el) {
   if (!el || AUDIO_REGISTRY.includes(el)) return;
@@ -1267,17 +1264,8 @@ function registerAudio(el) {
     });
   });
 }
-// Active Time関連（HTML側に既存の<audio>要素）をここで登録
 registerAudio(document.getElementById('asoboTimerBgm'));
 registerAudio(document.getElementById('asoboVoicePlayer'));
-// asoboSePlayer / asoboSePlayer2（探し物ミッション・なぞなぞの短い効果音チャンネル）は
-// あえて登録しない：preload="none"のため実際の再生開始（=playイベント発火）が
-// ネットワーク読み込み待ちで遅れることがあり、その遅延した瞬間に「他の音声を
-// 全部止める」仕様が発動してJayの本編音声(voice)を巻き込んで中断させる事故
-// （AbortErrorの原因）があったため。効果音は短く、主役の音声と多少重なっても
-// 実害が小さい一方、主役の音声が止まる方が致命的なので、効果音側を対象外にする。
-// 効果音は答え音声(Jayの声)と重なることがあるため、音量を控えめにして
-// 音声の頭が聞こえなくならないようにする
 (function () {
   const se = document.getElementById('asoboSePlayer');
   const se2 = document.getElementById('asoboSePlayer2');
@@ -1288,12 +1276,6 @@ registerAudio(document.getElementById('asoboVoicePlayer'));
 // ========================
 // データ
 // ========================
-
-// 今週の曲データ（興味別）
-// 今月のテーマ（Colors & Animals）に合わせて編集部が選んだ固定プレイリスト
-// オンボーディングの興味には連動しない（興味別の出し分けはYouTubeかけ流し側で行う）
-// type:'audio' = 自前ホスティングの商用フリー音源（Morning Talkのエンディングで使用中の曲）。タップでアプリ内再生。
-// type:'youtube'（省略時デフォルト） = 従来通りタップでYouTubeを開く。
 const MONTH_PLAYLIST = [
   { type:'audio', title:"Swingin' From a Rainbow", sub:'Morning Talkのエンディングで使用中の曲。ゆったり揺れるようなリズムが心地いい一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_swingin_rainbow.mp3' },
   { type:'audio', title:'Little Dolphin', sub:'Morning Talkのエンディングで使用中の曲。海を泳ぐイルカをイメージした、やさしいメロディ。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_little_dolphin.mp3' },
@@ -1303,8 +1285,6 @@ const MONTH_PLAYLIST = [
   { type:'youtube', videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
 ];
 
-// Jayのひとこと（タブバー直下・きょうのとびら直上・日替わり表示）
-// type省略＝Jay自身の言葉。type:'quote'＝Jayが選んだ名言（author必須・出典確認済みのもののみ追加すること）
 const JOEL_ONE_LINERS = [
   { en: "It's okay to make mistakes!", ja: '間違えても大丈夫だよ！' },
   { en: 'One word a day is enough.', ja: '1日1単語でじゅうぶん。' },
@@ -1330,7 +1310,6 @@ const JOEL_ONE_LINERS = [
   { en: "You showed up. That's the whole thing.", ja: '今日もここに来てくれた。それで十分だよ。' },
   { en: 'Slow and steady still gets there.', ja: 'ゆっくりでも、ちゃんと進んでるよ。' },
   { en: 'I\'m proud of you today.', ja: '今日のあなたを、誇りに思うよ。' },
-  // Jayが選んだ言葉（出典確認済み・6個・低頻度で登場）
   {
     type: 'quote',
     en: 'Learning another language is not only learning different words for the same things, but learning another way to think about things.',
@@ -1416,7 +1395,6 @@ function bumpLifetimeStat(key, amount) {
   saveLifetimeStats(s);
 }
 
-// 通算スタンプ数に応じた称号バッジ（週間カードの成長スタンプ絵柄をそのまま流用）
 const STAMP_BADGES = [
   { min: 0,  img: 'illustrations/stamps/stamp_week_01.png', name: 'めがでたよ' },
   { min: 5,  img: 'illustrations/stamps/stamp_week_02.png', name: 'ふたばになったよ' },
@@ -1460,10 +1438,6 @@ function renderLifetimeStats() {
 }
 
 
-// スタンプの絵柄は成長5段階（week_01=芽 〜 week_05=満開）を、貯まった数に応じて表示する。
-// トリガーは3カテゴリ：talk（絵本のLet's talk完了）／journey（きょうのとびらのどれか1つ）／asobo（あそぼでの遊び）。
-// 各カテゴリは1日1回まで。カレンダー週には紐付けず、5個貯まったら完成→ユーザーが手動で「次のカードをはじめる」を押すまで
-// 完成状態のまま表示され続ける（曜日固定でない・柔軟日程制という元々の設計方針に準拠）。
 const STAMP_CARD_KEY = 'enverly_stamp_card';
 const STAMP_CARD_MAX = 5;
 
@@ -1484,13 +1458,12 @@ function saveStampCardState(state) {
   try { localStorage.setItem(STAMP_CARD_KEY, JSON.stringify(state)); } catch (e) {}
 }
 
-// category: 'talk' | 'journey' | 'asobo' | 'shiru'（カテゴリごとに1日1回まで、カードが満了したらそれ以上は積み上がらない）
 function earnStamp(category) {
   const state = getStampCardState();
   const todayKey = new Date().toISOString().slice(0, 10);
   if (!state.days[todayKey]) state.days[todayKey] = {};
-  if (state.days[todayKey][category]) return; // 同じカテゴリは当日2回目以降カウントしない
-  if (state.count >= STAMP_CARD_MAX) return; // カード満了中は次のカードをはじめるまで積み上がらない
+  if (state.days[todayKey][category]) return;
+  if (state.count >= STAMP_CARD_MAX) return;
   state.days[todayKey][category] = true;
   state.count += 1;
   saveStampCardState(state);
@@ -1518,7 +1491,6 @@ function showStampToast(count) {
   stampToastTimer = setTimeout(() => el.classList.remove('show'), 1600);
 }
 
-// 「次のカードをはじめる」：完成したカードを手動で次に進める（自動リセットはしない）
 function advanceStampCard() {
   const state = { count: 0, days: {}, celebrated: false };
   saveStampCardState(state);
@@ -1555,19 +1527,16 @@ function closeStampCelebrate() {
   if (el) el.classList.remove('show');
 }
 
-// 絵本のLet's talk完了 → talkスタンプ（既存の「今日言えたよ！」ボタンから連携）
 function recordIeta() {
   bumpLifetimeStat('talkCount');
   earnStamp('talk');
 }
 
-// あそぼでの遊び → asoboスタンプ（探し物ミッションのタイマー完了 or なぞなぞの答えを見た時点で発火）
 function recordAsoboPlayed() {
   bumpLifetimeStat('asoboPlays');
   earnStamp('asobo');
 }
 
-// YouTubeキュレーションデータ
 const YT_DATA = [
   { icon:'talk', videoId:'zwL2o4jZxbc', title:'Ms. Rachel', when:'発語・語りかけ', age:'0〜4歳', interest:'ことば・発話', tip:'一番のお気に入り。うちの子はこれを見て育ちました。ゆったりした発音と、子どもの反応を引き出す間の取り方が心地いい。', url:'https://www.youtube.com/@msrachel' },
   { icon:'music', videoId:'9UasekNr8KI', title:'Super Simple Songs', when:'いつでも・BGMに', age:'0〜4歳', interest:'うた・音楽', tip:'小さい頃からずっとお世話になってる定番。CGに頼らない、良質な英語の歌がたくさん。', url:'https://www.youtube.com/channel/UCLsooMJoIpl_7ux2jvdPB-Q' },
@@ -1619,7 +1588,6 @@ let activeMode = null;
 // ========================
 // モニター利用ログ（Google Apps Script Webhook → スプレッドシート）
 // ========================
-// デプロイ後のGAS Web App URL（/exec）に差し替えること。未設定（プレースホルダのまま）の間は送信をスキップする。
 const TRACKING_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxCqYkySVMwhrrFUt_uAQYV-0V1HXm7VXMw6WHzM8qV2xYap1Ujo4qUc_DrC9PWK_ET/exec';
 
 let trackingSessionId = null;
@@ -1637,8 +1605,6 @@ function getTrackingSessionId() {
   return trackingSessionId;
 }
 
-// eventName: 'app_open' | 'tab_view' など。extraは補足情報（タブ名等）。
-// 招待コード未認証（ロック画面等）の状態では送信しない。GAS未設定時も送信しない。
 function trackEvent(eventName, extra) {
   try {
     if (!TRACKING_ENDPOINT || TRACKING_ENDPOINT.indexOf('PASTE_') === 0) return;
@@ -1666,9 +1632,6 @@ function trackEvent(eventName, extra) {
 // ========================
 // アプリ初期化
 // ========================
-// オンボーディング（興味選択）は廃止し、「今日のEnverly」おまかせ型に統一。
-// 以前はfinishOnboarding()内で呼んでいた初期描画を、ここで直接実行する。
-// → 興味選択UI自体は enverly_onboarding_interest_module.html に保管済み（将来の別用途向け）
 function initApp() {
   renderYT();
   renderScenes();
@@ -1683,7 +1646,6 @@ initApp();
 // ========================
 // 毎日の通知（Web Push）
 // ========================
-// VAPID公開鍵（秘密鍵はサーバー側の環境変数のみに保持。ここは公開して問題ない）
 const VAPID_PUBLIC_KEY = 'BDBTE8D67Pooo2ClU3adPkAWYC9jw7aKFc7CXzTtyQcL2yRtRoFr6JXJAhopiP5rZcUmrRE0RXAu8gqRZCwqCS0';
 
 function urlBase64ToUint8Array(base64String) {
@@ -1734,8 +1696,6 @@ async function toggleDailyNotification() {
     step = 'getRegistrations（既存の登録を確認）';
     const allRegs = await navigator.serviceWorker.getRegistrations();
     if (allRegs.length > 0) {
-      // 古い登録（誤ったパスで登録されてしまったもの等）が残っていると
-      // 新しい登録の妨げになることがあるため、念のため毎回すべて解除してから登録し直す。
       console.log('既存のSW登録を解除:', allRegs.map(function (r) { return r.scope; }));
       for (const r of allRegs) {
         await r.unregister();
@@ -1743,11 +1703,6 @@ async function toggleDailyNotification() {
     }
 
     step = 'serviceWorker.register';
-    // sw.jsはルート直下（enverly.jp/sw.js）に配置する前提。
-    // /app配下に置くと、その場所を根拠に計算される最大scopeが"/app/"（末尾スラッシュあり）に
-    // 制限され、ページURL"/app"（スラッシュなし）を確実にカバーできない
-    // （実機で "Scope URL should start with the given script URL" エラーとして再現・確認済み）。
-    // ルート直下ならデフォルトscopeが"/"になり、サイト全体を問題なくカバーできる。
     await navigator.serviceWorker.register('/sw.js');
 
     step = 'serviceWorker.ready';
@@ -1760,7 +1715,6 @@ async function toggleDailyNotification() {
     const existing = await reg.pushManager.getSubscription();
 
     if (existing && Notification.permission === 'granted') {
-      // OFFにする
       step = 'unsubscribe fetch';
       await fetch('/api/unsubscribe', {
         method: 'POST',
@@ -1773,7 +1727,6 @@ async function toggleDailyNotification() {
       return;
     }
 
-    // ONにする
     step = 'requestPermission';
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
@@ -1784,10 +1737,6 @@ async function toggleDailyNotification() {
       return;
     }
     step = 'pushManager.subscribe';
-    // readyが解決した直後でも、実機（特に通知許可を切替した直後など）では
-    // reg.active が一瞬まだ空のことがあるらしく、それが原因で
-    // 「Subscribing for push requires an active service worker」が出るケースがある。
-    // ここで数百ms待ちながら最大5回、activeになるのを確認してから進める。
     var activeReg = reg;
     for (var i = 0; i < 5 && !activeReg.active; i++) {
       await new Promise(function (r) { setTimeout(r, 400); });
@@ -1807,7 +1756,6 @@ async function toggleDailyNotification() {
       body: JSON.stringify({ subscription: sub }),
     });
     if (!res.ok) {
-      // サーバー側が失敗を返してきた場合もここで検知できるようにする
       var bodyText = '';
       try { bodyText = await res.text(); } catch (e2) {}
       throw new Error('subscribe API failed: HTTP ' + res.status + ' ' + bodyText);
@@ -1815,9 +1763,6 @@ async function toggleDailyNotification() {
     setNotifySwitchUI(true);
   } catch (e) {
     console.error('通知購読エラー [' + step + ']', e);
-    // モニター期間中の暫定対応: 開発者ツールを見れない相手からも
-    // 原因を報告してもらえるよう、失敗時のみ画面上に直接表示する。
-    // （一般公開時はこのalertを削除し、サイレントな失敗+サポート導線に置き換える想定）
     alert('通知の設定に失敗しました。\n\n失敗した処理: ' + step + '\nエラー内容: ' + (e && e.message ? e.message : e));
     setNotifySwitchUI(false);
   } finally {
@@ -1891,7 +1836,6 @@ function handleCarouselCardTap(idx) {
   if (item.ytUrl) window.open(item.ytUrl, '_blank', 'noopener');
 }
 
-// Monthly Playlist内の自前音源（Morning Talk使用曲）再生用
 const monthlyPlaylistAudioEl = new Audio();
 registerAudio(monthlyPlaylistAudioEl);
 let monthlyPlayingIndex = null;
@@ -1949,7 +1893,6 @@ function initCarousel() {
 
   updateCarousel(0, false);
 
-  // タッチスワイプ
   let startX = 0, startY = 0, moved = false;
   track.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
@@ -1964,7 +1907,6 @@ function initCarousel() {
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 38) {
       goCarousel(carouselIndex + (dx < 0 ? 1 : -1));
     }
-    // スワイプ直後の指離しをタップ扱いしてYouTubeに飛ばないようガード
     carouselSwipeGuard = true;
     setTimeout(() => { carouselSwipeGuard = false; }, 350);
   }, { passive: true });
@@ -1987,7 +1929,7 @@ function updateCarousel(idx, animate) {
   }
   track.style.transform = `translateX(${-(idx * (CAROUSEL_CARD_W + CAROUSEL_GAP))}px)`;
   if (!animate) {
-    track.offsetHeight; // reflow
+    track.offsetHeight;
     track.style.transition = '';
   }
 
@@ -2026,18 +1968,16 @@ function switchTab(name, el) {
 // トップ：今日のジャーニー（Now Playing型／Morning・Eveningは時間帯で主役交代、えほんタイムは常時展開）
 // ========================
 const JOURNEY_SLOTS = ['morning', 'evening', 'night'];
-let journeyManualFocus = null; // 小さいプレビューカードをタップして手動で選んだmorning/evening（時間帯と無関係にいつでも選べる）
+let journeyManualFocus = null;
 
-// スタンプ付与の判定用：実際の放送時間帯（従来ロジックのまま）。表示上の主役交代（getBigSlot）とは別の概念
 function getJourneyTimeSlot() {
   const h = new Date().getHours();
-  if (h >= 5 && h < 11) return 'morning';   // 5-11時：Morning Talk本編の時間
-  if (h >= 11 && h < 17) return 'teaser';   // 11-17時：どちらの本編時間でもない
-  if (h >= 17 && h < 19) return 'evening';  // 17-19時：Evening Talk本編の時間
-  return 'night';                            // 19-5時：Monthly Bookの時間
+  if (h >= 5 && h < 11) return 'morning';
+  if (h >= 11 && h < 17) return 'teaser';
+  if (h >= 17 && h < 19) return 'evening';
+  return 'night';
 }
 
-// Now Playingカードで「大きく見せる方」の判定：5-12時はMorning・13-4時はEvening（24時間を隙間なく2分割）
 function getBigSlot(h) {
   return (h >= 5 && h < 13) ? 'morning' : 'evening';
 }
@@ -2050,7 +1990,7 @@ function journeyOtherSlot() {
 }
 
 function journeyStorageKey() {
-  return 'enverly_journey_opened_' + new Date().toISOString().slice(0, 10); // 日付が変わればキーごと変わり、当日限定の目印になる
+  return 'enverly_journey_opened_' + new Date().toISOString().slice(0, 10);
 }
 function getJourneyOpenedSet() {
   try {
@@ -2064,19 +2004,18 @@ function markJourneyOpened(slot) {
   set.add(slot);
   try { localStorage.setItem(journeyStorageKey(), JSON.stringify([...set])); } catch (e) {}
   bumpLifetimeStat('journeyOpens');
-  earnStamp('journey'); // きょうのとびら、どれか1つ触れた時点でスタンプ対象（カテゴリにつき1日1回）
+  earnStamp('journey');
 }
 
 function applyJourneyState() {
   const timeSlot = getJourneyTimeSlot();
-  if (timeSlot !== 'teaser') markJourneyOpened(timeSlot); // 今の時間帯のコンテンツは自動的に「見た」扱い（スタンプ対象）。teaser中は対象コンテンツがないので記録しない
+  if (timeSlot !== 'teaser') markJourneyOpened(timeSlot);
 
   const big = journeyBigSlot();
   ['morning', 'evening'].forEach(slot => {
     const block = document.getElementById('jblock-' + slot);
     if (block) block.classList.toggle('collapsed', slot !== big);
   });
-  // jblock-nightにはcollapsedを一切付与しない＝えほんタイムは常に展開したまま
 
   renderJourneyNowPlaying();
 }
@@ -2089,8 +2028,6 @@ function focusJourneyBlock(slot) {
   if (block && typeof block.scrollIntoView === 'function') block.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// 上部Now Playingカードの文言を、Morning/Evening Talkの実データ（ft/et側の描画結果）から反映する
-// ※ft/etの本文はinitFtAudio()・initEtAudio()側で描画されるため、それらの後にも再実行して最終状態を反映する
 const JOURNEY_TALK_META = {
   morning: { label: 'Morning talk', smallLabel: 'モーニングトーク', sub: '朝のひとときに', img: 'illustrations/talks/morning_talk_hero.png', qId: 'ftQuestion', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
   evening: { label: 'Evening talk', smallLabel: 'イブニングトーク', sub: 'おかえりのひとときに', img: 'illustrations/talks/evening_talk_hero.png', qId: 'etQuestion', titleId: 'etPlayTitle', tagId: 'etStatusTag' }
@@ -2146,7 +2083,6 @@ function closeSettingsModal() {
   document.getElementById('settingsModal').classList.remove('open');
 }
 function logoutEnverly() {
-  // ログイン基盤（Stripe/認証）実装後に本処理を接続。現状はプレースホルダー
   alert('ログアウト機能は認証実装後に接続予定です');
 }
 
@@ -2247,10 +2183,6 @@ function playAsoboVoice(src, onEnded, onError) {
   voice.onended = null;
   try {
     if (onEnded) voice.onended = onEnded;
-    // 同じファイルを再生し直す時だけcurrentTimeを巻き戻す。
-    // 新しいsrcをセットした直後にcurrentTime=0を触ると、
-    // 読み込み未完了の状態でシークが発生し、直前のplay()が
-    // AbortErrorで中断されるブラウザのバグがあるため。
     let isSameSrc = false;
     try { isSameSrc = voice.src === new URL(src, window.location.href).href; } catch (e2) {}
     if (isSameSrc) {
@@ -2308,7 +2240,6 @@ function resetAsoboTimer() {
 
 function toggleAsoboTimer() {
   if (asoboTimerRunning) {
-    // 再生中に再タップ → 60秒経過を待たず「見つけた」扱いで即完了処理
     completeAsoboTimer();
   } else {
     startAsoboTimer();
@@ -2326,7 +2257,6 @@ function completeAsoboTimer() {
   icon.textContent = '▶';
   joelLine.classList.add('show');
   try { bgm.pause(); } catch (e) {}
-  // リングは完了扱いで満タン(残り0)にする
   ring.style.transition = 'none';
   ring.style.strokeDashoffset = '0';
   playAsoboSe(ASOBO_SFX.timerEnd);
@@ -2349,7 +2279,7 @@ function startAsoboTimer() {
   clearTimeout(asoboTimerTimeout);
   asoboTimerRunning = true;
   const startCountdown = () => {
-    if (!asoboTimerRunning) return; // 音声再生中にキャンセルされていたら何もしない
+    if (!asoboTimerRunning) return;
     ring.style.transition = 'stroke-dashoffset 60s linear';
     ring.style.strokeDashoffset = '0';
     try { bgm.src = ASOBO_SFX.timerBgm; bgm.currentTime = 0; bgm.play().catch(() => {}); } catch (e) {}
@@ -2357,7 +2287,6 @@ function startAsoboTimer() {
       completeAsoboTimer();
     }, 60000);
   };
-  // 先にJayのミッション音声を再生してからタイマー(BGM)をスタート
   playAsoboVoice(currentFindItem ? currentFindItem.audio : null, startCountdown);
 }
 
@@ -2422,7 +2351,6 @@ function toggleRiddleFlip(card) {
       playAsoboSe2(ASOBO_SFX.riddleCorrect);
       const answerSrc = currentRiddleItem.answerAudio;
       playAsoboVoice(answerSrc, null, (err) => {
-        // デバッグ用：原因特定できたらこのtoast表示は削除してOK
         console.error('answerAudio再生失敗', answerSrc, err);
         showToast('音声エラー: ' + (err && err.name ? err.name : 'unknown') + ' / ' + answerSrc.split('/').pop());
       });
@@ -2480,8 +2408,6 @@ function toggleLyrics() {
 // ========================
 let ftPlaying = false, ftProg = 0;
 
-// ---- 月1回まとめて入れるデータ（台本執筆と同時に作る想定）----
-// 月・水・金：フル新作。火・木：会話は直近のNEW回を再利用＋Maiの新規ミニレッスン。土・日：金曜の再放送。
 const MORNING_TALK_MONTH = 'aug';
 const MORNING_TALK_WEEKS = {
   w1: {
@@ -2490,10 +2416,6 @@ const MORNING_TALK_WEEKS = {
       mon: {
         title: "It's hot!",
         phrases: [{ en: "It's hot!", ja: "暑いね！" }, { en: "Let's swim!", ja: "泳ごう！" }],
-        // 台本はJay/Maiが普段書いてる「Jay: ...」「Mai: ...」形式のまま貼るだけでOK。
-        // ①②③⑤の英語セリフだけが自動抽出されてカラオケハイライトの対象になる。
-        // ④のMai日本語解説（プレフィックスなし）や見出し・ト書きは自然と対象外になる。
-        // 行末に「 | 日本語訳」を付けると、その行の日本語訳としてふきだし・フレーズ一覧の両方に反映される（任意・省略可）。
         rawScript: `
 Joel: Good morning, Mai! | おはよう、マイ！
 Mai: Good morning! Wow, it's already so hot today. | おはよう！わあ、今日はもうこんなに暑いね。
@@ -2512,17 +2434,12 @@ Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました
 (Mai) Okay, let's go swimming and cool down! — ハイライト対象外（Maiの日本語解説の後に続く、音楽前のクロージング）
 (Joel) See you tomorrow! Bye bye! — ハイライト対象外
         `,
-        talkDuration: 150, // 会話パート(①〜⑤)の目安秒数(2:30)。実際の収録に合わせて後で微調整可
+        talkDuration: 150,
         maiTalk: '今日は "It\'s hot!"（暑いね！）というフレーズを話したよ。あと "Let\'s swim!"（泳ごう！）も出てきたね。夏はお子さんが「暑い！」って感じる場面、結構多いと思うから、そんな時にぜひ真似して言ってみてください。',
       },
-      // 火・木は英会話パートを直近のNEW回から再利用（＝rawScriptは前日を流用するため未設定）、
-      // Maiの解説だけ新規録音。maiTalkだけ差し替えれば運用としては十分。
       tue: {
         title: "「Let's + 動詞」で広げよう",
         phrases: [{ en: "Let's eat!", ja: "一緒に食べよう！" }],
-        // 火は月曜の会話パートをそのまま再利用（MORNING_TALK_REPLAY_OFFSET.aug_w1_tueで頭のMai解説秒数を管理）。
-        // rawScriptは月曜(mon)と完全に同一の内容にすること＝行数・並び順がMORNING_TALK_LINE_TIMINGS.aug_w1_monと
-        // 一致していないと、offsetを足したタイミングが使われずフォールバックに落ちてしまう。
         rawScript: `
 Joel: Good morning, Mai! | おはよう、マイ！
 Mai: Good morning! Wow, it's already so hot today. | おはよう！わあ、今日はもうこんなに暑いね。
@@ -2546,8 +2463,6 @@ Joel: Great job! It's hot, it's hot! It's sunny and hot! | よくできました
       wed: {
         title: 'I like ice cream!',
         phrases: [{ en: 'I like ice cream!', ja: 'アイスクリームが好き！' }],
-        // 2026-08-12 Timing Sheet(Coding Master)確定版に差し替え（旧「So fun!」placeholderから変更）。
-        // 木は本rawScriptをそのまま流用するため、行数・並び順を変える場合はthuも必ず同時に直すこと。
         rawScript: `
 Jay: Good morning, Mai! | おはよう、Mai！
 Mai: Good morning, Joel! Hey, I had a great dream last night. | おはよう、Jay！ねえ、昨日の夜すごくいい夢を見たんだ。
@@ -2567,9 +2482,6 @@ Jay: Okay let's eat breakfast and then go get some ice cream. | よし、朝ご�
       thu: {
         title: '"too" をつけて広げよう',
         phrases: [{ en: 'I like ice cream, too!', ja: '私もアイスクリームが好き！' }],
-        // 木は水曜の会話パートをそのまま再利用（MORNING_TALK_REPLAY_OFFSET.aug_w1_thuで頭のMai解説秒数を管理）。
-        // rawScriptは水曜(wed)と完全に同一の内容にすること＝行数・並び順がMORNING_TALK_LINE_TIMINGS.aug_w1_wedと
-        // 一致していないと、offsetを足したタイミングが使われずフォールバックに落ちてしまう。
         rawScript: `
 Jay: Good morning, Mai! | おはよう、Mai！
 Mai: Good morning, Joel! Hey, I had a great dream last night. | おはよう、Jay！ねえ、昨日の夜すごくいい夢を見たんだ。
@@ -2589,7 +2501,6 @@ Jay: Okay let's eat breakfast and then go get some ice cream. | よし、朝ご�
       fri: {
         title: 'I am ready!',
         phrases: [{ en: 'It will be fun!', ja: '楽しくなるはず！' }, { en: 'I am ready!', ja: '準備できた！' }],
-        // 2026-08-12 Timing Sheet(Coding Master)確定版に差し替え（旧「Splash!」placeholderから変更）。
         rawScript: `
 Jay: Good morning, Mai! Ready for the day? | おはよう、Mai！今日の準備はいい？
 Mai: Yes! I heard we're going to the pool again today. | うん！今日もプールに行くって聞いたよ。
@@ -2610,8 +2521,6 @@ Jay: Let's say it together. I am ready! | 一緒に言ってみよう。I am rea
     }
   },
   w2: {
-    // 2026-08-13: Timing Sheet(Coding Master)確定の「海・雨の日」テーマに差し替え。
-    // 旧「家族旅行｜おばあちゃんの家」データ（Claude初期ドラフト→Joel大幅リライト前の没案）は削除。
     theme: '夏の締めくくり｜ビーチ・雨の日',
     days: {
       mon: {
@@ -2632,11 +2541,9 @@ Mai: OK everyone, we'll see you later. | それじゃあみんな、また後で
 Jay: Bye bye! | バイバイ！
 Mai: Bye bye! | バイバイ！
         `,
-        maiTalk: null, // TODO: Mai解説まだ未執筆（Timing Sheetにも未記載）
+        maiTalk: null,
       },
       tue: {
-        // TODO: Week1同様「月曜の表現を広げる」ミニレッスンのtitle/phrases/maiTalkが未執筆。
-        // 現状は月曜のプレースホルダーを暫定表示。音声は月曜の使い回し（REPLAY_OFFSET側で設定）。
         title: "It's a big day today!（仮・要文言追加）",
         phrases: [{ en: "It's a big day today!", ja: '今日は特別な日！' }],
         maiTalk: null,
@@ -2660,10 +2567,9 @@ Jay: Okay let's have fun in the rain! | よし、雨の日を楽しもう！
 Jay: Bye bye! | バイバイ！
 Mai: Bye bye! | バイバイ！
         `,
-        maiTalk: null, // TODO: Mai解説まだ未執筆
+        maiTalk: null,
       },
       thu: {
-        // TODO: 水曜の表現を広げるミニレッスンが未執筆。現状は水曜のプレースホルダーを暫定表示。
         title: "It's so rainy today!（仮・要文言追加）",
         phrases: [{ en: "It's so rainy today!", ja: '雨が降ってるね！' }],
         maiTalk: null,
@@ -2686,20 +2592,16 @@ Mai: I'm excited to swim in the ocean again! | また海で泳げるの楽しみ
 Jay: See you later! | またあとでね！
 Mai: Bye for now! | それじゃあね！
         `,
-        maiTalk: null, // TODO: Mai解説まだ未執筆
+        maiTalk: null,
       },
     }
   },
 };
-// 2026-08-13: ローンチ8/24延期に伴い、配信は「W1→W2」の2週構成に変更。
-// W3/W4は「Claude初期ドラフト→Joelの大幅リライトで方針転換」により不使用確定・データ削除済み。
-// まとめ回のためW1単独では文脈が成立せず不使用。9月「Let's Eat!」の開始日はズラさない前提。
 const MORNING_TALK_WEEK_STARTS = { w1: '2026-08-24' };
 const MORNING_TALK_WEEK_ORDER = ['w1', 'w2'];
 const DAY_KEY_BY_INDEX = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const DAY_LABEL_JA = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日' };
 const DAY_LABEL_EN = { mon: 'MON', tue: 'TUE', wed: 'WED', thu: 'THU', fri: 'FRI', sat: 'SAT', sun: 'SUN' };
-// 新デザインの日付バッジ（月/日/曜日を個別要素に反映）＋バッジ横の見出しタイトルをまとめて更新
 function setTalkDateHead(prefix, now, dayKey, title) {
   const monthEl = document.getElementById(prefix + 'DateMonth');
   const dayEl = document.getElementById(prefix + 'DateDay');
@@ -2712,46 +2614,25 @@ function setTalkDateHead(prefix, now, dayKey, title) {
 }
 const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
 
-// 音源マッピング（収録が済んだ分だけ登録。未収録は null＝再生ボタン無効）
-// 命名規則: morning_talk/mor_[月]_w[週数]_[曜日].mp3（2026-08-12〜：Evening Talkとファイル名が
-// 同一になる問題を防ぐため mor_ プレフィックスを追加。フォルダ自体は違うので技術的な衝突は無いが、
-// Audition書き出し直後のダウンロード/デスクトップ等、同名ファイルが並ぶ場面での取り違え事故を防ぐため）
 const MORNING_TALK_AUDIO = {
   aug_w1_mon: 'morning_talk/mor_aug_w1_mon.mp3',
   aug_w1_tue: 'morning_talk/mor_aug_w1_tue.mp3',
   aug_w1_wed: 'morning_talk/mor_aug_w1_wed.mp3',
   aug_w1_thu: 'morning_talk/mor_aug_w1_thu.mp3',
   aug_w1_fri: 'morning_talk/mor_aug_w1_fri.mp3',
-  // aug_w2_mon/wed/fri: 収録は完了しているが結合・編集がまだのため未登録。
-  // 命名規則はw1と同じ（例: morning_talk/mor_aug_w2_mon.mp3）。編集完了後に追加すること。
 };
 
-// Auditionでクリップマーカーを打ち終えた回だけ、ここに「各セリフの開始秒」を配列で追加する。
-// 配列の並び順は rawScript 内で Joel:/Mai: の行が出てくる順と完全に一致させること（1行=1要素）。
-// 例: aug_w1_mon: [1.3, 8.9, 14.2, ...]  ← 13行ぶん
-// ここに未登録の回、または配列の長さがセリフ数と合わない回は、
-// 自動的に旧来の文字数比率スケーリング方式（computeFtPhraseTimings）にフォールバックする。
 const MORNING_TALK_LINE_TIMINGS = {
-  // 2026-07-30 Audition実測（Mai計測）。4行目・10行目は台本側も分割して行数を合わせてある。
   aug_w1_mon: [0.454, 8.188, 13.545, 19.022, 21.969, 23.505, 28.689, 36.105, 40.426, 47.121, 53.720, 59.282, 63.387, 73.166],
-  // 2026-08-12 Audition実測（Mai計測）。Timing Sheet(Coding Master)より反映。
   aug_w1_wed: [6.0, 8.782, 14.950, 17.545, 22.024, 25.819, 29.929, 35.793, 38.646, 41.909, 50.510, 54.758],
-  // 2026-08-12 Audition実測（Mai計測）。Timing Sheet(Coding Master)より反映。
   aug_w1_fri: [4.996, 10.236, 15.630, 29.492, 34.529, 40.417, 49.383, 59.255, 63.813, 68.211, 71.703, 79.124, 86.903],
 };
 
-// 火・木は月・水の会話パートをそのまま再利用し、頭にMaiの新規解説（今日ならではの一言）が付く構成。
-// ここには「その解説が何秒あるか＝再利用した会話が何秒目から始まるか」を回ごとに登録するだけでいい。
-// rawScriptはbase（月/水）のものをそのままコピーして使う前提（＝セリフの中身・行数はbaseと同一）。
-// 登録の仕方：Maiは「w1_thu、オフセット◯秒」とだけ伝えればOK。baseは曜日から自動判定される
-// （火→直前の月、木→直前の水）ので、baseキーを毎回書く必要はない。
 const MORNING_TALK_REPLAY_OFFSET = {
-  aug_w1_tue: 33.352, // 2行目のMaiの台詞（月曜音源8.188秒地点）が41.54秒で始まるよう逆算（2026-08-13 ftdebug実測値より算出。1行目はMORNING_TALK_REPLAY_SKIP_FIRST_LINEでハイライト対象外にしているため、1行目自体の秒数は無視してOK）
-  aug_w1_thu: 38.218, // 2行目のMaiの台詞（水曜音源8.782秒地点）が47.000秒で始まるよう逆算（2026-08-13 Mai確認・実機ハイライトのズレを踏まえ44→38.218へ再修正）
+  aug_w1_tue: 33.352,
+  aug_w1_thu: 38.218,
 };
 
-// 火・木のaudioKeyから、再利用元(base)のaudioKeyを曜日ルールで自動算出する。
-// 命名規則 [月]_w[週数]_[曜日] が前提。火→月、木→水。それ以外の曜日は対象外（null）。
 function resolveMorningTalkReplayBaseKey(audioKey) {
   const m = /^(.+_w\d)_(tue|thu)$/.exec(audioKey);
   if (!m) return null;
@@ -2759,13 +2640,6 @@ function resolveMorningTalkReplayBaseKey(audioKey) {
   return `${m[1]}_${baseDayKey}`;
 }
 
-// 火・木のように「baseの再利用＋解説オフセット」で解決すべき回なら、baseのLINE_TIMINGSにoffsetを足した
-// 配列を動的に生成して返す。対象外の回はそのまま MORNING_TALK_LINE_TIMINGS[audioKey] を返す（undefinedもあり得る）。
-//
-// MORNING_TALK_REPLAY_SKIP_FIRST_LINE: 元音源の冒頭にBGM/イントロがあり、1行目の実際の発話開始が
-// 計測値より数秒遅れる（＝1行目のハイライトが早すぎて見える）回を登録する。
-// 該当する回は1行目のstartを2行目のstartと同じ値に上書きし、1行目の区間を実質ゼロ秒にする
-// →ハイライトは1行目を経由せず、いきなり2行目から始まる（2026-08-13 火曜の実機確認より導入）。
 const MORNING_TALK_REPLAY_SKIP_FIRST_LINE = new Set(['aug_w1_tue']);
 
 function resolveMorningTalkLineStarts(audioKey) {
@@ -2773,7 +2647,7 @@ function resolveMorningTalkLineStarts(audioKey) {
   if (offset == null) return MORNING_TALK_LINE_TIMINGS[audioKey];
   const baseKey = resolveMorningTalkReplayBaseKey(audioKey);
   const baseStarts = baseKey ? MORNING_TALK_LINE_TIMINGS[baseKey] : null;
-  if (!baseStarts) return MORNING_TALK_LINE_TIMINGS[audioKey]; // baseが未登録ならフォールバックに任せる
+  if (!baseStarts) return MORNING_TALK_LINE_TIMINGS[audioKey];
   const shifted = baseStarts.map(t => t + offset);
   if (MORNING_TALK_REPLAY_SKIP_FIRST_LINE.has(audioKey) && shifted.length > 1) {
     shifted[0] = shifted[1];
@@ -2781,7 +2655,6 @@ function resolveMorningTalkLineStarts(audioKey) {
   return shifted;
 }
 
-// Jay/Maiの口パクアバター画像（トーク系プロファイル）。3コマをループさせて話している間だけ動かす。
 const FT_MOUTH_FRAMES = {
   joel: [
     'illustrations/joel/joel_mouth_closed.png',
@@ -2804,25 +2677,18 @@ function resolveMorningTalkWeekKey(date) {
   return MORNING_TALK_WEEK_ORDER[idx];
 }
 
-// 今日表示すべき回を、日付から自動解決する（＝人間が毎日触らなくていい部分）
-// ファミリープレビュー用の裏口：enverly.jp/?familypreview=w2_wed のように週×曜日を指定すると、
-// 公開日を待たずにその回をそのまま体験できる（本番の公開ロジック自体は変更しない）
-// 例: ?familypreview=1 → 月曜(w1_mon)固定（後方互換）／?familypreview=w3_fri → 第3週金曜
 const FAMILY_PREVIEW_PARAM = (typeof window !== 'undefined' && window.location)
   ? new URLSearchParams(window.location.search).get('familypreview')
   : null;
 const FAMILY_PREVIEW = !!FAMILY_PREVIEW_PARAM;
 
-// カラオケハイライトのデバッグ用裏口：enverly.jp/?ftdebug=1 でアクセスすると、
-// Morning Talkプレイヤーの下に currentTime/duration/アクティブ行 などの実測値がその場で表示される。
-// 「ハイライトが止まる」系の不具合は数値を見ないと原因を切り分けにくいための一時的な計測ツール。
 const FT_DEBUG = (typeof window !== 'undefined' && window.location)
   ? new URLSearchParams(window.location.search).get('ftdebug') === '1'
   : false;
 
 function parseFamilyPreviewKey(param) {
   if (!param) return null;
-  if (param === '1') return { weekKey: 'w1', dayKey: 'mon' }; // 旧形式との互換
+  if (param === '1') return { weekKey: 'w1', dayKey: 'mon' };
   const m = /^(w[1-4])_(mon|tue|wed|thu|fri)$/.exec(param);
   if (!m) return null;
   const weekKey = m[1], dayKey = m[2];
@@ -2830,11 +2696,8 @@ function parseFamilyPreviewKey(param) {
   return { weekKey, dayKey };
 }
 
-// 「これまでの放送」から特定の回を選んで再生中かどうか（{weekKey, dayKey} | null）。
-// セッション内だけの一時状態＝ページ再読み込みや翌日アクセスでは自動的に「今日」に戻る。
 let ftArchiveOverride = null;
 const MORNING_TALK_DAY_OFFSET = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4 };
-// weekKey×dayKeyから実際の放送カレンダー日を逆算（アーカイブ一覧の日付表示・「まだ放送していない回」の判定に使う）
 function dateForMorningTalkDay(weekKey, dayKey) {
   const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
   const weekIdx = Math.max(0, MORNING_TALK_WEEK_ORDER.indexOf(weekKey));
@@ -2864,16 +2727,15 @@ function getTodayMorningTalkInfo() {
   const dayKey = DAY_KEY_BY_INDEX[now.getDay()];
   const weekKey = resolveMorningTalkWeekKey(now);
   const isWeekend = (dayKey === 'sat' || dayKey === 'sun');
-  const contentDayKey = isWeekend ? 'fri' : dayKey; // 土日は金曜回の再放送
+  const contentDayKey = isWeekend ? 'fri' : dayKey;
   const isNew = NEW_DAY_KEYS.includes(dayKey);
   const content = MORNING_TALK_WEEKS[weekKey].days[contentDayKey];
   const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${contentDayKey}`;
   const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
-  const isPreLaunch = now < w1Start; // 配信開始日より前＝まだ何も放送していない
+  const isPreLaunch = now < w1Start;
   return { now, dayKey, weekKey, isNew, isWeekend, isPreLaunch, content, audioKey };
 }
 
-// データから今日の表示内容（タイトル・フレーズ・NEW/再放送バッジ）を反映
 function renderMorningTalkContent() {
   const info = getTodayMorningTalkInfo();
   setTalkDateHead('ft', info.now, info.dayKey, info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
@@ -2885,8 +2747,6 @@ function renderMorningTalkContent() {
   const note = document.getElementById('ftReplayNote');
 
   if (info.isPreLaunch) {
-    // 配信開始日（内部的にはw1Start=8/17）より前：まだ何も放送していないので「近日公開」表示にする
-    // 外向けの文言はあえて具体日付を出さず「8月中旬予定」に統一（煽り防止・変更耐性のため）
     tag.textContent = '近日公開';
     tag.className = 'ft-status-tag replay';
     note.textContent = '配信は8月中旬スタート予定です';
@@ -2898,7 +2758,7 @@ function renderMorningTalkContent() {
     if (body) body.innerHTML = '';
     ftCurrentPhrases = [];
     ftPhraseTimings = [];
-    return null; // 音源キーなし＝再生ボタンは無効のまま
+    return null;
   }
 
   if (info.isArchive) {
@@ -2927,8 +2787,6 @@ function renderMorningTalkContent() {
   document.getElementById('ftQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
   document.getElementById('ftPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
 
-  // rawScript（Joel:/Mai:形式の台本）があればそこから英語セリフだけを自動抽出してハイライト対象にする。
-  // まだ台本形式で用意していない日は、従来通り短い「今日のフレーズ」をそのまま表示する（フォールバック）。
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
     : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
 
@@ -2946,18 +2804,12 @@ function renderMorningTalkContent() {
     body.innerHTML = rowsHtml + maiTalkHtml;
   }
   ftCurrentPhrases = lines;
-  ftCurrentTalkDuration = c.talkDuration || null; // 会話パートの目安秒数（音楽等の後半を除く）。未設定なら音声全体のdurationにフォールバック
-  ftPhraseTimings = []; // 音声のdurationが取れたらinitFtAudio側で再計算する
+  ftCurrentTalkDuration = c.talkDuration || null;
+  ftPhraseTimings = [];
 
   return info.audioKey;
 }
 
-// 台本テキストから「Joel: ...」「Jay: ...」「Mai: ...」で始まる行だけを抽出してセリフ配列にする。
-// ④のMai日本語解説（プレフィックスなし）や①②③の見出し・ト書きは、プレフィックスが無いため自然と除外される。
-// ＝台本をそのまま貼るだけでよく、書き起こしや整形作業は発生しない。
-// 行末に「 | 日本語訳」を付けると、その行の日本語訳としてふきだし・フレーズ一覧の両方に反映される（任意・省略可）。
-// 2026-08改名対応: 既存の録音済み回はJoel:表記のまま残り、新規回はJay:表記になるため両方を認識する。
-// 内部の speaker キーは表示名の変更に関わらず 'joel' に正規化（アバター画像・CSSクラス等の既存実装をそのまま使うため）。
 function parseMorningTalkScript(raw) {
   if (!raw) return [];
   return raw.split('\n')
@@ -2977,9 +2829,6 @@ function parseMorningTalkScript(raw) {
 // ========================
 // Morning Talk カラオケハイライト
 // ========================
-// 手動タイムスタンプなしで「今喋っている行」をふんわり合わせる仕組み。
-// 英語フレーズの文字数比率で尺を仮配分→実音声の総尺(duration)にスケーリングして当てはめる。
-// 完全な精度は狙わない（=収録のたびに手打ちする運用コストをかけない）。目的は「迷子にならない」こと。
 let ftCurrentPhrases = [];
 let ftCurrentTalkDuration = null;
 let ftPhraseTimings = [];
@@ -3000,10 +2849,6 @@ function computeFtPhraseTimings(phrases, totalDuration) {
   });
 }
 
-// Audition実測のstart秒配列から、各行の[start, end)セグメントを作る。
-// endは「次の行のstart」。最後の行だけ次のstartが無いので、セリフの文字数から自然な長さを推定する
-// （talkDuration/音声全体durationまで引き伸ばすと、実際にはもう次のパート（Maiの日本語解説や音楽）に
-// 進んでいるのに最後の英語セリフがいつまでもハイライトされ続けて見える、という不自然さが出るため）。
 function buildFtLineSegmentsFromStarts(starts, totalDuration, phrases) {
   return starts.map((s, i) => {
     if (i < starts.length - 1) return { start: s, end: starts[i + 1] };
@@ -3014,8 +2859,6 @@ function buildFtLineSegmentsFromStarts(starts, totalDuration, phrases) {
   });
 }
 
-// 実測データ(MORNING_TALK_LINE_TIMINGS)があればそれを最優先で使い、無ければ／行数が合わなければ
-// 従来の文字数比率スケーリングにフォールバックする。
 function resolveFtPhraseTimings(audioKey, phrases, totalDuration) {
   const starts = resolveMorningTalkLineStarts(audioKey);
   if (starts && starts.length === phrases.length) {
@@ -3028,9 +2871,6 @@ function updateFtPhraseHighlight(t) {
   try {
     if (FT_DEBUG) renderFtDebugOverlay(t);
     if (!ftPhraseTimings.length) { setFtActiveSpeaker(null); updateFtBubble(null, null); return; }
-    // 該当する区間が見つからない場合はactiveIdx=-1のまま。
-    // ケース1: 最後の行の終了時刻も過ぎた（→以降は誰もハイライトしない、ふきだしも隠れる）
-    // ケース2: まだ最初の行のstartにも達していない（→BGM/イントロ中などハイライトすべき行がまだない）
     let activeIdx = -1;
     for (let i = 0; i < ftPhraseTimings.length; i++) {
       if (t >= ftPhraseTimings[i].start && t < ftPhraseTimings[i].end) { activeIdx = i; break; }
@@ -3047,8 +2887,6 @@ function updateFtPhraseHighlight(t) {
     setFtActiveSpeaker(speaker);
     updateFtBubble(activeLine, speaker);
   } catch (e) {
-    // ここで例外が出ると以後ずっとハイライトが更新されなくなる（＝「止まって見える」原因になりうる）ため、
-    // 握りつぶして次のtimeupdateでの再試行に賭ける。ftdebug=1なら画面にエラー内容を出す。
     if (FT_DEBUG) {
       const el = document.getElementById('ftDebugOverlay');
       if (el) el.textContent = 'updateFtPhraseHighlight ERROR: ' + (e && e.message);
@@ -3056,7 +2894,6 @@ function updateFtPhraseHighlight(t) {
   }
 }
 
-// ftdebug=1専用：Morning Talkの再生に関する実測値をその場で表示する（原因切り分け用）
 function renderFtDebugOverlay(t) {
   const el = document.getElementById('ftDebugOverlay');
   if (!el) return;
@@ -3085,8 +2922,6 @@ function clearFtPhraseHighlight() {
   updateFtBubble(null, null);
 }
 
-// 掛け合いふきだしの中身・向き・文字サイズを更新する。
-// 文字量(英語+日本語の合計)に応じて自動でコンパクト表示に切り替える（「全部入れたいから長くなったら縮めて」の要望対応）。
 function updateFtBubble(line, speaker) {
   const bubble = document.getElementById('ftBubble');
   const enEl = document.getElementById('ftBubbleEn');
@@ -3115,11 +2950,9 @@ function updateFtBubble(line, speaker) {
 // ========================
 // Jay/Mai 口パクアバター
 // ========================
-let ftActiveSpeaker = null; // 'joel' | 'mai' | null
+let ftActiveSpeaker = null;
 let ftMouthTimer = null;
 let ftMouthCycleIdx = 0;
-// 喋ってる間ずっと開けっぱなしにせず、closed→open1→closed→open2…と口を閉じる瞬間を挟んで
-// パクパクしてる感じを出す（開いた2コマの往復だけだと「動いてるけど閉じない」不自然さが出るため）。
 const FT_MOUTH_CYCLE = [0, 1, 0, 2];
 
 function setFtMouthFrame(speaker, frameIdx) {
@@ -3129,7 +2962,6 @@ function setFtMouthFrame(speaker, frameIdx) {
   if (img) img.src = frames[frameIdx] || frames[0];
 }
 
-// 現在喋っている話者を切り替える。喋っていない方は口閉じ(0番)で静止。
 function setFtActiveSpeaker(speaker) {
   if (speaker !== 'joel' && speaker !== 'mai') speaker = null;
   if (speaker === ftActiveSpeaker) return;
@@ -3140,10 +2972,9 @@ function setFtActiveSpeaker(speaker) {
   });
   ftActiveSpeaker = speaker;
   ftMouthCycleIdx = 0;
-  if (speaker) setFtMouthFrame(speaker, FT_MOUTH_CYCLE[0]); // 話者が切り替わった瞬間は口閉じから始める
+  if (speaker) setFtMouthFrame(speaker, FT_MOUTH_CYCLE[0]);
 }
 
-// 220msおきに [closed, open1, closed, open2] を順番に回す。喋っていない間は何もしない（＝口閉じで静止したまま）。
 function startFtMouthLoop() {
   stopFtMouthLoop();
   ftMouthTimer = setInterval(() => {
@@ -3157,8 +2988,6 @@ function stopFtMouthLoop() {
   if (ftMouthTimer) { clearInterval(ftMouthTimer); ftMouthTimer = null; }
 }
 
-// 「今日のフレーズ」自動オープン：再生開始時、ユーザーがまだ手動で開閉していなければ自動で開く。
-// 一度でも手動操作したら以降は尊重して自動オープンしない。
 let ftPhrasesManualToggle = false;
 function openFtPhrasesAuto() {
   if (ftPhrasesManualToggle) return;
@@ -3171,13 +3000,12 @@ function openFtPhrasesAuto() {
 
 let ftCurrentAudioKey = null;
 
-// Morning Talk専用の音声プレイヤー
 const ftAudioEl = new Audio();
 registerAudio(ftAudioEl);
 let ftAudioLoaded = false;
 let ftTrackedPlayKey = null;
 ftAudioEl.addEventListener('play', () => {
-  if (ftTrackedPlayKey === ftCurrentAudioKey) return; // 同じ回の再開（一時停止→再生）は重複計測しない
+  if (ftTrackedPlayKey === ftCurrentAudioKey) return;
   ftTrackedPlayKey = ftCurrentAudioKey;
   trackEvent('morning_talk_play', ftCurrentAudioKey || '');
 });
@@ -3193,7 +3021,6 @@ function initFtAudio() {
   const src = MORNING_TALK_AUDIO[ftCurrentAudioKey];
   const playBtn = document.getElementById('ftPlayBtn');
   if (!src) {
-    // 未収録：再生ボタンを無効化し、準備中である旨を表示
     if (playBtn) { playBtn.disabled = true; playBtn.style.opacity = '0.4'; }
     const lenEl = document.getElementById('ftPlayLen');
     if (lenEl) lenEl.textContent = '収録準備中';
@@ -3207,10 +3034,6 @@ function initFtAudio() {
     if (lenEl) lenEl.textContent = fmtFtTime(ftAudioEl.duration);
     ftPhraseTimings = resolveFtPhraseTimings(ftCurrentAudioKey, ftCurrentPhrases, ftCurrentTalkDuration || ftAudioEl.duration);
   });
-  // Safari(特にiOS)はVBR形式のmp3で初回のduration取得値が不正確なことがあり、
-  // 再生が進むにつれて durationchange で正しい値に補正されるケースがある。
-  // ここでも都度タイミングを再計算しないと、「実際の音声はもう終わってるのにハイライトが古い（長すぎる）
-  // durationを基準にした位置で止まって見える」という不具合が起きるため。
   ftAudioEl.addEventListener('durationchange', () => {
     if (!isFinite(ftAudioEl.duration)) return;
     const lenEl = document.getElementById('ftPlayLen');
@@ -3269,7 +3092,7 @@ function setFtWavePlaying(isPlaying) {
 }
 
 function toggleFamilyTalk() {
-  if (!MORNING_TALK_AUDIO[ftCurrentAudioKey]) return; // 未収録は何もしない
+  if (!MORNING_TALK_AUDIO[ftCurrentAudioKey]) return;
   activeMode = 'familytalk';
   ftPlaying = !ftPlaying;
   const icon = document.getElementById('ftPlayIcon');
@@ -3294,9 +3117,6 @@ function toggleFamilyTalk() {
     stopFtMouthLoop();
   }
 }
-// Morning Talk再生完了→自動で朝の音楽（BGM）に切り替わる導線を表示。
-// ※現状は視覚状態のみのプロトタイプ。実際の音声チェーンは、
-//   著作権フリー音源ライブラリの選定・mp3組み込み後に実装する。
 function showFtAutoNext() {
   const el = document.getElementById('ftAutoNext');
   if (!el) return;
@@ -3325,36 +3145,32 @@ function toggleFtPhrases() {
 
 // ========================
 // 放送アーカイブ（これまでの放送）
-// 今週すでに公開済みの回だけを実データ(MORNING_TALK_WEEKS / MORNING_TALK_AUDIO)から一覧化する。
-// 「Best Of」（お気に入りの回のキュレーション）は放送本数が貯まってから改めて実装する。
 // ========================
 function getAiredMorningTalkDays() {
   const order = ['mon', 'tue', 'wed', 'thu', 'fri'];
   let weekKey, previewUptoIdx = null;
   if (FAMILY_PREVIEW) {
-    // ?familypreview=w1_fri のような裏口で見ている間は、公開日を待たずに
-    // 「その回までは放送済み」とみなしてアーカイブも動作確認できるようにする（本番ロジックには影響しない）。
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
     weekKey = parsed.weekKey;
     previewUptoIdx = order.indexOf(parsed.dayKey);
   } else {
     const now = new Date();
     const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
-    if (now < w1Start) return []; // 配信開始前は何もアーカイブされていない
+    if (now < w1Start) return [];
     weekKey = resolveMorningTalkWeekKey(now);
   }
   const now = new Date();
   const days = [];
   order.forEach((dayKey, idx) => {
-    if (previewUptoIdx !== null && idx > previewUptoIdx) return; // プレビュー中の回より後の曜日は除外
+    if (previewUptoIdx !== null && idx > previewUptoIdx) return;
     const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
     const dayDate = dateForMorningTalkDay(weekKey, dayKey);
-    if (previewUptoIdx === null && dayDate > now) return; // 本番では未来日を除外
+    if (previewUptoIdx === null && dayDate > now) return;
     if (MORNING_TALK_AUDIO[audioKey] && MORNING_TALK_WEEKS[weekKey].days[dayKey]) {
       days.push({ weekKey, dayKey, content: MORNING_TALK_WEEKS[weekKey].days[dayKey], date: dayDate });
     }
   });
-  return days.reverse(); // 新しい順（今日/プレビュー中の回に近いほど上に）
+  return days.reverse();
 }
 
 function renderArchiveModalBody() {
@@ -3390,7 +3206,6 @@ function closeArchiveModal() {
   document.getElementById('archiveModal').classList.remove('open');
 }
 
-// 過去の回をMorning Talkプレイヤーに読み込んで自動再生する（今日の回と同じプレイヤーを使い回す）
 function playArchivedMorningTalk(weekKey, dayKey) {
   const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
   if (!MORNING_TALK_AUDIO[audioKey]) return;
@@ -3411,14 +3226,13 @@ function playArchivedMorningTalk(weekKey, dayKey) {
   const playBtn = document.getElementById('ftPlayBtn');
   if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
   closeArchiveModal();
-  toggleFamilyTalk(); // すぐ再生開始
+  toggleFamilyTalk();
   const wrapEl = document.getElementById('ftWrap');
   if (wrapEl && typeof wrapEl.scrollIntoView === 'function') {
     wrapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
-// アーカイブ再生を終えて「今日」の回に戻る
 function returnToTodayMorningTalk() {
   if (ftPlaying) {
     ftAudioEl.pause();
@@ -3450,11 +3264,6 @@ initFtAudio();
 
 // ========================
 // Evening Talk（帰宅後の一言＋Did you know?）
-// エンジンはMorning Talkと共通（parseMorningTalkScript / computeFtPhraseTimings /
-// buildFtLineSegmentsFromStarts / fmtFtTime / FT_MOUTH_FRAMES 等はそのまま再利用）。
-// 会話音声の中にMaiの日本語解説・エンディングBGMまで一体化してミックス済みのため、
-// Morning Talkにあった「再生後に別音源へ自動切替」導線（ftAutoNext相当）はここには無い。
-// 週タイムライン（launch日・週の切り替わり）もMorning Talkと共有する前提（MORNING_TALK_WEEK_STARTS流用）。
 // ========================
 const EVENING_TALK_WEEKS = {
   w1: {
@@ -3463,7 +3272,6 @@ const EVENING_TALK_WEEKS = {
       mon: {
         title: "How was your day?",
         phrases: [{ en: "How was your day?", ja: "今日どうだった？" }, { en: "It was fun!", ja: "楽しかった！" }],
-        // Morning Talkと同じ台本形式。Mai:/Joel:の行だけが自動抽出されてカラオケハイライト対象になる。
         rawScript: `
 Mai: Hey Joel! You're home! How was your day? | ねえJoel！おかえり！今日どうだった？
 Joel: It was great! I went swimming! | 最高だったよ！泳ぎに行ったんだ！
@@ -3483,18 +3291,12 @@ Mai: That's so silly. | もう、おかしいなあ。
 Joel: OK. Time to say goodbye. Have a great night! | よし。そろそろバイバイの時間だね。良い夜を！
 Mai: Bye bye! | バイバイ！
         `,
-        // ⚠️暫定値（Audition未実測）。会話パート（"Bye bye!"まで）の目安秒数——実測後、下のEVENING_TALK_LINE_TIMINGSに
-        // start秒配列を追加すればそちらが優先され、この値は使われなくなる（Morning Talkと同じ運用）。
         talkDuration: 65,
         maiTalk: '今日の会話でJoelが "It was fun!" って言ってたよね。逆にMaiは公園が暑すぎて "It was not fun." って答えてた——同じ"It was..."の形で、楽しかった/楽しくなかったが言えちゃうんだよね。<br><br>あと、アヒルの<strong>feathers</strong>(羽根)って単語も出てきたよ。覚えてる？さっきの"アヒルの羽根は濡れない"って話、面白かったよね。みんなはアヒルのおもちゃ持ってる？Duckのおもちゃを見つけたら、パパやママに"Look! a duck!"って言ってみてね。<br><br>お母さん、お父さん今日も1日お疲れ様です。寝る前に"It was fun!"か"It was not fun."だけ真似してみてください。例えば、『今日は幼稚園楽しかった？ダックのお話面白かった？』てお子さんに聞いて『うん』って答えたら『It was fun』だね！とか伝えてみたら、それだけで十分お子様の耳に英語が届いています。',
       },
-      // tue/wed/thu/fri/以降はまだ台本・音源が未確定のため未登録。
-      // 追加する時はここにMorning Talkと同じ形式でdays.xxxを足すだけでOK（renderEveningTalkContentが自動対応）。
     }
   },
   w2: {
-    // 2026-08-13: Timing Sheet(Coding Master)より新規追加。月曜のみ「FINAL — Joel-approved」。
-    // 水・金はまだJoelレビュー待ちのドラフト状態のため、確定後にここへ追記する。
     theme: 'ビーチ・雨の日',
     days: {
       mon: {
@@ -3520,43 +3322,26 @@ Joel: No way! It's not fun to go to the beach on a rainy day. Let's say it toget
 Mai: I'm tired. It's time for bed. | 疲れたな。もう寝る時間だね。
 Mai: Goodnight! | おやすみ！
         `,
-        // talkDurationは未実測のため未設定（音声全体durationに自動フォールバック）
-        maiTalk: null, // TODO: Mai解説まだ未執筆（Timing Sheetにも未記載）
+        maiTalk: null,
       },
-      // wed/friはJoelレビュー待ちドラフトのため、確定・収録後にここへ追加する。
     }
   },
 };
 
-// 命名規則: evening_talk/ev_[月]_[週]_[曜日].mp3（Morning Talkと同じ理由でev_プレフィックスを追加。
-// フォルダは別だが、書き出し直後の一時フォルダで同名ファイルが並ぶ事故を防ぐため）
 const EVENING_TALK_MONTH = 'aug';
 const EVENING_TALK_AUDIO = {
   aug_w1_mon: 'evening_talk/ev_aug_w1_mon.mp3',
   aug_w1_tue: 'evening_talk/ev_aug_w1_tue.mp3',
-  // aug_w2_mon: 収録は完了しているが結合・編集がまだのため未登録。
-  // 命名規則はw1と同じ（例: evening_talk/ev_aug_w2_mon.mp3）。編集完了後に追加すること。
 };
 
-// Morning TalkのMORNING_TALK_LINE_TIMINGSと同じ運用。Auditionで各セリフの開始秒を実測したら
-// ここに配列で追加する（例: aug_w1_mon: [1.2, 6.8, ...]）。未登録の間は文字数比率スケーリングにフォールバックする。
 const EVENING_TALK_LINE_TIMINGS = {
-  // 2026-08-03 Audition実測（Mai計測、Recording Timing Sheetより転記）。
-  // rawScriptは全17行だが、末尾2行（Joel: OK. Time to say goodbye... / Mai: Bye bye!）は
-  // Maiの日本語解説パートと同様にハイライト対象外とする方針のため、あえて15個のみ登録。
-  // resolveEtPhraseTimings側で「配列長 <= セリフ行数」ならOKという判定に変更済みなので、
-  // 余った末尾2行は自動的にハイライトなし（音声だけ流れる）扱いになる。
   aug_w1_mon: [1.974, 5.664, 9.580, 14.325, 19.385, 22.348, 32.665, 36.255, 38.563, 40.332, 49.106, 58.882, 69.412, 73.554, 79.001],
 };
 
-// 火・木は月・水の会話パートを再利用し、頭にMaiの新規解説が付く（Morning Talkと同じ構成・同じ運用）。
-// 登録の仕方はMorning Talkと同様「w1_thu、オフセット◯秒」でOK。baseは曜日から自動判定される。
 const EVENING_TALK_REPLAY_OFFSET = {
-  aug_w1_tue: 34, // Maiの解説が0〜34秒、34秒から月曜の会話（aug_w1_mon）が再生される
+  aug_w1_tue: 34,
 };
 
-// 火・木のaudioKeyから再利用元(base)のaudioKeyを曜日ルールで自動算出（Morning Talkの
-// resolveMorningTalkReplayBaseKeyと同一ロジック。EVENING_TALK_MONTHを使う点だけが違う）。
 function resolveEveningTalkReplayBaseKey(audioKey) {
   const m = /^(.+_w\d)_(tue|thu)$/.exec(audioKey);
   if (!m) return null;
@@ -3569,15 +3354,10 @@ function resolveEveningTalkLineStarts(audioKey) {
   if (offset == null) return EVENING_TALK_LINE_TIMINGS[audioKey];
   const baseKey = resolveEveningTalkReplayBaseKey(audioKey);
   const baseStarts = baseKey ? EVENING_TALK_LINE_TIMINGS[baseKey] : null;
-  if (!baseStarts) return EVENING_TALK_LINE_TIMINGS[audioKey]; // baseが未登録ならフォールバックに任せる
+  if (!baseStarts) return EVENING_TALK_LINE_TIMINGS[audioKey];
   return baseStarts.map(t => t + offset);
 }
 
-// 完全一致(===)ではなく「実測データが行数以下ならOK」(<=)にしているのがポイント。
-// これにより、Maiの日本語解説パートや末尾の挨拶など「あえてハイライトさせたくない行」を
-// rawScript末尾に残したまま、実測した分の行だけ精密カラオケハイライトを効かせられる。
-// slice(0, starts.length)で余った末尾行をftCurrentPhrasesから切り離すので、
-// updateFtPhraseHighlight側は自動的にそれ以降を「ハイライトなし」として扱う。
 function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
   const starts = resolveEveningTalkLineStarts(audioKey);
   if (starts && starts.length > 0 && starts.length <= phrases.length) {
@@ -3586,9 +3366,6 @@ function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
   return computeFtPhraseTimings(phrases, totalDuration);
 }
 
-// 今日表示すべき回を日付から自動解決（Morning Talkと同じ週タイムラインを共有）。
-// familypreview（?familypreview=w1_mon 等）にも対応——Morning Talkと同じURLパラメータ1つで、
-// Morning/Evening両方を同時にプレビューできる。
 function getTodayEveningTalkInfo() {
   const now = new Date();
   if (FAMILY_PREVIEW) {
@@ -3603,7 +3380,7 @@ function getTodayEveningTalkInfo() {
   const dayKey = DAY_KEY_BY_INDEX[now.getDay()];
   const weekKey = resolveMorningTalkWeekKey(now);
   const isWeekend = (dayKey === 'sat' || dayKey === 'sun');
-  const contentDayKey = isWeekend ? 'fri' : dayKey; // 土日は金曜回の再放送（予定。金曜分が揃うまでは準備中表示）
+  const contentDayKey = isWeekend ? 'fri' : dayKey;
   const isNew = NEW_DAY_KEYS.includes(dayKey);
   const weekData = EVENING_TALK_WEEKS[weekKey];
   const content = (weekData && weekData.days[contentDayKey]) ? weekData.days[contentDayKey] : null;
@@ -3620,8 +3397,6 @@ function renderEveningTalkContent() {
   const tag = document.getElementById('etStatusTag');
   const note = document.getElementById('etReplayNote');
 
-  // 配信開始日より前、またはその曜日の回がまだ用意できていない場合は「準備中」表示にする
-  // （＝丸ごとエラーにせず、日々の台本追加に合わせて自動で表示が切り替わる設計）
   if (info.isPreLaunch || !info.content) {
     if (tag) { tag.textContent = info.isPreLaunch ? '近日公開' : '準備中'; tag.className = 'ft-status-tag replay'; }
     if (note) {
@@ -3651,7 +3426,6 @@ function renderEveningTalkContent() {
   document.getElementById('etQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
   document.getElementById('etPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
 
-  // Morning Talkの共通パーサーをそのまま流用（Mai:/Joel:形式なのでこれで解析できる）
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
     : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
 
@@ -3703,9 +3477,7 @@ function updateEtPhraseHighlight(t) {
     const speaker = activeLine ? activeLine.speaker : null;
     setEtActiveSpeaker(speaker);
     updateEtBubble(activeLine, speaker);
-  } catch (e) {
-    // Morning Talkと同じ方針：ここで落ちるとハイライトが止まって見えるため、握りつぶして次のtimeupdateに賭ける
-  }
+  } catch (e) {}
 }
 
 function clearEtPhraseHighlight() {
@@ -3856,7 +3628,7 @@ function setEtWavePlaying(isPlaying) {
 }
 
 function toggleEveningTalk() {
-  if (!EVENING_TALK_AUDIO[etCurrentAudioKey]) return; // 未収録は何もしない
+  if (!EVENING_TALK_AUDIO[etCurrentAudioKey]) return;
   activeMode = 'eveningtalk';
   etPlaying = !etPlaying;
   const icon = document.getElementById('etPlayIcon');
@@ -3900,40 +3672,32 @@ function toggleEtPhrases() {
 
 renderEtWave();
 initEtAudio();
-renderJourneyNowPlaying(); // ft/etの実データが揃った後に、Now Playingカードの文言を最終確定させる
+renderJourneyNowPlaying();
 
 // ========================
 // Active Time（探し物ミッション／なぞなぞクイズ）
 // ========================
 const AT_FIND = [
-  // カラー
   { axis: 'カラー', en: 'Find something red!', ja: '赤いものを探してみよう', audio: 'audio/asobo_audio/find_red.mp3' },
   { axis: 'カラー', en: 'Find something blue!', ja: '青いものを探してみよう', audio: 'audio/asobo_audio/find_blue.mp3' },
   { axis: 'カラー', en: 'Find something yellow!', ja: '黄色いものを探してみよう', audio: 'audio/asobo_audio/find_yellow.mp3' },
   { axis: 'カラー', en: 'Find something green!', ja: '緑のものを探してみよう', audio: 'audio/asobo_audio/find_green.mp3' },
-  // カウント
   { axis: 'カウント', en: 'Find three round things!', ja: '丸いものを3つ探してみよう', audio: 'audio/asobo_audio/find_three_round.mp3' },
   { axis: 'カウント', en: 'Find two little things!', ja: '小さいものを2つ探してみよう', audio: 'audio/asobo_audio/find_two_little.mp3' },
   { axis: 'カウント', en: 'Find one big thing!', ja: '大きいものを1つ探してみよう', audio: 'audio/asobo_audio/find_one_big.mp3' },
-  // サウンド
   { axis: 'サウンド', en: 'Find something that makes a sound!', ja: '音が出るものを探してみよう', audio: 'audio/asobo_audio/find_sound.mp3' },
   { axis: 'サウンド', en: 'Find something loud!', ja: '大きな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_loud.mp3' },
   { axis: 'サウンド', en: 'Find something quiet!', ja: '小さな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_quiet.mp3' },
-  // ロケーション
   { axis: 'ロケーション', en: 'Find something under the table!', ja: 'テーブルの下にあるものを探してみよう', audio: 'audio/asobo_audio/find_under_table.mp3' },
   { axis: 'ロケーション', en: 'Find something near the window!', ja: '窓のそばにあるものを探してみよう', audio: 'audio/asobo_audio/find_near_window.mp3' },
   { axis: 'ロケーション', en: 'Find something on the floor!', ja: '床の上にあるものを探してみよう', audio: 'audio/asobo_audio/find_floor.mp3' },
-  // テクスチャー
   { axis: 'テクスチャー', en: 'Find something soft!', ja: 'やわらかいものを探してみよう', audio: 'audio/asobo_audio/find_soft.mp3' },
   { axis: 'テクスチャー', en: 'Find something hard!', ja: 'かたいものを探してみよう', audio: 'audio/asobo_audio/find_hard.mp3' },
   { axis: 'テクスチャー', en: 'Find something smooth!', ja: 'つるつるしているものを探してみよう', audio: 'audio/asobo_audio/find_smooth.mp3' },
-  // カテゴリー
   { axis: 'カテゴリー', en: 'Find something you can eat!', ja: '食べられるものを探してみよう', audio: 'audio/asobo_audio/find_eat.mp3' },
   { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう', audio: 'audio/asobo_audio/find_wear.mp3' },
   { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう', audio: 'audio/asobo_audio/find_read.mp3' },
 ];
-// 探し物ミッション完了ボイス(質問系+リアクション系ミックス、ランダム再生)
-// 収録待ち: find_done_1〜6.mp3 (Jay収録リストに追加済み)
 const AT_FIND_DONE_AUDIO = [
   'audio/asobo_audio/find_done_1.mp3',
   'audio/asobo_audio/find_done_2.mp3',
@@ -4016,8 +3780,6 @@ function completeActiveTime() {
   btn.classList.add('done');
   btn.innerHTML = '<span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_check.png" alt="チェック"></span><span>今日もできたね！</span>';
   showToast('Jayからの褒め声、再生中… 🎉');
-  // 注：Active Timeはスタンプ独立カウントにせず、絵本のスタンプとは別軸で
-  // 「やったら良いことがある」程度の軽い演出（褒め声）のみとする設計
 }
 
 // ========================
@@ -4101,13 +3863,11 @@ function closeRoutineModal() {
   if (routineActiveBtn) { routineActiveBtn.textContent = '▶'; routineActiveBtn.dataset.playing = '0'; routineActiveBtn = null; }
 }
 
-// ルーティンフレーズ用の音声プレイヤー（同時に1個だけ再生）
 const routineAudioEl = new Audio();
 registerAudio(routineAudioEl);
 let routineActiveBtn = null;
 
 function playRoutineScene(btn, src) {
-  // 別のフレーズが再生中なら止めてアイコンを戻す
   if (routineActiveBtn && routineActiveBtn !== btn) {
     routineActiveBtn.textContent = '▶';
     routineActiveBtn.dataset.playing = '0';
@@ -4145,30 +3905,26 @@ renderRoutineCatGrid();
 // ========================
 // しる：Jayの発見（Animal / Food / 天気）本のUI
 // ========================
-// カードは3ジャンル固定＋予告カード1枠。新着は火・木のみ、日付ベースで個別登録する運用
-// （曜日とジャンルを機械的に固定しない＝前回と同じジャンルが連続しないよう内容側で手動調整する）。
 // フォルダ構成：shiru_book/audio/{category}/{topicId}.mp3、shiru_book/illustration/covers/（本の表紙、既存ファイル名のまま移動）、
-// shiru_book/illustration/topics/{topicId}.png（中身のイラスト）。カテゴリが増えても同じ規則で置ける。
+// shiru_book/illustration/topics/{topicId}/{topicId}_cover.png（トピック表紙・カード用フォールバック）、
+// shiru_book/illustration/topics/{topicId}/{topicId}_1.png〜（各Did you know？のイラスト、factsの並び順と対応）。
+// カテゴリが増えても同じ規則で置ける。イラストが未整備のトピックはtopic.imageのみでOK（fact.imageは省略可、topic.imageにフォールバックする）。
 const SHIRU_CATEGORIES = [
   { id: 'animal', title: 'Animal', sub: 'どうぶつ', image: 'shiru_book/illustration/covers/shiru_animal.png' },
   { id: 'food', title: 'Food', sub: 'たべもの', image: 'shiru_book/illustration/covers/shiru_food.png' },
   { id: 'weather', title: '天気', sub: 'てんき', image: 'shiru_book/illustration/covers/shiru_weather.png' },
 ];
 
-// トピック（本の中の1ページ＝1テーマ）。事実ごとの音声は2通りに対応：
-// ①fact.audio に個別ファイルを指定（切り出し済みの場合）②未指定ならtopic.audio+fact.start秒から自動再生
-// （②なら切り出し作業が丸ごと不要。次のトピックからはこちらを推奨）。
-// ⚠️ 仮データ。イラスト生成・実収録が済み次第、image/audio/startを実データに差し替える。
 const SHIRU_TOPICS = [
   {
     id: 'duck', category: 'animal', titleEn: 'Duck', titleJa: 'アヒル', dateAdded: '2026-08-18',
-    image: 'shiru_book/illustration/topics/duck.png',
+    image: 'shiru_book/illustration/topics/duck/duck_cover.png',
     audio: 'shiru_book/audio/animal/duck.mp3',
     facts: [
-      { en: "A duck's feathers never get wet.", ja: 'アヒルの羽根は、水に濡れないんだって。', start: 6.558 },
-      { en: 'Ducks can swim and fly really fast.', ja: 'アヒルは泳げるし、すごく速く飛べるんだって。', start: 17.050 },
-      { en: 'Ducks eat grass, leaves, bugs, and even small fish!', ja: 'アヒルは草や葉っぱ、虫や小さな魚まで食べるんだって。', start: 28.394 },
-      { en: 'A duck says "Quack, Quack."', ja: 'アヒルは「クワッ、クワッ」って鳴くよ。', start: 38.929 },
+      { en: "A duck's feathers never get wet.", ja: 'アヒルの羽根は、水に濡れないんだって。', start: 6.558, image: 'shiru_book/illustration/topics/duck/duck_1.png' },
+      { en: 'Ducks can swim and fly really fast.', ja: 'アヒルは泳げるし、すごく速く飛べるんだって。', start: 17.050, image: 'shiru_book/illustration/topics/duck/duck_2.png' },
+      { en: 'Ducks eat grass, leaves, bugs, and even small fish!', ja: 'アヒルは草や葉っぱ、虫や小さな魚まで食べるんだって。', start: 28.394, image: 'shiru_book/illustration/topics/duck/duck_3.png' },
+      { en: 'A duck says "Quack, Quack."', ja: 'アヒルは「クワッ、クワッ」って鳴くよ。', start: 38.929, image: 'shiru_book/illustration/topics/duck/duck_4.png' },
     ],
   },
   {
@@ -4201,12 +3957,10 @@ function getTodayShiruDateKey() {
   return `${y}-${m}-${d}`;
 }
 
-// カテゴリごとの全トピックを新しい順で返す
 function getShiruTopicsByCategory(catId) {
   return SHIRU_TOPICS.filter(t => t.category === catId).sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
 }
 
-// 「今日そのカテゴリを開いたか」を日付単位で記録（Newバッジは1日1回開いたら消える）
 const SHIRU_OPENED_KEY_PREFIX = 'enverly_shiru_opened_';
 function getShiruOpenedSet() {
   const key = SHIRU_OPENED_KEY_PREFIX + getTodayShiruDateKey();
@@ -4223,7 +3977,6 @@ function markShiruOpened(catId) {
   try { localStorage.setItem(key, JSON.stringify([...set])); } catch (e) {}
 }
 
-// めくって発見したカード（事実）の永続フラグ。日付リセットせず、発見ノートとしてずっと蓄積する
 const SHIRU_REVEALED_KEY = 'enverly_shiru_revealed';
 function getShiruRevealedSet() {
   try {
@@ -4265,7 +4018,6 @@ function renderShiruCatGrid() {
       </div>
     `;
   }).join('');
-  // 4枠目：予告カード（空枚・タップ不可、今後のジャンル追加をUI自体で匂わせる）
   const soonCard = `
     <div class="shiru-cat-card soon">
       <div class="shiru-cat-spine"></div>
@@ -4286,13 +4038,12 @@ function renderShiruCatGrid() {
 let shiruCurrentCategory = null;
 let shiruCurrentTopic = null;
 
-// 表紙タップ→本モーダルを開く→リフルしてもくじへ
 function openShiruBookModal(catId) {
   const cat = SHIRU_CATEGORIES.find(c => c.id === catId);
   if (!cat) return;
   shiruCurrentCategory = cat;
   markShiruOpened(catId);
-  renderShiruCatGrid(); // Newリボンを消すため再描画
+  renderShiruCatGrid();
   earnStamp('shiru');
 
   document.getElementById('shiruBookHeaderTitle').textContent = cat.title;
@@ -4301,7 +4052,6 @@ function openShiruBookModal(catId) {
   document.getElementById('shiruCoverSub').textContent = cat.sub;
   document.getElementById('shiruCoverSpine').className = 'shiru-cover-spine spine-' + catId;
 
-  // 表紙・ページ・もくじ・グリッドを初期状態にリセット
   ['shiruCoverPage', 'shiruPage1', 'shiruPage2', 'shiruPage3', 'shiruPage4', 'shiruPage5'].forEach(id => {
     document.getElementById(id).style.transform = 'rotateY(0deg)';
   });
@@ -4312,7 +4062,6 @@ function openShiruBookModal(catId) {
 
   document.getElementById('shiruBookModal').classList.add('open');
 
-  // 開いた直後にリフルアニメーション開始（表紙→中のページが少しずつ遅れてめくれる）
   requestAnimationFrame(() => {
     setTimeout(() => {
       document.getElementById('shiruCoverPage').style.transform = 'rotateY(-170deg)';
@@ -4326,7 +4075,6 @@ function openShiruBookModal(catId) {
   });
 }
 
-// トピック（または中の事実）が今日追加されたものかどうか。新しいDid you knowが増えた回もこれで拾える
 function topicHasNewToday(topic) {
   const todayKey = getTodayShiruDateKey();
   if (topic.dateAdded === todayKey) return true;
@@ -4356,12 +4104,11 @@ function renderShiruToc(cat) {
   tocEl.style.pointerEvents = 'auto';
 }
 
-// もくじ→トピック選択でページがもう1枚めくれて事実のグリッドへ
 function openShiruTopic(topicId) {
   const topic = SHIRU_TOPICS.find(t => t.id === topicId);
   if (!topic) return;
   shiruCurrentTopic = topic;
-  markShiruOpened(topic.category + '_' + topic.id); // トピック単位のNewバッジも1日1回開いたら消える
+  markShiruOpened(topic.category + '_' + topic.id);
   const tocEl = document.getElementById('shiruTocScreen');
   const gridEl = document.getElementById('shiruGridScreen');
   tocEl.style.opacity = '0'; tocEl.style.pointerEvents = 'none';
@@ -4404,7 +4151,6 @@ function closeShiruBookModal() {
   shiruAudioEl.pause();
 }
 
-// しる用の音声プレイヤー。1トピック=1本の連続録音を、事実のstart（秒）から次のstartまで再生する
 const shiruAudioEl = new Audio();
 registerAudio(shiruAudioEl);
 
@@ -4422,8 +4168,6 @@ function revealShiruFact(topicId, factIndex, cardEl) {
   shiruAudioEl.ontimeupdate = null;
   shiruAudioEl.pause();
 
-  // 事実ごとに切り出し済みの音声ファイルがあればそれを優先（fact.audio）。
-  // なければトピック丸ごと1本の録音を start秒から次のstartまで再生する（切り出し不要方式）。
   if (fact.audio) {
     shiruAudioEl.src = fact.audio;
     shiruAudioEl.currentTime = 0;
@@ -4451,7 +4195,7 @@ renderShiruCatGrid();
 // ========================
 const BOOK_DATA = {
   title: 'Sunny Day!',
-  levels: ['todler'], // この本が対応するレベル一覧。1つだけなら選択UIは自動的に非表示になる（9月号からtodler/kinderの2つに拡張予定）
+  levels: ['todler'],
   pagesByLevel: {
     todler: [
       { img: 'books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: 'audio/book_audio/sunnyday/sunnyday_01.mp3' },
@@ -4465,8 +4209,6 @@ const BOOK_DATA = {
     ]
   }
 };
-// BOOK_DATA.pages は「現在選択中のレベルのページ配列」を返すgetter。
-// 既存コード（BOOK_DATA.pages[...]・.length・.map など）は変更なしで動く。
 Object.defineProperty(BOOK_DATA, 'pages', {
   get() {
     return BOOK_DATA.pagesByLevel[getBookLevel()] || BOOK_DATA.pagesByLevel[BOOK_DATA.levels[0]];
@@ -4474,7 +4216,7 @@ Object.defineProperty(BOOK_DATA, 'pages', {
 });
 
 // ========================
-// 絵本レベル（とどらー/きんだー）：端末単位で記憶、本ごとにlevelsが違っても安全にフォールバック
+// 絵本レベル（とどらー/きんだー）
 // ========================
 const BOOK_LEVEL_LABELS = { todler: { label: 'とどらー', badgeClass: 'book-level-badge-todler' }, kinder: { label: 'きんだー', badgeClass: 'book-level-badge-kinder' } };
 const BOOK_LEVEL_STORAGE_KEY = 'enverly_book_level';
@@ -4483,12 +4225,12 @@ function getBookLevel() {
   let stored = null;
   try { stored = localStorage.getItem(BOOK_LEVEL_STORAGE_KEY); } catch (e) {}
   if (stored && BOOK_DATA.levels.includes(stored)) return stored;
-  return BOOK_DATA.levels[0]; // 記憶がない・非対応レベルの場合は先頭レベルにフォールバック
+  return BOOK_DATA.levels[0];
 }
 function setBookLevel(level) {
   if (!BOOK_DATA.levels.includes(level)) return;
   try { localStorage.setItem(BOOK_LEVEL_STORAGE_KEY, level); } catch (e) {}
-  bvCurrentPage = 0; // レベル切り替え時はページ構成が変わりうるので先頭に戻す
+  bvCurrentPage = 0;
   renderBookLevelToggles();
   if (document.getElementById('bookViewerModal') && document.getElementById('bookViewerModal').classList.contains('open')) {
     bvRenderPage();
@@ -4505,9 +4247,8 @@ function renderBookLevelToggles() {
     });
   });
 }
-renderBookLevelToggles(); // 初期表示（この時点でBOOK_DATAは定義済み）
+renderBookLevelToggles();
 
-// 絵本ビューワー共通の音声プレイヤー（Let's read / Let's talk 兼用）
 const bvAudioEl = new Audio();
 registerAudio(bvAudioEl);
 function bvPlayAudio(src, onEnded) {
@@ -4521,7 +4262,7 @@ function bvPlayAudio(src, onEnded) {
   bvAudioEl.onerror = () => {
     console.warn('[Enverly] 絵本の音声読み込みに失敗:', src);
     if (onEnded) onEnded();
-  }; // 音源が見つからない場合も進行を止めない
+  };
   try {
     const p = bvAudioEl.play();
     if (p && typeof p.catch === 'function') {
@@ -4538,10 +4279,10 @@ function bvStopAudio() {
 }
 
 let bvCurrentPage = 0;
-let bvMode = null; // 'read' | 'talk'
+let bvMode = null;
 let bvTalkTimer = null;
 let bvTalkDone = [];
-let bvTalkToken = 0; // Let's talkチェーンの世代管理（多重起動防止）
+let bvTalkToken = 0;
 
 function openBookModal(mode) {
   bvCurrentPage = 0;
@@ -4571,21 +4312,18 @@ function closeBookModal() {
 
 function bvRenderPage() {
   const page = BOOK_DATA.pages[bvCurrentPage];
-  if (!page) return; // 想定外のページ番号なら何もしない（クラッシュ防止）
+  if (!page) return;
   const img = document.getElementById('bvPageImg');
   img.src = page.img;
   document.getElementById('bvTitle').textContent = `Sunny Day!  ${bvCurrentPage + 1} / ${BOOK_DATA.pages.length}`;
   document.getElementById('bvPrev').disabled = bvCurrentPage === 0;
   document.getElementById('bvNext').disabled = bvCurrentPage === BOOK_DATA.pages.length - 1;
-  // インジケーター更新
   document.querySelectorAll('.bv-dot').forEach((d, i) => {
     d.classList.toggle('active', i === bvCurrentPage);
   });
   bvSyncNavToImage(img);
 }
 
-// object-fit:contain で表示中のイラストの実際の高さに、左右ナビの縦幅を合わせる
-// （上下に黒帯ができるページでも、半透明の帯がイラスト部分だけに収まるようにする）
 function bvSyncNavToImage(img) {
   const area = document.getElementById('bvPageArea');
   if (!img || !area) return;
@@ -4596,7 +4334,6 @@ function bvSyncNavToImage(img) {
     const imgRatio = img.naturalWidth / img.naturalHeight;
     let top = 0, bottom = 0;
     if (imgRatio > containerRatio) {
-      // 画像が横長 → 上下に黒帯
       const renderedH = areaW / imgRatio;
       top = bottom = Math.max(0, (areaH - renderedH) / 2);
     }
@@ -4624,12 +4361,11 @@ function bvChangePage(dir) {
   bvRenderPage();
   if (bvMode === 'read') {
     if (bvTalkTimer) clearTimeout(bvTalkTimer);
-    bvReadToken++; // 進行中の自動送りチェーンを無効化してからやり直す
+    bvReadToken++;
     bvPlayPageThenAdvance(bvReadToken);
   }
 }
 
-// スワイプ対応
 let bvTouchStartX = 0;
 document.getElementById('bvPageArea').addEventListener('touchstart', e => {
   bvTouchStartX = e.touches[0].clientX;
@@ -4639,7 +4375,7 @@ document.getElementById('bvPageArea').addEventListener('touchend', e => {
   if (Math.abs(diff) > 40) bvChangePage(diff > 0 ? 1 : -1);
 });
 
-let bvReadToken = 0; // 自動送りチェーンの世代管理（多重起動によるページ暴走を防ぐ）
+let bvReadToken = 0;
 
 function bvStartRead() {
   bvMode = 'read';
@@ -4649,25 +4385,24 @@ function bvStartRead() {
   document.getElementById('bvIetaBtn').classList.remove('show');
   document.getElementById('bvModeRow').style.display = 'flex';
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
-  bvReadToken++; // 新しいチェーンを開始。古いチェーンはこの後token不一致で止まる
+  bvReadToken++;
   bvPlayPageThenAdvance(bvReadToken);
 }
 
-// 現在のページの音声を再生 → 再生し終わったら少し間を置いて次ページへ
 function bvPlayPageThenAdvance(token) {
   const page = BOOK_DATA.pages[bvCurrentPage];
   if (!page) return;
   bvPlayAudio(page.audio, () => {
-    if (bvMode !== 'read' || token !== bvReadToken) return; // モード変更 or 古いチェーンなら中断
+    if (bvMode !== 'read' || token !== bvReadToken) return;
     if (bvCurrentPage < BOOK_DATA.pages.length - 1) {
       bvTalkTimer = setTimeout(() => {
         if (token !== bvReadToken) return;
         bvCurrentPage++;
         bvRenderPage();
         bvPlayPageThenAdvance(token);
-      }, 700); // ページ間の間（ページめくりアニメーションの余白）
+      }, 700);
     } else {
-      trackEvent('book_complete', 'read'); // 最後のページの音声再生が終わった＝最後まで聞いた
+      trackEvent('book_complete', 'read');
     }
   });
 }
@@ -4680,22 +4415,19 @@ function bvStartTalk() {
   document.getElementById('bvModeRow').style.display = 'none';
   document.getElementById('bvTalkBar').classList.add('active');
   document.getElementById('bvIetaBtn').classList.remove('show');
-  // 1ページ目（イントロ）から通して再生。ナレーションページは一時停止なし、練習フレーズのページでYour turnループに入る
   bvCurrentPage = 0;
   bvRenderPage();
-  bvTalkToken++; // 新しいチェーンを開始。古いチェーンはtoken不一致で止まる
+  bvTalkToken++;
   bvUpdateTalkProgress();
   bvRunTalkStep(bvTalkToken);
 }
 
-// 効果音まわり
 let bvAudioCtx = null;
 function bvGetAudioCtx() {
   if (!bvAudioCtx) bvAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (bvAudioCtx.state === 'suspended') bvAudioCtx.resume();
   return bvAudioCtx;
 }
-// 「Your turn!」の合図：実音源（Pixabayからダウンロードした効果音）を再生。読み込めない場合は合成音にフォールバック
 const bvSfxEl = new Audio();
 registerAudio(bvSfxEl);
 function bvPlayChime() {
@@ -4708,12 +4440,11 @@ function bvPlayChime() {
     if (p && typeof p.catch === 'function') p.catch(() => bvPlaySynthChime());
   } catch (e) { bvPlaySynthChime(); }
 }
-// 合成チャイム（フォールバック用）：弾むような3音の子供っぽいチャイム
 function bvPlaySynthChime() {
   try {
     const ctx = bvGetAudioCtx();
     const now = ctx.currentTime;
-    const notes = [523.25, 659.25, 783.99]; // ド・ミ・ソ（元気に跳ねる感じ）
+    const notes = [523.25, 659.25, 783.99];
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -4727,9 +4458,8 @@ function bvPlaySynthChime() {
       osc.start(start);
       osc.stop(start + 0.25);
     });
-  } catch (e) { /* Web Audio非対応環境でも無視して進行 */ }
+  } catch (e) {}
 }
-// 「もう一度Jayと一緒に」の合図：実音源（Pixabayの効果音）を再生。読み込めない場合は合成音にフォールバック
 function bvPlayReadyChime() {
   try {
     bvSfxEl.pause();
@@ -4740,7 +4470,6 @@ function bvPlayReadyChime() {
     if (p && typeof p.catch === 'function') p.catch(() => bvPlaySynthReadyChime());
   } catch (e) { bvPlaySynthReadyChime(); }
 }
-// 合成版「ぽよん」チャイム（フォールバック用）：跳ねて着地する1音
 function bvPlaySynthReadyChime() {
   try {
     const ctx = bvGetAudioCtx();
@@ -4749,33 +4478,30 @@ function bvPlaySynthReadyChime() {
     const gain = ctx.createGain();
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(660, now);
-    osc.frequency.exponentialRampToValueAtTime(440, now + 0.18); // 弾んで着地する下降ピッチ
+    osc.frequency.exponentialRampToValueAtTime(440, now + 0.18);
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
     osc.connect(gain).connect(ctx.destination);
     osc.start(now);
     osc.stop(now + 0.32);
-  } catch (e) { /* Web Audio非対応環境でも無視して進行 */ }
+  } catch (e) {}
 }
 
 function bvRunTalkStep(token) {
   const page = BOOK_DATA.pages[bvCurrentPage];
   if (!page) return;
 
-  // 全ページ共通：Jay読む→チャイム→Your turn→もう一度→次へ
   document.getElementById('bvTalkPhrase').textContent = page.talkPhrase || page.phrase;
   document.getElementById('bvTalkStatus').textContent = '🎧 Jayの声を聞いてね';
   bvUpdateTalkProgress();
 
   bvPlayAudio(page.audio, () => {
     if (bvMode !== 'talk' || token !== bvTalkToken) return;
-    // Step 1: Your turn（無音ポーズ・スキップ不可）
     bvPlayChime();
     document.getElementById('bvTalkStatus').textContent = '🎤 Your turn! 言ってみよう';
     bvTalkTimer = setTimeout(() => {
       if (token !== bvTalkToken) return;
-      // Step 2: 確認読み（同じ音声をもう一度）
       bvPlayReadyChime();
       document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Jayと一緒に';
       if (!bvTalkDone.includes(bvCurrentPage)) bvTalkDone.push(bvCurrentPage);
@@ -4786,15 +4512,14 @@ function bvRunTalkStep(token) {
         bvTalkTimer = setTimeout(() => {
           if (token !== bvTalkToken) return;
           bvAdvanceTalkPage(token);
-        }, 900); // 次のページへ移る間の余白
+        }, 900);
       });
-    }, page.talkPause || 4000); // Your turnポーズ（スキップ不可）。ページ側にtalkPauseがあればそちらを優先
+    }, page.talkPause || 4000);
   });
 }
 
 function bvAdvanceTalkPage(token) {
   if (bvCurrentPage >= BOOK_DATA.pages.length - 1) {
-    // 最後まで到達：全ページ完了
     document.getElementById('bvTalkPhrase').textContent = '🌟 全部言えたね！';
     document.getElementById('bvTalkStatus').textContent = 'すごい！今日もよく頑張ったよ！';
     document.getElementById('bvIetaBtn').classList.add('show');
@@ -4815,11 +4540,9 @@ function bvUpdateTalkProgress() {
 }
 
 function bvIeta() {
-  // 既存の言えたよ機能に連携
   const btn = document.getElementById('bvIetaBtn');
   btn.textContent = '✅ 記録したよ！';
   btn.disabled = true;
-  // スタンプ機能があれば連携
   if (typeof recordIeta === 'function') recordIeta();
   setTimeout(() => closeBookModal(), 1500);
 }
