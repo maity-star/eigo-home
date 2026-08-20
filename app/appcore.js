@@ -515,7 +515,6 @@ function initApp() {
   initPushNotification();
   trackEvent('app_open');
 }
-initApp();
 
 // ========================
 // 毎日の通知（Web Push）
@@ -942,7 +941,6 @@ function renderJourneyNowPlaying() {
   }
 }
 
-applyJourneyState();
 
 
 // ========================
@@ -974,4 +972,3 @@ function toggleLyrics() {
   const o = b.classList.toggle('open');
   c.style.transform = o ? 'rotate(180deg)' : 'rotate(0deg)';
 }
-
