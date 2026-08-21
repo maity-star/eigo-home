@@ -1276,9 +1276,9 @@ registerAudio(document.getElementById('asoboVoicePlayer'));
 // データ
 // ========================
 const MONTH_PLAYLIST = [
-  { type:'audio', title:"Swingin' From a Rainbow", sub:'Morning Talkのエンディングで使用中の曲。ゆったり揺れるようなリズムが心地いい一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_swingin_rainbow.mp3' },
-  { type:'audio', title:'Little Dolphin', sub:'Morning Talkのエンディングで使用中の曲。海を泳ぐイルカをイメージした、やさしいメロディ。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_little_dolphin.mp3' },
-  { type:'audio', title:'Alphabet Song', sub:'Morning Talkのエンディングで使用中の曲。アルファベットを楽しく覚えられる定番ソング。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_alphabet_song.mp3' },
+  { type:'audio', title:"Swingin' From a Rainbow", sub:'Morning Talkのエンディングで使用中の曲。ゆったり揺れるようなリズムが心地いい一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_swingin_rainbow.mp3', img:'illustrations/monthly_playlist/mp_swingin_rainbow.png' },
+  { type:'audio', title:'Little Dolphin', sub:'Morning Talkのエンディングで使用中の曲。海を泳ぐイルカをイメージした、やさしいメロディ。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_little_dolphin.mp3', img:'illustrations/monthly_playlist/mp_little_dolphin.png' },
+  { type:'audio', title:'Alphabet Song', sub:'Morning Talkのエンディングで使用中の曲。アルファベットを楽しく覚えられる定番ソング。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_alphabet_song.mp3', img:'illustrations/monthly_playlist/mp_alphabet_song.png' },
   { type:'youtube', videoId:'KbrSWbuWtmc', title:'The Ice Cream Song', sub:'ice cream・scoopなど夏らしい単語がいっぱい。数を数えながら歌える定番曲。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=KbrSWbuWtmc' },
   { type:'youtube', videoId:'hlzvrEfyL2Y', title:'Mr. Sun, Sun, Mr. Golden Sun', sub:'太陽に呼びかけるやさしいメロディ。今月のテーマ「Water &amp; Sun」にぴったりの一曲。', age:'1〜4歳', ytUrl:'https://www.youtube.com/watch?v=hlzvrEfyL2Y' },
   { type:'youtube', videoId:'cAMbqRWqLXQ', title:'Down By The Bay', sub:'watermelonなど夏の単語で韻を踏む遊び歌。テンポよく体を揺らしながら楽しめる。', age:'2〜5歳', ytUrl:'https://www.youtube.com/watch?v=cAMbqRWqLXQ' },
@@ -1782,6 +1782,7 @@ function renderMonthlyPlaylist() {
           <div class="carousel-card${i === 0 ? ' active' : ''}${s.type === 'audio' ? ' audio-card' : ''}" data-index="${i}" id="carouselCard${i}" onclick="handleCarouselCardTap(${i})">
             ${s.type === 'audio' ? `
               <div class="carousel-thumb-area audio-thumb audio-thumb-${i % 3}">
+                <img src="${s.img}" alt="${s.title}">
                 <div class="audio-thumb-play" id="audioThumbPlay${i}">
                   <svg class="audio-thumb-icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                   <svg class="audio-thumb-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
