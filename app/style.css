@@ -812,7 +812,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* 今週の一冊 */
 .weekly-book-card { background: #F9FAFB; border-radius: 14px; border: 0.5px solid #E5E7EB; overflow: hidden; }
-.weekly-book-cover-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #EDF6F1; }
+.weekly-book-cover-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #EDF6F1; border-radius: 14px 14px 0 0; }
 .weekly-book-cover-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
 .weekly-book-cover-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.45) 100%); }
 .weekly-book-overlay { position: absolute; bottom: 12px; left: 14px; right: 14px; z-index: 1; }
@@ -865,6 +865,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .lyrics-en { font-size: 14px; font-weight: 600; color: #1F2937; line-height: 1.5; }
 .lyrics-kana { font-size: 11px; color: #6DB88A; margin-top: 2px; }
 .lyrics-ja { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+
+/* 耳コピカナ：強勢＝大きく/太く、弱化・連結する音＝小さく詰めて表記 */
+.kana-phrase-group { margin-bottom: 16px; }
+.kana-phrase-group:last-child { margin-bottom: 0; }
+.kana-phrase-en { font-size: 13px; font-weight: 600; color: #1F2937; line-height: 1.4; }
+.kana-phrase-kana { margin-top: 5px; line-height: 1.35; }
+.kana-phrase-kana .ks-sm { font-size: 12px; font-weight: 500; color: #9CA3AF; }
+.kana-phrase-kana .ks-lg { font-size: 19px; font-weight: 800; color: #6DB88A; margin: 0 1px; }
+.kana-phrase-ja { font-size: 11px; color: #9CA3AF; margin-top: 4px; }
 
 /* ==============================
    今週やることパネル（Weekly Pick + Monthly Playlist を包む）
