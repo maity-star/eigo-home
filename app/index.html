@@ -74,7 +74,7 @@
   }
   .gate-howto-body b { display: block; color: #2D6A4F; margin-bottom: 2px; font-size: 12.5px; }
 
-  /* ホーム画面追加のデモアニメーション（LPのはじめかたセクションを移植） */
+  /* ホーム画面追加のデモアニメーション(LPのはじめかたセクションを移植) */
   .gate-demo-wrap { display: flex; justify-content: center; margin: 14px 0 4px; }
   .gate-demo-frame {
     width: 190px; background: #111827; border-radius: 26px; padding: 6px;
@@ -252,12 +252,12 @@
   var unlocked = isValidRecord(record);
   document.documentElement.classList.add(unlocked ? 'gate-unlocked' : 'gate-locked');
 
-  // 注: 以前はここで世帯ごとの専用manifest（start_urlにコードを焼き込んだもの）に
+  // 注: 以前はここで世帯ごとの専用manifest(start_urlにコードを焼き込んだもの)に
   // 差し替える処理を入れていたが、運用をシンプルにするため撤回。
   // 代わりに「ホーム画面に追加 → アイコンから開く → その場で招待コードを入力する」
   // 流れに統一し、保存領域(localStorage)のズレ問題自体を回避する設計にした。
 
-  // ロック画面からの手動コード入力用（bodyのフォームから呼ばれる）
+  // ロック画面からの手動コード入力用(bodyのフォームから呼ばれる)
   window.__enverlyGate = {
     tryUnlockWithCode: function (code) {
       var trimmed = (code || '').trim();
@@ -273,7 +273,6 @@
 </script>
 </head>
 <body>
-
 <!-- ========================
      LINE等アプリ内ブラウザ警告バナー
      （ホーム画面に追加できない・ストレージが別扱いになるため、最優先で表示）
@@ -593,7 +592,6 @@
     </div><!-- /weekly-mission-wrap -->
       </div><!-- /journey-full (morning) -->
     </div><!-- /journey-block jblock-morning -->
-
     <!-- ② Evening Talk（帰宅後の一言＋Did you know?） -->
     <div class="journey-block" id="jblock-evening" data-slot="evening">
       <div class="journey-full">
@@ -804,8 +802,16 @@
         <div class="monthly-playlist-label">Monthly Playlist <span class="monthly-playlist-label-ja">今月のテーマに合わせた曲</span></div>
         <div class="monthly-playlist-line"></div>
       </div>
-      <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップでYouTubeが開きます。かけ流しはスピーカーから流すのがおすすめ。</p>
+      <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">タップするとそのまま再生されます。YouTubeの曲は終わると自動で次の曲に進みます。</p>
       <div id="monthlyPlaylist"></div>
+      <div class="yt-player-panel" id="ytPlayerPanel">
+        <div class="yt-player-frame" id="ytPlayerHost"></div>
+        <div class="yt-player-meta">
+          <div class="yt-player-title" id="ytPlayerTitle"></div>
+          <div class="yt-player-sub" id="ytPlayerSub"></div>
+        </div>
+        <button class="yt-player-close" onclick="closeYtPlayer()">✕ とじる</button>
+      </div>
     </div>
 
 
@@ -916,7 +922,6 @@
 
     <div style="height:24px;"></div>
   </div>
-
   <!-- しるタブ -->
   <div id="tab-shiru" style="display:none;">
     <div class="shiru-hero">
@@ -1242,7 +1247,6 @@ function handleGateSubmit() {
 
   playStep(0);
 })();
-
 // ========================
 // グローバル音声マネージャー
 // ========================
@@ -1256,6 +1260,7 @@ function registerAudio(el) {
         try { other.pause(); } catch (e) {}
       }
     });
+    pauseYtPlayer();
   });
 }
 registerAudio(document.getElementById('asoboTimerBgm'));
@@ -1763,7 +1768,6 @@ async function toggleDailyNotification() {
     switchEl.classList.remove('pending');
   }
 }
-
 // ========================
 // Monthly Playlist カルーセル
 // ========================
@@ -1800,7 +1804,7 @@ function renderMonthlyPlaylist() {
                 <div class="carousel-card-age">${s.age}</div>
                 <div class="carousel-card-sub">${s.sub}</div>
                 <div class="carousel-card-yt">
-                  <span>▶</span>見る
+                  <span>▶</span>再生
                 </div>
               </div>
             `}
@@ -1827,7 +1831,10 @@ function handleCarouselCardTap(idx) {
     toggleMonthlyAudio(idx);
     return;
   }
-  if (item.ytUrl) window.open(item.ytUrl, '_blank', 'noopener');
+  if (item.type === 'youtube') {
+    playYtQueueIndex(idx);
+    return;
+  }
 }
 
 const monthlyPlaylistAudioEl = new Audio();
@@ -1874,6 +1881,92 @@ monthlyPlaylistAudioEl.addEventListener('ended', () => {
   if (monthlyPlayingIndex !== null) setMonthlyCardPlayingUI(monthlyPlayingIndex, false);
   monthlyPlayingIndex = null;
 });
+
+// ========================
+// Monthly Playlist：YouTube曲の自前キュー自動送り（IFrame Player API）
+// 自前音源3曲（mp3）とは完全に分離。YouTubeの3曲だけが対象。
+// 終了時に関連動画のサジェストが一瞬映る可能性は許容した上で、こちらの制御で次の曲へ進める。
+// ========================
+let ytPlayer = null;
+let ytApiLoading = false;
+let ytApiReady = false;
+let ytCurrentPlaylistIndex = null;
+
+function getYtQueueIndices() {
+  return MONTH_PLAYLIST.reduce((arr, item, i) => { if (item.type === 'youtube') arr.push(i); return arr; }, []);
+}
+
+function pauseYtPlayer() {
+  try { if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo(); } catch (e) {}
+}
+
+function loadYtApiIfNeeded(onReady) {
+  if (ytApiReady && window.YT && window.YT.Player) { onReady(); return; }
+  const prevReady = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function () {
+    ytApiReady = true;
+    if (typeof prevReady === 'function') { try { prevReady(); } catch (e) {} }
+    onReady();
+  };
+  if (ytApiLoading) return;
+  ytApiLoading = true;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+function playYtQueueIndex(idx) {
+  const item = MONTH_PLAYLIST[idx];
+  if (!item || item.type !== 'youtube') return;
+
+  AUDIO_REGISTRY.forEach(el => { if (!el.paused) { try { el.pause(); } catch (e) {} } });
+
+  ytCurrentPlaylistIndex = idx;
+  const titleEl = document.getElementById('ytPlayerTitle');
+  const subEl = document.getElementById('ytPlayerSub');
+  if (titleEl) titleEl.textContent = item.title;
+  if (subEl) subEl.textContent = item.sub || '';
+  const panel = document.getElementById('ytPlayerPanel');
+  if (panel) panel.classList.add('show');
+
+  loadYtApiIfNeeded(() => {
+    if (ytCurrentPlaylistIndex !== idx) return;
+    if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+      ytPlayer.loadVideoById(item.videoId);
+    } else {
+      ytPlayer = new YT.Player('ytPlayerHost', {
+        videoId: item.videoId,
+        playerVars: { rel: 0, playsinline: 1, autoplay: 1 },
+        events: { onStateChange: onYtPlayerStateChange },
+      });
+    }
+  });
+
+  goCarousel(idx);
+  if (panel && typeof panel.scrollIntoView === 'function') {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function onYtPlayerStateChange(e) {
+  if (window.YT && e.data === YT.PlayerState.ENDED) {
+    advanceYtQueue();
+  }
+}
+
+function advanceYtQueue() {
+  const queue = getYtQueueIndices();
+  const pos = queue.indexOf(ytCurrentPlaylistIndex);
+  if (pos === -1 || pos === queue.length - 1) return;
+  playYtQueueIndex(queue[pos + 1]);
+}
+
+function closeYtPlayer() {
+  pauseYtPlayer();
+  const panel = document.getElementById('ytPlayerPanel');
+  if (panel) panel.classList.remove('show');
+  ytCurrentPlaylistIndex = null;
+}
 
 function initCarousel() {
   const outer = document.getElementById('carouselOuter');
@@ -2079,8 +2172,6 @@ function closeSettingsModal() {
 function logoutEnverly() {
   alert('ログアウト機能は認証実装後に接続予定です');
 }
-
-
 // ========================
 // あそぼタブ
 // ========================
@@ -2396,7 +2487,6 @@ function toggleLyrics() {
   const o = b.classList.toggle('open');
   c.style.transform = o ? 'rotate(180deg)' : 'rotate(0deg)';
 }
-
 // ========================
 // Family Talk（ポッドキャスト＝Morning Talk）
 // ========================
@@ -2729,7 +2819,6 @@ function getTodayMorningTalkInfo() {
   const isPreLaunch = now < w1Start;
   return { now, dayKey, weekKey, isNew, isWeekend, isPreLaunch, content, audioKey };
 }
-
 function renderMorningTalkContent() {
   const info = getTodayMorningTalkInfo();
   setTalkDateHead('ft', info.now, info.dayKey, info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
@@ -3255,7 +3344,6 @@ function returnToTodayMorningTalk() {
 
 renderFtWave();
 initFtAudio();
-
 // ========================
 // Evening Talk（帰宅後の一言＋Did you know?）
 // ========================
@@ -3667,7 +3755,6 @@ function toggleEtPhrases() {
 renderEtWave();
 initEtAudio();
 renderJourneyNowPlaying();
-
 // ========================
 // Active Time（探し物ミッション／なぞなぞクイズ）
 // ========================
@@ -3895,7 +3982,6 @@ function playRoutineScene(btn, src) {
 }
 
 renderRoutineCatGrid();
-
 // ========================
 // しる：Jayの発見（Animal / Food / 天気）本のUI
 // ========================
@@ -4246,7 +4332,6 @@ function renderBookLevelToggles() {
   });
 }
 renderBookLevelToggles();
-
 const bvAudioEl = new Audio();
 registerAudio(bvAudioEl);
 function bvPlayAudio(src, onEnded) {
