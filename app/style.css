@@ -20,8 +20,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .journey-eyebrow { font-size: 11px; font-weight: 600; color: #9CA3AF; margin-bottom: 8px; letter-spacing: 0.02em; }
 
-/* Now Playing型：大きく見せるカード＝時間帯でMorning/Evening自動交代、タップで手動スワップも可
-   左に素材（右端だけ丸くカット）、右にMorning talk(大見出し)/朝のひとときに(小見出し)/タイトル(実データ) */
+/* Now Playing型:大きく見せるカード＝時間帯でMorning/Evening自動交代、タップで手動スワップも可
+   左に素材(右端だけ丸くカット)、右にMorning talk(大見出し)/朝のひとときに(小見出し)/タイトル(実データ) */
 .journey-now-big {
   position: relative; display: flex; align-items: stretch;
   border-radius: 18px; border: 1.5px solid #6AA17F; background: #fff;
@@ -49,12 +49,12 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .journey-now-small .journey-now-sub { font-size: 8px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .journey-now-small .journey-now-title { font-size: 11px; margin-top: 5px; -webkit-line-clamp: 2; }
 
-/* Morning/Evening：手動フォーカスされていない方はページ上から完全非表示（下に重複ミニカードを残さない） */
+/* Morning/Evening:手動フォーカスされていない方はページ上から完全非表示(下に重複ミニカードを残さない) */
 .journey-block .journey-full { display: block; }
 .journey-block.collapsed { display: none; }
-/* えほんタイムだけはこの仕組みの対象外＝常に展開（collapsedクラス自体を付与しない） */
+/* えほんタイムだけはこの仕組みの対象外＝常に展開(collapsedクラス自体を付与しない) */
 
-/* Jayのひとこと（タブバー直下・きょうのとびら直上） */
+/* Jayのひとこと(タブバー直下・きょうのとびら直上) */
 .joel-line-wrap { display: flex; align-items: flex-start; gap: 8px; margin: 14px 20px 12px 34px; }
 .joel-line-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1px solid #BBDAC8; margin-top: 4px; }
 .joel-line-bubble {
@@ -82,14 +82,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .joel-line-text .en { font-weight: 600; color: #6B8577; display: block; margin-bottom: 1px; }
 .joel-line-text .ja { font-size: 9.5px; color: #C2C7CC; }
 
-/* Jayが選んだ言葉（キュレーション名言バリエーション） */
+/* Jayが選んだ言葉(キュレーション名言バリエーション) */
 .joel-line-bubble.is-quote { border-left: 3px solid #6AA17F; padding-left: 11px; }
 .joel-line-eyebrow { font-size: 8px; font-weight: 700; color: #6AA17F; letter-spacing: 0.03em; margin-bottom: 3px; }
 .joel-line-bubble.is-quote .joel-line-text .en { font-style: italic; }
 .joel-line-text .author { display: block; font-size: 8.5px; color: #B7BDC4; margin-top: 3px; text-align: right; }
 
-/* 週間スタンプカード（紙のスタンプカード風・きょうのとびら直下） */
-/* スタンプカード：設定＞あゆみ内に常設表示する「今のカード」 */
+/* 週間スタンプカード(紙のスタンプカード風・きょうのとびら直下) */
+/* スタンプカード:設定＞あゆみ内に常設表示する「今のカード」 */
 .stamp-card-caption { font-size: 11.5px; font-weight: 700; color: #6B7280; margin: 4px 0 8px; }
 .stamp-card-slots-wrap {
   background-color: #F3ECDD;
@@ -118,7 +118,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 @keyframes stampCardPop { 0% { transform: scale(0); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
 .stamp-card-footer { text-align: center; font-size: 10.5px; color: #8A9A8F; margin-top: 10px; letter-spacing: 0.01em; }
 
-/* スタンプ獲得の瞬間だけ、今いる場所の近くにポンと出て消えるトースト（ご褒美感の主役はこちら） */
+/* スタンプ獲得の瞬間だけ、今いる場所の近くにポンと出て消えるトースト(ご褒美感の主役はこちら) */
 .stamp-toast {
   position: fixed;
   left: 50%;
@@ -162,7 +162,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .stamp-celebrate-sub { font-size: 12px; color: #6B7280; line-height: 1.6; margin-bottom: 18px; }
 .stamp-celebrate-btn { background: #2D6A4F; color: #fff; border: none; border-radius: 12px; padding: 10px 16px; font-size: 12.5px; font-weight: 700; flex: 1; white-space: nowrap; }
 
-/* Weekly Pickを独立セクション化（旧：Weekly Mission内ネスト） */
+/* Weekly Pickを独立セクション化(旧:Weekly Mission内ネスト) */
 .weekly-pick-standalone { margin: 16px 20px 0; background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 20px; padding: 18px 16px 20px; }
 .weekly-pick-standalone .weekly-pick-block { margin-top: 0; padding-top: 0; border-top: none; }
 
@@ -227,7 +227,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #F3F4F6; border: none; color: #6B7280; font-size: 12.5px; font-weight: 600; cursor: pointer;
 }
 
-/* タブ（Option A：塗りつぶしピル / セグメントコントロール） */
+/* タブ(Option A:塗りつぶしピル / セグメントコントロール) */
 .tab-bar { display: flex; gap: 3px; margin: 14px 20px 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
 .tab { flex: 1; text-align: center; padding: 9px 2px; font-size: 11.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-radius: 10px; transition: background .2s ease, color .2s ease, box-shadow .2s ease; white-space: nowrap; }
 .tab.active { background: #6DB88A; color: #fff; box-shadow: 0 2px 6px rgba(109,184,138,0.35); }
@@ -248,7 +248,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .content-block + .content-block { margin-top: 12px; }
 
 /* ==============================
-   今月の教材絵本（スタンドアロン・最上位ヒーロー）
+   今月の教材絵本(スタンドアロン・最上位ヒーロー)
 ============================== */
 .month-hero-section { margin: 20px 20px 0; }
 .month-hero-section .month-lesson-wrap { margin: 0; }
@@ -263,10 +263,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
    Weekly Mission パネル
 ============================== */
 /* ==============================
-   Weekly Mission ラッパー＋見出し（絵本セクションと同じ構造）
+   Weekly Mission ラッパー＋見出し(絵本セクションと同じ構造)
 ============================== */
 .weekly-mission-wrap { margin: 16px 20px 0; }
-/* パネル本体（絵本の month-lesson-card に相当） */
+/* パネル本体(絵本の month-lesson-card に相当) */
 .weekly-mission-panel {
   background: #F5FAF7;
   border: 1px solid #BBDAC8;
@@ -275,7 +275,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   overflow: hidden;
   margin: 0;
 }
-/* ヒーロー画像（絵本の month-lesson-card-hero に相当） */
+/* ヒーロー画像(絵本の month-lesson-card-hero に相当) */
 .weekly-mission-hero { position: relative; height: 260px; overflow: hidden; }
 .weekly-mission-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 54%; display: block; }
 .weekly-mission-hero::after {
@@ -294,18 +294,18 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-mission-panel .at-eyebrow-line { background: rgba(45,106,79,0.18); }
 .weekly-mission-panel .ft-card { box-shadow: 0 6px 18px rgba(45,106,79,0.10); }
 .weekly-mission-panel p { color: #4D7D63 !important; }
-/* standalone文脈（Evening TalkのようにWeekly Missionパネルの外＝白背景のft-wrap内）ではヒーロー下部のフェードを白に合わせる */
+/* standalone文脈(Evening TalkのようにWeekly Missionパネルの外＝白背景のft-wrap内)ではヒーロー下部のフェードを白に合わせる */
 .talk-hero.standalone::after {
   background: linear-gradient(to bottom, transparent 60%, rgba(255,255,255,0.6) 82%, rgba(255,255,255,1.0) 100%);
 }
 
-/* Weekly Pick ブロック（Weekly Mission内） */
+/* Weekly Pick ブロック(Weekly Mission内) */
 .weekly-pick-block { margin-top: 22px; padding-top: 20px; border-top: 1px solid #BBDAC8; }
 
 /* ==============================
-   Talk見出し（Morning talk / Evening talk 共通・たたき台デザイン）
-   バナー：逆三角形2枚（各90%不透明度）を重ねてヒーロー画像上に配置。重なった部分が濃くなる
-   日付バッジ：丸2つを重ねたコイン風バッジ（月の小円＋日付の大円）
+   Talk見出し(Morning talk / Evening talk 共通・たたき台デザイン)
+   バナー:逆三角形2枚(各90%不透明度)を重ねてヒーロー画像上に配置。重なった部分が濃くなる
+   日付バッジ:丸2つを重ねたコイン風バッジ(月の小円＋日付の大円)
 ============================== */
 .talk-hero-banner { position: absolute; top: 0; left: 0; width: 100%; height: 54%; z-index: 2; overflow: visible; }
 .talk-hero-tri {
@@ -345,7 +345,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 
 /* ==============================
-   Monthly Playlist セクション（独立）
+   Monthly Playlist セクション(独立)
 ============================== */
 .monthly-playlist-section { margin: 14px 20px 0; }
 .monthly-playlist-eyebrow {
@@ -368,7 +368,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-lesson-card-hero { position: relative; height: 220px; overflow: hidden; }
 .month-lesson-card-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; display: block; }
 .month-lesson-card-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(109,184,138,0.0) 0%, rgba(109,184,138,0.0) 50%, rgba(109,184,138,0.7) 85%, rgba(109,184,138,1.0) 100%); }
-/* hero上部オーバーレイ：Jayラベル */
+/* hero上部オーバーレイ:Jayラベル */
 .month-hero-overlay { position: absolute; top: 16px; left: 16px; right: 0; z-index: 2; text-align: left; pointer-events: none; }
 .month-hero-label { display: inline-block; background: rgba(61,120,82,0.25); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 5px 16px; font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: 0.2px; white-space: nowrap; }
 .month-lesson-top { padding: 16px 20px 0; position: relative; z-index: 1; }
@@ -403,7 +403,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-tip-num { width: 18px; height: 18px; border-radius: 50%; background: rgba(159,225,203,0.25); color: #BBDAC8; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
 
 /* ==============================
-   Active Time（ホーム非表示・あそぼタブのみ／スタイル定義は流用）
+   Active Time(ホーム非表示・あそぼタブのみ／スタイル定義は流用)
 ============================== */
 .at-wrap { margin: 22px 20px 0; }
 .at-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
@@ -454,7 +454,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .at-done-btn.done { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
 
 /* ==============================
-   Family Talk（ポッドキャスト・プレミアム限定）
+   Family Talk(ポッドキャスト・プレミアム限定)
 ============================== */
 .ft-wrap {
   margin: 22px 20px 0;
@@ -475,7 +475,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-question { font-size: 16px; font-weight: 600; color: #1A4232; line-height: 1.45; margin-bottom: 4px; }
 .ft-question-ja { font-size: 11px; color: #6B8577; margin-bottom: 16px; }
 
-/* 話者アバター＋吹き出し（掛け合いUI・口パク・トーク系プロファイル） */
+/* 話者アバター＋吹き出し(掛け合いUI・口パク・トーク系プロファイル) */
 .ft-dialogue { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
 .ft-avatar {
   width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
@@ -552,7 +552,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   transition: background 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease, transform 0.35s ease;
 }
 .ft-phrase-row:first-child { border-top: none; }
-/* 再生中のフレーズだけ白く浮かせて視線を誘導（カラオケ演出／文字数比率で自動同期・完全な精度は狙わない） */
+/* 再生中のフレーズだけ白く浮かせて視線を誘導(カラオケ演出／文字数比率で自動同期・完全な精度は狙わない) */
 .ft-phrase-row.active {
   background: #ffffff; box-shadow: 0 2px 8px rgba(45,106,79,0.14);
   border-top-color: transparent; transform: scale(1.02);
@@ -574,7 +574,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-phrase-en { font-weight: 600; color: #1A4232; }
 .ft-phrase-ja { color: #6B8577; font-size: 11px; }
 
-/* エピソード一覧（今週分） */
+/* エピソード一覧(今週分) */
 .ft-ep-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .ft-ep-item {
   display: flex; align-items: center; gap: 12px;
@@ -612,7 +612,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 
 /* ==============================
-   放送アーカイブモーダル（明るいトーン）
+   放送アーカイブモーダル(明るいトーン)
 ============================== */
 .archive-modal {
   position: fixed; inset: 0; z-index: 260;
@@ -655,7 +655,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .archive-best-q { font-size: 12px; font-weight: 600; color: #111827; line-height: 1.4; margin-bottom: 6px; }
 .archive-best-meta { font-size: 10px; color: #B8860B; font-weight: 600; }
 
-/* 全エピソード（月別グルーピング） */
+/* 全エピソード(月別グルーピング) */
 .archive-month-group { margin-bottom: 22px; }
 .archive-month-title { font-size: 12px; font-weight: 700; color: #6B7280; margin-bottom: 10px; }
 .archive-ep-row {
@@ -668,7 +668,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .archive-ep-q { flex: 1; font-size: 12px; color: #111827; min-width: 0; }
 .archive-ep-play { width: 26px; height: 26px; border-radius: 50%; background: #FFF6E5; color: #B8860B; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; cursor: pointer; }
 
-/* フリープラン：ロック状態 */
+/* フリープラン:ロック状態 */
 .ft-locked-overlay {
   position: absolute; inset: 0; z-index: 2;
   background: linear-gradient(to bottom, rgba(42,38,64,0) 0%, rgba(42,38,64,0.75) 55%, rgba(42,38,64,0.97) 100%);
@@ -705,7 +705,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   cursor: pointer;
 }
 
-/* 絵本レベル切り替え（とどらー/きんだー） */
+/* 絵本レベル切り替え(とどらー/きんだー) */
 .book-level-toggle { display: none; gap: 4px; }
 .book-level-pill {
   font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: 20px;
@@ -731,7 +731,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   object-fit: contain; display: block;
   user-select: none; -webkit-user-drag: none;
 }
-/* 左右ナビ（画像の高さに合わせて動的に調整・タップ領域は左右半分ずつ） */
+/* 左右ナビ(画像の高さに合わせて動的に調整・タップ領域は左右半分ずつ) */
 .bv-nav {
   position: absolute; top: 0; bottom: 0;
   width: 50%; border-radius: 0;
@@ -759,7 +759,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .bv-dot.active { background: #6DB88A; width: 16px; border-radius: 3px; }
 
-/* モードバー（Let's read / Let's talk） */
+/* モードバー(Let's read / Let's talk) */
 .bv-mode-bar {
   padding: 10px 16px 16px; flex-shrink: 0;
   background: rgba(0,0,0,0.6);
@@ -818,7 +818,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-book-overlay { position: absolute; bottom: 12px; left: 14px; right: 14px; z-index: 1; }
 .weekly-book-overlay-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
 .weekly-book-overlay-author { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
-/* Weekly Pick 控えめ表示（サムネイル縮小版） */
+/* Weekly Pick 控えめ表示(サムネイル縮小版) */
 .weekly-pick-compact { display: flex; align-items: center; gap: 12px; padding: 12px; }
 .weekly-pick-thumb { position: relative; width: 56px; height: 56px; flex-shrink: 0; border-radius: 10px; overflow: hidden; background: #EDF6F1; }
 .weekly-pick-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
@@ -836,7 +836,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .wbl-icon.red { background: #FDE8E8; }
 .wbl-icon.rose { background: #FCEEF0; }
 
-/* 毎日の通知トグル（設定＞アカウント） */
+/* 毎日の通知トグル(設定＞アカウント) */
 .notify-switch { position: relative; width: 40px; height: 23px; border-radius: 12px; background: #E0E0E0; flex-shrink: 0; transition: background 0.2s; }
 .notify-switch-knob { position: absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: left 0.2s; }
 .notify-switch.on { background: #6AA17F; }
@@ -857,7 +857,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-why-body { display: none; padding: 14px 16px; border-top: 0.5px solid #E5E7EB; font-size: 12px; color: #374151; line-height: 1.75; background: white; }
 .weekly-why-body.open { display: block; }
 
-/* 童謡の歌詞（アプリ内ネイティブ表示） */
+/* 童謡の歌詞(アプリ内ネイティブ表示) */
 .weekly-lyrics-body { display: none; background: #F0F5F2; border: 0.5px solid #BBDAC8; border-radius: 10px; padding: 16px 18px; margin-top: 8px; text-align: center; }
 .weekly-lyrics-body.open { display: block; }
 .lyrics-line-group { margin-bottom: 14px; }
@@ -866,7 +866,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .lyrics-kana { font-size: 11px; color: #6DB88A; margin-top: 2px; }
 .lyrics-ja { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
 
-/* 耳コピカナ：強勢＝大きく/太く、弱化・連結する音＝小さく詰めて表記 */
+/* 耳コピカナ:強勢＝大きく/太く、弱化・連結する音＝小さく詰めて表記 */
 .kana-phrase-group { margin-bottom: 16px; }
 .kana-phrase-group:last-child { margin-bottom: 0; }
 .kana-phrase-en { font-size: 13px; font-weight: 600; color: #1F2937; line-height: 1.4; }
@@ -876,7 +876,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .kana-phrase-ja { font-size: 11px; color: #9CA3AF; margin-top: 4px; }
 
 /* ==============================
-   今週やることパネル（Weekly Pick + Monthly Playlist を包む）
+   今週やることパネル(Weekly Pick + Monthly Playlist を包む)
 ============================== */
 .weekly-todo-panel {
   margin: 18px 20px 0;
@@ -894,7 +894,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-todo-eyebrow-line { flex: 1; height: 1px; background: #F0E6D2; }
 .weekly-todo-block + .weekly-todo-block { margin-top: 20px; }
 
-/* パネル内カードのシャドウ・サイズ（メインゾーンより控えめ） */
+/* パネル内カードのシャドウ・サイズ(メインゾーンより控えめ) */
 .weekly-todo-panel .content-block {
   box-shadow: 0 2px 8px rgba(120,90,30,0.05);
   border: 1px solid #F0E6D2;
@@ -902,7 +902,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .weekly-todo-panel .weekly-book-cover-wrap { height: 170px; }
 
 /* ==============================
-   Monthly Playlist（今月テーマ固定・コンパクト縦カード）
+   Monthly Playlist(今月テーマ固定・コンパクト縦カード)
 ============================== */
 .mp-list { display: flex; flex-direction: column; gap: 10px; }
 .mp-card {
@@ -1016,7 +1016,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .carousel-card-yt:hover { background: #F9FAFB; }
 .carousel-card-yt span { color: #E24B4A; font-size: 10px; }
 
-/* Monthly Playlist内の自前音源カード（Morning Talk使用曲） */
+/* Monthly Playlist内の自前音源カード(Morning Talk使用曲) */
 .audio-thumb {
   display: flex; align-items: center; justify-content: center;
 }
@@ -1045,6 +1045,38 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .carousel-dot.active {
   background: #6DB88A; width: 20px; border-radius: 3px;
 }
+
+/* Monthly Playlist:YouTube曲の自前キュー再生パネル(IFrame Player API) */
+.yt-player-panel {
+  display: none;
+  margin: 16px 20px 0;
+  background: #111827;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+}
+.yt-player-panel.show { display: block; }
+.yt-player-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.yt-player-frame iframe,
+.yt-player-frame > div {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+.yt-player-meta { padding: 10px 14px 8px; }
+.yt-player-title { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.4; }
+.yt-player-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 3px; line-height: 1.5; }
+.yt-player-close {
+  width: 100%; padding: 11px 0; margin-top: 4px;
+  background: #1F2937; color: rgba(255,255,255,0.75); border: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.yt-player-close:hover { background: #26324a; }
 
 /* ==============================
    今週 & 音楽タブ共通プレイリスト
@@ -1122,7 +1154,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-hero-title { font-size: 17px; font-weight: 700; color: #111827; margin-top: 4px; }
 .shiru-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-top: 6px; }
 
-/* しる：カテゴリーカード（本の表紙風。ヴィンテージトーン、布装丁の背表紙＋金の飾り罫＋しおり） */
+/* しる:カテゴリーカード(本の表紙風。ヴィンテージトーン、布装丁の背表紙＋金の飾り罫＋しおり) */
 .shiru-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 20px 0; }
 .shiru-cat-card {
   background: #F7F2E4; border-radius: 4px 12px 12px 4px; padding: 0; cursor: pointer;
@@ -1154,7 +1186,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-cat-title { font-size: 13px; font-weight: 700; color: #3E2F1C; margin-bottom: 2px; font-family: Georgia, serif; }
 .shiru-cat-sub { font-size: 10px; color: #9C8E6E; margin-bottom: 8px; }
 .shiru-cat-count { font-size: 10px; color: #7A6B4D; display: flex; align-items: center; gap: 4px; }
-/* 予告カード（4枠目・空枚）：グレーアウトでタップ不可、期待値だけ軽く匂わせる */
+/* 予告カード(4枠目・空枚):グレーアウトでタップ不可、期待値だけ軽く匂わせる */
 .shiru-cat-card.soon { cursor: default; background: #EAE3CE; box-shadow: none; }
 .shiru-cat-card.soon:active { transform: none; box-shadow: none; }
 .shiru-cat-card.soon .shiru-cat-spine { background: repeating-linear-gradient(135deg,#B5AA8A 0 6px,#A89C7C 6px 12px); }
@@ -1166,7 +1198,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-cat-card.soon .shiru-cat-title { color: #8C8368; }
 .shiru-cat-card.soon .shiru-cat-sub { color: #A89C7C; }
 
-/* しる：本モーダル（表紙タップ後にリフルして開く本。もくじ→トピックグリッドの2段構成） */
+/* しる:本モーダル(表紙タップ後にリフルして開く本。もくじ→トピックグリッドの2段構成) */
 .shiru-book-modal {
   position: fixed; inset: 0; z-index: 265; background: #EFE9D8;
   display: none; flex-direction: column; max-width: 390px; margin: 0 auto;
@@ -1249,8 +1281,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 10px; color: #8C8368; text-align: center; margin-top: 12px; line-height: 1.6;
 }
 
-/* しる：カードめくり後に英語・日本語の文章を表示（音声だけだと英語が読めない親には内容が分からないため）
-   モノクロ→イラスト表示のフィルム切り替え（0.4s）が終わってから、少し遅れてテキストをフェードインさせる */
+/* しる:カードめくり後に英語・日本語の文章を表示(音声だけだと英語が読めない親には内容が分からないため)
+   モノクロ→イラスト表示のフィルム切り替え(0.4s)が終わってから、少し遅れてテキストをフェードインさせる */
 .shiru-fact-card-text {
   position: absolute; left: 0; right: 0; bottom: 0;
   background: linear-gradient(to top, rgba(20,30,24,0.82) 0%, rgba(20,30,24,0.55) 65%, rgba(20,30,24,0) 100%);
@@ -1270,7 +1302,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-fact-card-text-en { color: #fff; font-size: 12px; font-weight: 700; line-height: 1.45; }
 .shiru-fact-card-text-ja { color: #D9EFE2; font-size: 11px; line-height: 1.5; margin-top: 3px; }
 
-/* しる：アーカイブモーダル（ルーティンモーダルと共通クラスを流用しつつ専用要素だけ追加） */
+/* しる:アーカイブモーダル(ルーティンモーダルと共通クラスを流用しつつ専用要素だけ追加) */
 .shiru-entry-card { background: #F9FAFB; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
 .shiru-entry-date { font-size: 10px; color: #9CA3AF; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 .shiru-entry-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
@@ -1282,7 +1314,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-entry-title { font-size: 14px; color: #111827; line-height: 1.4; }
 .shiru-entry-ja { font-size: 11px; color: #9CA3AF; padding-left: 42px; line-height: 1.6; }
 
-/* セクション見出し（1・2の縦並び） */
+/* セクション見出し(1・2の縦並び) */
 .asobo-section { padding: 0 20px 20px; }
 
 .asobo-coming-soon, .coming-soon-panel {
@@ -1311,7 +1343,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .asobo-section-title svg { width: 16px; height: 16px; margin-right: 5px; vertical-align: -3px; }
 .asobo-section-illust { width: 100%; border-radius: 16px; margin-bottom: 14px; display: block; }
 
-/* ガチャボタン（強調） */
+/* ガチャボタン(強調) */
 .asobo-gacha-wrap { margin-bottom: 12px; }
 .asobo-gacha-btn {
   width: 100%; border: none; border-radius: 16px;
@@ -1329,7 +1361,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   50% { box-shadow: 0 4px 20px rgba(232,163,61,0.6); }
 }
 
-/* ガチャ結果：アコーディオン */
+/* ガチャ結果:アコーディオン */
 .asobo-gacha-result { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; margin-bottom: 12px; }
 .asobo-gacha-result.show { grid-template-rows: 1fr; }
 .asobo-gacha-result-inner { overflow: hidden; min-height: 0; }
@@ -1355,7 +1387,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .asobo-joel-line.show { display: flex; }
 .asobo-joel-line img { width: 16px; height: 16px; }
 
-/* 軸フレーム（アコーディオン） */
+/* 軸フレーム(アコーディオン) */
 .asobo-axis-list { display: flex; flex-direction: column; gap: 10px; }
 .asobo-axis-frame { border-radius: 14px; overflow: hidden; transition: box-shadow 0.15s; }
 .asobo-axis-frame-head {
@@ -1371,7 +1403,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .asobo-axis-frame.open .asobo-axis-body-wrap { grid-template-rows: 1fr; }
 .asobo-axis-body { overflow: hidden; min-height: 0; }
 .asobo-axis-body-inner { padding: 0 13px 13px; display: flex; flex-direction: column; gap: 8px; }
-/* 配色：セージ＋ゴールドの濃淡のみ（既存hex流用） */
+/* 配色:セージ＋ゴールドの濃淡のみ(既存hex流用) */
 .asobo-axis-frame.tile-color { background: #FFF6E5; color: #B8680B; }
 .asobo-axis-frame.tile-count { background: #EDF6F1; color: #2D6A4F; }
 .asobo-axis-frame.tile-sound { background: #F0E6D2; color: #B8680B; }
@@ -1408,7 +1440,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .at-archive-axis svg { width: 10px; height: 10px; }
 
-/* なぞなぞ：今日の1問ガチャ＋フリップ式 */
+/* なぞなぞ:今日の1問ガチャ＋フリップ式 */
 .asobo-riddle-result { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease; }
 .asobo-riddle-result.show { grid-template-rows: 1fr; }
 .asobo-riddle-result-inner { overflow: hidden; min-height: 0; padding-top: 2px; }
@@ -1453,7 +1485,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .sub-text-sub { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.5; }
 .sub-btn { font-size: 11px; font-weight: 500; background: white; color: #4D7D63; border: none; border-radius: 8px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
 
-/* ルーティン：カテゴリーカード */
+/* ルーティン:カテゴリーカード */
 .routine-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .routine-cat-card {
   background: #F9FAFB; border-radius: 14px; padding: 0; cursor: pointer;
@@ -1470,7 +1502,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .routine-cat-sub { font-size: 10px; color: #9CA3AF; margin-bottom: 8px; }
 .routine-cat-count { font-size: 10px; color: #6B7280; display: flex; align-items: center; gap: 4px; }
 
-/* ルーティン：フレーズリストモーダル */
+/* ルーティン:フレーズリストモーダル */
 .routine-modal {
   position: fixed; inset: 0; z-index: 260;
   background: #FFFDF8;
@@ -1540,7 +1572,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .yt-cta span { font-size: 11px; }
 .yt-tip { display: flex; gap: 5px; font-size: 10.5px; color: #6B7280; margin-top: 8px; padding-top: 8px; border-top: 0.5px solid #E5E7EB; line-height: 1.6; }
 
-/* 「読もう」ボタン（メインカード） */
+/* 「読もう」ボタン(メインカード) */
 .month-read-btn {
   width: 100%; height: 60px; margin-top: 18px;
   background: #ffffff; border: 2.5px solid rgba(255,255,255,0.6); border-radius: 14px;
@@ -1561,7 +1593,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-read-btn-ja { font-size: 10px; font-weight: 500; opacity: 0.6; margin-top: 1px; }
 
 /* ==============================
-   絵本モーダル（フルスクリーン）
+   絵本モーダル(フルスクリーン)
 ============================== */
 .book-modal {
   position: fixed; inset: 0; z-index: 250;
@@ -1597,7 +1629,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .book-mode-tab:active { transform: scale(0.98); }
 .book-mode-tab-ja { font-size: 10px; font-weight: 500; opacity: 0.65; }
 
-/* Let's Study：いってみるオーバーレイ */
+/* Let's Study:いってみるオーバーレイ */
 .study-overlay {
   position: absolute; inset: 0; z-index: 5; border-radius: 14px;
   background: linear-gradient(160deg, #2D6A4F, #1D9E75);
@@ -1644,7 +1676,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.6);
 }
 
-/* 全フレーズ終了：言えたよボタン画面 */
+/* 全フレーズ終了:言えたよボタン画面 */
 .study-complete {
   position: absolute; inset: 0; z-index: 8; border-radius: 14px;
   background: rgba(15,74,62,0.97);
@@ -1729,7 +1761,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .book-page-dot.active { background: #BBDAC8; width: 16px; border-radius: 3px; }
 .book-page-count { font-size: 11px; color: rgba(255,255,255,0.45); min-width: 38px; text-align: right; flex-shrink: 0; }
 
-/* 下部固定プレイヤー（ポップアップ内） */
+/* 下部固定プレイヤー(ポップアップ内) */
 .book-modal-player {
   flex-shrink: 0; padding: 14px 20px 22px;
   background: rgba(0,0,0,0.18);
