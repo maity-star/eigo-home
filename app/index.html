@@ -3998,7 +3998,7 @@ const SHIRU_CATEGORIES = [
 
 const SHIRU_TOPICS = [
   {
-    id: 'duck', category: 'animal', titleEn: 'Duck', titleJa: 'アヒル', dateAdded: '2026-08-18',
+    id: 'duck', category: 'animal', titleEn: 'Duck', titleJa: 'アヒル', dateAdded: '2026-08-25',
     image: 'shiru_book/illustration/topics/duck/duck_cover.png',
     audio: 'shiru_book/audio/animal/duck.mp3',
     facts: [
@@ -4009,7 +4009,7 @@ const SHIRU_TOPICS = [
     ],
   },
   {
-    id: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-08-25',
+    iid: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-09-01',
     image: 'shiru_book/illustration/topics/turtle.png',
     audio: 'shiru_book/audio/animal/turtle.mp3',
     facts: [
@@ -4019,7 +4019,7 @@ const SHIRU_TOPICS = [
     ],
   },
   {
-    id: 'icecream', category: 'food', titleEn: 'Ice Cream', titleJa: 'アイスクリーム', dateAdded: '2026-08-20',
+     id: 'icecream', category: 'food', titleEn: 'Ice Cream', titleJa: 'アイスクリーム', dateAdded: '2026-08-27',
     image: 'shiru_book/illustration/topics/icecream.png',
     audio: 'shiru_book/audio/food/icecream.mp3',
     facts: [
@@ -4038,10 +4038,14 @@ function getTodayShiruDateKey() {
   return `${y}-${m}-${d}`;
 }
 
-function getShiruTopicsByCategory(catId) {
-  return SHIRU_TOPICS.filter(t => t.category === catId).sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
+function isShiruTopicReleased(topic) {
+  return topic.dateAdded <= getTodayShiruDateKey();
 }
-
+function getShiruTopicsByCategory(catId) {
+  return SHIRU_TOPICS
+    .filter(t => t.category === catId && isShiruTopicReleased(t))
+    .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
+}
 const SHIRU_OPENED_KEY_PREFIX = 'enverly_shiru_opened_';
 function getShiruOpenedSet() {
   const key = SHIRU_OPENED_KEY_PREFIX + getTodayShiruDateKey();
@@ -4188,6 +4192,7 @@ function renderShiruToc(cat) {
 function openShiruTopic(topicId) {
   const topic = SHIRU_TOPICS.find(t => t.id === topicId);
   if (!topic) return;
+  if (!isShiruTopicReleased(topic)) return;
   shiruCurrentTopic = topic;
   markShiruOpened(topic.category + '_' + topic.id);
   const tocEl = document.getElementById('shiruTocScreen');
@@ -4208,14 +4213,22 @@ function renderShiruFactGrid(topic) {
   gridEl.innerHTML = topic.facts.map((f, i) => {
     const factKey = `${topic.id}_${i}`;
     const isRevealed = revealed.has(factKey);
+    const imgSrc = f.image || topic.image;
     return `
       <div class="shiru-fact-card ${isRevealed ? 'revealed' : ''}" data-fact-key="${factKey}" onclick="revealShiruFact('${topic.id}', ${i}, this)">
-        <img src="${f.image || topic.image}" alt="">
-        <div class="shiru-fact-card-play">▶</div>
-        <div class="shiru-fact-card-text">
-          <div class="shiru-fact-card-text-en">${f.en}</div>
-          <div class="shiru-fact-card-text-ja">${f.ja}</div>
+        <div class="shiru-fact-card-inner">
+          <div class="shiru-fact-card-face front">
+            <img src="${imgSrc}" alt="">
+          </div>
+          <div class="shiru-fact-card-face back">
+            <img src="${imgSrc}" alt="">
+            <div class="shiru-fact-card-text">
+              <div class="shiru-fact-card-text-en">${f.en}</div>
+              <div class="shiru-fact-card-text-ja">${f.ja}</div>
+            </div>
+          </div>
         </div>
+        <div class="shiru-fact-card-play">▶</div>
       </div>
     `;
   }).join('');
