@@ -1250,6 +1250,20 @@ function handleGateSubmit() {
 // ========================
 // グローバル音声マネージャー
 // ========================
+// ?previewdate=YYYY-MM-DD がURLに付いていたら、Morning Talk・Evening Talk・
+// しるタブすべてが「その日が今日である」という前提で表示される
+// （配信前日に、翌日どう見えるかをまとめて確認するためのプレビュー機能）
+function getEnverlyPreviewDate() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const preview = params.get('previewdate');
+    if (preview && /^\d{4}-\d{2}-\d{2}$/.test(preview)) {
+      return new Date(preview + 'T00:00:00');
+    }
+  } catch (e) {}
+  return null;
+}
+	
 const AUDIO_REGISTRY = [];
 function registerAudio(el) {
   if (!el || AUDIO_REGISTRY.includes(el)) return;
@@ -2791,7 +2805,8 @@ function dateForMorningTalkDay(weekKey, dayKey) {
 }
 
 function getTodayMorningTalkInfo() {
-  const now = new Date();
+  const previewDate = getEnverlyPreviewDate();
+  const now = previewDate || new Date();
   if (ftArchiveOverride) {
     const { weekKey, dayKey } = ftArchiveOverride;
     const content = MORNING_TALK_WEEKS[weekKey].days[dayKey];
@@ -2801,7 +2816,7 @@ function getTodayMorningTalkInfo() {
       isNew: false, isWeekend: false, isPreLaunch: false, content, audioKey, isArchive: true,
     };
   }
-  if (FAMILY_PREVIEW) {
+  if (!previewDate && FAMILY_PREVIEW) {
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
     const { weekKey, dayKey } = parsed;
     const content = MORNING_TALK_WEEKS[weekKey].days[dayKey];
@@ -3450,8 +3465,9 @@ function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
 }
 
 function getTodayEveningTalkInfo() {
-  const now = new Date();
-  if (FAMILY_PREVIEW) {
+  const previewDate = getEnverlyPreviewDate();
+  const now = previewDate || new Date();
+  if (!previewDate && FAMILY_PREVIEW) {
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
     const { weekKey, dayKey } = parsed;
     const weekData = EVENING_TALK_WEEKS[weekKey];
@@ -4031,7 +4047,7 @@ const SHIRU_TOPICS = [
 ];
 
 function getTodayShiruDateKey() {
-  const now = new Date();
+  const now = getEnverlyPreviewDate() || new Date();
   const y = now.getFullYear();
   const m = String(now.getMonth() + 1).padStart(2, '0');
   const d = String(now.getDate()).padStart(2, '0');
