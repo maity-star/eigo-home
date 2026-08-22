@@ -594,8 +594,16 @@ function getTodayShiruDateKey() {
   return `${y}-${m}-${d}`;
 }
 
+// 公開日ゲート:dateAddedが今日より先のトピックは、もくじにも詳細ページにも出さない
+// (文字列 'YYYY-MM-DD' 同士なので localeCompare で日付順に比較できる)
+function isShiruTopicReleased(topic) {
+  return topic.dateAdded <= getTodayShiruDateKey();
+}
+
 function getShiruTopicsByCategory(catId) {
-  return SHIRU_TOPICS.filter(t => t.category === catId).sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
+  return SHIRU_TOPICS
+    .filter(t => t.category === catId && isShiruTopicReleased(t))
+    .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded));
 }
 
 const SHIRU_OPENED_KEY_PREFIX = 'enverly_shiru_opened_';
@@ -744,6 +752,7 @@ function renderShiruToc(cat) {
 function openShiruTopic(topicId) {
   const topic = SHIRU_TOPICS.find(t => t.id === topicId);
   if (!topic) return;
+  if (!isShiruTopicReleased(topic)) return; // 公開日ゲート:直リンクや古いキャッシュ経由でも未公開トピックは開けない
   shiruCurrentTopic = topic;
   markShiruOpened(topic.category + '_' + topic.id);
   const tocEl = document.getElementById('shiruTocScreen');
