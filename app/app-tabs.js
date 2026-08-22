@@ -544,6 +544,8 @@ function playRoutineScene(btn, src) {
 // shiru_book/illustration/topics/{topicId}/{topicId}_cover.png（トピック表紙・カード用フォールバック）、
 // shiru_book/illustration/topics/{topicId}/{topicId}_1.png〜（各Did you know？のイラスト、factsの並び順と対応）。
 // カテゴリが増えても同じ規則で置ける。イラストが未整備のトピックはtopic.imageのみでOK（fact.imageは省略可、topic.imageにフォールバックする）。
+// 【配信スケジュール】しるタブは火・木の週2回更新。Week1(8/17〜)の月曜日は公開なし＝空。
+//   Week2火曜(8/25)にDuck、Week2木曜(8/27)にIce Cream、Week3火曜(9/1)にTurtleが配信される想定でdateAddedを設定している。
 const SHIRU_CATEGORIES = [
   { id: 'animal', title: 'Animal', sub: 'どうぶつ', image: 'shiru_book/illustration/covers/shiru_animal.png' },
   { id: 'food', title: 'Food', sub: 'たべもの', image: 'shiru_book/illustration/covers/shiru_food.png' },
@@ -552,7 +554,7 @@ const SHIRU_CATEGORIES = [
 
 const SHIRU_TOPICS = [
   {
-    id: 'duck', category: 'animal', titleEn: 'Duck', titleJa: 'アヒル', dateAdded: '2026-08-18',
+    id: 'duck', category: 'animal', titleEn: 'Duck', titleJa: 'アヒル', dateAdded: '2026-08-25',
     image: 'shiru_book/illustration/topics/duck/duck_cover.png',
     audio: 'shiru_book/audio/animal/duck.mp3',
     facts: [
@@ -563,7 +565,7 @@ const SHIRU_TOPICS = [
     ],
   },
   {
-    id: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-08-25',
+    id: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-09-01',
     image: 'shiru_book/illustration/topics/turtle.png',
     audio: 'shiru_book/audio/animal/turtle.mp3',
     facts: [
@@ -573,7 +575,7 @@ const SHIRU_TOPICS = [
     ],
   },
   {
-    id: 'icecream', category: 'food', titleEn: 'Ice Cream', titleJa: 'アイスクリーム', dateAdded: '2026-08-20',
+    id: 'icecream', category: 'food', titleEn: 'Ice Cream', titleJa: 'アイスクリーム', dateAdded: '2026-08-27',
     image: 'shiru_book/illustration/topics/icecream.png',
     audio: 'shiru_book/audio/food/icecream.mp3',
     facts: [
@@ -766,11 +768,15 @@ function renderShiruFactGrid(topic) {
     return `
       <div class="shiru-fact-card ${isRevealed ? 'revealed' : ''}" data-fact-key="${factKey}" onclick="revealShiruFact('${topic.id}', ${i}, this)">
         <div class="shiru-fact-card-inner">
-          <div class="shiru-fact-card-face shiru-fact-card-front">
+          <div class="shiru-fact-card-face front">
             <img src="${imgSrc}" alt="">
           </div>
-          <div class="shiru-fact-card-face shiru-fact-card-back">
+          <div class="shiru-fact-card-face back">
             <img src="${imgSrc}" alt="">
+            <div class="shiru-fact-card-text">
+              <div class="shiru-fact-card-text-en">${f.en}</div>
+              <div class="shiru-fact-card-text-ja">${f.ja}</div>
+            </div>
           </div>
         </div>
         <div class="shiru-fact-card-play">▶</div>
