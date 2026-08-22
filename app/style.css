@@ -1292,6 +1292,9 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
 .shiru-fact-card-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* 保険:app-tabs.jsが未更新でfront/backのラッパーが無いHTMLのままでも、
+   直下に<img>が来た場合はここでサイズを固定して巨大表示を防ぐ */
+.shiru-fact-card > img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* タップ前:形だけがうっすらわかるモノクロのシルエット表示 */
 .shiru-fact-card-face.front img { filter: grayscale(1) brightness(0) opacity(0.4); }
 /* タップ後に見える裏面(イラスト本体)。表面と逆向きに180度回転させて仕込んでおくことで、
