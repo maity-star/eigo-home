@@ -404,7 +404,7 @@
   <!-- タブバー -->
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('home',this)">ホーム</div>
-    <div class="tab" onclick="switchTab('shiru',this)">しる</div>
+    <div class="tab" onclick="switchTab('shiru',this)">しる<span class="tab-badge-new" id="shiruTabBadge">NEW</span></div>
     <div class="tab" onclick="switchTab('asobo',this)">あそぼ</div>
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
     <div class="tab" onclick="switchTab('playlist',this)">みる</div>
@@ -1377,7 +1377,7 @@ function renderJoelLine() {
   if (bubble) bubble.classList.toggle('is-quote', isQuote);
   const eyebrow = isQuote ? `<div class="joel-line-eyebrow">Jayが選んだ言葉</div>` : '';
   const author = isQuote ? `<span class="author">— ${line.author}${line.authorJa ? `（${line.authorJa}）` : ''}</span>` : '';
-  const enText = isQuote ? `“${line.en}”` : line.en;
+  const enText = isQuote ? `"${line.en}"` : line.en;
   const jaText = isQuote ? `「${line.ja}」` : line.ja;
   el.innerHTML = `${eyebrow}<span class="en">${enText}</span><span class="ja">${jaText}</span>${author}`;
 }
@@ -2713,6 +2713,23 @@ function setTalkDateHead(prefix, now, dayKey, title) {
 }
 const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
 
+// ========================
+// 配信解禁時刻（この時刻を過ぎるまでは「前日分」を表示し続ける）
+// 例：Morning Talkは毎日7:00、Evening Talkは毎日16:00に切り替わる。
+// 日付が変わった瞬間(0:00)に中身が見えてしまっていた不具合の対策として追加。
+// previewdate指定時（配信前日に翌日の見え方を確認する用途）はこのゲートを無視し、指定日をそのまま使う。
+// ========================
+const MORNING_TALK_RELEASE_HOUR = 7;
+const EVENING_TALK_RELEASE_HOUR = 16;
+function getReleaseEffectiveNow(previewDate, releaseHour) {
+  if (previewDate) return previewDate;
+  const raw = new Date();
+  if (raw.getHours() < releaseHour) {
+    return new Date(raw.getTime() - 86400000);
+  }
+  return raw;
+}
+
 const MORNING_TALK_AUDIO = {
   aug_w1_mon: 'morning_talk/mor_aug_w1_mon.mp3',
   aug_w1_tue: 'morning_talk/mor_aug_w1_tue.mp3',
@@ -2806,7 +2823,7 @@ function dateForMorningTalkDay(weekKey, dayKey) {
 
 function getTodayMorningTalkInfo() {
   const previewDate = getEnverlyPreviewDate();
-  const now = previewDate || new Date();
+  const now = getReleaseEffectiveNow(previewDate, MORNING_TALK_RELEASE_HOUR);
   if (ftArchiveOverride) {
     const { weekKey, dayKey } = ftArchiveOverride;
     const content = MORNING_TALK_WEEKS[weekKey].days[dayKey];
@@ -3503,7 +3520,7 @@ Mai: I'm tired. It's time for bed. | 疲れたな。もう寝る時間だね。
 Mai: Goodnight! | おやすみ！
         `,
         maiTalk: null,
-      },
+      }
     }
   },
 };
@@ -3552,7 +3569,7 @@ function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
 
 function getTodayEveningTalkInfo() {
   const previewDate = getEnverlyPreviewDate();
-  const now = previewDate || new Date();
+  const now = getReleaseEffectiveNow(previewDate, EVENING_TALK_RELEASE_HOUR);
   if (!previewDate && FAMILY_PREVIEW) {
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
     const { weekKey, dayKey } = parsed;
@@ -4111,7 +4128,7 @@ const SHIRU_TOPICS = [
     ],
   },
   {
-    iid: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-09-01',
+    id: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-09-01',
     image: 'shiru_book/illustration/topics/turtle.png',
     audio: 'shiru_book/audio/animal/turtle.mp3',
     facts: [
@@ -4178,6 +4195,24 @@ function markShiruFactRevealed(factKey) {
   try { localStorage.setItem(SHIRU_REVEALED_KEY, JSON.stringify([...set])); } catch (e) {}
 }
 
+// ========================
+// タブバー「しる」バッジ：火・木に新しい豆知識が入った日、開くまで表示する
+// カテゴリカードの isNewToday 判定（renderShiruCatGrid内）と同じロジックを再利用する
+// ========================
+function shiruTabHasNew() {
+  const todayKey = getTodayShiruDateKey();
+  const opened = getShiruOpenedSet();
+  return SHIRU_CATEGORIES.some(cat => {
+    const topics = getShiruTopicsByCategory(cat.id);
+    return topics.length > 0 && topics[0].dateAdded === todayKey && !opened.has(cat.id);
+  });
+}
+function updateShiruTabBadge() {
+  const badge = document.getElementById('shiruTabBadge');
+  if (!badge) return;
+  badge.style.display = shiruTabHasNew() ? 'block' : 'none';
+}
+
 function renderShiruCatGrid() {
   const grid = document.getElementById('shiruCatGrid');
   if (!grid) return;
@@ -4214,12 +4249,13 @@ function renderShiruCatGrid() {
         </div>
       </div>
       <div class="shiru-cat-body">
-        <div class="shiru-cat-title">また今度</div>
+        <div class="shiru-cat-title">その他</div>
         <div class="shiru-cat-sub">新しいジャンル準備中</div>
       </div>
     </div>
   `;
   grid.innerHTML = cardsHtml + soonCard;
+  updateShiruTabBadge();
 }
 
 let shiruCurrentCategory = null;
