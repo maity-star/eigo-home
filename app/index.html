@@ -195,9 +195,7 @@
     'yxtkw-n':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 田中さん
     'pecku-ka': { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // かねますさん
  '7ages-s':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // サラちゃん
-	  'tz37x-s': { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // すきさん
     'ndrn7-n':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // ノノちゃん
-	  'en-test_mai': { type: 'test', expiry: null, autoRenew: true }, // Mai（テスト用）
     '9aq2t-fam':{ type: 'family',  expiry: null,          autoRenew: true  }  // 家族共通・無期限
   };
 
@@ -670,6 +668,9 @@
             </div>
             <div class="ft-phrases-body" id="etPhrasesBody"></div>
           </div>
+
+          <button class="ft-archive-link" onclick="openEtArchiveModal()">これまでの放送 →</button>
+          <button class="ft-archive-link ft-archive-back" id="etArchiveBackBtn" onclick="returnToTodayEveningTalk()" style="display:none;">← 今日の放送にもどる</button>
         </div>
       </div><!-- /journey-full (evening) -->
     </div><!-- /journey-block jblock-evening -->
@@ -1070,6 +1071,20 @@
   <div class="archive-body" id="archiveBody">
     <!-- 中身はrenderArchiveModalBody()がMORNING_TALK_WEEKS/MORNING_TALK_AUDIOの実データから動的生成する。
          「⭐ Best Of」は放送本数がまだ少なくキュレーションできないため一旦保留（W2以降、蓄積を見て再検討）。 -->
+  </div>
+</div>
+
+<!-- 放送アーカイブモーダル（Evening Talk） -->
+<div class="archive-modal" id="etArchiveModal">
+  <div class="archive-modal-header">
+    <div>
+      <div class="archive-modal-title">これまでの放送</div>
+      <div class="archive-modal-sub">Jay &amp; Mai Time · Evening Talk</div>
+    </div>
+    <button class="archive-modal-close" onclick="closeEtArchiveModal()">✕</button>
+  </div>
+  <div class="archive-body" id="etArchiveBody">
+    <!-- 中身はrenderEtArchiveModalBody()がEVENING_TALK_WEEKS/EVENING_TALK_AUDIOの実データから動的生成する。 -->
   </div>
 </div>
 
@@ -2860,7 +2875,9 @@ function getTodayMorningTalkInfo() {
 }
 function renderMorningTalkContent() {
   const info = getTodayMorningTalkInfo();
-  setTalkDateHead('ft', info.now, info.dayKey, (info.isPreLaunch || info.isBeforeRelease) ? '配信準備中' : `"${info.content.title}"`);
+  setTalkDateHead('ft', info.now, info.dayKey,
+    info.isBeforeRelease ? `${MORNING_TALK_RELEASE_HOUR}時に配信`
+    : info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
 
   const backBtn = document.getElementById('ftArchiveBackBtn');
   if (backBtn) backBtn.style.display = info.isArchive ? 'flex' : 'none';
@@ -2884,13 +2901,12 @@ function renderMorningTalkContent() {
   }
 
   if (info.isBeforeRelease) {
-    tag.textContent = '近日公開';
+    tag.textContent = `${MORNING_TALK_RELEASE_HOUR}時公開`;
     tag.className = 'ft-status-tag replay';
-    note.textContent = `${MORNING_TALK_RELEASE_HOUR}時に配信するよ`;
-    note.style.display = 'block';
+    note.style.display = 'none';
     document.getElementById('ftQuestion').textContent = 'Coming today!';
     document.getElementById('ftQuestionJa').textContent = `今日のMorning talkは${MORNING_TALK_RELEASE_HOUR}:00に配信予定`;
-    document.getElementById('ftPlayTitle').textContent = '配信準備中';
+    document.getElementById('ftPlayTitle').textContent = `${MORNING_TALK_RELEASE_HOUR}時に配信`;
     const body = document.getElementById('ftPhrasesBody');
     if (body) body.innerHTML = '';
     ftCurrentPhrases = [];
@@ -3588,10 +3604,21 @@ function resolveEtPhraseTimings(audioKey, phrases, totalDuration) {
   return computeFtPhraseTimings(phrases, totalDuration);
 }
 
+let etArchiveOverride = null;
 function getTodayEveningTalkInfo() {
   const previewDate = getEnverlyPreviewDate();
   const gate = getReleaseGate(previewDate, EVENING_TALK_RELEASE_HOUR);
   const now = gate.now;
+  if (etArchiveOverride) {
+    const { weekKey, dayKey } = etArchiveOverride;
+    const weekData = EVENING_TALK_WEEKS[weekKey];
+    const content = (weekData && weekData.days[dayKey]) ? weekData.days[dayKey] : null;
+    const audioKey = content ? `${EVENING_TALK_MONTH}_${weekKey}_${dayKey}` : null;
+    return {
+      now: dateForMorningTalkDay(weekKey, dayKey), dayKey, weekKey,
+      isNew: false, isWeekend: false, isPreLaunch: false, isBeforeRelease: false, content, audioKey, isArchive: true,
+    };
+  }
   if (!previewDate && FAMILY_PREVIEW) {
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
     const { weekKey, dayKey } = parsed;
@@ -3616,29 +3643,45 @@ function getTodayEveningTalkInfo() {
 
 function renderEveningTalkContent() {
   const info = getTodayEveningTalkInfo();
-  setTalkDateHead('et', info.now, info.dayKey, (info.isPreLaunch || info.isBeforeRelease || !info.content) ? '配信準備中' : `"${info.content.title}"`);
+  setTalkDateHead('et', info.now, info.dayKey,
+    info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信`
+    : (info.isPreLaunch || !info.content) ? '配信準備中' : `"${info.content.title}"`);
+
+  const backBtn = document.getElementById('etArchiveBackBtn');
+  if (backBtn) backBtn.style.display = info.isArchive ? 'flex' : 'none';
 
   const tag = document.getElementById('etStatusTag');
   const note = document.getElementById('etReplayNote');
 
   if (info.isPreLaunch || info.isBeforeRelease || !info.content) {
-    if (tag) { tag.textContent = info.isPreLaunch ? '近日公開' : (info.isBeforeRelease ? '近日公開' : '準備中'); tag.className = 'ft-status-tag replay'; }
+    if (tag) {
+      tag.textContent = info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時公開` : (info.isPreLaunch ? '近日公開' : '準備中');
+      tag.className = 'ft-status-tag replay';
+    }
     if (note) {
-      note.textContent = info.isPreLaunch ? '配信は8月中旬スタート予定です'
-        : (info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信するよ` : 'この曜日の回は準備中です');
-      note.style.display = 'block';
+      if (info.isBeforeRelease) {
+        note.style.display = 'none';
+      } else {
+        note.textContent = info.isPreLaunch ? '配信は8月中旬スタート予定です' : 'この曜日の回は準備中です';
+        note.style.display = 'block';
+      }
     }
     const q = document.getElementById('etQuestion'); if (q) q.textContent = info.isBeforeRelease ? 'Coming today!' : 'Coming soon!';
     const qj = document.getElementById('etQuestionJa'); if (qj) qj.textContent = info.isBeforeRelease
       ? `今日のEvening talkは${EVENING_TALK_RELEASE_HOUR}:00に配信予定` : 'もうすぐ配信スタート';
-    const pt = document.getElementById('etPlayTitle'); if (pt) pt.textContent = '配信準備中';
+    const pt = document.getElementById('etPlayTitle'); if (pt) pt.textContent = info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信` : '配信準備中';
     const body = document.getElementById('etPhrasesBody'); if (body) body.innerHTML = '';
     etCurrentPhrases = [];
     etPhraseTimings = [];
     return null;
   }
 
-  if (info.isNew) {
+  if (info.isArchive) {
+    tag.textContent = 'アーカイブ再生中';
+    tag.className = 'ft-status-tag replay';
+    note.textContent = `${DAY_LABEL_JA[info.dayKey]}曜日の放送をもう一度お届け中`;
+    note.style.display = 'block';
+  } else if (info.isNew) {
     tag.textContent = 'NEW'; tag.className = 'ft-status-tag new'; note.style.display = 'none';
   } else {
     tag.className = 'ft-status-tag replay';
@@ -3894,6 +3937,123 @@ function toggleEtPhrases() {
   etPhrasesManualToggle = true;
   const b = document.getElementById('etPhrasesBody'); const c = document.getElementById('etPhrasesChevron');
   const o = b.classList.toggle('open'); c.classList.toggle('open', o);
+}
+
+// ========================
+// 放送アーカイブ（これまでの放送・Evening Talk）
+// ========================
+function getAiredEveningTalkDays() {
+  const order = ['mon', 'tue', 'wed', 'thu', 'fri'];
+  let weekKey, previewUptoIdx = null;
+  if (FAMILY_PREVIEW) {
+    const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
+    weekKey = parsed.weekKey;
+    previewUptoIdx = order.indexOf(parsed.dayKey);
+  } else {
+    const now = new Date();
+    const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
+    if (now < w1Start) return [];
+    weekKey = resolveMorningTalkWeekKey(now);
+  }
+  const now = new Date();
+  const days = [];
+  order.forEach((dayKey, idx) => {
+    if (previewUptoIdx !== null && idx > previewUptoIdx) return;
+    const audioKey = `${EVENING_TALK_MONTH}_${weekKey}_${dayKey}`;
+    const dayDate = dateForMorningTalkDay(weekKey, dayKey);
+    if (previewUptoIdx === null && dayDate > now) return;
+    const weekData = EVENING_TALK_WEEKS[weekKey];
+    if (EVENING_TALK_AUDIO[audioKey] && weekData && weekData.days[dayKey]) {
+      days.push({ weekKey, dayKey, content: weekData.days[dayKey], date: dayDate });
+    }
+  });
+  return days.reverse();
+}
+
+function renderEtArchiveModalBody() {
+  const body = document.getElementById('etArchiveBody');
+  if (!body) return;
+  const days = getAiredEveningTalkDays();
+  if (!days.length) {
+    body.innerHTML = `<div class="archive-empty">まだ配信された放送がありません</div>`;
+    return;
+  }
+  const theme = EVENING_TALK_WEEKS[days[0].weekKey].theme || '';
+  const rowsHtml = days.map(d => `
+    <div class="archive-ep-row" onclick="playArchivedEveningTalk('${d.weekKey}','${d.dayKey}')">
+      <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
+      <div class="archive-ep-q">${d.content.title}</div>
+      <div class="archive-ep-play">▶</div>
+    </div>
+  `).join('');
+  body.innerHTML = `
+    <div class="archive-section-label"><span>すべての放送</span><div class="archive-section-line"></div></div>
+    <div class="archive-month-group">
+      <div class="archive-month-title">${theme}</div>
+      ${rowsHtml}
+    </div>
+  `;
+}
+
+function openEtArchiveModal() {
+  renderEtArchiveModalBody();
+  document.getElementById('etArchiveModal').classList.add('open');
+}
+function closeEtArchiveModal() {
+  document.getElementById('etArchiveModal').classList.remove('open');
+}
+
+function playArchivedEveningTalk(weekKey, dayKey) {
+  const audioKey = `${EVENING_TALK_MONTH}_${weekKey}_${dayKey}`;
+  if (!EVENING_TALK_AUDIO[audioKey]) return;
+  if (etPlaying) {
+    etAudioEl.pause();
+    etPlaying = false;
+    stopEtMouthLoop();
+    setEtWavePlaying(false);
+  }
+  etArchiveOverride = { weekKey, dayKey };
+  etCurrentAudioKey = renderEveningTalkContent();
+  etAudioEl.src = EVENING_TALK_AUDIO[etCurrentAudioKey];
+  etAudioEl.currentTime = 0;
+  etProg = 0;
+  document.getElementById('etFill').style.width = '0%';
+  document.getElementById('etTime').textContent = '0:00';
+  clearEtPhraseHighlight();
+  const playBtn = document.getElementById('etPlayBtn');
+  if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  closeEtArchiveModal();
+  toggleEveningTalk();
+  const wrapEl = document.getElementById('etWrap');
+  if (wrapEl && typeof wrapEl.scrollIntoView === 'function') {
+    wrapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function returnToTodayEveningTalk() {
+  if (etPlaying) {
+    etAudioEl.pause();
+    etPlaying = false;
+    const icon = document.getElementById('etPlayIcon');
+    if (icon) icon.textContent = '▶';
+    setEtWavePlaying(false);
+    stopEtMouthLoop();
+  }
+  etArchiveOverride = null;
+  etCurrentAudioKey = renderEveningTalkContent();
+  const src = EVENING_TALK_AUDIO[etCurrentAudioKey];
+  const playBtn = document.getElementById('etPlayBtn');
+  if (src) {
+    etAudioEl.src = src;
+    if (playBtn) { playBtn.disabled = false; playBtn.style.opacity = ''; }
+  } else if (playBtn) {
+    playBtn.disabled = true; playBtn.style.opacity = '0.4';
+  }
+  etAudioEl.currentTime = 0;
+  etProg = 0;
+  document.getElementById('etFill').style.width = '0%';
+  document.getElementById('etTime').textContent = '0:00';
+  clearEtPhraseHighlight();
 }
 
 renderEtWave();
