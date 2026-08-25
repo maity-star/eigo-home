@@ -195,6 +195,7 @@
     'yxtkw-n':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // 田中さん
     'pecku-ka': { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // かねますさん
  '7ages-s':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // サラちゃん
+	  'tz37x-s': { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // すきさん
     'ndrn7-n':  { type: 'monitor', expiry: '2026-09-27', autoRenew: false }, // ノノちゃん
     '9aq2t-fam':{ type: 'family',  expiry: null,          autoRenew: true  }  // 家族共通・無期限
   };
@@ -1259,6 +1260,9 @@ function getEnverlyPreviewDate() {
     const preview = params.get('previewdate');
     if (preview && /^\d{4}-\d{2}-\d{2}$/.test(preview)) {
       return new Date(preview + 'T00:00:00');
+    }
+    if (preview && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(preview)) {
+      return new Date(preview + ':00');
     }
   } catch (e) {}
   return null;
@@ -2722,7 +2726,10 @@ const NEW_DAY_KEYS = ['mon', 'wed', 'fri'];
 const MORNING_TALK_RELEASE_HOUR = 7;
 const EVENING_TALK_RELEASE_HOUR = 16;
 function getReleaseGate(previewDate, releaseHour) {
-  if (previewDate) return { now: previewDate, isBeforeRelease: false };
+  if (previewDate) {
+    const hasTime = !(previewDate.getHours() === 0 && previewDate.getMinutes() === 0 && previewDate.getSeconds() === 0);
+    return { now: previewDate, isBeforeRelease: hasTime ? previewDate.getHours() < releaseHour : false };
+  }
   const raw = new Date();
   return { now: raw, isBeforeRelease: raw.getHours() < releaseHour };
 }
@@ -2852,9 +2859,7 @@ function getTodayMorningTalkInfo() {
 }
 function renderMorningTalkContent() {
   const info = getTodayMorningTalkInfo();
-  setTalkDateHead('ft', info.now, info.dayKey,
-    info.isBeforeRelease ? `${MORNING_TALK_RELEASE_HOUR}時に配信`
-    : info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
+  setTalkDateHead('ft', info.now, info.dayKey, (info.isPreLaunch || info.isBeforeRelease) ? '配信準備中' : `"${info.content.title}"`);
 
   const backBtn = document.getElementById('ftArchiveBackBtn');
   if (backBtn) backBtn.style.display = info.isArchive ? 'flex' : 'none';
@@ -2878,12 +2883,13 @@ function renderMorningTalkContent() {
   }
 
   if (info.isBeforeRelease) {
-    tag.textContent = `${MORNING_TALK_RELEASE_HOUR}時公開`;
+    tag.textContent = '近日公開';
     tag.className = 'ft-status-tag replay';
-    note.style.display = 'none';
+    note.textContent = `${MORNING_TALK_RELEASE_HOUR}時に配信するよ`;
+    note.style.display = 'block';
     document.getElementById('ftQuestion').textContent = 'Coming today!';
     document.getElementById('ftQuestionJa').textContent = `今日のMorning talkは${MORNING_TALK_RELEASE_HOUR}:00に配信予定`;
-    document.getElementById('ftPlayTitle').textContent = `${MORNING_TALK_RELEASE_HOUR}時に配信`;
+    document.getElementById('ftPlayTitle').textContent = '配信準備中';
     const body = document.getElementById('ftPhrasesBody');
     if (body) body.innerHTML = '';
     ftCurrentPhrases = [];
@@ -3609,30 +3615,22 @@ function getTodayEveningTalkInfo() {
 
 function renderEveningTalkContent() {
   const info = getTodayEveningTalkInfo();
-  setTalkDateHead('et', info.now, info.dayKey,
-    info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信`
-    : (info.isPreLaunch || !info.content) ? '配信準備中' : `"${info.content.title}"`);
+  setTalkDateHead('et', info.now, info.dayKey, (info.isPreLaunch || info.isBeforeRelease || !info.content) ? '配信準備中' : `"${info.content.title}"`);
 
   const tag = document.getElementById('etStatusTag');
   const note = document.getElementById('etReplayNote');
 
   if (info.isPreLaunch || info.isBeforeRelease || !info.content) {
-    if (tag) {
-      tag.textContent = info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時公開` : (info.isPreLaunch ? '近日公開' : '準備中');
-      tag.className = 'ft-status-tag replay';
-    }
+    if (tag) { tag.textContent = info.isPreLaunch ? '近日公開' : (info.isBeforeRelease ? '近日公開' : '準備中'); tag.className = 'ft-status-tag replay'; }
     if (note) {
-      if (info.isBeforeRelease) {
-        note.style.display = 'none';
-      } else {
-        note.textContent = info.isPreLaunch ? '配信は8月中旬スタート予定です' : 'この曜日の回は準備中です';
-        note.style.display = 'block';
-      }
+      note.textContent = info.isPreLaunch ? '配信は8月中旬スタート予定です'
+        : (info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信するよ` : 'この曜日の回は準備中です');
+      note.style.display = 'block';
     }
     const q = document.getElementById('etQuestion'); if (q) q.textContent = info.isBeforeRelease ? 'Coming today!' : 'Coming soon!';
     const qj = document.getElementById('etQuestionJa'); if (qj) qj.textContent = info.isBeforeRelease
       ? `今日のEvening talkは${EVENING_TALK_RELEASE_HOUR}:00に配信予定` : 'もうすぐ配信スタート';
-    const pt = document.getElementById('etPlayTitle'); if (pt) pt.textContent = info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信` : '配信準備中';
+    const pt = document.getElementById('etPlayTitle'); if (pt) pt.textContent = '配信準備中';
     const body = document.getElementById('etPhrasesBody'); if (body) body.innerHTML = '';
     etCurrentPhrases = [];
     etPhraseTimings = [];
