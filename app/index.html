@@ -883,6 +883,7 @@
                   <span class="asobo-timer-play-icon" id="asoboTimerPlayIcon">▶</span>
                 </button>
               </div>
+              <div class="asobo-joel-line" id="asoboTimerHint"><img src="icons/icon_func_mic.png" alt="マイク">見つけたらもう一度タップ！タイマーが止まるよ</div>
               <div class="asobo-joel-line" id="asoboJoelLine"><img src="icons/icon_func_mic.png" alt="マイク">見つかったかな？</div>
             </div>
           </div>
@@ -2235,7 +2236,7 @@ function renderAsoboAxisList() {
     const missions = AT_FIND.filter(d => d.axis === axis);
     const cards = missions.map(m => `
         <div class="at-archive-card">
-          <button class="at-archive-play" onclick="playAtArchiveItem(this); event.stopPropagation();">▶</button>
+          <button class="at-archive-play" onclick="playAtArchiveItem(this,'${m.audio}',event)">▶</button>
           <div class="at-archive-body">
             <div class="at-archive-en">${m.en}</div>
             <div class="at-archive-ja">${m.ja}</div>
@@ -2273,6 +2274,7 @@ function toggleAxisFrame(axis) {
 
 let asoboTimerTimeout = null;
 const ASOBO_TIMER_CIRCUMFERENCE = 175.9;
+const ASOBO_TIMER_SECONDS = 45;
 let currentFindItem = null;
 
 function playAsoboSe(src) {
@@ -2353,6 +2355,8 @@ function resetAsoboTimer() {
   icon.classList.remove('playing');
   icon.textContent = '▶';
   joelLine.classList.remove('show');
+  const timerHint = document.getElementById('asoboTimerHint');
+  if (timerHint) timerHint.classList.remove('show');
   try { bgm.pause(); } catch (e) {}
   const voice = document.getElementById('asoboVoicePlayer');
   try { voice.pause(); voice.onended = null; } catch (e) {}
@@ -2371,10 +2375,12 @@ function completeAsoboTimer() {
   asoboTimerRunning = false;
   const icon = document.getElementById('asoboTimerPlayIcon');
   const joelLine = document.getElementById('asoboJoelLine');
+  const timerHint = document.getElementById('asoboTimerHint');
   const bgm = document.getElementById('asoboTimerBgm');
   const ring = document.getElementById('asoboTimerRingFg');
   icon.classList.remove('playing');
   icon.textContent = '▶';
+  if (timerHint) timerHint.classList.remove('show');
   joelLine.classList.add('show');
   try { bgm.pause(); } catch (e) {}
   ring.style.transition = 'none';
@@ -2388,9 +2394,11 @@ function startAsoboTimer() {
   const ring = document.getElementById('asoboTimerRingFg');
   const icon = document.getElementById('asoboTimerPlayIcon');
   const joelLine = document.getElementById('asoboJoelLine');
+  const timerHint = document.getElementById('asoboTimerHint');
   const bgm = document.getElementById('asoboTimerBgm');
   if (!ring) return;
   joelLine.classList.remove('show');
+  if (timerHint) timerHint.classList.add('show');
   icon.classList.add('playing');
   icon.textContent = '⏸';
   ring.style.transition = 'none';
@@ -2400,12 +2408,12 @@ function startAsoboTimer() {
   asoboTimerRunning = true;
   const startCountdown = () => {
     if (!asoboTimerRunning) return;
-    ring.style.transition = 'stroke-dashoffset 60s linear';
+    ring.style.transition = `stroke-dashoffset ${ASOBO_TIMER_SECONDS}s linear`;
     ring.style.strokeDashoffset = '0';
     try { bgm.src = ASOBO_SFX.timerBgm; bgm.currentTime = 0; bgm.play().catch(() => {}); } catch (e) {}
     asoboTimerTimeout = setTimeout(() => {
       completeAsoboTimer();
-    }, 60000);
+    }, ASOBO_TIMER_SECONDS * 1000);
   };
   playAsoboVoice(currentFindItem ? currentFindItem.audio : null, startCountdown);
 }
@@ -2478,15 +2486,21 @@ function toggleRiddleFlip(card) {
   }
 }
 
-function playAtArchiveItem(btn) {
+function playAtArchiveItem(btn, src, evt) {
+  if (evt) evt.stopPropagation();
   const wasPlaying = btn.classList.contains('playing');
   document.querySelectorAll('.at-archive-play.playing, .at-riddle-play.playing').forEach(b => {
     b.classList.remove('playing'); b.textContent = '▶';
   });
-  if (!wasPlaying) {
-    btn.classList.add('playing'); btn.textContent = '⏸';
-    setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶'; }, 4000);
+  const voice = document.getElementById('asoboVoicePlayer');
+  if (wasPlaying) {
+    try { voice.pause(); voice.onended = null; } catch (e) {}
+    return;
   }
+  if (!src) return;
+  btn.classList.add('playing'); btn.textContent = '⏸';
+  const reset = () => { btn.classList.remove('playing'); btn.textContent = '▶'; };
+  playAsoboVoice(src, reset);
 }
 
 function playAtRiddle(btn, evt) {
