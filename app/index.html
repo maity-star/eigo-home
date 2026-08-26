@@ -17,156 +17,428 @@
      - 期限切れ・未認証はロック画面を表示、本体(#mainApp)は隠す
      ======================== -->
 <style>
-  /* デフォルトは両方非表示。判定スクリプトがhtmlタグにクラスを付けて出し分ける */
-  #accessLockScreen { display: none; }
-  #mainApp { display: none; }
-  html.gate-unlocked #mainApp { display: block; }
-  html.gate-locked #accessLockScreen { display: flex; }
-
-  #accessLockScreen {
-    position: fixed; inset: 0; z-index: 9999;
-    flex-direction: column; align-items: center; justify-content: flex-start;
+/* デフォルトは両方非表示。判定スクリプトがhtmlタグにクラスを付けて出し分ける */
+#accessLockScreen {
+    display: none;
+}
+#mainApp {
+    display: none;
+}
+html.gate-unlocked #mainApp {
+    display: block;
+}
+html.gate-locked #accessLockScreen {
+    display: flex;
+}
+#accessLockScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     background: #F5FAF7;
     padding: 40px 24px 60px;
     text-align: center;
     font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-  }
-  .gate-logo { font-size: 26px; font-weight: 800; color: #2D6A4F; margin-bottom: 18px; }
-  .gate-logo span { color: #6AA17F; font-weight: 600; }
-  .gate-message {
-    max-width: 320px; font-size: 14px; line-height: 1.8; color: #3A3A3A;
+}
+.gate-logo {
+    font-size: 26px;
+    font-weight: 800;
+    color: #2D6A4F;
+    margin-bottom: 18px;
+}
+.gate-logo span {
+    color: #6AA17F;
+    font-weight: 600;
+}
+.gate-message {
+    max-width: 320px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #3A3A3A;
     margin-bottom: 24px;
-  }
-  .gate-input-row {
-    display: flex; gap: 8px; width: 100%; max-width: 320px; margin-bottom: 10px;
-  }
-  .gate-input {
-    flex: 1; padding: 12px 14px; border: 1.5px solid #BBDAC8; border-radius: 12px;
-    font-size: 16px; background: #fff; color: #3A3A3A; outline: none;
-  }
-  .gate-input:focus { border-color: #6AA17F; }
-  .gate-submit-btn {
-    padding: 12px 18px; border: none; border-radius: 12px;
-    background: #2D6A4F; color: #fff; font-size: 14px; font-weight: 700;
-    cursor: pointer; white-space: nowrap;
-  }
-  .gate-submit-btn:active { background: #24543F; }
-  .gate-error {
-    color: #C1443F; font-size: 12.5px; margin-bottom: 14px; min-height: 16px;
-  }
-  .gate-note {
-    font-size: 11.5px; color: #8A8A8A; max-width: 300px; line-height: 1.6;
-  }
-
-  .gate-howto {
-    width: 100%; max-width: 320px; margin-bottom: 16px;
-    background: #fff; border: 1.5px solid #BBDAC8; border-radius: 12px;
+}
+.gate-input-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 10px;
+}
+.gate-input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid #BBDAC8;
+    border-radius: 12px;
+    font-size: 16px;
+    background: #fff;
+    color: #3A3A3A;
+    outline: none;
+}
+.gate-input:focus {
+    border-color: #6AA17F;
+}
+.gate-submit-btn {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background: #2D6A4F;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.gate-submit-btn:active {
+    background: #24543F;
+}
+.gate-error {
+    color: #C1443F;
+    font-size: 12.5px;
+    margin-bottom: 14px;
+    min-height: 16px;
+}
+.gate-note {
+    font-size: 11.5px;
+    color: #8A8A8A;
+    max-width: 300px;
+    line-height: 1.6;
+}
+.gate-howto {
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 16px;
+    background: #fff;
+    border: 1.5px solid #BBDAC8;
+    border-radius: 12px;
     padding: 14px 16px;
     text-align: left;
-  }
-  .gate-howto-title {
-    font-size: 13px; font-weight: 700; color: #2D6A4F; margin-bottom: 8px;
-  }
-  .gate-howto-body {
-    font-size: 12.5px; line-height: 1.8; color: #3A3A3A;
-  }
-  .gate-howto-body b { display: block; color: #2D6A4F; margin-bottom: 2px; font-size: 12.5px; }
-
-  /* ホーム画面追加のデモアニメーション(LPのはじめかたセクションを移植) */
-  .gate-demo-wrap { display: flex; justify-content: center; margin: 14px 0 4px; }
-  .gate-demo-frame {
-    width: 190px; background: #111827; border-radius: 26px; padding: 6px;
-  }
-  .gate-demo-screen {
-    background: #FFFDF8; border-radius: 20px; overflow: hidden; position: relative; height: 340px;
-  }
-  .gate-demo-topbar { padding: 10px 12px 4px; display: flex; align-items: center; }
-  .gate-demo-logo { font-size: 12px; font-weight: 700; color: #111827; }
-  .gate-demo-logo span { color: #2D6A4F; }
-  .gate-demo-hero { margin: 4px 10px 0; height: 100px; border-radius: 12px; background: #EDF6F1; border: 1px solid #BBDAC8; }
-  .gate-demo-toolbar {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 10px 12px;
-  }
-  .gate-demo-pill {
-    background: #FFFDF8; border: 1px solid #BBDAC8; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    display: flex; align-items: center; justify-content: center; font-size: 9px; color: #6B7280;
-  }
-  .gate-demo-pill-back { width: 30px; height: 30px; border-radius: 50%; font-size: 13px; flex-shrink: 0; }
-  .gate-demo-pill-url { flex: 1; height: 30px; border-radius: 999px; gap: 4px; padding: 0 10px; }
-  .gate-demo-dots {
-    width: 30px; height: 30px; border-radius: 50%; border: 1px solid #BBDAC8; background: #FFFDF8;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; color: #6B7280; flex-shrink: 0;
-  }
-  .gate-demo-popup {
-    position: absolute; right: 8px; bottom: 40px; width: 140px;
-    background: #FFFDF8; border: 1px solid #BBDAC8; border-radius: 12px; padding: 4px 0;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: scale(0.85); transform-origin: bottom right;
-    opacity: 0; transition: all 0.25s ease;
-  }
-  .gate-demo-popup.show { opacity: 1; transform: scale(1); }
-  .gate-demo-popup-item { display: flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 10.5px; color: #3A3A36; }
-  .gate-demo-sheet {
-    position: absolute; left: 0; right: 0; bottom: 0; background: #262626; color: #fff;
-    border-radius: 16px 16px 0 0; padding: 14px 16px 18px; min-height: 140px;
-    transform: translateY(100%); transition: transform 0.4s ease;
-  }
-  .gate-demo-sheet.show { transform: translateY(0%); }
-  .gate-demo-sheet.tall { min-height: 220px; }
-  .gate-demo-share-head { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #444; }
-  .gate-demo-share-icon { width: 28px; height: 28px; border-radius: 8px; background: #6DB88A; }
-  .gate-demo-share-actions { display: flex; justify-content: space-between; padding: 12px 2px 0; }
-  .gate-demo-share-actions div { text-align: center; font-size: 8px; color: #ccc; width: 46px; }
-  .gate-demo-share-actions .accent { color: #9FE1CB; }
-  .gate-demo-extra-list { border-top: 1px solid #444; margin-top: 8px; padding-top: 6px; }
-  .gate-demo-extra-item { display: flex; align-items: center; gap: 8px; padding: 7px 2px; font-size: 10.5px; color: #eee; }
-  .gate-demo-extra-item.accent { background: rgba(159,225,203,0.18); border-radius: 8px; padding: 7px 8px; color: #9FE1CB; font-weight: 700; }
-  .gate-demo-addscreen-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .gate-demo-addscreen-head .add-btn { color: #9FE1CB; font-weight: 700; font-size: 11px; }
-  .gate-demo-addscreen-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid #444; border-bottom: 1px solid #444; font-size: 11px; }
-  .gate-demo-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; font-size: 9.5px; color: #ddd; }
-  .gate-demo-toggle { width: 28px; height: 16px; border-radius: 8px; background: #4caf50; position: relative; }
-  .gate-demo-toggle::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #fff; position: absolute; right: 2px; top: 2px; }
-  .gate-demo-dot {
-    position: absolute; width: 18px; height: 18px; border-radius: 50%; background: rgba(74,157,90,0.35);
-    opacity: 0; pointer-events: none; transition: opacity 0.35s, transform 0.35s;
-  }
-  .gate-demo-caption { text-align: center; font-size: 11px; color: #6B7280; margin-top: 10px; min-height: 15px; }
-
-  /* LINE等のアプリ内ブラウザで開いた場合の警告バナー
+}
+.gate-howto-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2D6A4F;
+    margin-bottom: 8px;
+}
+.gate-howto-body {
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #3A3A3A;
+}
+.gate-howto-body b {
+    display: block;
+    color: #2D6A4F;
+    margin-bottom: 2px;
+    font-size: 12.5px;
+}
+/* ホーム画面追加のデモアニメーション(LPのはじめかたセクションを移植) */
+.gate-demo-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 14px 0 4px;
+}
+.gate-demo-frame {
+    width: 190px;
+    background: #111827;
+    border-radius: 26px;
+    padding: 6px;
+}
+.gate-demo-screen {
+    background: #FFFDF8;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    height: 340px;
+}
+.gate-demo-topbar {
+    padding: 10px 12px 4px;
+    display: flex;
+    align-items: center;
+}
+.gate-demo-logo {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111827;
+}
+.gate-demo-logo span {
+    color: #2D6A4F;
+}
+.gate-demo-hero {
+    margin: 4px 10px 0;
+    height: 100px;
+    border-radius: 12px;
+    background: #EDF6F1;
+    border: 1px solid #BBDAC8;
+}
+.gate-demo-toolbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 10px 12px;
+}
+.gate-demo-pill {
+    background: #FFFDF8;
+    border: 1px solid #BBDAC8;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #6B7280;
+}
+.gate-demo-pill-back {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.gate-demo-pill-url {
+    flex: 1;
+    height: 30px;
+    border-radius: 999px;
+    gap: 4px;
+    padding: 0 10px;
+}
+.gate-demo-dots {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #BBDAC8;
+    background: #FFFDF8;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6B7280;
+    flex-shrink: 0;
+}
+.gate-demo-popup {
+    position: absolute;
+    right: 8px;
+    bottom: 40px;
+    width: 140px;
+    background: #FFFDF8;
+    border: 1px solid #BBDAC8;
+    border-radius: 12px;
+    padding: 4px 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: scale(0.85);
+    transform-origin: bottom right;
+    opacity: 0;
+    transition: all 0.25s ease;
+}
+.gate-demo-popup.show {
+    opacity: 1;
+    transform: scale(1);
+}
+.gate-demo-popup-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    font-size: 10.5px;
+    color: #3A3A36;
+}
+.gate-demo-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #262626;
+    color: #fff;
+    border-radius: 16px 16px 0 0;
+    padding: 14px 16px 18px;
+    min-height: 140px;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+}
+.gate-demo-sheet.show {
+    transform: translateY(0%);
+}
+.gate-demo-sheet.tall {
+    min-height: 220px;
+}
+.gate-demo-share-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+.gate-demo-share-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #6DB88A;
+}
+.gate-demo-share-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 2px 0;
+}
+.gate-demo-share-actions div {
+    text-align: center;
+    font-size: 8px;
+    color: #ccc;
+    width: 46px;
+}
+.gate-demo-share-actions .accent {
+    color: #9FE1CB;
+}
+.gate-demo-extra-list {
+    border-top: 1px solid #444;
+    margin-top: 8px;
+    padding-top: 6px;
+}
+.gate-demo-extra-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 2px;
+    font-size: 10.5px;
+    color: #eee;
+}
+.gate-demo-extra-item.accent {
+    background: rgba(159,225,203,0.18);
+    border-radius: 8px;
+    padding: 7px 8px;
+    color: #9FE1CB;
+    font-weight: 700;
+}
+.gate-demo-addscreen-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.gate-demo-addscreen-head .add-btn {
+    color: #9FE1CB;
+    font-weight: 700;
+    font-size: 11px;
+}
+.gate-demo-addscreen-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    border-top: 1px solid #444;
+    border-bottom: 1px solid #444;
+    font-size: 11px;
+}
+.gate-demo-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    font-size: 9.5px;
+    color: #ddd;
+}
+.gate-demo-toggle {
+    width: 28px;
+    height: 16px;
+    border-radius: 8px;
+    background: #4caf50;
+    position: relative;
+}
+.gate-demo-toggle::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+}
+.gate-demo-dot {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(74,157,90,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s, transform 0.35s;
+}
+.gate-demo-caption {
+    text-align: center;
+    font-size: 11px;
+    color: #6B7280;
+    margin-top: 10px;
+    min-height: 15px;
+}
+/* LINE等のアプリ内ブラウザで開いた場合の警告バナー
      （ホーム画面への追加ができない・ストレージが別扱いになるため、外部ブラウザに誘導する） */
-  #inAppBrowserWarning { display: none; }
-  html.in-app-browser #inAppBrowserWarning { display: flex; }
-  html.in-app-browser #accessLockScreen,
-  html.in-app-browser #mainApp { display: none !important; }
-
-  #inAppBrowserWarning {
-    position: fixed; inset: 0; z-index: 10000;
-    flex-direction: column; align-items: center; justify-content: center;
+#inAppBrowserWarning {
+    display: none;
+}
+html.in-app-browser #inAppBrowserWarning {
+    display: flex;
+}
+html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
+    display: none !important;
+}
+#inAppBrowserWarning {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     background: #F5FAF7;
     padding: 32px 24px;
     text-align: center;
     font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-  }
-  .iab-icon-line { width: 40px; height: 40px; border-radius: 50%; background: var(--iab-icon-bg, #EDF6F1); border: 2px solid #6AA17F; margin-bottom: 16px; }
-  .iab-title { font-size: 16px; font-weight: 800; color: #2D6A4F; margin-bottom: 12px; }
-  .iab-message {
-    max-width: 300px; font-size: 13.5px; line-height: 1.9; color: #3A3A3A;
+}
+.iab-icon-line {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--iab-icon-bg, #EDF6F1);
+    border: 2px solid #6AA17F;
+    margin-bottom: 16px;
+}
+.iab-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #2D6A4F;
+    margin-bottom: 12px;
+}
+.iab-message {
+    max-width: 300px;
+    font-size: 13.5px;
+    line-height: 1.9;
+    color: #3A3A3A;
     margin-bottom: 22px;
-  }
-  .iab-steps {
-    background: #fff; border: 1.5px solid #BBDAC8; border-radius: 14px;
-    padding: 16px 18px; max-width: 300px; text-align: left;
-    font-size: 13px; line-height: 1.9; color: #3A3A3A;
-  }
-  .iab-steps b { color: #2D6A4F; }
+}
+.iab-steps {
+    background: #fff;
+    border: 1.5px solid #BBDAC8;
+    border-radius: 14px;
+    padding: 16px 18px;
+    max-width: 300px;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.9;
+    color: #3A3A3A;
+}
+.iab-steps b {
+    color: #2D6A4F;
+}
 </style>
-
 <script>
   // LINE等のアプリ内ブラウザ（WebView）を検知する。
   // 判定基準: navigator.userAgent に "Line" が含まれる場合はLINEのアプリ内ブラウザ。
@@ -175,8 +447,7 @@
   if (IS_IN_APP_BROWSER) {
     document.documentElement.classList.add('in-app-browser');
   }
-</script>
-
+</script> 
 <script>
 (function () {
   // ------------------------------------------------------------
@@ -280,15 +551,11 @@
 <div id="inAppBrowserWarning">
   <div class="iab-icon-line"></div>
   <div class="iab-title">ブラウザ画面でご登録ください</div>
-  <div class="iab-message">
-    LINEの中で開くと、ホーム画面への追加が正しく行えません。<br>
-    お手数ですが、Safari（またはChrome）で開き直してください。
-  </div>
-  <div class="iab-steps">
-    ①画面<b>下</b>のツールバーにある <b>「…」</b> をタップ<br>
+  <div class="iab-message"> LINEの中で開くと、ホーム画面への追加が正しく行えません。<br>
+    お手数ですが、Safari（またはChrome）で開き直してください。 </div>
+  <div class="iab-steps"> ①画面<b>下</b>のツールバーにある <b>「…」</b> をタップ<br>
     ②<b>「ブラウザで開く」</b>を選択<br>
-    ③そのままSafari（またはChrome）で開きます
-  </div>
+    ③そのままSafari（またはChrome）で開きます </div>
 </div>
 
 <!-- ========================
@@ -296,37 +563,28 @@
      ======================== -->
 <div id="accessLockScreen">
   <div class="gate-logo">En<span>verly</span></div>
-  <div class="gate-message">
-    只今、招待制でご案内しています。<br>
-    招待コードをお持ちの方は、下に入力してください。
-  </div>
+  <div class="gate-message"> 只今、招待制でご案内しています。<br>
+    招待コードをお持ちの方は、下に入力してください。 </div>
   <div class="gate-input-row">
     <input type="text" id="gateCodeInput" class="gate-input" placeholder="招待コード" autocomplete="off" autocapitalize="off">
     <button class="gate-submit-btn" onclick="handleGateSubmit()">つづける</button>
   </div>
   <div class="gate-error" id="gateErrorMsg"></div>
-
   <div class="gate-howto">
     <div class="gate-howto-title">ホーム画面への追加方法</div>
-    <div class="gate-howto-body">
-      <b>iPhone・Safariの場合</b>
-      ①画面の一番下にある「…」のボタンをタップ<br>
+    <div class="gate-howto-body"> <b>iPhone・Safariの場合</b> ①画面の一番下にある「…」のボタンをタップ<br>
       ②「共有」を選ぶ<br>
       ③下部の小さいボタンが並んだ中から「ホーム画面に追加」を選ぶ（なければ「表示を増やす」をタップするとあります）<br>
       ④右上の「追加」をタップして完了<br>
       <br>
-      <b>iPhone・Chromeの場合</b>
-      ①画面上部、URLの横にある共有ボタン（四角に↑のアイコン）をタップ<br>
+      <b>iPhone・Chromeの場合</b> ①画面上部、URLの横にある共有ボタン（四角に↑のアイコン）をタップ<br>
       ②「表示を増やす」を選ぶ<br>
       ③「ホーム画面に追加」を選択<br>
       <br>
-      <b>Android・Chromeの場合</b>
-      ①右上の「⋮」メニューをタップ<br>
+      <b>Android・Chromeの場合</b> ①右上の「⋮」メニューをタップ<br>
       ②「ホーム画面に追加」または「アプリをインストール」を選ぶ<br>
       <br>
-      追加後、ホーム画面のアイコンから開いたら、もう一度この画面で招待コードを入力してください。
-    </div>
-
+      追加後、ホーム画面のアイコンから開いたら、もう一度この画面で招待コードを入力してください。 </div>
     <div class="gate-demo-wrap">
       <div class="gate-demo-frame">
         <div class="gate-demo-screen" id="gateDemoScreen">
@@ -334,11 +592,7 @@
             <div class="gate-demo-logo">En<span>verly</span></div>
           </div>
           <div class="gate-demo-hero"></div>
-          <div class="gate-demo-toolbar">
-            <span class="gate-demo-pill gate-demo-pill-back">‹</span>
-            <span class="gate-demo-pill gate-demo-pill-url">🔒 enverly.jp ↻</span>
-            <span id="gateDemoDots" class="gate-demo-dots">•••</span>
-          </div>
+          <div class="gate-demo-toolbar"> <span class="gate-demo-pill gate-demo-pill-back">‹</span> <span class="gate-demo-pill gate-demo-pill-url">🔒 enverly.jp ↻</span> <span id="gateDemoDots" class="gate-demo-dots">•••</span> </div>
           <div class="gate-demo-popup" id="gateDemoPopup"></div>
           <div class="gate-demo-sheet" id="gateDemoSheet"></div>
           <div class="gate-demo-dot" id="gateDemoDot"></div>
@@ -347,14 +601,11 @@
     </div>
     <p class="gate-demo-caption" id="gateDemoCaption">画面下の「…」をタップ</p>
   </div>
-
-  <div class="gate-note">
-    招待コードについてのお問い合わせは、Instagram（@enverly_english）のDMまでお願いします。
-  </div>
+  <div class="gate-note"> 招待コードについてのお問い合わせは、Instagram（@enverly_english）のDMまでお願いします。 </div>
 </div>
 
 <!-- オンボーディング（興味選択）は2026年7月に廃止・別ファイルへ退避済み
-     → enverly_onboarding_interest_module.html を参照 -->
+     → enverly_onboarding_interest_module.html を参照 --> 
 
 <!-- 絵本ビューワーモーダル -->
 <div class="book-viewer-modal" id="bookViewerModal">
@@ -366,8 +617,7 @@
     </div>
     <button class="bv-close" onclick="closeBookModal()">✕</button>
   </div>
-  <div class="bv-page-area" id="bvPageArea">
-    <img class="bv-page-img" id="bvPageImg" src="" alt="">
+  <div class="bv-page-area" id="bvPageArea"> <img class="bv-page-img" id="bvPageImg" src="" alt="">
     <button class="bv-nav prev" id="bvPrev" onclick="bvChangePage(-1)"><span>‹</span></button>
     <button class="bv-nav next" id="bvNext" onclick="bvChangePage(1)"><span>›</span></button>
   </div>
@@ -387,20 +637,23 @@
 </div>
 
 <!-- メインアプリ -->
-<div class="app" id="mainApp">
-
+<div class="app" id="mainApp"> 
+  
   <!-- ヘッダー -->
   <div class="header">
     <div class="header-top">
       <div class="logo">En<span>verly</span></div>
       <div class="header-top-right">
         <button class="settings-gear-btn" onclick="openSettingsModal()" aria-label="設定">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
         </button>
       </div>
     </div>
   </div>
-
+  
   <!-- タブバー -->
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('home',this)">ホーム</div>
@@ -409,25 +662,22 @@
     <div class="tab" onclick="switchTab('routine',this)">ルーティン</div>
     <div class="tab" onclick="switchTab('playlist',this)">みる</div>
   </div>
-
+  
   <!-- 今週タブ -->
-  <div id="tab-home">
-
+  <div id="tab-home"> 
+    
     <!-- Jayのひとこと（タブバー直下・きょうのとびら直上） -->
-    <div class="joel-line-wrap">
-      <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Jay">
+    <div class="joel-line-wrap"> <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Jay">
       <div class="joel-line-bubble" id="joelLineBubble">
         <div class="joel-line-text" id="joelLineText"></div>
       </div>
     </div>
-
+    
     <!-- 今日のジャーニー（①②③ステップ誘導＋時間帯ナビ） -->
     <div class="journey-nav">
       <div class="journey-eyebrow">きょうのとびら</div>
       <div class="journey-now-big" id="journeyNowBig" onclick="focusJourneyBlock(journeyBigSlot())">
-        <div class="journey-now-media">
-          <img id="journeyNowBigImg" src="illustrations/talks/morning_talk_hero.png" alt="">
-        </div>
+        <div class="journey-now-media"> <img id="journeyNowBigImg" src="illustrations/talks/morning_talk_hero.png" alt=""> </div>
         <div class="journey-now-content">
           <div class="journey-now-eyebrow" id="journeyNowBigLabel">Morning talk</div>
           <div class="journey-now-sub" id="journeyNowBigSub">朝のひとときに</div>
@@ -453,156 +703,156 @@
         </div>
       </div>
     </div>
-
-    <!-- 週間スタンプカードはトップ常設をやめ、設定＞あゆみに移動（獲得の瞬間はstamp-toastで代替） -->
-
+    
+    <!-- 週間スタンプカードはトップ常設をやめ、設定＞あゆみに移動（獲得の瞬間はstamp-toastで代替） --> 
+    
     <!-- ① 今日のEnverly（曜日でMorning Talk/Active Time自動切替・週ストリップ内蔵） -->
     <div class="journey-block" id="jblock-morning" data-slot="morning">
       <div class="journey-full">
-    <div class="weekly-mission-wrap">
-      <div class="weekly-mission-panel">
-        <div class="weekly-mission-hero talk-hero">
-          <img id="ftHeroImg" src="illustrations/talks/morning_talk_hero.png" alt="Morning talk">
-          <div class="talk-hero-banner">
-            <div class="talk-hero-tri tri1"></div>
-            <div class="talk-hero-tri tri2"></div>
-            <div class="talk-hero-text">
-              <div class="talk-hero-title">Morning talk</div>
-              <div class="talk-hero-sub">朝のひとときに</div>
-            </div>
-          </div>
-        </div>
-        <div class="weekly-mission-content">
-
-      <!-- Morning Talk（ポッドキャスト・プレミアム限定）／毎日表示・新作は月・水・金 -->
-      <div class="ft-wrap" id="ftWrap">
-        <div class="talk-datehead">
-          <div class="talk-datebadge">
-            <div class="talk-datebadge-month" id="ftDateMonth">--</div>
-            <div class="talk-datebadge-daycircle">
-              <div class="talk-datebadge-day" id="ftDateDay">--</div>
-              <div class="talk-datebadge-dow" id="ftDateDow">---</div>
-            </div>
-          </div>
-          <div class="talk-datehead-text">
-            <div class="talk-datehead-title" id="ftHeaderTitle">タイトル</div>
-            <span class="ft-status-tag" id="ftStatusTag"></span>
-          </div>
-        </div>
-        <div class="ft-replay-note" id="ftReplayNote" style="display:none;"></div>
-        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">朝のひととき、ラジオ感覚で流してみてね。<br>ふと出てきたフレーズが、今日の親子の話のきっかけになりますように。</p>
-        <div class="ft-card">
-          <div class="ft-card-top">
-            <div class="ft-question" id="ftQuestion">"What animal did you see today?"</div>
-            <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
-            <div class="ft-dialogue">
-              <div class="ft-avatar joel" id="ftAvatarJoel">
-                <img id="ftAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Jay">
-              </div>
-              <div class="ft-bubble-wrap" id="ftBubbleWrap">
-                <div class="ft-bubble" id="ftBubble">
-                  <div class="ft-bubble-en" id="ftBubbleEn"></div>
-                  <div class="ft-bubble-ja" id="ftBubbleJa"></div>
+        <div class="weekly-mission-wrap">
+          <div class="weekly-mission-panel">
+            <div class="weekly-mission-hero talk-hero"> <img id="ftHeroImg" src="illustrations/talks/morning_talk_hero.png" alt="Morning talk">
+              <div class="talk-hero-banner">
+                <div class="talk-hero-tri tri1"></div>
+                <div class="talk-hero-tri tri2"></div>
+                <div class="talk-hero-text">
+                  <div class="talk-hero-title">Morning talk</div>
+                  <div class="talk-hero-sub">朝のひとときに</div>
                 </div>
               </div>
-              <div class="ft-avatar mai" id="ftAvatarMai">
-                <img id="ftAvatarMaiImg" src="illustrations/mai/mai_mouth_closed.png" alt="Mai">
-              </div>
             </div>
-            <div class="ft-wave" id="ftWave"></div>
-          </div>
-          <div class="ft-player-inner">
-            <div class="ft-play-row">
-              <button class="ft-play-btn" id="ftPlayBtn" onclick="toggleFamilyTalk()">
-                <span id="ftPlayIcon">▶</span>
-              </button>
-              <div class="ft-play-meta">
-                <div class="ft-play-title" id="ftPlayTitle">Wed · What animal did you see today?</div>
-                <div class="ft-play-len" id="ftPlayLen">3:40</div>
-              </div>
-            </div>
-            <div class="ft-prog-row">
-              <div class="ft-prog-bar" onclick="seekFamilyTalk(event)"><div class="ft-prog-fill" id="ftFill"></div></div>
-              <div class="ft-prog-time" id="ftTime">0:00</div>
-            </div>
-            <div id="ftDebugOverlay" style="display:none; margin-top:8px; padding:8px 10px; background:rgba(0,0,0,0.75); border-radius:8px; font-size:10px; color:#B7F5C8; font-family:monospace; line-height:1.6; white-space:pre-wrap;"></div>
-          </div>
-          <div class="ft-phrases-toggle" onclick="toggleFtPhrases()">
-            <div class="ft-phrases-label"><span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_bubble.png" alt="フレーズ"></span><span>今日のフレーズ</span></div>
-            <div class="ft-phrases-chevron" id="ftPhrasesChevron">▼</div>
-          </div>
-          <div class="ft-phrases-body" id="ftPhrasesBody">
-            <div class="ft-phrase-row"><span class="ft-phrase-en">"What animal did you see today?"</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div>
-            <div class="ft-phrase-row"><span class="ft-phrase-en">"It was brown!"</span><span class="ft-phrase-ja">茶色だったよ！</span></div>
-            <div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>
-          </div>
-        </div>
-
-        <button class="ft-archive-link" onclick="openArchiveModal()">これまでの放送 →</button>
-        <button class="ft-archive-link ft-archive-back" id="ftArchiveBackBtn" onclick="returnToTodayMorningTalk()" style="display:none;">← 今日の放送にもどる</button>
-
-        <!-- Morning Talk終了後、自動で朝の音楽に切り替わる導線（プロトタイプ：視覚状態のみ再現。
+            <div class="weekly-mission-content"> 
+              
+              <!-- Morning Talk（ポッドキャスト・プレミアム限定）／毎日表示・新作は月・水・金 -->
+              <div class="ft-wrap" id="ftWrap">
+                <div class="talk-datehead">
+                  <div class="talk-datebadge">
+                    <div class="talk-datebadge-month" id="ftDateMonth">--</div>
+                    <div class="talk-datebadge-daycircle">
+                      <div class="talk-datebadge-day" id="ftDateDay">--</div>
+                      <div class="talk-datebadge-dow" id="ftDateDow">---</div>
+                    </div>
+                  </div>
+                  <div class="talk-datehead-text">
+                    <div class="talk-datehead-title" id="ftHeaderTitle">タイトル</div>
+                    <span class="ft-status-tag" id="ftStatusTag"></span> </div>
+                </div>
+                <div class="ft-replay-note" id="ftReplayNote" style="display:none;"></div>
+                <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">朝のひととき、ラジオ感覚で流してみてね。<br>
+                  ふと出てきたフレーズが、今日の親子の話のきっかけになりますように。</p>
+                <div class="ft-card">
+                  <div class="ft-card-top">
+                    <div class="ft-question" id="ftQuestion">"What animal did you see today?"</div>
+                    <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
+                    <div class="ft-dialogue">
+                      <div class="ft-avatar joel" id="ftAvatarJoel"> <img id="ftAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
+                      <div class="ft-bubble-wrap" id="ftBubbleWrap">
+                        <div class="ft-bubble" id="ftBubble">
+                          <div class="ft-bubble-en" id="ftBubbleEn"></div>
+                          <div class="ft-bubble-ja" id="ftBubbleJa"></div>
+                        </div>
+                      </div>
+                      <div class="ft-avatar mai" id="ftAvatarMai"> <img id="ftAvatarMaiImg" src="illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
+                    </div>
+                    <div class="ft-wave" id="ftWave"></div>
+                  </div>
+                  <div class="ft-player-inner">
+                    <div class="ft-play-row">
+                      <button class="ft-play-btn" id="ftPlayBtn" onclick="toggleFamilyTalk()"> <span id="ftPlayIcon">▶</span> </button>
+                      <div class="ft-play-meta">
+                        <div class="ft-play-title" id="ftPlayTitle">Wed · What animal did you see today?</div>
+                        <div class="ft-play-len" id="ftPlayLen">3:40</div>
+                      </div>
+                    </div>
+                    <div class="ft-prog-row">
+                      <div class="ft-prog-bar" onclick="seekFamilyTalk(event)">
+                        <div class="ft-prog-fill" id="ftFill"></div>
+                      </div>
+                      <div class="ft-prog-time" id="ftTime">0:00</div>
+                    </div>
+                    <div id="ftDebugOverlay" style="display:none; margin-top:8px; padding:8px 10px; background:rgba(0,0,0,0.75); border-radius:8px; font-size:10px; color:#B7F5C8; font-family:monospace; line-height:1.6; white-space:pre-wrap;"></div>
+                  </div>
+                  <div class="ft-phrases-toggle" onclick="toggleFtPhrases()">
+                    <div class="ft-phrases-label"><span><img class="icon-img" style="width:20px;height:20px;" src="icons/icon_func_bubble.png" alt="フレーズ"></span><span>今日のフレーズ</span></div>
+                    <div class="ft-phrases-chevron" id="ftPhrasesChevron">▼</div>
+                  </div>
+                  <div class="ft-phrases-body" id="ftPhrasesBody">
+                    <div class="ft-phrase-row"><span class="ft-phrase-en">"What animal did you see today?"</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div>
+                    <div class="ft-phrase-row"><span class="ft-phrase-en">"It was brown!"</span><span class="ft-phrase-ja">茶色だったよ！</span></div>
+                    <div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>
+                  </div>
+                </div>
+                <button class="ft-archive-link" onclick="openArchiveModal()">これまでの放送 →</button>
+                <button class="ft-archive-link ft-archive-back" id="ftArchiveBackBtn" onclick="returnToTodayMorningTalk()" style="display:none;">← 今日の放送にもどる</button>
+                
+                <!-- Morning Talk終了後、自動で朝の音楽に切り替わる導線（プロトタイプ：視覚状態のみ再現。
              実音源チェーンは著作権フリー音源ライブラリ選定後に実装） -->
-        <div class="ft-auto-next" id="ftAutoNext">
-          <div class="ft-auto-next-label"><img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_headphone.png" alt="音楽"> そのまま朝の音楽が流れています</div>
-          <div class="playlist-item playing" style="margin-top:8px;">
-            <div class="pl-icon pl-icon-placeholder"><div class="pl-icon-play"><span>♪</span></div></div>
-            <div class="pl-info"><div class="pl-title">Morning Routine Songs</div><div class="pl-sub">朝の支度BGM · 自動再生中</div></div>
-            <button class="ft-auto-next-stop" onclick="stopFtAutoNext()">⏸</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Active Time（探し物ミッション／なぞなぞクイズ）／ホームからは非表示。あそぼタブへ移動 -->
-      <div class="at-wrap" id="atWrap" style="display:none;">
-        <div class="at-eyebrow">
-          <div class="at-eyebrow-label"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブタイム"> Active Time</div>
-          <div class="at-eyebrow-line"></div>
-        </div>
-        <div class="at-eyebrow-sub">体を動かして英語タイム</div>
-        <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">Jayの声に合わせて、お部屋の中で探したり答えたり。動画のお手本は不要、声だけで遊べるよ。</p>
-        <div class="at-card">
-          <div class="at-card-top">
-            <div class="at-mode-row">
-              <div class="at-mode-pill active" id="atModeFind" onclick="switchAtMode('find')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_search.png" alt="探し物"> 探し物ミッション</div>
-              <div class="at-mode-pill" id="atModeRiddle" onclick="switchAtMode('riddle')">🐮 なぞなぞクイズ</div>
-            </div>
-            <div class="at-axis-tag" id="atAxisTag">カラー</div>
-            <div class="at-question" id="atQuestion">Find something red!</div>
-            <div class="at-question-ja" id="atQuestionJa">赤いものを探してみよう</div>
-          </div>
-          <div class="at-player-inner">
-            <div class="at-play-row">
-              <button class="at-play-btn" id="atPlayBtn" onclick="toggleActiveTime()"><span id="atPlayIcon">▶</span></button>
-              <div class="at-play-meta">
-                <div class="at-play-title" id="atPlayTitle">Jayの声を聞く</div>
-                <div class="at-play-len">0:08</div>
+                <div class="ft-auto-next" id="ftAutoNext">
+                  <div class="ft-auto-next-label"><img class="icon-img" style="width:16px;height:16px;" src="icons/icon_func_headphone.png" alt="音楽"> そのまま朝の音楽が流れています</div>
+                  <div class="playlist-item playing" style="margin-top:8px;">
+                    <div class="pl-icon pl-icon-placeholder">
+                      <div class="pl-icon-play"><span>♪</span></div>
+                    </div>
+                    <div class="pl-info">
+                      <div class="pl-title">Morning Routine Songs</div>
+                      <div class="pl-sub">朝の支度BGM · 自動再生中</div>
+                    </div>
+                    <button class="ft-auto-next-stop" onclick="stopFtAutoNext()">⏸</button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Active Time（探し物ミッション／なぞなぞクイズ）／ホームからは非表示。あそぼタブへ移動 -->
+              <div class="at-wrap" id="atWrap" style="display:none;">
+                <div class="at-eyebrow">
+                  <div class="at-eyebrow-label"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_active.png" alt="アクティブタイム"> Active Time</div>
+                  <div class="at-eyebrow-line"></div>
+                </div>
+                <div class="at-eyebrow-sub">体を動かして英語タイム</div>
+                <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">Jayの声に合わせて、お部屋の中で探したり答えたり。動画のお手本は不要、声だけで遊べるよ。</p>
+                <div class="at-card">
+                  <div class="at-card-top">
+                    <div class="at-mode-row">
+                      <div class="at-mode-pill active" id="atModeFind" onclick="switchAtMode('find')"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_search.png" alt="探し物"> 探し物ミッション</div>
+                      <div class="at-mode-pill" id="atModeRiddle" onclick="switchAtMode('riddle')">🐮 なぞなぞクイズ</div>
+                    </div>
+                    <div class="at-axis-tag" id="atAxisTag">カラー</div>
+                    <div class="at-question" id="atQuestion">Find something red!</div>
+                    <div class="at-question-ja" id="atQuestionJa">赤いものを探してみよう</div>
+                  </div>
+                  <div class="at-player-inner">
+                    <div class="at-play-row">
+                      <button class="at-play-btn" id="atPlayBtn" onclick="toggleActiveTime()"><span id="atPlayIcon">▶</span></button>
+                      <div class="at-play-meta">
+                        <div class="at-play-title" id="atPlayTitle">Jayの声を聞く</div>
+                        <div class="at-play-len">0:08</div>
+                      </div>
+                    </div>
+                  </div>
+                  <button class="at-next-btn" onclick="nextAtQuestion()">次のお題へ →</button>
+                  <button class="at-done-btn" id="atDoneBtn" onclick="completeActiveTime()"> <span><img class="icon-img" style="width:24px;height:24px;" src="icons/icon_func_medal.png" alt="できたよ"></span><span>できたよ！</span> </button>
+                </div>
               </div>
             </div>
+            <!-- /weekly-mission-content --> 
           </div>
-          <button class="at-next-btn" onclick="nextAtQuestion()">次のお題へ →</button>
-          <button class="at-done-btn" id="atDoneBtn" onclick="completeActiveTime()">
-            <span><img class="icon-img" style="width:24px;height:24px;" src="icons/icon_func_medal.png" alt="できたよ"></span><span>できたよ！</span>
-          </button>
+          <!-- /weekly-mission-panel --> 
         </div>
+        <!-- /weekly-mission-wrap --> 
       </div>
-
-        </div><!-- /weekly-mission-content -->
-      </div><!-- /weekly-mission-panel -->
-    </div><!-- /weekly-mission-wrap -->
-      </div><!-- /journey-full (morning) -->
-    </div><!-- /journey-block jblock-morning -->
+      <!-- /journey-full (morning) --> 
+    </div>
+    <!-- /journey-block jblock-morning --> 
     <!-- ② Evening Talk（帰宅後の一言＋Did you know?） -->
     <div class="journey-block" id="jblock-evening" data-slot="evening">
-      <div class="journey-full">
+      <div class="journey-full"> 
         <!-- Evening Talk（ポッドキャスト）／エンジンはMorning Talkと共通（parseMorningTalkScript等を再利用）。
              会話音声の中にMaiの日本語解説・エンディングBGMまで一体化してミックス済みのため、
              Morning Talkの「再生後に別音源へ自動切替」導線（ftAutoNext相当）はEvening Talkには無い。 -->
-        <div class="ft-wrap" id="etWrap">
+        <div class="ft-wrap" id="etWrap"> 
           <!-- Evening Talk用の夜イラストも、Morning Talkと同じくルート直下ではなくillustrations/talks/配下に固定配置。
                週替わりではなく、この1枚をずっとデフォルトとして使い続ける運用（Morning Talkと同じ扱い） -->
-          <div class="weekly-mission-hero talk-hero standalone" style="margin:-16px -16px 14px;border-radius:19px 19px 0 0;">
-            <img id="etHeroImg" src="illustrations/talks/evening_talk_hero.png" alt="Evening talk">
+          <div class="weekly-mission-hero talk-hero standalone" style="margin:-16px -16px 14px;border-radius:19px 19px 0 0;"> <img id="etHeroImg" src="illustrations/talks/evening_talk_hero.png" alt="Evening talk">
             <div class="talk-hero-banner evening">
               <div class="talk-hero-tri tri1"></div>
               <div class="talk-hero-tri tri2"></div>
@@ -622,43 +872,39 @@
             </div>
             <div class="talk-datehead-text">
               <div class="talk-datehead-title" id="etHeaderTitle">タイトル</div>
-              <span class="ft-status-tag" id="etStatusTag"></span>
-            </div>
+              <span class="ft-status-tag" id="etStatusTag"></span> </div>
           </div>
           <div class="ft-replay-note" id="etReplayNote" style="display:none;"></div>
-          <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">おかえりなさい。今日の「どうだった？」を、JayとMaiのおしゃべりと一緒にどうぞ。<br>寝る前のひとときに、ぴったりの長さです。</p>
+          <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">おかえりなさい。今日の「どうだった？」を、JayとMaiのおしゃべりと一緒にどうぞ。<br>
+            寝る前のひとときに、ぴったりの長さです。</p>
           <div class="ft-card">
             <div class="ft-card-top">
               <div class="ft-question" id="etQuestion">"How was your day?"</div>
               <div class="ft-question-ja" id="etQuestionJa">今日どうだった？</div>
               <div class="ft-dialogue">
-                <div class="ft-avatar joel" id="etAvatarJoel">
-                  <img id="etAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Jay">
-                </div>
+                <div class="ft-avatar joel" id="etAvatarJoel"> <img id="etAvatarJoelImg" src="illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
                 <div class="ft-bubble-wrap" id="etBubbleWrap">
                   <div class="ft-bubble" id="etBubble">
                     <div class="ft-bubble-en" id="etBubbleEn"></div>
                     <div class="ft-bubble-ja" id="etBubbleJa"></div>
                   </div>
                 </div>
-                <div class="ft-avatar mai" id="etAvatarMai">
-                  <img id="etAvatarMaiImg" src="illustrations/mai/mai_mouth_closed.png" alt="Mai">
-                </div>
+                <div class="ft-avatar mai" id="etAvatarMai"> <img id="etAvatarMaiImg" src="illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
               </div>
               <div class="ft-wave" id="etWave"></div>
             </div>
             <div class="ft-player-inner">
               <div class="ft-play-row">
-                <button class="ft-play-btn" id="etPlayBtn" onclick="toggleEveningTalk()">
-                  <span id="etPlayIcon">▶</span>
-                </button>
+                <button class="ft-play-btn" id="etPlayBtn" onclick="toggleEveningTalk()"> <span id="etPlayIcon">▶</span> </button>
                 <div class="ft-play-meta">
                   <div class="ft-play-title" id="etPlayTitle">Mon · How was your day?</div>
                   <div class="ft-play-len" id="etPlayLen">--:--</div>
                 </div>
               </div>
               <div class="ft-prog-row">
-                <div class="ft-prog-bar" onclick="seekEveningTalk(event)"><div class="ft-prog-fill" id="etFill"></div></div>
+                <div class="ft-prog-bar" onclick="seekEveningTalk(event)">
+                  <div class="ft-prog-fill" id="etFill"></div>
+                </div>
                 <div class="ft-prog-time" id="etTime">0:00</div>
               </div>
             </div>
@@ -668,72 +914,58 @@
             </div>
             <div class="ft-phrases-body" id="etPhrasesBody"></div>
           </div>
-
           <button class="ft-archive-link" onclick="openEtArchiveModal()">これまでの放送 →</button>
           <button class="ft-archive-link ft-archive-back" id="etArchiveBackBtn" onclick="returnToTodayEveningTalk()" style="display:none;">← 今日の放送にもどる</button>
         </div>
-      </div><!-- /journey-full (evening) -->
-    </div><!-- /journey-block jblock-evening -->
-
-
+      </div>
+      <!-- /journey-full (evening) --> 
+    </div>
+    <!-- /journey-block jblock-evening --> 
+    
     <!-- ③ 今月の教材絵本 -->
     <div class="journey-block" id="jblock-night" data-slot="night">
       <div class="journey-full">
-    <div class="month-hero-section">
-      <div class="month-lesson-wrap">
-        <div class="month-lesson-eyebrow">
-          <div class="month-eyebrow-label">
-            <span class="month-eyebrow-en">Monthly Book</span>
-            今月の教材絵本
-          </div>
-          <div class="month-eyebrow-line"></div>
-        </div>
-        <div class="month-lesson-card">
-          <div class="month-lesson-card-hero">
-            <!-- 毎月更新：その月の絵本テーマに合わせたヒーロー画像。4コマグリッド制作時に横長構図のカット
+        <div class="month-hero-section">
+          <div class="month-lesson-wrap">
+            <div class="month-lesson-eyebrow">
+              <div class="month-eyebrow-label"> <span class="month-eyebrow-en">Monthly Book</span> 今月の教材絵本 </div>
+              <div class="month-eyebrow-line"></div>
+            </div>
+            <div class="month-lesson-card">
+              <div class="month-lesson-card-hero"> 
+                <!-- 毎月更新：その月の絵本テーマに合わせたヒーロー画像。4コマグリッド制作時に横長構図のカット
                  を1枚追加で作り、books/<月>/monthly_book/hero.jpg として配置する（本編ページと同じ
-                 グリッド内で生成すればキャラの一貫性が保たれる）。未配置の月は旧くまイラストに自動フォールバック -->
-            <img src="books/aug/monthly_book/hero.jpg" alt="Sunny Day! - Enverly" onerror="this.onerror=null;this.src='illustrations/books/monthly_book_default.png';">
-            <div class="month-hero-overlay">
-              <span class="month-hero-label">Jayと一緒に読もう</span>
-            </div>
-          </div>
-          <div class="month-lesson-top" style="padding-bottom:20px;">
-            <div class="month-theme-row">
-              <div class="month-theme-dot"></div>
-              <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
-            </div>
-            <div class="month-title">Sunny Day!</div>
-            <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
-            <div class="book-level-toggle" style="display:none; margin-bottom:12px;">
-              <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
-              <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
-            </div>
-            <div class="month-read-btn-row">
-              <button class="month-read-btn" onclick="openBookModal('listen')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Listening</span>
-                  <span class="month-read-btn-ja">聞く</span>
-                </span>
-              </button>
-              <button class="month-read-btn study-variant" onclick="openBookModal('talk')">
-                <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング">
-                <span class="month-read-btn-text">
-                  <span class="month-read-btn-en">Talking</span>
-                  <span class="month-read-btn-ja">話す</span>
-                </span>
-              </button>
+                 グリッド内で生成すればキャラの一貫性が保たれる）。未配置の月は旧くまイラストに自動フォールバック --> 
+                <img src="books/aug/monthly_book/hero.jpg" alt="Sunny Day! - Enverly" onerror="this.onerror=null;this.src='illustrations/books/monthly_book_default.png';">
+                <div class="month-hero-overlay"> <span class="month-hero-label">Jayと一緒に読もう</span> </div>
+              </div>
+              <div class="month-lesson-top" style="padding-bottom:20px;">
+                <div class="month-theme-row">
+                  <div class="month-theme-dot"></div>
+                  <div class="month-theme-label">8月のテーマ · Water &amp; Sun</div>
+                </div>
+                <div class="month-title">Sunny Day!</div>
+                <div class="month-book-feature">あひるの子と一緒に、暑い夏の日を過ごす絵本です。"It's hot!" "Let's swim!" など、夏らしいフレーズが繰り返し出てくるので、読み聞かせながら一緒に声に出してみて。</div>
+                <div class="book-level-toggle" style="display:none; margin-bottom:12px;">
+                  <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
+                  <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
+                </div>
+                <div class="month-read-btn-row">
+                  <button class="month-read-btn" onclick="openBookModal('listen')"> <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_headphone.png" alt="リスニング"> <span class="month-read-btn-text"> <span class="month-read-btn-en">Listening</span> <span class="month-read-btn-ja">聞く</span> </span> </button>
+                  <button class="month-read-btn study-variant" onclick="openBookModal('talk')"> <img class="icon-img" style="width:26px;height:26px;" src="icons/icon_func_speak.png" alt="スピーキング"> <span class="month-read-btn-text"> <span class="month-read-btn-en">Talking</span> <span class="month-read-btn-ja">話す</span> </span> </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <!-- /month-hero-section --> 
       </div>
-    </div><!-- /month-hero-section -->
-      </div><!-- /journey-full (night) -->
-    </div><!-- /journey-block jblock-night -->
-
-    <!-- ブラウズエリア（ジャーニーとは独立・常時閲覧可、キュレーション系） -->
-
+      <!-- /journey-full (night) --> 
+    </div>
+    <!-- /journey-block jblock-night --> 
+    
+    <!-- ブラウズエリア（ジャーニーとは独立・常時閲覧可、キュレーション系） --> 
+    
     <!-- Weekly Pick（今週のおすすめ絵本） -->
     <div class="weekly-pick-standalone" style="margin-top:28px;">
       <div class="weekly-pick-block">
@@ -744,26 +976,24 @@
         <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">寝る前や日本語の絵本と一緒に取り入れてみてね。Jayが選んだ1冊です。</p>
         <div class="content-block" style="padding:0;">
           <div class="weekly-book-card" style="border:none;border-radius:0;background:transparent;">
-            <div class="weekly-book-cover-wrap">
-              <img src="books/aug/weekly_pick/goodnight_moon.jpg" alt="Goodnight Moon">
+            <div class="weekly-book-cover-wrap"> <img src="books/aug/weekly_pick/goodnight_moon.jpg" alt="Goodnight Moon">
               <div class="weekly-book-overlay">
                 <div class="weekly-book-overlay-title">Goodnight Moon</div>
                 <div class="weekly-book-overlay-author">Margaret Wise Brown · とどらー向け</div>
               </div>
             </div>
-            <div class="joel-line-wrap" style="margin:14px 16px 4px;">
-              <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Jay">
+            <div class="joel-line-wrap" style="margin:14px 16px 4px;"> <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Jay">
               <div class="joel-line-bubble is-quote">
                 <div class="joel-line-eyebrow">なぜJayがこの本を選んだの？</div>
-                <div class="joel-line-text">
-                  <span class="ja">うちの子が一番落ち着いて眠りについてくれた絵本のひとつ。身の回りのものひとつひとつに「おやすみ」を言っていくシンプルな構成だから、英語がまだの子でも安心して真似できます。</span>
-                </div>
+                <div class="joel-line-text"> <span class="ja">うちの子が一番落ち着いて眠りについてくれた絵本のひとつ。身の回りのものひとつひとつに「おやすみ」を言っていくシンプルな構成だから、英語がまだの子でも安心して真似できます。</span> </div>
               </div>
             </div>
             <div class="weekly-book-links">
               <div class="wbl-item featured" onclick="toggleLyrics()" style="cursor:pointer;">
                 <div class="wbl-icon green"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_document.png" alt="フレーズ"></div>
-                <div class="wbl-text"><div class="wbl-title">フレーズ応用編</div></div>
+                <div class="wbl-text">
+                  <div class="wbl-title">フレーズ応用編</div>
+                </div>
                 <div class="wbl-arr" id="lyricsChevron" style="transition:transform 0.25s;">▼</div>
               </div>
               <div class="weekly-lyrics-body" id="lyricsBody">
@@ -789,16 +1019,19 @@
                 </div>
               </div>
               <a class="wbl-item" href="https://www.amazon.co.jp/dp/0064430170?tag=enverly-22" target="_blank" onclick="trackEvent('amazon_click', '0064430170')">
-                <div class="wbl-icon gray"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_box.png" alt="Amazon"></div>
-                <div class="wbl-text"><div class="wbl-title">手元に置く（Amazon）</div><div class="wbl-sub">Goodnight Moon（Board Book）</div></div>
-                <div class="wbl-arr">↗</div>
-              </a>
-            </div>
+              <div class="wbl-icon gray"><img class="icon-img" style="width:22px;height:22px;" src="icons/icon_func_box.png" alt="Amazon"></div>
+              <div class="wbl-text">
+                <div class="wbl-title">手元に置く（Amazon）</div>
+                <div class="wbl-sub">Goodnight Moon（Board Book）</div>
+              </div>
+              <div class="wbl-arr">↗</div>
+              </a> </div>
           </div>
         </div>
       </div>
-    </div><!-- /weekly-pick-standalone -->
-
+    </div>
+    <!-- /weekly-pick-standalone --> 
+    
     <!-- Monthly Playlist（独立セクション・3曲） -->
     <div class="monthly-playlist-section">
       <div class="monthly-playlist-eyebrow">
@@ -816,21 +1049,21 @@
         <button class="yt-player-close" onclick="closeYtPlayer()">✕ とじる</button>
       </div>
     </div>
-
-
+    
     <!-- サブスクバナー -->
     <div class="sub-banner">
       <div>
         <div class="sub-text-title">週1回の英会話では話せません。</div>
-        <div class="sub-text-sub">毎日5分の家庭英語が子供を変える。<br>月額980円で全コンテンツ使い放題。</div>
+        <div class="sub-text-sub">毎日5分の家庭英語が子供を変える。<br>
+          月額980円で全コンテンツ使い放題。</div>
       </div>
       <button class="sub-btn">無料で始める</button>
     </div>
   </div>
-
+  
   <!-- 音楽タブ -->
-  <div id="tab-playlist" style="display:none;">
-
+  <div id="tab-playlist" style="display:none;"> 
+    
     <!-- YouTubeかけ流し（全件） -->
     <div class="yt-section" id="ytFullSection" style="padding-top:20px;">
       <div class="yt-header">
@@ -842,31 +1075,47 @@
       <div style="height:12px;"></div>
       <div id="ytCards"></div>
     </div>
-
+    
     <!-- シーン別プレイリスト -->
-    <div class="scene-divider"><div class="scene-label">シーン別</div><div class="scene-line"></div></div>
+    <div class="scene-divider">
+      <div class="scene-label">シーン別</div>
+      <div class="scene-line"></div>
+    </div>
     <div class="scene-grid" id="sceneCards"></div>
     <div style="height:20px;"></div>
   </div>
-
+  
   <!-- あそぼタブ -->
   <div id="tab-asobo" style="display:none;">
-
-    <div class="asobo-hero">
-      <img class="asobo-hero-illust" src="illustrations/asobo-hero.png" alt="あそぼ">
-      <div class="asobo-hero-sub">Jayの声に合わせて探したり答えたり。<br>気分でえらんで、何度でも遊べるよ。</div>
+    <div class="asobo-hero"> <img class="asobo-hero-illust" src="illustrations/asobo-hero.png" alt="あそぼ">
+      <div class="asobo-hero-sub">Jayの声に合わせて探したり答えたり。<br>
+        気分でえらんで、何度でも遊べるよ。</div>
     </div>
-
+    
     <!-- 1: 探し物ミッション -->
     <div class="asobo-section">
       <div class="asobo-section-card">
         <div class="asobo-section-head">
           <div class="asobo-section-num">1</div>
-          <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;"><circle cx="10" cy="10" r="6"/><line x1="20" y1="20" x2="14.5" y2="14.5"/></svg>探し物ミッション</div>
+          <div class="asobo-section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;">
+              <circle cx="10" cy="10" r="6"/>
+              <line x1="20" y1="20" x2="14.5" y2="14.5"/>
+            </svg>
+            探し物ミッション</div>
         </div>
         <img class="asobo-section-illust" src="illustrations/asobo-find.png" alt="探し物ミッション">
         <div class="asobo-gacha-wrap">
-          <button class="asobo-gacha-btn" onclick="drawAsoboGacha()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg> 今日のミッションを引く</button>
+          <button class="asobo-gacha-btn" onclick="drawAsoboGacha()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="3"/>
+            <circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+          今日のミッションを引く</button>
         </div>
         <div class="asobo-gacha-result" id="asoboGachaResult">
           <div class="asobo-gacha-result-inner">
@@ -876,12 +1125,11 @@
               <div class="asobo-gacha-ja" id="asoboGachaJa"></div>
               <div class="asobo-gacha-play-row">
                 <button class="asobo-timer-btn" onclick="toggleAsoboTimer()">
-                  <svg class="asobo-timer-ring" viewBox="0 0 64 64">
-                    <circle class="asobo-timer-ring-bg" cx="32" cy="32" r="28"/>
-                    <circle class="asobo-timer-ring-fg" id="asoboTimerRingFg" cx="32" cy="32" r="28"/>
-                  </svg>
-                  <span class="asobo-timer-play-icon" id="asoboTimerPlayIcon">▶</span>
-                </button>
+                <svg class="asobo-timer-ring" viewBox="0 0 64 64">
+                  <circle class="asobo-timer-ring-bg" cx="32" cy="32" r="28"/>
+                  <circle class="asobo-timer-ring-fg" id="asoboTimerRingFg" cx="32" cy="32" r="28"/>
+                </svg>
+                <span class="asobo-timer-play-icon" id="asoboTimerPlayIcon">▶</span> </button>
               </div>
               <div class="asobo-joel-line" id="asoboTimerHint"><img src="icons/icon_func_mic.png" alt="マイク">見つけたらもう一度タップ！タイマーが止まるよ</div>
               <div class="asobo-joel-line" id="asoboJoelLine"><img src="icons/icon_func_mic.png" alt="マイク">見つかったかな？</div>
@@ -895,17 +1143,29 @@
         <audio id="asoboSePlayer2" preload="none"></audio>
       </div>
     </div>
-
+    
     <!-- 2: なぞなぞクイズ -->
     <div class="asobo-section">
       <div class="asobo-section-card">
         <div class="asobo-section-head">
           <div class="asobo-section-num">2</div>
-          <div class="asobo-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg>なぞなぞクイズ</div>
+          <div class="asobo-section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/>
+              <line x1="12" y1="17" x2="12" y2="17.1"/>
+            </svg>
+            なぞなぞクイズ</div>
         </div>
         <img class="asobo-section-illust" src="illustrations/asobo-riddle.png" alt="なぞなぞクイズ">
         <div class="asobo-gacha-wrap">
-          <button class="asobo-gacha-btn" onclick="drawAsoboRiddle()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/><line x1="12" y1="17" x2="12" y2="17.1"/></svg> 今日のなぞなぞを引く</button>
+          <button class="asobo-gacha-btn" onclick="drawAsoboRiddle()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4"/>
+            <line x1="12" y1="17" x2="12" y2="17.1"/>
+          </svg>
+          今日のなぞなぞを引く</button>
         </div>
         <div class="asobo-riddle-result" id="asoboRiddleResult">
           <div class="asobo-riddle-result-inner">
@@ -914,16 +1174,14 @@
         </div>
       </div>
     </div>
-
+    
     <!-- 今後のコンテンツ拡張予告（初期の物量不足による離脱抑制） -->
-    <div class="asobo-coming-soon">
-      <img class="asobo-coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Jay">
+    <div class="asobo-coming-soon"> <img class="asobo-coming-soon-avatar" src="illustrations/joel/joel_wave_960x640.png" alt="Jay">
       <div class="asobo-coming-soon-text">
         <div class="asobo-coming-soon-main">今後も楽しいあそびを続々追加予定！</div>
         <div class="asobo-coming-soon-sub">お楽しみに♪</div>
       </div>
     </div>
-
     <div style="height:24px;"></div>
   </div>
   <!-- しるタブ -->
@@ -933,13 +1191,11 @@
       <div class="shiru-hero-title">今日知ったこと、ためていく場所</div>
       <div class="shiru-hero-sub">Jayが動物や食べ物のことなど小さな発見を教えてくれるよ。もっともっと知りたかったらパパやママにどんどん聞いてみてー！</div>
     </div>
-
     <div class="shiru-cat-grid" id="shiruCatGrid"></div>
     <div class="hint-box" style="margin:14px 20px 0;"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"> カードをタップすると、そのジャンルで今まで知ったことを見返せるよ。</div>
-
     <div style="height:24px;"></div>
   </div>
-
+  
   <!-- ルーティンタブ -->
   <div id="tab-routine" style="display:none;">
     <div class="section" style="padding-top:20px;">
@@ -948,45 +1204,38 @@
       <div class="hint-box"><img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_idea.png" alt="ヒント"> 全部覚えなくて大丈夫。気になるシーンだけ、その時に開いて使ってください。</div>
     </div>
   </div>
-
-</div><!-- /mainApp -->
+</div>
+<!-- /mainApp --> 
 
 <!-- スタンプ獲得の瞬間トースト（常設カードの代わりに、今いる場所の近くで一瞬だけ知らせる） -->
-<div class="stamp-toast" id="stampToast">
-  <img id="stampToastImg" src="illustrations/stamps/stamp_week_01.png" alt="">
-  <span id="stampToastText">ゲット！</span>
-</div>
+<div class="stamp-toast" id="stampToast"> <img id="stampToastImg" src="illustrations/stamps/stamp_week_01.png" alt=""> <span id="stampToastText">ゲット！</span> </div>
 
-<!-- 設定モーダル -->
+<!-- 設定モーダル --> 
 <!-- 週間スタンプカード達成お祝い -->
 <div class="stamp-celebrate-overlay" id="stampCelebrateOverlay">
-  <div class="stamp-celebrate-card">
-    <img src="illustrations/joel/joel_banzai_960x640.png" alt="Jay">
+  <div class="stamp-celebrate-card"> <img src="illustrations/joel/joel_banzai_960x640.png" alt="Jay">
     <div class="stamp-celebrate-title">スタンプカード、コンプリート！</div>
-    <div class="stamp-celebrate-sub">毎日えらいね。<br>このまま眺めていても、新しいカードをはじめてもいいよ。</div>
+    <div class="stamp-celebrate-sub">毎日えらいね。<br>
+      このまま眺めていても、新しいカードをはじめてもいいよ。</div>
     <div style="display:flex; gap:8px; justify-content:center;">
       <button class="stamp-celebrate-btn" onclick="closeStampCelebrate()" style="background:#fff; color:#2D6A4F; border:1.5px solid #2D6A4F;">とじる</button>
       <button class="stamp-celebrate-btn" onclick="advanceStampCard()">次のカードをはじめる</button>
     </div>
   </div>
 </div>
-
 <div class="settings-modal" id="settingsModal">
   <div class="settings-modal-header">
     <div class="settings-modal-title">設定</div>
     <button class="settings-modal-close" onclick="closeSettingsModal()">✕</button>
   </div>
   <div class="settings-body">
-
     <div class="settings-block-label">あゆみ</div>
     <div class="ayumi-badge" id="ayumiBadge"></div>
-
     <div class="stamp-card-caption">今のカード（5個で完成）</div>
     <div class="stamp-card-slots-wrap">
       <div class="stamp-card-slots" id="stampCardSlots"></div>
       <div class="stamp-card-footer">絵本のLet's talk・きょうのとびら・あそぼ・しる、どれか1つで1日1つゲット</div>
     </div>
-
     <div class="ayumi-grid">
       <div class="ayumi-card">
         <div class="ayumi-num" id="lifetimeTotalStamps">0</div>
@@ -1009,7 +1258,6 @@
         <div class="ayumi-label">あそぼで遊んだ回数</div>
       </div>
     </div>
-
     <div class="settings-block-label">アカウント</div>
     <div class="settings-account-card">
       <div class="settings-account-plan" id="settingsPlanLabel">Full プラン</div>
@@ -1018,45 +1266,57 @@
     <div class="settings-rows">
       <div class="wbl-item" id="notifyToggleRow" onclick="toggleDailyNotification()">
         <div class="wbl-icon rose">🔔</div>
-        <div class="wbl-text"><div class="wbl-title">毎日の通知</div><div class="wbl-sub" id="notifyToggleSub">朝、Morning Talkの配信をお知らせ</div></div>
-        <div class="notify-switch" id="notifySwitch"><div class="notify-switch-knob"></div></div>
+        <div class="wbl-text">
+          <div class="wbl-title">毎日の通知</div>
+          <div class="wbl-sub" id="notifyToggleSub">朝、Morning Talkの配信をお知らせ</div>
+        </div>
+        <div class="notify-switch" id="notifySwitch">
+          <div class="notify-switch-knob"></div>
+        </div>
       </div>
       <a class="wbl-item" href="https://billing.stripe.com/p/login/xxxxxxx" target="_blank">
-        <div class="wbl-icon blue">💳</div>
-        <div class="wbl-text"><div class="wbl-title">支払い方法の変更・解約</div><div class="wbl-sub">Stripeカスタマーポータルへ</div></div>
-        <div class="wbl-arr">↗</div>
+      <div class="wbl-icon blue">💳</div>
+      <div class="wbl-text">
+        <div class="wbl-title">支払い方法の変更・解約</div>
+        <div class="wbl-sub">Stripeカスタマーポータルへ</div>
+      </div>
+      <div class="wbl-arr">↗</div>
       </a>
       <div class="wbl-item" onclick="logoutEnverly()">
         <div class="wbl-icon gray">🚪</div>
-        <div class="wbl-text"><div class="wbl-title">ログアウト</div></div>
+        <div class="wbl-text">
+          <div class="wbl-title">ログアウト</div>
+        </div>
         <div class="wbl-arr">＞</div>
       </div>
     </div>
-
     <div class="settings-block-label">サービス情報</div>
-    <div class="settings-rows">
-      <a class="wbl-item" href="tokushoho.html" target="_blank">
-        <div class="wbl-icon gray">📄</div>
-        <div class="wbl-text"><div class="wbl-title">特定商取引法に基づく表記</div></div>
-        <div class="wbl-arr">＞</div>
-      </a>
-      <a class="wbl-item" href="privacy.html" target="_blank">
-        <div class="wbl-icon gray">🔒</div>
-        <div class="wbl-text"><div class="wbl-title">プライバシーポリシー</div></div>
-        <div class="wbl-arr">＞</div>
-      </a>
-      <a class="wbl-item" href="terms.html" target="_blank">
-        <div class="wbl-icon gray">📋</div>
-        <div class="wbl-text"><div class="wbl-title">利用規約</div></div>
-        <div class="wbl-arr">＞</div>
-      </a>
-      <a class="wbl-item" href="mailto:Enverly.official@gmail.com">
-        <div class="wbl-icon gray">✉️</div>
-        <div class="wbl-text"><div class="wbl-title">お問い合わせ</div><div class="wbl-sub">Enverly.official@gmail.com</div></div>
-        <div class="wbl-arr">＞</div>
-      </a>
-    </div>
-
+    <div class="settings-rows"> <a class="wbl-item" href="tokushoho.html" target="_blank">
+      <div class="wbl-icon gray">📄</div>
+      <div class="wbl-text">
+        <div class="wbl-title">特定商取引法に基づく表記</div>
+      </div>
+      <div class="wbl-arr">＞</div>
+      </a> <a class="wbl-item" href="privacy.html" target="_blank">
+      <div class="wbl-icon gray">🔒</div>
+      <div class="wbl-text">
+        <div class="wbl-title">プライバシーポリシー</div>
+      </div>
+      <div class="wbl-arr">＞</div>
+      </a> <a class="wbl-item" href="terms.html" target="_blank">
+      <div class="wbl-icon gray">📋</div>
+      <div class="wbl-text">
+        <div class="wbl-title">利用規約</div>
+      </div>
+      <div class="wbl-arr">＞</div>
+      </a> <a class="wbl-item" href="mailto:Enverly.official@gmail.com">
+      <div class="wbl-icon gray">✉️</div>
+      <div class="wbl-text">
+        <div class="wbl-title">お問い合わせ</div>
+        <div class="wbl-sub">Enverly.official@gmail.com</div>
+      </div>
+      <div class="wbl-arr">＞</div>
+      </a> </div>
   </div>
 </div>
 
@@ -1069,9 +1329,9 @@
     </div>
     <button class="archive-modal-close" onclick="closeArchiveModal()">✕</button>
   </div>
-  <div class="archive-body" id="archiveBody">
+  <div class="archive-body" id="archiveBody"> 
     <!-- 中身はrenderArchiveModalBody()がMORNING_TALK_WEEKS/MORNING_TALK_AUDIOの実データから動的生成する。
-         「⭐ Best Of」は放送本数がまだ少なくキュレーションできないため一旦保留（W2以降、蓄積を見て再検討）。 -->
+         「⭐ Best Of」は放送本数がまだ少なくキュレーションできないため一旦保留（W2以降、蓄積を見て再検討）。 --> 
   </div>
 </div>
 
@@ -1084,15 +1344,14 @@
     </div>
     <button class="archive-modal-close" onclick="closeEtArchiveModal()">✕</button>
   </div>
-  <div class="archive-body" id="etArchiveBody">
-    <!-- 中身はrenderEtArchiveModalBody()がEVENING_TALK_WEEKS/EVENING_TALK_AUDIOの実データから動的生成する。 -->
+  <div class="archive-body" id="etArchiveBody"> 
+    <!-- 中身はrenderEtArchiveModalBody()がEVENING_TALK_WEEKS/EVENING_TALK_AUDIOの実データから動的生成する。 --> 
   </div>
 </div>
 
 <!-- ルーティン・フレーズリストモーダル -->
 <div class="routine-modal" id="routineModal">
-  <div class="routine-modal-hero-wrap">
-    <img class="routine-modal-hero" id="routineModalImage" src="" alt="">
+  <div class="routine-modal-hero-wrap"> <img class="routine-modal-hero" id="routineModalImage" src="" alt="">
     <button class="routine-modal-close" onclick="closeRoutineModal()">✕</button>
   </div>
   <div class="routine-modal-header">
@@ -1110,7 +1369,6 @@
   </div>
   <div class="shiru-book-stage" id="shiruBookStage">
     <div class="shiru-book-paper"></div>
-
     <div class="shiru-grid-screen" id="shiruGridScreen">
       <div class="shiru-grid-header">
         <div class="shiru-grid-back" onclick="backToShiruToc()">← Back</div>
@@ -1122,22 +1380,18 @@
       <div class="shiru-fact-grid" id="shiruFactGrid"></div>
       <div class="shiru-fact-note">カードをタップすると、めくれて答えが聞こえるよ（英語と日本語の文章も出るよ）</div>
     </div>
-
     <div class="shiru-toc-screen" id="shiruTocScreen">
       <div class="shiru-toc-title" id="shiruTocTitle">Animal のもくじ</div>
       <div id="shiruTocList"></div>
     </div>
-
     <div class="shiru-riffle-page" id="shiruPage5" style="background:#F5EFDE;"></div>
     <div class="shiru-riffle-page" id="shiruPage4" style="background:#F6F0E1;"></div>
     <div class="shiru-riffle-page" id="shiruPage3" style="background:#F6F1E2;"></div>
     <div class="shiru-riffle-page" id="shiruPage2" style="background:#F7F1E3;"></div>
     <div class="shiru-riffle-page" id="shiruPage1" style="background:#F7F2E4;"></div>
-
     <div class="shiru-cover-page" id="shiruCoverPage">
       <div class="shiru-cover-spine" id="shiruCoverSpine"></div>
-      <div class="shiru-cover-body">
-        <img id="shiruCoverImage" src="" alt="" style="width:56px;height:56px;object-fit:contain;">
+      <div class="shiru-cover-body"> <img id="shiruCoverImage" src="" alt="" style="width:56px;height:56px;object-fit:contain;">
         <div class="shiru-cover-title" id="shiruCoverTitle">Animal</div>
         <div class="shiru-cover-sub" id="shiruCoverSub">どうぶつ</div>
       </div>
@@ -1147,7 +1401,6 @@
 
 <!-- トースト -->
 <div class="toast" id="toast"></div>
-
 <script>
 // ========================
 // 招待制アクセスゲート：ロック画面フォームの送信ハンドラ
@@ -1392,6 +1645,24 @@ function renderJoelLine() {
   const el = document.getElementById('joelLineText');
   const bubble = document.getElementById('joelLineBubble');
   if (!el) return;
+	  let hasShiruNews = false;
+  try { hasShiruNews = shiruTabHasNew(); } catch (e) { hasShiruNews = false; }
+
+  if (hasShiruNews) {
+    bubble.classList.remove('is-quote');
+    bubble.classList.add('is-news');
+    bubble.style.cursor = 'pointer';
+    bubble.onclick = function () {
+      const shiruTabEl = document.querySelectorAll('.tab-bar .tab')[1];
+      if (shiruTabEl) switchTab('shiru', shiruTabEl);
+    };
+    el.innerHTML = `<div class="joel-line-eyebrow news">🆕 NEWS</div><span class="en">Jayからの新しい豆知識が届いたよ！</span><span class="ja">タップして「しる」をチェック →</span>`;
+    return;
+  }
+
+  bubble.classList.remove('is-news');
+  bubble.style.cursor = '';
+  bubble.onclick = null;
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
   const line = JOEL_ONE_LINERS[dayOfYear % JOEL_ONE_LINERS.length];
   const isQuote = line.type === 'quote';
@@ -2084,6 +2355,7 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   if (name === 'asobo') renderAsoboContent();
+	  if (name === 'home') renderJoelLine();
   trackEvent('tab_view', name);
 }
 
@@ -4624,6 +4896,7 @@ function revealShiruFact(topicId, factIndex, cardEl) {
 }
 
 renderShiruCatGrid();
+	renderJoelLine();
 
 // ========================
 // 絵本ビューワー
@@ -5006,7 +5279,7 @@ function renderYT() {
     </div>
   `).join('');
 }
-</script>
+</script> 
 
 <!--
 ==================================================
