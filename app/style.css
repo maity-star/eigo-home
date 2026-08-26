@@ -87,6 +87,35 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .joel-line-eyebrow { font-size: 8px; font-weight: 700; color: #6AA17F; letter-spacing: 0.03em; margin-bottom: 3px; }
 .joel-line-bubble.is-quote .joel-line-text .en { font-style: italic; }
 .joel-line-text .author { display: block; font-size: 8.5px; color: #B7BDC4; margin-top: 3px; text-align: right; }
+.joel-line-bubble.is-news {
+  border: 1px solid #E8C39A;
+  border-left: 3px solid #B5471F;
+  padding-left: 11px;
+  background: linear-gradient(135deg, #FFF6EC 0%, #FFEFDD 100%);
+  box-shadow: 0 2px 8px rgba(181,71,31,0.14);
+}
+.joel-line-bubble.is-news::before {
+  background: #FFF6EC;
+  border-left-color: #E8C39A;
+  border-bottom-color: #E8C39A;
+}
+.joel-line-eyebrow.news {
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+  background: #B5471F;
+  padding: 2px 7px;
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+  animation: joelNewsPulse 1.8s ease-in-out infinite;
+}
+.joel-line-bubble.is-news .joel-line-text .en { color: #7A3B1A; font-weight: 700; font-style: normal; }
+.joel-line-bubble.is-news .joel-line-text .ja { color: #B08862; font-size: 9.5px; }
+@keyframes joelNewsPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(181,71,31,0.35); }
+  50% { box-shadow: 0 0 0 4px rgba(181,71,31,0); }
+}
 
 /* 週間スタンプカード(紙のスタンプカード風・きょうのとびら直下) */
 /* スタンプカード:設定＞あゆみ内に常設表示する「今のカード」 */
