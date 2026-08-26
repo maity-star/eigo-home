@@ -55,66 +55,48 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* えほんタイムだけはこの仕組みの対象外＝常に展開(collapsedクラス自体を付与しない) */
 
 /* Jayのひとこと(タブバー直下・きょうのとびら直上) */
+/* 2026-08-26: 影・吹き出しのしっぽを廃止し、色の塗りだけで区別するフラット/モダンなカードに変更 */
 .joel-line-wrap { display: flex; align-items: flex-start; gap: 8px; margin: 14px 20px 12px 34px; }
 .joel-line-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1px solid #BBDAC8; margin-top: 4px; }
 .joel-line-bubble {
   position: relative;
   flex: 1;
-  background: #FFFFFF;
-  border: 1px solid #E4E0D4;
-  border-radius: 14px;
-  padding: 9px 13px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-.joel-line-bubble::before {
-  content: '';
-  position: absolute;
-  left: -6px;
-  top: 13px;
-  width: 11px;
-  height: 11px;
-  background: #FFFFFF;
-  border-left: 1px solid #E4E0D4;
-  border-bottom: 1px solid #E4E0D4;
-  transform: rotate(45deg);
+  background: #F3F7F4;
+  border: none;
+  border-radius: 16px;
+  padding: 10px 14px;
+  box-shadow: none;
 }
 .joel-line-text { font-size: 10.5px; color: #9CA3AF; line-height: 1.4; }
 .joel-line-text .en { font-weight: 600; color: #6B8577; display: block; margin-bottom: 1px; }
 .joel-line-text .ja { font-size: 9.5px; color: #C2C7CC; }
 
 /* Jayが選んだ言葉(キュレーション名言バリエーション) */
-.joel-line-bubble.is-quote { border-left: 3px solid #6AA17F; padding-left: 11px; }
+.joel-line-bubble.is-quote { background: #EDF5F0; }
 .joel-line-eyebrow { font-size: 8px; font-weight: 700; color: #6AA17F; letter-spacing: 0.03em; margin-bottom: 3px; }
 .joel-line-bubble.is-quote .joel-line-text .en { font-style: italic; }
 .joel-line-text .author { display: block; font-size: 8.5px; color: #B7BDC4; margin-top: 3px; text-align: right; }
+
+/* しるタブに新しい豆知識が届いた日(火・木)のお知らせバナー：Jayのひとことの表示を差し替える */
 .joel-line-bubble.is-news {
-  border: 1px solid #E8C39A;
-  border-left: 3px solid #B5471F;
-  padding-left: 11px;
-  background: linear-gradient(135deg, #FFF6EC 0%, #FFEFDD 100%);
-  box-shadow: 0 2px 8px rgba(181,71,31,0.14);
-}
-.joel-line-bubble.is-news::before {
-  background: #FFF6EC;
-  border-left-color: #E8C39A;
-  border-bottom-color: #E8C39A;
+  background: #FFF1E1;
 }
 .joel-line-eyebrow.news {
   display: inline-flex;
   align-items: center;
   color: #fff;
-  background: #B5471F;
+  background: #E8935A;
   padding: 2px 7px;
   border-radius: 8px;
   letter-spacing: 0.02em;
   margin-bottom: 4px;
   animation: joelNewsPulse 1.8s ease-in-out infinite;
 }
-.joel-line-bubble.is-news .joel-line-text .en { color: #7A3B1A; font-weight: 700; font-style: normal; }
-.joel-line-bubble.is-news .joel-line-text .ja { color: #B08862; font-size: 9.5px; }
+.joel-line-bubble.is-news .joel-line-text .en { color: #A85A28; font-weight: 700; font-style: normal; }
+.joel-line-bubble.is-news .joel-line-text .ja { color: #C08256; font-size: 9.5px; }
 @keyframes joelNewsPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(181,71,31,0.35); }
-  50% { box-shadow: 0 0 0 4px rgba(181,71,31,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232,147,90,0.35); }
+  50% { box-shadow: 0 0 0 4px rgba(232,147,90,0); }
 }
 
 /* 週間スタンプカード(紙のスタンプカード風・きょうのとびら直下) */
