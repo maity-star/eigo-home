@@ -2017,6 +2017,34 @@ async function toggleDailyNotification() {
       new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready がタイムアウトしました（5秒待っても解決しませんでした）')), 5000))
     ]);
 
+    // iOS Safari対策：unregisterで一度すべてのSW登録を解除してからregisterし直すと、
+    // activate内でclients.claim()を呼んでいても、今開いているこのページの
+    // navigator.serviceWorker.controller がすぐには更新されないことがある（WebKitの既知の癖）。
+    // controllerが無いままpushManagerを触ると
+    // 「Getting push subscription requires a service worker」というエラーになるため、
+    // 少しだけcontrollerchangeを待ち、それでも来なければ一度だけページを再読み込みする。
+    if (!navigator.serviceWorker.controller) {
+      step = 'controller待ち';
+      const gotController = await Promise.race([
+        new Promise((resolve) => {
+          navigator.serviceWorker.addEventListener('controllerchange', function () { resolve(true); }, { once: true });
+        }),
+        new Promise((resolve) => setTimeout(function () { resolve(false); }, 1500)),
+      ]);
+      if (!gotController && !navigator.serviceWorker.controller) {
+        var alreadyRetried = false;
+        try { alreadyRetried = sessionStorage.getItem('enverly_notify_retry') === '1'; } catch (e3) {}
+        if (alreadyRetried) {
+          try { sessionStorage.removeItem('enverly_notify_retry'); } catch (e4) {}
+          throw new Error('ページを再読み込みしても通知の準備が整いませんでした。少し時間をおいてもう一度お試しください。');
+        }
+        try { sessionStorage.setItem('enverly_notify_retry', '1'); } catch (e5) {}
+        location.reload();
+        return;
+      }
+    }
+    try { sessionStorage.removeItem('enverly_notify_retry'); } catch (e6) {}
+
     step = 'getSubscription';
     const existing = await reg.pushManager.getSubscription();
 
