@@ -766,16 +766,12 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                       <button class="ft-skip-btn" onclick="skipFamilyTalk(10)" aria-label="10秒進める">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M20 12h-9a5 5 0 0 0 0 10h1"/></svg>
                       </button>
-                      <div class="ft-play-meta">
-                        <div class="ft-play-title" id="ftPlayTitle">Wed · What animal did you see today?</div>
-                        <div class="ft-play-len" id="ftPlayLen">3:40</div>
-                      </div>
                     </div>
                     <div class="ft-prog-row">
                       <div class="ft-prog-bar" onclick="seekFamilyTalk(event)">
                         <div class="ft-prog-fill" id="ftFill"></div>
                       </div>
-                      <div class="ft-prog-time" id="ftTime">0:00</div>
+                      <div class="ft-prog-time"><span id="ftTime">0:00</span> / <span id="ftPlayLen">3:40</span></div>
                     </div>
                     <div id="ftDebugOverlay" style="display:none; margin-top:8px; padding:8px 10px; background:rgba(0,0,0,0.75); border-radius:8px; font-size:10px; color:#B7F5C8; font-family:monospace; line-height:1.6; white-space:pre-wrap;"></div>
                   </div>
@@ -909,16 +905,12 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                 <button class="ft-skip-btn" onclick="skipEveningTalk(10)" aria-label="10秒進める">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M20 12h-9a5 5 0 0 0 0 10h1"/></svg>
                 </button>
-                <div class="ft-play-meta">
-                  <div class="ft-play-title" id="etPlayTitle">Mon · How was your day?</div>
-                  <div class="ft-play-len" id="etPlayLen">--:--</div>
-                </div>
               </div>
               <div class="ft-prog-row">
                 <div class="ft-prog-bar" onclick="seekEveningTalk(event)">
                   <div class="ft-prog-fill" id="etFill"></div>
                 </div>
-                <div class="ft-prog-time" id="etTime">0:00</div>
+                <div class="ft-prog-time"><span id="etTime">0:00</span> / <span id="etPlayLen">--:--</span></div>
               </div>
             </div>
             <div class="ft-phrases-toggle" onclick="toggleEtPhrases()">
@@ -3223,7 +3215,6 @@ function renderMorningTalkContent() {
     note.style.display = 'block';
     document.getElementById('ftQuestion').textContent = 'Coming soon!';
     document.getElementById('ftQuestionJa').textContent = 'もうすぐ配信スタート';
-    document.getElementById('ftPlayTitle').textContent = '配信準備中';
     const body = document.getElementById('ftPhrasesBody');
     if (body) body.innerHTML = '';
     ftCurrentPhrases = [];
@@ -3237,7 +3228,6 @@ function renderMorningTalkContent() {
     note.style.display = 'none';
     document.getElementById('ftQuestion').textContent = 'Coming today!';
     document.getElementById('ftQuestionJa').textContent = `今日のMorning talkは${MORNING_TALK_RELEASE_HOUR}:00に配信予定`;
-    document.getElementById('ftPlayTitle').textContent = `${MORNING_TALK_RELEASE_HOUR}時に配信`;
     const body = document.getElementById('ftPhrasesBody');
     if (body) body.innerHTML = '';
     ftCurrentPhrases = [];
@@ -3269,7 +3259,6 @@ function renderMorningTalkContent() {
   const c = info.content;
   document.getElementById('ftQuestion').textContent = `"${c.title}"`;
   document.getElementById('ftQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
-  document.getElementById('ftPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
 
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
     : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
@@ -4010,7 +3999,6 @@ function renderEveningTalkContent() {
     const q = document.getElementById('etQuestion'); if (q) q.textContent = info.isBeforeRelease ? 'Coming today!' : 'Coming soon!';
     const qj = document.getElementById('etQuestionJa'); if (qj) qj.textContent = info.isBeforeRelease
       ? `今日のEvening talkは${EVENING_TALK_RELEASE_HOUR}:00に配信予定` : 'もうすぐ配信スタート';
-    const pt = document.getElementById('etPlayTitle'); if (pt) pt.textContent = info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信` : '配信準備中';
     const body = document.getElementById('etPhrasesBody'); if (body) body.innerHTML = '';
     etCurrentPhrases = [];
     etPhraseTimings = [];
@@ -4034,7 +4022,6 @@ function renderEveningTalkContent() {
   const c = info.content;
   document.getElementById('etQuestion').textContent = `"${c.title}"`;
   document.getElementById('etQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
-  document.getElementById('etPlayTitle').textContent = `${DAY_LABEL_JA[info.dayKey]} · ${c.title}`;
 
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
     : c.phrases.map(p => ({ speaker: null, en: p.en, ja: p.ja }));
