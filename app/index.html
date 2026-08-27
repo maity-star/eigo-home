@@ -759,7 +759,13 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                   </div>
                   <div class="ft-player-inner">
                     <div class="ft-play-row">
+                      <button class="ft-skip-btn" onclick="skipFamilyTalk(-10)" aria-label="10秒戻す">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M4 12h9a5 5 0 0 1 0 10h-1"/></svg>
+                      </button>
                       <button class="ft-play-btn" id="ftPlayBtn" onclick="toggleFamilyTalk()"> <span id="ftPlayIcon">▶</span> </button>
+                      <button class="ft-skip-btn" onclick="skipFamilyTalk(10)" aria-label="10秒進める">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M20 12h-9a5 5 0 0 0 0 10h1"/></svg>
+                      </button>
                       <div class="ft-play-meta">
                         <div class="ft-play-title" id="ftPlayTitle">Wed · What animal did you see today?</div>
                         <div class="ft-play-len" id="ftPlayLen">3:40</div>
@@ -896,7 +902,13 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
             </div>
             <div class="ft-player-inner">
               <div class="ft-play-row">
+                <button class="ft-skip-btn" onclick="skipEveningTalk(-10)" aria-label="10秒戻す">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M4 12h9a5 5 0 0 1 0 10h-1"/></svg>
+                </button>
                 <button class="ft-play-btn" id="etPlayBtn" onclick="toggleEveningTalk()"> <span id="etPlayIcon">▶</span> </button>
+                <button class="ft-skip-btn" onclick="skipEveningTalk(10)" aria-label="10秒進める">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M20 12h-9a5 5 0 0 0 0 10h1"/></svg>
+                </button>
                 <div class="ft-play-meta">
                   <div class="ft-play-title" id="etPlayTitle">Mon · How was your day?</div>
                   <div class="ft-play-len" id="etPlayLen">--:--</div>
@@ -1122,6 +1134,7 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
           <div class="asobo-gacha-result-inner">
             <div class="asobo-gacha-card">
               <div class="asobo-gacha-label">TODAY'S MISSION</div>
+              <div class="asobo-gacha-visual" id="asoboGachaVisual"></div>
               <div class="asobo-gacha-en" id="asoboGachaEn"></div>
               <div class="asobo-gacha-ja" id="asoboGachaJa"></div>
               <div class="asobo-gacha-play-row">
@@ -2542,6 +2555,7 @@ function renderAsoboAxisList() {
             <div class="at-archive-en">${m.en}</div>
             <div class="at-archive-ja">${m.ja}</div>
           </div>
+          ${renderAsoboVisual(m, 'sm')}
         </div>`).join('');
     return `
     <div class="asobo-axis-frame ${meta.cls}" id="axisFrame-${meta.cls}" data-axis="${axis}">
@@ -2629,6 +2643,8 @@ function drawAsoboGacha() {
   playAsoboSe(ASOBO_SFX.gachaDraw);
   document.getElementById('asoboGachaEn').textContent = pick.en;
   document.getElementById('asoboGachaJa').textContent = pick.ja;
+  const visualEl = document.getElementById('asoboGachaVisual');
+  if (visualEl) visualEl.innerHTML = renderAsoboVisual(pick);
   document.getElementById('asoboGachaResult').classList.add('show');
   resetAsoboTimer();
   const meta = AXIS_META[pick.axis];
@@ -3605,6 +3621,16 @@ function seekFamilyTalk(e) {
   document.getElementById('ftFill').style.width = ftProg + '%';
   updateFtWaveProgress(ftProg);
 }
+function skipFamilyTalk(deltaSec) {
+  if (!MORNING_TALK_AUDIO[ftCurrentAudioKey] || !ftAudioEl.duration) return;
+  const newTime = Math.min(ftAudioEl.duration, Math.max(0, ftAudioEl.currentTime + deltaSec));
+  ftAudioEl.currentTime = newTime;
+  ftProg = (newTime / ftAudioEl.duration) * 100;
+  document.getElementById('ftFill').style.width = ftProg + '%';
+  updateFtWaveProgress(ftProg);
+  document.getElementById('ftTime').textContent = fmtFtTime(newTime);
+  updateFtPhraseHighlight(newTime);
+}
 function toggleFtPhrases() {
   ftPhrasesManualToggle = true;
   const b = document.getElementById('ftPhrasesBody'); const c = document.getElementById('ftPhrasesChevron');
@@ -4247,6 +4273,16 @@ function seekEveningTalk(e) {
   const fill = document.getElementById('etFill'); if (fill) fill.style.width = etProg + '%';
   updateEtWaveProgress(etProg);
 }
+function skipEveningTalk(deltaSec) {
+  if (!EVENING_TALK_AUDIO[etCurrentAudioKey] || !etAudioEl.duration) return;
+  const newTime = Math.min(etAudioEl.duration, Math.max(0, etAudioEl.currentTime + deltaSec));
+  etAudioEl.currentTime = newTime;
+  etProg = (newTime / etAudioEl.duration) * 100;
+  const fill = document.getElementById('etFill'); if (fill) fill.style.width = etProg + '%';
+  updateEtWaveProgress(etProg);
+  const timeEl = document.getElementById('etTime'); if (timeEl) timeEl.textContent = fmtFtTime(newTime);
+  updateEtPhraseHighlight(newTime);
+}
 
 function toggleEtPhrases() {
   etPhrasesManualToggle = true;
@@ -4378,26 +4414,34 @@ renderJourneyNowPlaying();
 // Active Time（探し物ミッション／なぞなぞクイズ）
 // ========================
 const AT_FIND = [
-  { axis: 'カラー', en: 'Find something red!', ja: '赤いものを探してみよう', audio: 'audio/asobo_audio/find_red.mp3' },
-  { axis: 'カラー', en: 'Find something blue!', ja: '青いものを探してみよう', audio: 'audio/asobo_audio/find_blue.mp3' },
-  { axis: 'カラー', en: 'Find something yellow!', ja: '黄色いものを探してみよう', audio: 'audio/asobo_audio/find_yellow.mp3' },
-  { axis: 'カラー', en: 'Find something green!', ja: '緑のものを探してみよう', audio: 'audio/asobo_audio/find_green.mp3' },
-  { axis: 'カウント', en: 'Find three round things!', ja: '丸いものを3つ探してみよう', audio: 'audio/asobo_audio/find_three_round.mp3' },
-  { axis: 'カウント', en: 'Find two little things!', ja: '小さいものを2つ探してみよう', audio: 'audio/asobo_audio/find_two_little.mp3' },
-  { axis: 'カウント', en: 'Find one big thing!', ja: '大きいものを1つ探してみよう', audio: 'audio/asobo_audio/find_one_big.mp3' },
-  { axis: 'サウンド', en: 'Find something that makes a sound!', ja: '音が出るものを探してみよう', audio: 'audio/asobo_audio/find_sound.mp3' },
-  { axis: 'サウンド', en: 'Find something loud!', ja: '大きな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_loud.mp3' },
-  { axis: 'サウンド', en: 'Find something quiet!', ja: '小さな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_quiet.mp3' },
-  { axis: 'ロケーション', en: 'Find something under the table!', ja: 'テーブルの下にあるものを探してみよう', audio: 'audio/asobo_audio/find_under_table.mp3' },
-  { axis: 'ロケーション', en: 'Find something near the window!', ja: '窓のそばにあるものを探してみよう', audio: 'audio/asobo_audio/find_near_window.mp3' },
-  { axis: 'ロケーション', en: 'Find something on the floor!', ja: '床の上にあるものを探してみよう', audio: 'audio/asobo_audio/find_floor.mp3' },
-  { axis: 'テクスチャー', en: 'Find something soft!', ja: 'やわらかいものを探してみよう', audio: 'audio/asobo_audio/find_soft.mp3' },
-  { axis: 'テクスチャー', en: 'Find something hard!', ja: 'かたいものを探してみよう', audio: 'audio/asobo_audio/find_hard.mp3' },
-  { axis: 'テクスチャー', en: 'Find something smooth!', ja: 'つるつるしているものを探してみよう', audio: 'audio/asobo_audio/find_smooth.mp3' },
-  { axis: 'カテゴリー', en: 'Find something you can eat!', ja: '食べられるものを探してみよう', audio: 'audio/asobo_audio/find_eat.mp3' },
-  { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう', audio: 'audio/asobo_audio/find_wear.mp3' },
-  { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう', audio: 'audio/asobo_audio/find_read.mp3' },
+  { axis: 'カラー', en: 'Find something red!', ja: '赤いものを探してみよう', audio: 'audio/asobo_audio/find_red.mp3', visual: { type: 'color', value: '#E5484D' } },
+  { axis: 'カラー', en: 'Find something blue!', ja: '青いものを探してみよう', audio: 'audio/asobo_audio/find_blue.mp3', visual: { type: 'color', value: '#4C82E0' } },
+  { axis: 'カラー', en: 'Find something yellow!', ja: '黄色いものを探してみよう', audio: 'audio/asobo_audio/find_yellow.mp3', visual: { type: 'color', value: '#F0B93D' } },
+  { axis: 'カラー', en: 'Find something green!', ja: '緑のものを探してみよう', audio: 'audio/asobo_audio/find_green.mp3', visual: { type: 'color', value: '#6DB88A' } },
+  { axis: 'カウント', en: 'Find three round things!', ja: '丸いものを3つ探してみよう', audio: 'audio/asobo_audio/find_three_round.mp3', visual: { type: 'emoji', value: '3️⃣' } },
+  { axis: 'カウント', en: 'Find two little things!', ja: '小さいものを2つ探してみよう', audio: 'audio/asobo_audio/find_two_little.mp3', visual: { type: 'emoji', value: '2️⃣' } },
+  { axis: 'カウント', en: 'Find one big thing!', ja: '大きいものを1つ探してみよう', audio: 'audio/asobo_audio/find_one_big.mp3', visual: { type: 'emoji', value: '1️⃣' } },
+  { axis: 'サウンド', en: 'Find something that makes a sound!', ja: '音が出るものを探してみよう', audio: 'audio/asobo_audio/find_sound.mp3', visual: { type: 'emoji', value: '🔊' } },
+  { axis: 'サウンド', en: 'Find something loud!', ja: '大きな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_loud.mp3', visual: { type: 'emoji', value: '📢' } },
+  { axis: 'サウンド', en: 'Find something quiet!', ja: '小さな音が出るものを探してみよう', audio: 'audio/asobo_audio/find_quiet.mp3', visual: { type: 'emoji', value: '🤫' } },
+  { axis: 'ロケーション', en: 'Find something under the table!', ja: 'テーブルの下にあるものを探してみよう', audio: 'audio/asobo_audio/find_under_table.mp3', visual: { type: 'emoji', value: '🪑' } },
+  { axis: 'ロケーション', en: 'Find something near the window!', ja: '窓のそばにあるものを探してみよう', audio: 'audio/asobo_audio/find_near_window.mp3', visual: { type: 'emoji', value: '🪟' } },
+  { axis: 'ロケーション', en: 'Find something on the floor!', ja: '床の上にあるものを探してみよう', audio: 'audio/asobo_audio/find_floor.mp3', visual: { type: 'emoji', value: '👣' } },
+  { axis: 'テクスチャー', en: 'Find something soft!', ja: 'やわらかいものを探してみよう', audio: 'audio/asobo_audio/find_soft.mp3', visual: { type: 'emoji', value: '🧸' } },
+  { axis: 'テクスチャー', en: 'Find something hard!', ja: 'かたいものを探してみよう', audio: 'audio/asobo_audio/find_hard.mp3', visual: { type: 'emoji', value: '🪨' } },
+  { axis: 'テクスチャー', en: 'Find something smooth!', ja: 'つるつるしているものを探してみよう', audio: 'audio/asobo_audio/find_smooth.mp3', visual: { type: 'emoji', value: '🥚' } },
+  { axis: 'カテゴリー', en: 'Find something you can eat!', ja: '食べられるものを探してみよう', audio: 'audio/asobo_audio/find_eat.mp3', visual: { type: 'emoji', value: '🍎' } },
+  { axis: 'カテゴリー', en: 'Find something you can wear!', ja: '着られるものを探してみよう', audio: 'audio/asobo_audio/find_wear.mp3', visual: { type: 'emoji', value: '👕' } },
+  { axis: 'カテゴリー', en: 'Find something you can read!', ja: '読めるものを探してみよう', audio: 'audio/asobo_audio/find_read.mp3', visual: { type: 'emoji', value: '📖' } },
 ];
+function renderAsoboVisual(item, size) {
+  if (!item || !item.visual) return '';
+  const sizeCls = size === 'sm' ? ' asobo-visual-sm' : '';
+  if (item.visual.type === 'color') {
+    return `<span class="asobo-visual-swatch${sizeCls}" style="background:${item.visual.value}"></span>`;
+  }
+  return `<span class="asobo-visual-emoji${sizeCls}">${item.visual.value}</span>`;
+}
 const AT_FIND_DONE_AUDIO = [
   'audio/asobo_audio/find_done_1.mp3',
   'audio/asobo_audio/find_done_2.mp3',
