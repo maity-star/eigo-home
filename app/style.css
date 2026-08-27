@@ -550,7 +550,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 
 .ft-player-inner { background: rgba(255,255,255,0.55); border-radius: 14px 14px 0 0; margin: 0 0; padding: 14px 16px; position: relative; z-index: 1; }
-.ft-play-row { display: flex; align-items: center; gap: 12px; }
+.ft-play-row { display: flex; align-items: center; justify-content: center; gap: 12px; }
 .ft-play-btn {
   width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
   background: #6DB88A; border: none; cursor: pointer;
@@ -567,13 +567,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-skip-btn:hover { background: rgba(45,106,79,0.16); }
 .ft-skip-btn:active { transform: scale(0.92); }
 .ft-skip-btn svg { width: 18px; height: 18px; }
-.ft-play-meta { flex: 1; min-width: 0; }
-.ft-play-title { font-size: 12px; font-weight: 600; color: #1A4232; }
-.ft-play-len { font-size: 10px; color: #6B8577; margin-top: 1px; }
 .ft-prog-bar { flex: 1; height: 3px; background: rgba(45,106,79,0.15); border-radius: 2px; overflow: hidden; cursor: pointer; }
 .ft-prog-fill { height: 100%; background: #6DB88A; width: 0%; border-radius: 2px; transition: width 0.4s linear; }
 .ft-prog-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-.ft-prog-time { font-size: 10px; color: #6B8577; min-width: 32px; text-align: right; }
+.ft-prog-time { font-size: 10px; color: #6B8577; min-width: 68px; text-align: right; white-space: nowrap; }
 
 .ft-phrases-toggle { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px 15px; cursor: pointer; position: relative; z-index: 1; }
 .ft-phrases-label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 500; color: #4D7D63; }
