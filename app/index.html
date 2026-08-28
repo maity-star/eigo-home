@@ -3248,8 +3248,8 @@ function renderMorningTalkContent() {
   } else {
     tag.className = 'ft-status-tag replay';
     if (info.isWeekend) {
-      tag.textContent = '今週の再放送';
-      note.textContent = '金曜日の回をもう一度お届け中';
+      tag.textContent = '週末リプレイ';
+      note.textContent = '配信はお休み中。金曜の回でゆるっと復習タイム。金曜日以外の回は「これまでの放送」から聞いてね';
     } else {
       tag.textContent = 'Maiのひとこと';
       note.textContent = '今日は復習DAY、Maiの新しい解説つきだよ';
@@ -4015,7 +4015,7 @@ function renderEveningTalkContent() {
     tag.textContent = 'NEW'; tag.className = 'ft-status-tag new'; note.style.display = 'none';
   } else {
     tag.className = 'ft-status-tag replay';
-    if (info.isWeekend) { tag.textContent = '今週の再放送'; note.textContent = '金曜日の回をもう一度お届け中'; }
+    if (info.isWeekend) { tag.textContent = '週末リプレイ'; note.textContent = '配信はお休み中。金曜の回でゆるっと復習タイム。金曜日以外の回は「これまでの放送」から聞いてね'; }
     else { tag.textContent = 'Maiのひとこと'; note.textContent = '今日は復習DAY、Maiの新しい解説つきだよ'; }
     note.style.display = 'block';
   }
