@@ -70,6 +70,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .joel-line-text { font-size: 10.5px; color: #9CA3AF; line-height: 1.4; }
 .joel-line-text .en { font-weight: 600; color: #6B8577; display: block; margin-bottom: 1px; }
 .joel-line-text .ja { font-size: 9.5px; color: #C2C7CC; }
+/* 長文用（Weekly Pickの推薦コメントなど）：一言キャプションより濃く・大きく読ませる */
+.joel-line-bubble.is-quote .joel-line-text.is-body .ja { font-size: 12px; color: #374151; line-height: 1.75; }
 
 /* Jayが選んだ言葉(キュレーション名言バリエーション) */
 .joel-line-bubble.is-quote { background: #EDF5F0; }
