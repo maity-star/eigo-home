@@ -4204,7 +4204,7 @@ function updateEtPhraseHighlight(t) {
     if (!etPhraseTimings.length) { setEtActiveSpeaker(null); updateEtBubble(null, null); return; }
     let activeIdx = -1;
     for (let i = 0; i < etPhraseTimings.length; i++) {
-      if (t < etPhraseTimings[i].end) { activeIdx = i; break; }
+      if (t >= etPhraseTimings[i].start && t < etPhraseTimings[i].end) { activeIdx = i; break; }
     }
     etPhraseTimings.forEach((_, i) => {
       const row = document.getElementById('etPhraseRow' + i);
