@@ -761,11 +761,17 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                   <div class="ft-player-inner">
                     <div class="ft-play-row">
                       <button class="ft-skip-btn" onclick="skipFamilyTalk(-10)" aria-label="10秒戻す">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M4 12h9a5 5 0 0 1 0 10h-1"/></svg>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 17 4 12 9 7"/>
+                        <path d="M4 12h9a5 5 0 0 1 0 10h-1"/>
+                      </svg>
                       </button>
                       <button class="ft-play-btn" id="ftPlayBtn" onclick="toggleFamilyTalk()"> <span id="ftPlayIcon">▶</span> </button>
                       <button class="ft-skip-btn" onclick="skipFamilyTalk(10)" aria-label="10秒進める">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M20 12h-9a5 5 0 0 0 0 10h1"/></svg>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 17 20 12 15 7"/>
+                        <path d="M20 12h-9a5 5 0 0 0 0 10h1"/>
+                      </svg>
                       </button>
                     </div>
                     <div class="ft-prog-row">
@@ -900,11 +906,17 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
             <div class="ft-player-inner">
               <div class="ft-play-row">
                 <button class="ft-skip-btn" onclick="skipEveningTalk(-10)" aria-label="10秒戻す">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M4 12h9a5 5 0 0 1 0 10h-1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 17 4 12 9 7"/>
+                  <path d="M4 12h9a5 5 0 0 1 0 10h-1"/>
+                </svg>
                 </button>
                 <button class="ft-play-btn" id="etPlayBtn" onclick="toggleEveningTalk()"> <span id="etPlayIcon">▶</span> </button>
                 <button class="ft-skip-btn" onclick="skipEveningTalk(10)" aria-label="10秒進める">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M20 12h-9a5 5 0 0 0 0 10h1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 17 20 12 15 7"/>
+                  <path d="M20 12h-9a5 5 0 0 0 0 10h1"/>
+                </svg>
                 </button>
               </div>
               <div class="ft-prog-row">
@@ -1571,6 +1583,9 @@ registerAudio(document.getElementById('asoboVoicePlayer'));
 // データ
 // ========================
 const MONTH_PLAYLIST = [
+	{ type:'audio', title:'Jump Like a Kangaroo', sub:'Morning Talkのエンディングで使用中の曲。カンガルーと一緒に跳びはねる、体を動かして楽しむ一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_jump_like_kangaroo.mp3', img:'illustrations/monthly_playlist/mp_jump_like_a_kangaroo.png' },
+{ type:'audio', title:'Choose to Shine', sub:'Morning Talkのエンディングで使用中の曲。朝の光をテーマにした、やさしく背中を押してくれるメロディ。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_choose_to_shine.mp3', img:'illustrations/monthly_playlist/mp_choose_to_shine.png' },
+{ type:'audio', title:'The Turtle Burped', sub:'Morning Talkのエンディングで使用中の曲。海辺でカメが盛大にゲップ！？家族みんな大笑いしちゃう、思わずクスッとくるコミカルな一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_turtle_burped.mp3', img:'illustrations/monthly_playlist/mp_turtle_burped.png' },
   { type:'audio', title:"Swingin' From a Rainbow", sub:'Morning Talkのエンディングで使用中の曲。ゆったり揺れるようなリズムが心地いい一曲。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_swingin_rainbow.mp3', img:'illustrations/monthly_playlist/mp_swingin_rainbow.png' },
   { type:'audio', title:'Little Dolphin', sub:'Morning Talkのエンディングで使用中の曲。海を泳ぐイルカをイメージした、やさしいメロディ。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_little_dolphin.mp3', img:'illustrations/monthly_playlist/mp_little_dolphin.png' },
   { type:'audio', title:'Alphabet Song', sub:'Morning Talkのエンディングで使用中の曲。アルファベットを楽しく覚えられる定番ソング。', tag:'Morning Talkで使用中', src:'audio/monthly_playlist/mp_alphabet_song.mp3', img:'illustrations/monthly_playlist/mp_alphabet_song.png' },
@@ -5505,4 +5520,5 @@ function renderYT() {
 ==================================================
 -->
 </body>
+
 </html>
