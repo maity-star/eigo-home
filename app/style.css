@@ -1212,9 +1212,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-cat-spine.spine-food { background: repeating-linear-gradient(180deg,#8C6134 0 3px,#7A5429 3px 6px); }
 .shiru-cat-spine.spine-weather { background: repeating-linear-gradient(180deg,#5B6E52 0 3px,#4E5F47 3px 6px); }
 .shiru-cat-spine.spine-default { background: repeating-linear-gradient(180deg,#7A6A54 0 3px,#6B5C48 3px 6px); }
+/* 2026-08-31改訂:小さい無地のリボン(見落とされやすい)から、文字入りバッジ+パルス演出に変更。
+   角から少しはみ出すシール風の配置にして視認性を上げる。パルスは.joel-line-bubble.is-newsと同じ演出を流用 */
 .shiru-cat-ribbon {
-  position: absolute; top: 8px; right: 14px; width: 14px; height: 22px; background: #B5471F;
-  clip-path: polygon(0 0,100% 0,100% 100%,50% 75%,0 100%); box-shadow: 0 1px 3px rgba(74,58,30,0.3);
+  position: absolute; top: -7px; right: 8px; z-index: 3;
+  font-size: 10.5px; font-weight: 700; color: #fff; letter-spacing: 0.03em;
+  background: #B5471F; padding: 3px 10px; border-radius: 9px;
+  box-shadow: 0 2px 6px rgba(74,58,30,0.35);
+  animation: joelNewsPulse 1.8s ease-in-out infinite;
 }
 .shiru-cat-frame { margin: 0 0 0 11px; padding: 11px 10px 3px; }
 .shiru-cat-frame-inner { border: 0.5px solid #C9A25C; border-radius: 2px; padding: 2px; }
@@ -1286,8 +1291,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .shiru-toc-title { font-size: 14px; font-weight: 700; color: #3E2F1C; margin-bottom: 14px; }
 .shiru-toc-item {
-  display: flex; align-items: center; gap: 10px; padding: 13px 4px;
+  display: flex; align-items: center; gap: 12px; padding: 13px 4px;
   border-bottom: 0.5px dashed #C9A25C; cursor: pointer;
+}
+/* 2026-08-31追加:もくじの各トピック行にカバー画像のサムネイルを追加(テキストだけだと味気ないため) */
+.shiru-toc-thumb {
+  width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0; object-fit: cover;
+  border: 0.5px solid #C9A25C; background: #EEE8D6;
 }
 .shiru-toc-text-wrap { display: flex; align-items: baseline; gap: 6px; }
 .shiru-toc-text { font-size: 14px; font-weight: 700; color: #3E2F1C; }
@@ -1305,15 +1315,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-grid-title-wrap { display: flex; align-items: baseline; gap: 6px; }
 .shiru-grid-title { font-size: 15px; font-weight: 700; color: #3E2F1C; }
 .shiru-grid-title-ja { font-size: 10px; color: #9C8E6E; }
-.shiru-fact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.shiru-fact-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
 
-/* しる:知識カード(タップ前=モノクロのうっすらシルエット／タップ後=カードがフリップしてフルカラーイラスト+英日テキストが現れる)
-   .shiru-fact-card = 外枠(perspectiveを持たせて3D回転の奥行きを作る)
+/* しる:知識カード(タップ前=モノクロのうっすらシルエット／タップ後=イラストがフリップしてフルカラーに変わる)
+   2026-08-31改訂：1カラム化、キャプション(英日テキスト)をイラストの外(下)に出して画像を邪魔しないように変更。
+   .shiru-fact-card = カード全体の外枠(イラスト部＋キャプション部を縦に積む)
+   .shiru-fact-card-media = イラスト部分だけのラッパー(perspectiveを持たせて3D回転の奥行きを作る)
    .shiru-fact-card-inner = 実際に回転する板(preserve-3d)。revealedが付くとrotateY(180deg)
-   .shiru-fact-card-face = 表(front)/裏(back)の各面。backface-visibility:hiddenで裏返った面を隠す */
+   .shiru-fact-card-face = 表(front)/裏(back)の各面。backface-visibility:hiddenで裏返った面を隠す
+   .shiru-fact-caption = イラストの外側に置くキャプション欄。revealedになるまでは高さ0で隠す */
 .shiru-fact-card {
-  position: relative; aspect-ratio: 1 / 1; border-radius: 8px; cursor: pointer;
-  border: 0.5px solid #C9A25C; background: #EEE8D6; perspective: 900px;
+  position: relative; border-radius: 16px; cursor: pointer; overflow: hidden;
+  border: 1px solid #E4D8BB; background: #F7F2E4;
+  box-shadow: 0 2px 10px rgba(74,58,30,0.08);
+}
+.shiru-fact-card-media {
+  position: relative; aspect-ratio: 16 / 10; perspective: 900px; background: #EEE8D6;
 }
 .shiru-fact-card-inner {
   position: relative; width: 100%; height: 100%;
@@ -1322,7 +1339,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .shiru-fact-card.revealed .shiru-fact-card-inner { transform: rotateY(180deg); }
 .shiru-fact-card-face {
-  position: absolute; inset: 0; border-radius: 8px; overflow: hidden;
+  position: absolute; inset: 0; overflow: hidden;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
 .shiru-fact-card-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -1332,35 +1349,74 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
    親(.shiru-fact-card-inner)が回転した瞬間にちょうど正面へ向く */
 .shiru-fact-card-face.back { transform: rotateY(180deg); }
 .shiru-fact-card-play {
-  position: absolute; bottom: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
-  background: rgba(247,242,228,0.9); display: flex; align-items: center; justify-content: center;
-  font-size: 10px; color: #3E2F1C; z-index: 2;
+  position: absolute; bottom: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(247,242,228,0.92); border: 1px solid #D9CDAE;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #3E2F1C; z-index: 2;
   transition: opacity 0.2s ease;
 }
 .shiru-fact-card.revealed .shiru-fact-card-play { opacity: 0; pointer-events: none; }
 .shiru-fact-note {
-  font-size: 10px; color: #8C8368; text-align: center; margin-top: 12px; line-height: 1.6;
+  font-size: 10px; color: #8C8368; text-align: center; margin-top: 14px; line-height: 1.6;
 }
 
-/* しる:カードめくり後に英語・日本語の文章を表示(音声だけだと英語が読めない親には内容が分からないため)
-   フリップ(0.6s)が終わるのに合わせて、少し遅れてテキストをフェードインさせる */
-.shiru-fact-card-text {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to top, rgba(20,30,24,0.82) 0%, rgba(20,30,24,0.55) 65%, rgba(20,30,24,0) 100%);
-  padding: 22px 10px 8px;
-  text-align: left;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.35s ease 0.35s, transform 0.35s ease 0.35s;
-  pointer-events: none;
+/* しる:カードめくり後に英語・日本語の文章をイラストの"外"(下)に表示
+   (音声だけだと英語が読めない親には内容が分からないため。画像には何も重ねず、絵本のキャプション欄のように配置) */
+.shiru-fact-caption {
+  max-height: 0; opacity: 0; overflow: hidden; padding: 0 16px;
+  border-top: 1px dashed transparent;
+  transition: max-height 0.4s ease 0.15s, opacity 0.35s ease 0.15s, padding 0.4s ease 0.15s;
 }
-.shiru-fact-card.revealed .shiru-fact-card-text {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+.shiru-fact-card.revealed .shiru-fact-caption {
+  max-height: 200px; opacity: 1; padding: 14px 16px 16px; border-top-color: #C9A25C;
 }
-.shiru-fact-card-text-en { color: #fff; font-size: 12px; font-weight: 700; line-height: 1.45; }
-.shiru-fact-card-text-ja { color: #D9EFE2; font-size: 11px; line-height: 1.5; margin-top: 3px; }
+.shiru-fact-caption-en { font-family: Georgia, 'Times New Roman', serif; font-size: 14px; font-weight: 700; color: #3E2F1C; line-height: 1.55; }
+.shiru-fact-caption-ja { font-size: 11px; color: #9C8E6E; line-height: 1.6; margin-top: 5px; }
+
+/* しる:Jayからのクイズコーナー(トピックの豆知識を1つでも聞くと出現。全部聞くと遊べるようになる)
+   topic.quizが無いトピックではrenderShiruQuizCorner側で描画自体をスキップするので、通常のフローには影響しない。 */
+.shiru-quiz-corner {
+  margin-top: 18px; background: #FBF3E1; border: 1.5px solid #DCC181; border-radius: 18px;
+  padding: 18px 16px 16px; animation: shiruQuizIn 0.5s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes shiruQuizIn {
+  0% { opacity: 0; transform: translateY(8px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.shiru-quiz-corner.locked { background: #F3ECDD; border-color: #D9CDAE; animation: none; }
+.shiru-quiz-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.shiru-quiz-title { font-size: 13px; font-weight: 700; color: #8A6A2C; }
+.shiru-quiz-corner.locked .shiru-quiz-title { color: #9C8E6E; }
+.shiru-quiz-sub { font-size: 9.5px; color: #B08F49; margin-top: 1px; }
+.shiru-quiz-corner.locked .shiru-quiz-sub { color: #B0A788; }
+.shiru-quiz-jay-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px; }
+.shiru-quiz-corner:not(.locked) .shiru-quiz-jay-row { cursor: pointer; }
+.shiru-quiz-bubble { flex: 1; background: #FFFDF7; border-radius: 14px; padding: 9px 12px; }
+.shiru-quiz-corner.locked .shiru-quiz-bubble { background: #FAF7EE; }
+.shiru-quiz-bubble-en { font-size: 12px; font-weight: 700; color: #3E2F1C; line-height: 1.45; }
+.shiru-quiz-corner.locked .shiru-quiz-bubble-en { color: #8C8368; }
+.shiru-quiz-bubble-ja { font-size: 10px; color: #9C8E6E; margin-top: 2px; }
+/* 2026-08-31改訂:1枚の集合絵+当たり判定ではなく、3枚の豆知識カードの画像をそのまま3択に並べる方式に変更。
+   新規イラスト不要になり、今後トピックが増えても自動で成立する */
+.shiru-quiz-options-wrap { position: relative; margin-bottom: 10px; }
+.shiru-quiz-options { display: flex; gap: 8px; }
+.shiru-quiz-option {
+  flex: 1; aspect-ratio: 1 / 1; padding: 0; cursor: pointer; overflow: hidden;
+  border-radius: 12px; border: 1.5px solid #D9CDAE; background: #EEE8D6;
+  transition: opacity 0.2s ease;
+}
+.shiru-quiz-option img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.shiru-quiz-option.picked { border-color: #6AA17F; box-shadow: 0 0 0 3px rgba(106,161,127,0.22); }
+.shiru-quiz-option.answer { border-color: #DCA83B; box-shadow: 0 0 0 3px rgba(220,168,59,0.22); }
+.shiru-quiz-corner.locked .shiru-quiz-option { opacity: 0.5; cursor: default; }
+.shiru-quiz-lock-badge {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(247,242,228,0.94); border: 1px solid #D9CDAE;
+  display: flex; align-items: center; justify-content: center;
+}
+.shiru-quiz-hint { text-align: center; font-size: 10.5px; color: #B08F49; }
+.shiru-quiz-corner.locked .shiru-quiz-hint { color: #B0A788; }
 
 /* しる:アーカイブモーダル(ルーティンモーダルと共通クラスを流用しつつ専用要素だけ追加) */
 .shiru-entry-card { background: #F9FAFB; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
