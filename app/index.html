@@ -4819,11 +4819,13 @@ const SHIRU_TOPICS = [
   {
     id: 'turtle', category: 'animal', titleEn: 'Turtle', titleJa: 'カメ', dateAdded: '2026-09-01',
     image: 'shiru_book/illustration/topics/turtle.png',
+    // 2026-09-01改訂:1本のtopic.audio+start秒数ではなく、豆知識ごとに個別録音(fact.audio)する方式に変更。
+    // duck/icecreamのようなtopic.audio共有パターンは使わないので、このtopic.audio自体は実質未使用(残しておいても無害)。
     audio: 'shiru_book/audio/animal/turtle.mp3',
     facts: [
-      { en: 'Turtles come in many different sizes.', ja: 'カメには小さい子も、すごく大きい子もいるんだって。', start: 0, image: 'shiru_book/illustration/topics/turtle/turtle_1.png' },
-      { en: 'Turtles can live for up to 150 years!', ja: 'カメは150歳まで生きることもあるんだって。', start: 10, image: 'shiru_book/illustration/topics/turtle/turtle_2.png' },
-      { en: 'Turtles love vegetables, small fish, and worms.', ja: 'カメは野菜や小さな魚、ミミズが好きなんだって。', start: 20, image: 'shiru_book/illustration/topics/turtle/turtle_3.png' },
+      { en: 'Turtles come in many different sizes.', ja: 'カメには小さい子も、すごく大きい子もいるんだって。', image: 'shiru_book/illustration/topics/turtle/turtle_1.png', audio: 'shiru_book/audio/animal/turtle_1.mp3' },
+      { en: 'Turtles can live for up to 150 years!', ja: 'カメは150歳まで生きることもあるんだって。', image: 'shiru_book/illustration/topics/turtle/turtle_2.png', audio: 'shiru_book/audio/animal/turtle_2.mp3' },
+      { en: 'Turtles love vegetables, small fish, and worms.', ja: 'カメは野菜や小さな魚、ミミズが好きなんだって。', image: 'shiru_book/illustration/topics/turtle/turtle_3.png', audio: 'shiru_book/audio/animal/turtle_3.mp3' },
     ],
     // Jayからのクイズコーナー:新規イラストは使わず、3枚の豆知識カードの画像(facts[i].image)を
     // そのまま3択のタップ選択肢として再利用する。questionAudioが録れたら追加すればOK(未設定でも動く)。
