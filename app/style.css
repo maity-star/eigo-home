@@ -1052,7 +1052,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* Monthly Playlist内の自前音源カード(Morning Talk使用曲) */
 .audio-thumb {
-  display: flex; align-items: center; justify-content: center;
+  position: relative;
 }
 .audio-thumb-0 { background: #FFF1E6; }
 .audio-thumb-1 { background: #EAF6EC; }
@@ -1062,13 +1062,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   width: 100%; height: 100%;
   object-fit: cover;
 }
+/* イラストが再生ボタンで隠れないよう、中央ではなく右下の角に配置 */
 .audio-thumb-play {
-  position: relative; z-index: 1;
-  width: 52px; height: 52px; border-radius: 50%;
+  position: absolute; z-index: 1;
+  right: 10px; bottom: 10px;
+  width: 40px; height: 40px; border-radius: 50%;
   background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center;
   box-shadow: 0 6px 16px rgba(0,0,0,0.18);
 }
-.audio-thumb-play svg { width: 22px; height: 22px; color: #E24B4A; }
+.audio-thumb-play svg { width: 18px; height: 18px; color: #E24B4A; }
 .carousel-card.playing .audio-thumb-play { background: #E24B4A; }
 .carousel-card.playing .audio-thumb-play svg { color: #fff; }
 .carousel-card-tag-audio { background: #FDEDE9; color: #C0392B; }
