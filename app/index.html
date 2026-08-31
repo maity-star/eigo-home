@@ -1399,6 +1399,7 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
       <div class="shiru-fact-grid" id="shiruFactGrid"></div>
       <div class="shiru-fact-note">カードをタップすると、めくれて答えが聞こえるよ（英語と日本語の文章も出るよ）</div>
       <div id="shiruQuizCorner" style="display:none;"></div>
+      <audio id="shiruQuizSePlayer" preload="none"></audio>
     </div>
     <div class="shiru-toc-screen" id="shiruTocScreen">
       <div class="shiru-toc-title" id="shiruTocTitle">Animal のもくじ</div>
@@ -5090,6 +5091,23 @@ function closeShiruBookModal() {
 const shiruAudioEl = new Audio();
 registerAudio(shiruAudioEl);
 
+// クイズの正解/不正解SE。ナレーション(shiruAudioEl)とは別チャンネルで鳴らすので、
+// 音声と重なっても止まらない(ASOBO_SFXのplayAsoboSeと同じ考え方)。
+const SHIRU_QUIZ_SFX = {
+  correct: 'shiru_book/audio/sfx/se_quiz_correct.mp3',
+  incorrect: 'shiru_book/audio/sfx/se_quiz_incorrect.mp3',
+};
+function playShiruQuizSe(src) {
+  const se = document.getElementById('shiruQuizSePlayer');
+  if (!se || !src) return;
+  try {
+    let isSameSrc = false;
+    try { isSameSrc = se.src === new URL(src, window.location.href).href; } catch (e2) {}
+    if (isSameSrc) { se.currentTime = 0; } else { se.src = src; }
+    se.play().catch(() => {});
+  } catch (e) {}
+}
+
 // トピックの音声(1本のtopic.audio内をstart/endで切り出す方式)と、
 // facts[i].audioで個別ファイルを持つ方式の両方に対応した共通再生ヘルパー。
 // revealShiruFact(通常のカード)とpickShiruQuizOption(クイズの答え合わせ)から共用する。
@@ -5188,19 +5206,26 @@ function renderShiruQuizCorner(topic) {
         </div>
       </div>
       ${isUnlocked ? `
-      <button class="shiru-quiz-play-btn" onclick="playShiruQuizRandomFact('${topic.id}')">▶ きいてみる</button>
+      <button class="shiru-quiz-play-btn" onclick="playShiruQuizRandomFact('${topic.id}')">
+        <span class="shiru-quiz-play-icon">▶</span>
+        <span class="shiru-quiz-play-text">
+          <span class="shiru-quiz-play-en">Listen</span>
+          <span class="shiru-quiz-play-ja">きいてみる</span>
+        </span>
+      </button>
       ` : ''}
       <div class="shiru-quiz-options-wrap">
         <div class="shiru-quiz-options${isUnlocked ? ' unplayed' : ''}">${optionsHtml}</div>
         ${isUnlocked ? '' : `<div class="shiru-quiz-lock-badge"><img class="icon-img" style="width:13px;height:13px;" src="icons/icon_func_lock.png" alt=""></div>`}
       </div>
-      <div class="shiru-quiz-hint">${isUnlocked ? 'タップして選んでみよう' : 'ぜんぶ聞くと挑戦できるよ'}</div>
+      <div class="shiru-quiz-hint">${isUnlocked ? SHIRU_QUIZ_HINT_DEFAULT : 'ぜんぶ聞くと挑戦できるよ'}</div>
     </div>
   `;
 }
 
 // 「きいてみる」ボタン:3枚のうち1枚をランダムに選んで再生。何度でも押し直せて、押すたびに
-// 新しいラウンドとして選び直す(前回の選択ハイライトもリセット)。
+// 新しいラウンドとして選び直す(前回の選択・SE・フィードバック文もリセット)。
+const SHIRU_QUIZ_HINT_DEFAULT = 'タップして選んでみよう';
 function playShiruQuizRandomFact(topicId) {
   const topic = SHIRU_TOPICS.find(t => t.id === topicId);
   if (!topic || !topic.quiz) return;
@@ -5210,27 +5235,42 @@ function playShiruQuizRandomFact(topicId) {
   const optionsWrap = document.querySelector('#shiruQuizCorner .shiru-quiz-options');
   if (optionsWrap) {
     optionsWrap.classList.remove('unplayed');
-    [...optionsWrap.children].forEach(b => b.classList.remove('picked', 'answer'));
+    [...optionsWrap.children].forEach(b => b.classList.remove('wrong', 'answer'));
   }
+  const hintEl = document.querySelector('#shiruQuizCorner .shiru-quiz-hint');
+  if (hintEl) { hintEl.textContent = SHIRU_QUIZ_HINT_DEFAULT; hintEl.className = 'shiru-quiz-hint'; }
   playShiruFactAudio(topic, shiruQuizPlayedIndex);
 }
 
-// 選んだ方には控えめなセージのリングだけ(不正解演出はしない)。まだ一度も「きいてみる」を
-// 押していない状態でタップされた場合は何もしない(先に音声を聞いてもらう)。
+// 2026-09-04改訂:正解/不正解がその場でわかるようにSEとテキストを追加。
+// 正解タップ:即座に金リング+チェックマーク+correct SE+「せいかい!」表示。
+// 不正解タップ:タップしたカードにテラコッタ色のリング+ゆれアニメ+incorrect SE+「おしい!」表示。
+// 少し間を置いて正解カードにも金リングをつけて「これだよ」と示す(不正解演出はしても叱る演出はしない)。
 function pickShiruQuizOption(topicId, i, btnEl) {
   const topic = SHIRU_TOPICS.find(t => t.id === topicId);
   if (!topic || !topic.quiz) return;
   if (shiruQuizPlayedIndex === null) return;
   const optionsWrap = btnEl.closest('.shiru-quiz-options');
   if (!optionsWrap) return;
-  [...optionsWrap.children].forEach(b => b.classList.remove('picked', 'answer'));
-  btnEl.classList.add('picked');
+  [...optionsWrap.children].forEach(b => b.classList.remove('wrong', 'answer'));
 
   const correctIndex = shiruQuizPlayedIndex;
-  setTimeout(() => {
-    const correctBtn = optionsWrap.children[correctIndex];
-    if (correctBtn) correctBtn.classList.add('answer');
-  }, 350);
+  const isCorrect = i === correctIndex;
+  const hintEl = document.querySelector('#shiruQuizCorner .shiru-quiz-hint');
+
+  if (isCorrect) {
+    btnEl.classList.add('answer');
+    playShiruQuizSe(SHIRU_QUIZ_SFX.correct);
+    if (hintEl) { hintEl.textContent = 'せいかい!🎉'; hintEl.className = 'shiru-quiz-hint is-correct'; }
+  } else {
+    btnEl.classList.add('wrong');
+    playShiruQuizSe(SHIRU_QUIZ_SFX.incorrect);
+    if (hintEl) { hintEl.textContent = 'おしい!もういちどきいてみよう'; hintEl.className = 'shiru-quiz-hint is-wrong'; }
+    setTimeout(() => {
+      const correctBtn = optionsWrap.children[correctIndex];
+      if (correctBtn) correctBtn.classList.add('answer');
+    }, 500);
+  }
 }
 
 renderShiruCatGrid();
