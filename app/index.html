@@ -1398,6 +1398,7 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
       </div>
       <div class="shiru-fact-grid" id="shiruFactGrid"></div>
       <div class="shiru-fact-note">カードをタップすると、めくれて答えが聞こえるよ（英語と日本語の文章も出るよ）</div>
+      <div id="shiruQuizCorner" style="display:none;"></div>
     </div>
     <div class="shiru-toc-screen" id="shiruTocScreen">
       <div class="shiru-toc-title" id="shiruTocTitle">Animal のもくじ</div>
@@ -4820,10 +4821,16 @@ const SHIRU_TOPICS = [
     image: 'shiru_book/illustration/topics/turtle.png',
     audio: 'shiru_book/audio/animal/turtle.mp3',
     facts: [
-      { en: 'Turtles come in many different sizes.', ja: 'カメには小さい子も、すごく大きい子もいるんだって。', start: 0 },
-      { en: 'Turtles can live for up to 150 years!', ja: 'カメは150歳まで生きることもあるんだって。', start: 10 },
-      { en: 'Turtles love vegetables, small fish, and worms.', ja: 'カメは野菜や小さな魚、ミミズが好きなんだって。', start: 20 },
+      { en: 'Turtles come in many different sizes.', ja: 'カメには小さい子も、すごく大きい子もいるんだって。', start: 0, image: 'shiru_book/illustration/topics/turtle/turtle_1.png' },
+      { en: 'Turtles can live for up to 150 years!', ja: 'カメは150歳まで生きることもあるんだって。', start: 10, image: 'shiru_book/illustration/topics/turtle/turtle_2.png' },
+      { en: 'Turtles love vegetables, small fish, and worms.', ja: 'カメは野菜や小さな魚、ミミズが好きなんだって。', start: 20, image: 'shiru_book/illustration/topics/turtle/turtle_3.png' },
     ],
+    // Jayからのクイズコーナー:新規イラストは使わず、3枚の豆知識カードの画像(facts[i].image)を
+    // そのまま3択のタップ選択肢として再利用する。questionAudioが録れたら追加すればOK(未設定でも動く)。
+    quiz: {
+      correctIndex: 1, // facts配列の何番目が正解か(0=大きさいろいろ, 1=150歳, 2=食べ物)
+      // questionAudio: 'shiru_book/audio/animal/turtle_quiz.mp3', // Jayの具体的な設問。画面のテキストは汎用固定文なので、この音声だけが本当の出題内容
+    },
   },
   {
      id: 'icecream', category: 'food', titleEn: 'Ice Cream', titleJa: 'アイスクリーム', dateAdded: '2026-08-27',
@@ -4911,7 +4918,7 @@ function renderShiruCatGrid() {
     const topics = getShiruTopicsByCategory(cat.id);
     const factCount = topics.reduce((sum, t) => sum + t.facts.length, 0);
     const isNewToday = topics.length > 0 && topics[0].dateAdded === todayKey && !opened.has(cat.id);
-    const ribbon = isNewToday ? '<div class="shiru-cat-ribbon"></div>' : '';
+    const ribbon = isNewToday ? '<div class="shiru-cat-ribbon">NEW</div>' : '';
     return `
       <div class="shiru-cat-card" onclick="openShiruBookModal('${cat.id}')">
         <div class="shiru-cat-spine spine-${cat.id}"></div>
@@ -5002,6 +5009,7 @@ function renderShiruToc(cat) {
     const isNew = topicHasNewToday(t) && !opened.has(cat.id + '_' + t.id);
     return `
     <div class="shiru-toc-item" onclick="openShiruTopic('${t.id}')">
+      <img class="shiru-toc-thumb" src="${t.image}" alt="">
       <div class="shiru-toc-text-wrap">
         <div class="shiru-toc-text">${t.titleEn}</div>
         <div class="shiru-toc-text-ja">${t.titleJa}</div>
@@ -5028,6 +5036,7 @@ function openShiruTopic(topicId) {
   document.getElementById('shiruGridTitle').textContent = topic.titleEn;
   document.getElementById('shiruGridTitleJa').textContent = topic.titleJa;
   renderShiruFactGrid(topic);
+  renderShiruQuizCorner(topic);
   setTimeout(() => {
     gridEl.style.opacity = '1';
     gridEl.style.pointerEvents = 'auto';
@@ -5043,19 +5052,21 @@ function renderShiruFactGrid(topic) {
     const imgSrc = f.image || topic.image;
     return `
       <div class="shiru-fact-card ${isRevealed ? 'revealed' : ''}" data-fact-key="${factKey}" onclick="revealShiruFact('${topic.id}', ${i}, this)">
-        <div class="shiru-fact-card-inner">
-          <div class="shiru-fact-card-face front">
-            <img src="${imgSrc}" alt="">
-          </div>
-          <div class="shiru-fact-card-face back">
-            <img src="${imgSrc}" alt="">
-            <div class="shiru-fact-card-text">
-              <div class="shiru-fact-card-text-en">${f.en}</div>
-              <div class="shiru-fact-card-text-ja">${f.ja}</div>
+        <div class="shiru-fact-card-media">
+          <div class="shiru-fact-card-inner">
+            <div class="shiru-fact-card-face front">
+              <img src="${imgSrc}" alt="">
+            </div>
+            <div class="shiru-fact-card-face back">
+              <img src="${imgSrc}" alt="">
             </div>
           </div>
+          <div class="shiru-fact-card-play">▶</div>
         </div>
-        <div class="shiru-fact-card-play">▶</div>
+        <div class="shiru-fact-caption">
+          <div class="shiru-fact-caption-en">${f.en}</div>
+          <div class="shiru-fact-caption-ja">${f.ja}</div>
+        </div>
       </div>
     `;
   }).join('');
@@ -5079,14 +5090,12 @@ function closeShiruBookModal() {
 const shiruAudioEl = new Audio();
 registerAudio(shiruAudioEl);
 
-function revealShiruFact(topicId, factIndex, cardEl) {
-  const topic = SHIRU_TOPICS.find(t => t.id === topicId);
-  if (!topic) return;
+// トピックの音声(1本のtopic.audio内をstart/endで切り出す方式)と、
+// facts[i].audioで個別ファイルを持つ方式の両方に対応した共通再生ヘルパー。
+// revealShiruFact(通常のカード)とpickShiruQuizOption(クイズの答え合わせ)から共用する。
+function playShiruFactAudio(topic, factIndex) {
   const fact = topic.facts[factIndex];
-  const factKey = `${topicId}_${factIndex}`;
-
-  markShiruFactRevealed(factKey);
-  cardEl.classList.add('revealed');
+  if (!fact) return;
 
   shiruAudioEl.onended = null;
   shiruAudioEl.onerror = null;
@@ -5111,6 +5120,114 @@ function revealShiruFact(topicId, factIndex, cardEl) {
     const p = shiruAudioEl.play();
     if (p && typeof p.catch === 'function') { p.catch(() => {}); }
   } catch (e) {}
+}
+
+function revealShiruFact(topicId, factIndex, cardEl) {
+  const topic = SHIRU_TOPICS.find(t => t.id === topicId);
+  if (!topic) return;
+  const factKey = `${topicId}_${factIndex}`;
+  const wasComplete = getShiruTopicRevealedCount(topic) >= topic.facts.length;
+
+  markShiruFactRevealed(factKey);
+  cardEl.classList.add('revealed');
+  playShiruFactAudio(topic, factIndex);
+
+  renderShiruQuizCorner(topic);
+  const nowComplete = getShiruTopicRevealedCount(topic) >= topic.facts.length;
+  if (topic.quiz && !wasComplete && nowComplete) {
+    // 3枚目を開けた瞬間にクイズコーナーが解放される。少し間を置いてJayの設問を自動再生。
+    setTimeout(() => playShiruQuizQuestion(topicId), 900);
+  }
+}
+
+// ========================
+// しる:Jayからのクイズコーナー
+// トピックの豆知識を1つでも聞くと出現(ロック状態)、全部聞くと挑戦できるようになる。
+// topic.quizが未設定のトピックでは何も描画しない＝既存の通常フローに一切影響しない。
+// ========================
+function getShiruTopicRevealedCount(topic) {
+  const revealed = getShiruRevealedSet();
+  return topic.facts.reduce((n, _, i) => n + (revealed.has(`${topic.id}_${i}`) ? 1 : 0), 0);
+}
+
+function renderShiruQuizCorner(topic) {
+  const wrap = document.getElementById('shiruQuizCorner');
+  if (!wrap) return;
+
+  if (!topic.quiz) { wrap.innerHTML = ''; wrap.style.display = 'none'; return; }
+
+  const total = topic.facts.length;
+  const done = getShiruTopicRevealedCount(topic);
+  if (done === 0) { wrap.innerHTML = ''; wrap.style.display = 'none'; return; }
+
+  const isUnlocked = done >= total;
+  const remain = total - done;
+
+  // 新規イラストは使わず、3枚の豆知識カードの画像をそのまま3択の選択肢として並べる
+  const optionsHtml = topic.facts.map((f, i) => `
+    <button class="shiru-quiz-option" ${isUnlocked ? `onclick="pickShiruQuizOption('${topic.id}', ${i}, this)"` : 'disabled'}>
+      <img src="${f.image || topic.image}" alt="">
+    </button>
+  `).join('');
+
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="shiru-quiz-corner ${isUnlocked ? '' : 'locked'}">
+      <div class="shiru-quiz-header">
+        <img class="icon-img" style="width:18px;height:18px;" src="icons/icon_func_star.png" alt="">
+        <div>
+          <div class="shiru-quiz-title">Jayからのクイズコーナー</div>
+          <div class="shiru-quiz-sub">${isUnlocked ? '3つとも聞いたね！さいごにクイズだよ' : `あと${remain}つきくと、挑戦できるよ`}</div>
+        </div>
+      </div>
+      <div class="shiru-quiz-jay-row" ${isUnlocked ? `onclick="playShiruQuizQuestion('${topic.id}')"` : ''}>
+        <img class="joel-line-avatar" src="illustrations/joel/joel_icon_common_512.png" alt="Jay">
+        <div class="shiru-quiz-bubble">
+          <div class="shiru-quiz-bubble-en">${isUnlocked ? 'Which one do you think is my answer?' : "Guess my answer... once you've heard it all!"}</div>
+          <div class="shiru-quiz-bubble-ja">${isUnlocked ? '僕の質問の答えはどれだと思う？' : 'ぜんぶ聞いたら、いっしょに挑戦しよう'}</div>
+        </div>
+      </div>
+      <div class="shiru-quiz-options-wrap">
+        <div class="shiru-quiz-options">${optionsHtml}</div>
+        ${isUnlocked ? '' : `<div class="shiru-quiz-lock-badge"><img class="icon-img" style="width:13px;height:13px;" src="icons/icon_func_lock.png" alt=""></div>`}
+      </div>
+      <div class="shiru-quiz-hint">${isUnlocked ? 'タップして選んでみよう' : 'ぜんぶ聞くと挑戦できるよ'}</div>
+    </div>
+  `;
+}
+
+function playShiruQuizQuestion(topicId) {
+  const topic = SHIRU_TOPICS.find(t => t.id === topicId);
+  if (!topic || !topic.quiz || !topic.quiz.questionAudio) return;
+  shiruAudioEl.onended = null;
+  shiruAudioEl.onerror = null;
+  shiruAudioEl.ontimeupdate = null;
+  shiruAudioEl.pause();
+  shiruAudioEl.src = topic.quiz.questionAudio;
+  shiruAudioEl.currentTime = 0;
+  try {
+    const p = shiruAudioEl.play();
+    if (p && typeof p.catch === 'function') { p.catch(() => {}); }
+  } catch (e) {}
+}
+
+// 選んだ方には控えめなセージのリングだけ(不正解演出はしない)。
+// 正解/不正解の判定そのものより、少し間を置いて「正解のカメの豆知識ナレーション」を
+// 再生することで答え合わせにする(新規音声は設問1本だけで済む設計)。
+function pickShiruQuizOption(topicId, i, btnEl) {
+  const topic = SHIRU_TOPICS.find(t => t.id === topicId);
+  if (!topic || !topic.quiz) return;
+  const optionsWrap = btnEl.closest('.shiru-quiz-options');
+  if (!optionsWrap) return;
+  [...optionsWrap.children].forEach(b => b.classList.remove('picked', 'answer'));
+  btnEl.classList.add('picked');
+
+  const correctIndex = topic.quiz.correctIndex;
+  setTimeout(() => {
+    const correctBtn = optionsWrap.children[correctIndex];
+    if (correctBtn) correctBtn.classList.add('answer');
+    playShiruFactAudio(topic, correctIndex);
+  }, 500);
 }
 
 renderShiruCatGrid();
