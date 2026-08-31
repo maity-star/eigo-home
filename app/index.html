@@ -3093,6 +3093,16 @@ const MORNING_TALK_WEEK_ORDER = ['w1', 'w2'];
 const DAY_KEY_BY_INDEX = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const DAY_LABEL_JA = { mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日' };
 const DAY_LABEL_EN = { mon: 'MON', tue: 'TUE', wed: 'WED', thu: 'THU', fri: 'FRI', sat: 'SAT', sun: 'SUN' };
+// 放送アーカイブ：日付表示用ヘルパー(「これまでの放送」一覧を月をまたいでも迷わず追えるように)
+function formatArchiveMD(date) {
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+function archiveWeekRangeLabel(weekKey) {
+  const weekIdx = MORNING_TALK_WEEK_ORDER.indexOf(weekKey);
+  const monDate = dateForMorningTalkDay(weekKey, 'mon');
+  const friDate = dateForMorningTalkDay(weekKey, 'fri');
+  return `Week ${weekIdx + 1}　${formatArchiveMD(monDate)}〜${formatArchiveMD(friDate)}`;
+}
 function setTalkDateHead(prefix, now, dayKey, title) {
   const monthEl = document.getElementById(prefix + 'DateMonth');
   const dayEl = document.getElementById(prefix + 'DateDay');
@@ -3741,10 +3751,14 @@ function renderArchiveModalBody() {
   });
   const groupsHtml = groups.map(g => `
     <div class="archive-month-group">
+      <div class="archive-week-meta">${archiveWeekRangeLabel(g.weekKey)}</div>
       <div class="archive-month-title">${g.theme}</div>
       ${g.items.map(d => `
         <div class="archive-ep-row" onclick="playArchivedMorningTalk('${d.weekKey}','${d.dayKey}')">
-          <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
+          <div class="archive-ep-date">
+            <span class="archive-ep-dow">${DAY_LABEL_JA[d.dayKey]}</span>
+            <span class="archive-ep-daynum">${formatArchiveMD(d.date)}</span>
+          </div>
           <div class="archive-ep-q">${d.content.title}</div>
           <div class="archive-ep-play">▶</div>
         </div>
@@ -4511,10 +4525,14 @@ function renderEtArchiveModalBody() {
   });
   const groupsHtml = groups.map(g => `
     <div class="archive-month-group">
+      <div class="archive-week-meta">${archiveWeekRangeLabel(g.weekKey)}</div>
       <div class="archive-month-title">${g.theme}</div>
       ${g.items.map(d => `
         <div class="archive-ep-row" onclick="playArchivedEveningTalk('${d.weekKey}','${d.dayKey}')">
-          <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
+          <div class="archive-ep-date">
+            <span class="archive-ep-dow">${DAY_LABEL_JA[d.dayKey]}</span>
+            <span class="archive-ep-daynum">${formatArchiveMD(d.date)}</span>
+          </div>
           <div class="archive-ep-q">${d.content.title}</div>
           <div class="archive-ep-play">▶</div>
         </div>
