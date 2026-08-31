@@ -3690,28 +3690,34 @@ function toggleFtPhrases() {
 // ========================
 function getAiredMorningTalkDays() {
   const order = ['mon', 'tue', 'wed', 'thu', 'fri'];
-  let weekKey, previewUptoIdx = null;
+  let targetWeekKey, previewUptoIdx = null;
   if (FAMILY_PREVIEW) {
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
-    weekKey = parsed.weekKey;
+    targetWeekKey = parsed.weekKey;
     previewUptoIdx = order.indexOf(parsed.dayKey);
   } else {
     const now = new Date();
     const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
     if (now < w1Start) return [];
-    weekKey = resolveMorningTalkWeekKey(now);
+    targetWeekKey = resolveMorningTalkWeekKey(now);
   }
   const now = new Date();
+  const targetWeekIdx = MORNING_TALK_WEEK_ORDER.indexOf(targetWeekKey);
   const days = [];
-  order.forEach((dayKey, idx) => {
-    if (previewUptoIdx !== null && idx > previewUptoIdx) return;
-    const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
-    const dayDate = dateForMorningTalkDay(weekKey, dayKey);
-    if (previewUptoIdx === null && dayDate > now) return;
-    if (MORNING_TALK_AUDIO[audioKey] && MORNING_TALK_WEEKS[weekKey].days[dayKey]) {
-      days.push({ weekKey, dayKey, content: MORNING_TALK_WEEKS[weekKey].days[dayKey], date: dayDate });
-    }
-  });
+  // 今週分だけでなく、これまでの全週(w1〜対象週)を通しでチェックする
+  for (let wIdx = 0; wIdx <= targetWeekIdx; wIdx++) {
+    const weekKey = MORNING_TALK_WEEK_ORDER[wIdx];
+    if (!MORNING_TALK_WEEKS[weekKey]) continue;
+    order.forEach((dayKey, idx) => {
+      if (wIdx === targetWeekIdx && previewUptoIdx !== null && idx > previewUptoIdx) return;
+      const audioKey = `${MORNING_TALK_MONTH}_${weekKey}_${dayKey}`;
+      const dayDate = dateForMorningTalkDay(weekKey, dayKey);
+      if (previewUptoIdx === null && dayDate > now) return;
+      if (MORNING_TALK_AUDIO[audioKey] && MORNING_TALK_WEEKS[weekKey].days[dayKey]) {
+        days.push({ weekKey, dayKey, content: MORNING_TALK_WEEKS[weekKey].days[dayKey], date: dayDate });
+      }
+    });
+  }
   return days.reverse();
 }
 
@@ -3723,20 +3729,31 @@ function renderArchiveModalBody() {
     body.innerHTML = `<div class="archive-empty">まだ配信された放送がありません</div>`;
     return;
   }
-  const theme = MORNING_TALK_WEEKS[days[0].weekKey].theme || '';
-  const rowsHtml = days.map(d => `
-    <div class="archive-ep-row" onclick="playArchivedMorningTalk('${d.weekKey}','${d.dayKey}')">
-      <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
-      <div class="archive-ep-q">${d.content.title}</div>
-      <div class="archive-ep-play">▶</div>
+  // 週(テーマ)ごとにグループ化して表示(daysは新しい順)
+  const groups = [];
+  days.forEach(d => {
+    let g = groups[groups.length - 1];
+    if (!g || g.weekKey !== d.weekKey) {
+      g = { weekKey: d.weekKey, theme: MORNING_TALK_WEEKS[d.weekKey].theme || '', items: [] };
+      groups.push(g);
+    }
+    g.items.push(d);
+  });
+  const groupsHtml = groups.map(g => `
+    <div class="archive-month-group">
+      <div class="archive-month-title">${g.theme}</div>
+      ${g.items.map(d => `
+        <div class="archive-ep-row" onclick="playArchivedMorningTalk('${d.weekKey}','${d.dayKey}')">
+          <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
+          <div class="archive-ep-q">${d.content.title}</div>
+          <div class="archive-ep-play">▶</div>
+        </div>
+      `).join('')}
     </div>
   `).join('');
   body.innerHTML = `
     <div class="archive-section-label"><span>すべての放送</span><div class="archive-section-line"></div></div>
-    <div class="archive-month-group">
-      <div class="archive-month-title">${theme}</div>
-      ${rowsHtml}
-    </div>
+    ${groupsHtml}
   `;
 }
 
@@ -4442,29 +4459,35 @@ function toggleEtPhrases() {
 // ========================
 function getAiredEveningTalkDays() {
   const order = ['mon', 'tue', 'wed', 'thu', 'fri'];
-  let weekKey, previewUptoIdx = null;
+  let targetWeekKey, previewUptoIdx = null;
   if (FAMILY_PREVIEW) {
     const parsed = parseFamilyPreviewKey(FAMILY_PREVIEW_PARAM) || { weekKey: 'w1', dayKey: 'mon' };
-    weekKey = parsed.weekKey;
+    targetWeekKey = parsed.weekKey;
     previewUptoIdx = order.indexOf(parsed.dayKey);
   } else {
     const now = new Date();
     const w1Start = new Date(MORNING_TALK_WEEK_STARTS.w1 + 'T00:00:00');
     if (now < w1Start) return [];
-    weekKey = resolveMorningTalkWeekKey(now);
+    targetWeekKey = resolveMorningTalkWeekKey(now);
   }
   const now = new Date();
+  const targetWeekIdx = MORNING_TALK_WEEK_ORDER.indexOf(targetWeekKey);
   const days = [];
-  order.forEach((dayKey, idx) => {
-    if (previewUptoIdx !== null && idx > previewUptoIdx) return;
-    const audioKey = `${EVENING_TALK_MONTH}_${weekKey}_${dayKey}`;
-    const dayDate = dateForMorningTalkDay(weekKey, dayKey);
-    if (previewUptoIdx === null && dayDate > now) return;
+  // 今週分だけでなく、これまでの全週(w1〜対象週)を通しでチェックする
+  for (let wIdx = 0; wIdx <= targetWeekIdx; wIdx++) {
+    const weekKey = MORNING_TALK_WEEK_ORDER[wIdx];
     const weekData = EVENING_TALK_WEEKS[weekKey];
-    if (EVENING_TALK_AUDIO[audioKey] && weekData && weekData.days[dayKey]) {
-      days.push({ weekKey, dayKey, content: weekData.days[dayKey], date: dayDate });
-    }
-  });
+    if (!weekData) continue;
+    order.forEach((dayKey, idx) => {
+      if (wIdx === targetWeekIdx && previewUptoIdx !== null && idx > previewUptoIdx) return;
+      const audioKey = `${EVENING_TALK_MONTH}_${weekKey}_${dayKey}`;
+      const dayDate = dateForMorningTalkDay(weekKey, dayKey);
+      if (previewUptoIdx === null && dayDate > now) return;
+      if (EVENING_TALK_AUDIO[audioKey] && weekData.days[dayKey]) {
+        days.push({ weekKey, dayKey, content: weekData.days[dayKey], date: dayDate });
+      }
+    });
+  }
   return days.reverse();
 }
 
@@ -4476,20 +4499,31 @@ function renderEtArchiveModalBody() {
     body.innerHTML = `<div class="archive-empty">まだ配信された放送がありません</div>`;
     return;
   }
-  const theme = EVENING_TALK_WEEKS[days[0].weekKey].theme || '';
-  const rowsHtml = days.map(d => `
-    <div class="archive-ep-row" onclick="playArchivedEveningTalk('${d.weekKey}','${d.dayKey}')">
-      <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
-      <div class="archive-ep-q">${d.content.title}</div>
-      <div class="archive-ep-play">▶</div>
+  // 週(テーマ)ごとにグループ化して表示(daysは新しい順)
+  const groups = [];
+  days.forEach(d => {
+    let g = groups[groups.length - 1];
+    if (!g || g.weekKey !== d.weekKey) {
+      g = { weekKey: d.weekKey, theme: EVENING_TALK_WEEKS[d.weekKey].theme || '', items: [] };
+      groups.push(g);
+    }
+    g.items.push(d);
+  });
+  const groupsHtml = groups.map(g => `
+    <div class="archive-month-group">
+      <div class="archive-month-title">${g.theme}</div>
+      ${g.items.map(d => `
+        <div class="archive-ep-row" onclick="playArchivedEveningTalk('${d.weekKey}','${d.dayKey}')">
+          <div class="archive-ep-date">${DAY_LABEL_JA[d.dayKey]}</div>
+          <div class="archive-ep-q">${d.content.title}</div>
+          <div class="archive-ep-play">▶</div>
+        </div>
+      `).join('')}
     </div>
   `).join('');
   body.innerHTML = `
     <div class="archive-section-label"><span>すべての放送</span><div class="archive-section-line"></div></div>
-    <div class="archive-month-group">
-      <div class="archive-month-title">${theme}</div>
-      ${rowsHtml}
-    </div>
+    ${groupsHtml}
   `;
 }
 
