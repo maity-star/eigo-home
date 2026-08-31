@@ -1396,36 +1396,72 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-quiz-corner.locked .shiru-quiz-bubble-en { color: #8C8368; }
 .shiru-quiz-bubble-ja { font-size: 10px; color: #9C8E6E; margin-top: 2px; }
 
-/* 2026-09-02追加:「きいてみる」ボタン。押すたびに3枚のうち1枚をランダム再生する(新規録音なし・何度でも挑戦可) */
+/* 2026-09-02追加:「きいてみる」ボタン。押すたびに3枚のうち1枚をランダム再生する(新規録音なし・何度でも挑戦可)
+   2026-09-05改訂:英語(メイン)+日本語(サブ)の2段表記に変更。month-read-btnの表記ルールに合わせた */
 .shiru-quiz-play-btn {
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%; margin: 0 0 12px; padding: 10px 20px; border: none; border-radius: 20px;
-  background: #6AA17F; color: #fff; font-size: 12.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin: 0 0 12px; padding: 9px 20px; border: none; border-radius: 20px;
+  background: #6AA17F; color: #fff;
   cursor: pointer; box-shadow: 0 2px 6px rgba(106,161,127,0.35);
 }
 .shiru-quiz-play-btn:active { transform: translateY(1px); box-shadow: 0 1px 3px rgba(106,161,127,0.35); }
+.shiru-quiz-play-icon { font-size: 13px; line-height: 1; }
+.shiru-quiz-play-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2; }
+.shiru-quiz-play-en { font-size: 13px; font-weight: 700; }
+.shiru-quiz-play-ja { font-size: 9.5px; font-weight: 500; opacity: 0.85; margin-top: 1px; }
 /* 2026-08-31改訂:1枚の集合絵+当たり判定ではなく、3枚の豆知識カードの画像をそのまま3択に並べる方式に変更。
    新規イラスト不要になり、今後トピックが増えても自動で成立する */
 .shiru-quiz-options-wrap { position: relative; margin-bottom: 10px; }
 .shiru-quiz-options { display: flex; gap: 8px; }
 .shiru-quiz-option {
+  position: relative;
   flex: 1; aspect-ratio: 1 / 1; padding: 0; cursor: pointer; overflow: hidden;
-  border-radius: 12px; border: 1.5px solid #D9CDAE; background: #EEE8D6;
-  transition: opacity 0.2s ease;
+  border-radius: 12px; border: 2px solid #D9CDAE; background: #EEE8D6;
+  transition: opacity 0.2s ease, border-color 0.15s ease;
 }
 .shiru-quiz-option img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.shiru-quiz-option.picked { border-color: #6AA17F; box-shadow: 0 0 0 3px rgba(106,161,127,0.22); }
-.shiru-quiz-option.answer { border-color: #DCA83B; box-shadow: 0 0 0 3px rgba(220,168,59,0.22); }
 .shiru-quiz-corner.locked .shiru-quiz-option { opacity: 0.5; cursor: default; }
 .shiru-quiz-options.unplayed .shiru-quiz-option { opacity: 0.6; }
+
+/* 2026-09-04追加:正解/不正解をその場ではっきり区別できるように。
+   正解=金リング+チェックバッジ+ポップ、不正解=テラコッタのリング+小さくゆれる(叱る演出にはしない) */
+.shiru-quiz-option.answer {
+  border-color: #DCA83B; box-shadow: 0 0 0 3px rgba(220,168,59,0.25);
+  animation: shiruQuizCorrectPop 0.45s ease;
+}
+.shiru-quiz-option.answer::after {
+  content: '✓';
+  position: absolute; top: 5px; right: 5px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #6AA17F; color: #fff; font-size: 12px; font-weight: 700; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.shiru-quiz-option.wrong {
+  border-color: #C97B63; box-shadow: 0 0 0 3px rgba(201,123,99,0.2);
+  animation: shiruQuizWrongShake 0.4s ease;
+}
+@keyframes shiruQuizCorrectPop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@keyframes shiruQuizWrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+}
 .shiru-quiz-lock-badge {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
   width: 30px; height: 30px; border-radius: 50%;
   background: rgba(247,242,228,0.94); border: 1px solid #D9CDAE;
   display: flex; align-items: center; justify-content: center;
 }
-.shiru-quiz-hint { text-align: center; font-size: 10.5px; color: #B08F49; }
+.shiru-quiz-hint { text-align: center; font-size: 10.5px; color: #B08F49; transition: color 0.15s ease; }
 .shiru-quiz-corner.locked .shiru-quiz-hint { color: #B0A788; }
+.shiru-quiz-hint.is-correct { font-size: 12.5px; font-weight: 700; color: #5C8F6B; }
+.shiru-quiz-hint.is-wrong { font-size: 12.5px; font-weight: 700; color: #BD7154; }
 
 /* しる:アーカイブモーダル(ルーティンモーダルと共通クラスを流用しつつ専用要素だけ追加) */
 .shiru-entry-card { background: #F9FAFB; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
