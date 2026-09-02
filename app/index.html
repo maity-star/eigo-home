@@ -4896,6 +4896,18 @@ const SHIRU_TOPICS = [
       { en: 'Some people even eat bacon ice cream!', ja: 'ベーコン味のアイスを食べる人もいるんだって。', start: 33.828, image: 'shiru_book/illustration/topics/icecream/icecream_4.png' },
     ],
   },
+  {
+    id: 'shavedice', category: 'food', titleEn: 'Shaved Ice', titleJa: 'かき氷', dateAdded: '2026-09-02',
+    image: 'shiru_book/illustration/topics/shavedice/shavedice.png',
+    // turtleと同じく、豆知識ごとに個別録音(fact.audio)する方式。このtopic.audioは実質未使用(残しておいても無害)。
+    audio: 'shiru_book/audio/food/shavedice/shavedice_1.mp3',
+    facts: [
+      { en: 'Shaved ice was created in Japan, and people have eaten it for hundreds of years.', ja: 'かき氷は日本生まれ。何百年も前から食べられているんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_1.png', audio: 'shiru_book/audio/food/shavedice/shavedice_1.mp3' },
+      { en: 'The most popular flavor of shaved ice is strawberry.', ja: 'かき氷で一番人気の味はいちごなんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_2.png', audio: 'shiru_book/audio/food/shavedice/shavedice_2.mp3' },
+      { en: 'Some shaved ice costs over six thousand yen!', ja: 'かき氷は、6000円を超えるものもあるんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_3.png', audio: 'shiru_book/audio/food/shavedice/shavedice_3.mp3' },
+    ],
+    quiz: true,
+  },
 ];
 
 function getTodayShiruDateKey() {
