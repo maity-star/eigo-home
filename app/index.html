@@ -4902,9 +4902,9 @@ const SHIRU_TOPICS = [
     // turtleと同じく、豆知識ごとに個別録音(fact.audio)する方式。このtopic.audioは実質未使用(残しておいても無害)。
     audio: 'shiru_book/audio/food/shavedice/shavedice_1.mp3',
     facts: [
-      { en: 'Shaved ice was created in Japan, and people have eaten it for hundreds of years.', ja: 'かき氷は日本生まれ。何百年も前から食べられているんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_1.png', audio: 'shiru_book/audio/food/shavedice/shavedice_1.mp3' },
-      { en: 'The most popular flavor of shaved ice is strawberry.', ja: 'かき氷で一番人気の味はいちごなんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_2.png', audio: 'shiru_book/audio/food/shavedice/shavedice_2.mp3' },
-      { en: 'Some shaved ice costs over six thousand yen!', ja: 'かき氷は、6000円を超えるものもあるんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_3.png', audio: 'shiru_book/audio/food/shavedice/shavedice_3.mp3' },
+      { en: 'Shaved ice was created in Japan. People have been eating shaved ice for hundreds of years.', ja: 'かき氷は日本生まれ。何百年も前から食べられているんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_1.png', audio: 'shiru_book/audio/food/shavedice/shavedice_1.mp3' },
+      { en: 'The most popular flavor of shaved ice is strawberry. Other popular flavors are melon, blue Hawaii, and lemon.', ja: 'かき氷で一番人気の味はいちご。メロンやブルーハワイ、レモンも人気なんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_2.png', audio: 'shiru_book/audio/food/shavedice/shavedice_2.mp3' },
+      { en: 'Shaved ice can be very cheap or very expensive. Some shaved ice costs over six thousand yen!', ja: 'かき氷は安いものから高いものまであって、中には6000円を超えるものもあるんだって。', image: 'shiru_book/illustration/topics/shavedice/shavedice_3.png', audio: 'shiru_book/audio/food/shavedice/shavedice_3.mp3' },
     ],
     quiz: true,
   },
@@ -4965,7 +4965,10 @@ function shiruTabHasNew() {
   const opened = getShiruOpenedSet();
   return SHIRU_CATEGORIES.some(cat => {
     const topics = getShiruTopicsByCategory(cat.id);
-    return topics.length > 0 && topics[0].dateAdded === todayKey && !opened.has(cat.id);
+    // 2026-09-02修正:カテゴリー単位のopened('food'等)だと、その日すでにジャンルを開いただけで
+    // (新トピックそのものは見ていなくても)NEWが消えてしまっていた。
+    // トピック単位のキー('food_shavedice'等。openShiruTopicで実際に記録している形式)で判定するよう修正。
+    return topics.length > 0 && topics[0].dateAdded === todayKey && !opened.has(cat.id + '_' + topics[0].id);
   });
 }
 function updateShiruTabBadge() {
@@ -4982,7 +4985,7 @@ function renderShiruCatGrid() {
   const cardsHtml = SHIRU_CATEGORIES.map(cat => {
     const topics = getShiruTopicsByCategory(cat.id);
     const factCount = topics.reduce((sum, t) => sum + t.facts.length, 0);
-    const isNewToday = topics.length > 0 && topics[0].dateAdded === todayKey && !opened.has(cat.id);
+    const isNewToday = topics.length > 0 && topics[0].dateAdded === todayKey && !opened.has(cat.id + '_' + topics[0].id);
     const ribbon = isNewToday ? '<div class="shiru-cat-ribbon">NEW</div>' : '';
     return `
       <div class="shiru-cat-card" onclick="openShiruBookModal('${cat.id}')">
