@@ -1,4 +1,4 @@
- /* dev test 2026-09-08 */
+/* dev test 2026-09-08 */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; }
 .app { max-width: 390px; margin: 0 auto; padding: 0 0 80px; }
@@ -879,6 +879,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .wbl-icon.gray { background: #F3F4F6; }
 .wbl-icon.red { background: #FDE8E8; }
 .wbl-icon.rose { background: #FCEEF0; }
+.wbl-icon.mint { background: #EAF4EE; }
 
 /* 毎日の通知トグル(設定＞アカウント) */
 .notify-switch { position: relative; width: 40px; height: 23px; border-radius: 12px; background: #E0E0E0; flex-shrink: 0; transition: background 0.2s; }
@@ -1984,3 +1985,64 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .toast.show { opacity: 1; }
 .icon-img{width:1em;height:1em;vertical-align:-0.15em;object-fit:contain;display:inline-block}
 .icon-img-lg{width:32px;height:32px;object-fit:contain;display:block}
+
+/* ==============================
+   Enverlyツアー（登録直後オンボーディング／2026-09実装）
+   ・実際のUIの上に「暗幕＋穴あき（対象タブだけ触れる）」を重ねる形式
+   ・完了/スキップは別ステータスとしてlocalStorageに保存（enverly_tour_status）
+============================== */
+.tour-overlay { position: fixed; inset: 0; z-index: 480; display: none; pointer-events: none; }
+.tour-overlay.show { display: block; }
+
+.tour-scrim { position: fixed; background: rgba(20,26,20,0.62); pointer-events: auto; transition: top .28s ease, bottom .28s ease, left .28s ease, right .28s ease, width .28s ease, height .28s ease; }
+
+.tour-ring { position: fixed; z-index: 484; border: 2.5px solid #FFD166; border-radius: 16px; box-shadow: 0 0 0 4px rgba(255,209,102,0.32), 0 6px 18px rgba(0,0,0,0.25); pointer-events: none; transition: top .3s cubic-bezier(.34,1.56,.64,1), left .3s cubic-bezier(.34,1.56,.64,1), width .3s cubic-bezier(.34,1.56,.64,1), height .3s cubic-bezier(.34,1.56,.64,1); display: none; }
+.tour-ring.show { display: block; }
+
+.tour-skip-btn {
+  position: fixed; top: max(14px, env(safe-area-inset-top, 14px)); right: 14px; z-index: 490;
+  background: rgba(255,255,255,0.94); color: #6B7280; font-size: 11.5px; font-weight: 600;
+  padding: 7px 13px; border-radius: 999px; box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+  pointer-events: auto; cursor: pointer; display: none; border: none;
+}
+.tour-skip-btn.show { display: block; }
+.tour-skip-btn:active { background: #F3F4F6; }
+
+.tour-card {
+  position: fixed; left: 18px; right: 18px; z-index: 490;
+  background: #fff; border-radius: 20px; padding: 15px 15px 14px;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.3);
+  display: flex; gap: 10px; align-items: flex-start;
+  pointer-events: auto;
+  animation: tourCardPop .32s cubic-bezier(.34,1.56,.64,1);
+}
+.tour-card.centered { top: 50%; transform: translateY(-50%); left: 24px; right: 24px; max-width: 340px; margin: 0 auto; flex-direction: column; align-items: center; text-align: center; padding: 28px 22px 24px; }
+@keyframes tourCardPop { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.tour-card-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1.5px solid #BBDAC8; margin-top: 1px; }
+.tour-card.centered .tour-card-avatar { width: 88px; height: 88px; border-radius: 0; background: none; border: none; margin-bottom: 2px; }
+
+.tour-card-body { flex: 1; min-width: 0; }
+.tour-card-text { font-size: 12.5px; color: #374151; line-height: 1.7; font-weight: 500; }
+.tour-card.centered .tour-card-text { font-size: 14px; line-height: 1.8; }
+.tour-card-text b { color: #2D6A4F; }
+
+.tour-card-nudge {
+  margin-top: 10px; font-size: 12px; font-weight: 700; color: #2D6A4F;
+  background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 10px; padding: 8px 10px;
+  display: none; align-items: center; gap: 4px;
+}
+.tour-card-nudge.show { display: flex; }
+
+.tour-card-actions { margin-top: 12px; display: flex; gap: 8px; width: 100%; }
+.tour-card.centered .tour-card-actions { justify-content: center; }
+.tour-btn-primary {
+  background: #2D6A4F; color: #fff; border: none; border-radius: 12px;
+  padding: 11px 22px; font-size: 13px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(45,106,79,0.3);
+}
+.tour-btn-primary:active { opacity: .85; }
+
+.tour-dots { display: flex; gap: 5px; margin-top: 10px; justify-content: center; }
+.tour-dots span { width: 5px; height: 5px; border-radius: 50%; background: #E5E7EB; }
+.tour-dots span.on { background: #6DB88A; }
