@@ -22,7 +22,7 @@ const MONTHLY_BOOK_NOTIFICATION = {
   title: '今月の新しい絵本が届いたよ！Hooray!',
   body: 'Jayはどんな新しいお話を読んでくれるのかな',
   tag: NOTIFICATION_TAG,
-  url: '/',
+  url: '/app',
 };
 
 const EVENING_TALK_TITLE = 'おつかれさまでした。今日も一緒に英語のひとときを。';
@@ -74,14 +74,14 @@ export function getMorningSlotMessage(now = new Date()) {
   if (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5) {
     const scripted = MORNING_TALK_NOTIFICATIONS[dateKey];
     if (scripted) {
-      return { ...scripted, tag: NOTIFICATION_TAG, url: '/' };
+      return { ...scripted, tag: NOTIFICATION_TAG, url: '/app' };
     }
     const line = pickJoelLine(jst);
     return {
       title: '今日のフレーズ、届いたよ🎈',
       body: `Jay: "${line.en}" ${line.ja}`,
       tag: NOTIFICATION_TAG,
-      url: '/',
+      url: '/app',
     };
   }
 
@@ -107,7 +107,7 @@ export function getEveningSlotMessage(now = new Date()) {
       title: EVENING_TALK_TITLE,
       body: pickRandom(EVENING_TALK_BODIES),
       tag: NOTIFICATION_TAG,
-      url: '/',
+      url: '/app',
     };
   }
 
