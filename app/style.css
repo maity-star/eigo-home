@@ -1994,7 +1994,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .tour-overlay { position: fixed; inset: 0; z-index: 480; display: none; pointer-events: none; }
 .tour-overlay.show { display: block; }
 
-.tour-scrim { position: fixed; background: rgba(20,26,20,0.62); pointer-events: auto; transition: top .28s ease, bottom .28s ease, left .28s ease, right .28s ease, width .28s ease, height .28s ease; }
+/* 位置をtransitionでアニメーションさせると、穴が開き切る前のごく短い時間帯にタップすると
+   まだ動いている暗幕に当たってブロックされてしまう不具合があったため、位置は即座に反映する
+   （見た目のなめらかさより、タップの確実性を優先）。光る演出自体は.tour-ring側のtransitionで担う。 */
+.tour-scrim { position: fixed; background: rgba(20,26,20,0.62); pointer-events: auto; }
 
 .tour-ring { position: fixed; z-index: 484; border: 2.5px solid #FFD166; border-radius: 16px; box-shadow: 0 0 0 4px rgba(255,209,102,0.32), 0 6px 18px rgba(0,0,0,0.25); pointer-events: none; transition: top .3s cubic-bezier(.34,1.56,.64,1), left .3s cubic-bezier(.34,1.56,.64,1), width .3s cubic-bezier(.34,1.56,.64,1), height .3s cubic-bezier(.34,1.56,.64,1); display: none; }
 .tour-ring.show { display: block; }
