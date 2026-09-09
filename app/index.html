@@ -1242,6 +1242,29 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
     </div>
   </div>
 </div>
+
+<!-- ========================
+     Enverlyツアー（登録直後オンボーディング／2026-09実装）
+     実際のUIの上に「暗幕＋対象タブだけ穴あき」を重ねて、実際にタップして一周してもらう形式。
+     ロジックはswitchTab()の直後（タブ切替まわり）にまとめてある。
+     ======================== -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-scrim" id="tourScrimTop"></div>
+  <div class="tour-scrim" id="tourScrimBottom"></div>
+  <div class="tour-scrim" id="tourScrimLeft"></div>
+  <div class="tour-scrim" id="tourScrimRight"></div>
+  <div class="tour-card" id="tourCard">
+    <img class="tour-card-avatar" id="tourCardAvatar" src="/illustrations/joel/joel_icon_common_512.png" alt="Jay">
+    <div class="tour-card-body">
+      <div class="tour-card-text" id="tourCardText"></div>
+      <div class="tour-card-nudge" id="tourCardNudge"></div>
+      <div class="tour-card-actions" id="tourCardActions"></div>
+      <div class="tour-dots" id="tourDots"></div>
+    </div>
+  </div>
+</div>
+<button type="button" class="tour-skip-btn" id="tourSkipBtn" onclick="skipEnverlyTour()">あとで見る</button>
+
 <div class="settings-modal" id="settingsModal">
   <div class="settings-modal-header">
     <div class="settings-modal-title">設定</div>
@@ -1310,7 +1333,16 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
       </div>
     </div>
     <div class="settings-block-label">サービス情報</div>
-    <div class="settings-rows"> <a class="wbl-item" href="tokushoho.html" target="_blank">
+    <div class="settings-rows">
+      <div class="wbl-item" onclick="restartEnverlyTour()">
+        <div class="wbl-icon mint">🧭</div>
+        <div class="wbl-text">
+          <div class="wbl-title">Enverlyツアーをもう一度見る</div>
+          <div class="wbl-sub">各タブの使い方をおさらい</div>
+        </div>
+        <div class="wbl-arr">＞</div>
+      </div>
+      <a class="wbl-item" href="tokushoho.html" target="_blank">
       <div class="wbl-icon gray">📄</div>
       <div class="wbl-text">
         <div class="wbl-title">特定商取引法に基づく表記</div>
@@ -1969,6 +2001,7 @@ function initApp() {
   renderStampCard();
   initPushNotification();
   trackEvent('app_open');
+  maybeStartEnverlyTour();
 }
 initApp();
 
@@ -2427,6 +2460,310 @@ function switchTab(name, el) {
   if (name === 'asobo') renderAsoboContent();
 	  if (name === 'home') renderJoelLine();
   trackEvent('tab_view', name);
+  if (window.EnverlyTour && EnverlyTour.active) EnverlyTour.onTabTap(name);
+}
+
+// ========================
+// Enverlyツアー（登録直後オンボーディング）
+// ・目的：機能の網羅説明ではなく「Home以外にも場所がある」という全体像を、
+//   実際に各タブをタップしながら体感してもらうこと（モニターの声：Home以外のタブに気づかなかった）
+// ・実装方針：既存タブ切替(switchTab)やアプリ本体には手を入れず、上に重ねるオーバーレイのみで完結させる
+//   （既存機能への影響を最小にするため。フックはswitchTab末尾の1行のみ）
+// ・進行の起点：ユーザーが対象タブを実際にタップ→switchTab内のフックがEnverlyTour.onTabTapを呼ぶ→次のステップへ
+// ・状態保存：localStorage['enverly_tour_status'] = 'completed' | 'skipped'（未設定＝未実施）
+//   スキップは「完了」とは別状態として保存し、将来「もう一度見る」で再実施できる（restartEnverlyTour）
+// ========================
+// 注意：initApp()の呼び出し自体がこのコードよりファイル内で先に実行されるため、
+// ここでキー名をvarに入れて参照すると「まだ代入前でundefined」を踏むタイミング事故が起きる。
+// そのため文字列リテラルをそのまま使う（宣言順に依存しない安全策）。
+function getTourStatus() {
+  try { return localStorage.getItem('enverly_tour_status'); } catch (e) { return null; }
+}
+function setTourStatus(v) {
+  try { localStorage.setItem('enverly_tour_status', v); } catch (e) {}
+}
+
+var TOUR_TAB_INDEX = { home: 0, shiru: 1, asobo: 2, routine: 3, playlist: 4 };
+
+// ステップ1〜5の中身（対象タブ・説明文・次にタップしてほしいタブ名）
+// ※「あそぼ」はタブの実表記に合わせている（依頼文中の表記ゆれ「あそぶ」は反映していません）
+// ※2026-09-08 Maiさんの指定文言に差し替え。絵文字は基本なし（ナッジの☝️とアウトロの🎉のみ意図的に残す）
+// ※step1(home)は「最初にリンクを開いた時のメッセージ」を兼ねる＝独立したintro画面は廃止し、
+//   ツアー開始時にいきなりこのHomeステップから始まる構成に変更
+var ENVERLY_TOUR_STEPS = [
+  null, // index0は使わない
+  {
+    tab: 'home',
+    text: '今ひらいてるところがHomeだよ！<br><b>Morning Talk</b>や<b>Evening talk</b>が毎日届くよ。ラジオ感覚で流してみてね。<br>今月の絵本もここから。読み聞かせだけじゃなく、覚えたフレーズを言ってみる<b>Let\'s talk</b>もお楽しみに！<br>まずはここがスタート地点！',
+    nudgeLabel: 'しる', nextTab: 'shiru'
+  },
+  {
+    tab: 'shiru',
+    text: 'このタブは『しる』<br>火曜日と木曜日に、Jayから新しい豆知識が届くよ！<br>動物や食べもの、お天気など、英語でいろんなことを知っていこう。<br>リスニングクイズも用意してるから挑戦してみてね！Jayが何を言っていたか聞き取れるかな？',
+    nudgeLabel: 'あそぼ', nextTab: 'asobo'
+  },
+  {
+    tab: 'asobo',
+    text: 'ここは『あそぼ』<br>遊びながら英語に触れる場所だよ。<br>音を聞いて探したり、親子で一緒に楽しんだり。<br>ちょっとした待ち時間や、料理中にも使える遊びを増やしていくよ！',
+    nudgeLabel: 'ルーティン', nextTab: 'routine'
+  },
+  {
+    tab: 'routine',
+    text: 'ここは『ルーティン』<br>英語で何て言うのかな？迷った時に開いてみて。<br>毎日の生活に取り入れやすいように、おすすめの英語フレーズをまとめているよ。',
+    nudgeLabel: 'みる', nextTab: 'playlist'
+  },
+  {
+    tab: 'playlist',
+    text: 'ここは『みる』<br>Jayのおすすめや、Enverlyの世界をもっと楽しめるコンテンツがここに集まっていくよ。<br>ちょっと時間がある時に、気軽に覗いてみてね。',
+    nudgeLabel: null, nextTab: null
+  }
+];
+
+function tourScrimEls() {
+  return {
+    top: document.getElementById('tourScrimTop'),
+    bottom: document.getElementById('tourScrimBottom'),
+    left: document.getElementById('tourScrimLeft'),
+    right: document.getElementById('tourScrimRight')
+  };
+}
+
+// PCなど画面幅が広い環境で暗幕がブラウザ全幅に広がってしまう問題への対策。
+// .app（スマホ幅カラム、max-width:390pxで中央寄せ）の実際の左右端を基準にする。
+// スマホ実機では画面幅≒.app幅なのでほぼ影響なし。
+function tourAppBounds() {
+  var app = document.querySelector('.app');
+  var r = app ? app.getBoundingClientRect() : null;
+  if (!r) return { left: 0, right: 0 };
+  return {
+    left: Math.max(Math.round(r.left), 0),
+    right: Math.max(Math.round(window.innerWidth - r.right), 0)
+  };
+}
+
+// 1〜2個のタブ名の矩形を囲む最小の四角形を返す（隣り合うタブなら間の隙間ごと1つの穴として扱う）
+function tourTabsUnionRect(tabNames) {
+  var els = document.querySelectorAll('.tab-bar .tab');
+  var pad = 5;
+  var top = Infinity, left = Infinity, right = -Infinity, bottom = -Infinity;
+  tabNames.forEach(function (name) {
+    var el = els[TOUR_TAB_INDEX[name]];
+    if (!el) return;
+    var r = el.getBoundingClientRect();
+    top = Math.min(top, r.top - pad);
+    left = Math.min(left, r.left - pad);
+    right = Math.max(right, r.right + pad);
+    bottom = Math.max(bottom, r.bottom + pad);
+  });
+  return { top: Math.max(top, 0), left: Math.max(left, 0), right: right, bottom: bottom };
+}
+
+// 指定したタブ（1つ、または隣り合う2つ）だけ暗幕に「穴」を開けてタップを通す（4分割の暗幕）。
+// 「説明中のタブ」は常にこの穴の中に入れておくことで、グレーの透過がかからないようにする。
+// 暗幕の左右端は.appのカラム幅までに留める（tourAppBounds）
+function tourPunchHoleForTabs(tabNames) {
+  var rect = tourTabsUnionRect(tabNames);
+  var top = rect.top, left = rect.left, right = rect.right, bottom = rect.bottom;
+  var b = tourAppBounds();
+
+  var s = tourScrimEls();
+  s.top.style.cssText = 'top:0; left:' + b.left + 'px; right:' + b.right + 'px; height:' + top + 'px;';
+  s.bottom.style.cssText = 'top:' + bottom + 'px; left:' + b.left + 'px; right:' + b.right + 'px; bottom:0;';
+  s.left.style.cssText = 'top:' + top + 'px; left:' + b.left + 'px; width:' + Math.max(left - b.left, 0) + 'px; height:' + (bottom - top) + 'px;';
+  s.right.style.cssText = 'top:' + top + 'px; left:' + right + 'px; right:' + b.right + 'px; height:' + (bottom - top) + 'px;';
+}
+
+// スポットライトなし＝アプリのカラム幅いっぱいを暗幕で覆う（outroのみで使用）
+function tourScrimFullScreen() {
+  var b = tourAppBounds();
+  var s = tourScrimEls();
+  s.top.style.cssText = 'top:0; left:' + b.left + 'px; right:' + b.right + 'px; bottom:0;';
+  s.bottom.style.cssText = 'top:0; left:0; right:0; height:0;';
+  s.left.style.cssText = 'top:0; left:0; width:0; height:0;';
+  s.right.style.cssText = 'top:0; left:0; width:0; height:0;';
+}
+
+// 次にタップしてほしいタブそのものを点滅させる（以前は別要素のリング演出だったが、
+// 「タブ自体が点滅する」方式に変更。対象タブのDOM要素に直接クラスを付け外しする）
+var tourBlinkingTabName = null;
+function tourSetBlinkTab(tabName) {
+  tourClearBlinkTab();
+  if (!tabName) return;
+  var els = document.querySelectorAll('.tab-bar .tab');
+  var el = els[TOUR_TAB_INDEX[tabName]];
+  if (el) { el.classList.add('tour-tab-blink'); tourBlinkingTabName = tabName; }
+}
+function tourClearBlinkTab() {
+  if (!tourBlinkingTabName) return;
+  var els = document.querySelectorAll('.tab-bar .tab');
+  var el = els[TOUR_TAB_INDEX[tourBlinkingTabName]];
+  if (el) el.classList.remove('tour-tab-blink');
+  tourBlinkingTabName = null;
+}
+
+function tourPositionCardAnchored() {
+  var tabBar = document.querySelector('.tab-bar');
+  var card = document.getElementById('tourCard');
+  card.classList.remove('centered');
+  card.style.transform = '';
+  if (!tabBar) return;
+  var r = tabBar.getBoundingClientRect();
+  var b = tourAppBounds();
+  card.style.top = (r.bottom + 14) + 'px';
+  card.style.left = (b.left + 18) + 'px';
+  card.style.right = (b.right + 18) + 'px';
+}
+function tourPositionCardCentered() {
+  var card = document.getElementById('tourCard');
+  card.classList.add('centered');
+  card.style.top = '50%';
+  var b = tourAppBounds();
+  card.style.left = (b.left + 24) + 'px';
+  card.style.right = (b.right + 24) + 'px';
+}
+
+function tourPositionSkipBtn() {
+  var b = tourAppBounds();
+  document.getElementById('tourSkipBtn').style.right = (b.right + 14) + 'px';
+}
+
+function tourRenderDots(current, total) {
+  var wrap = document.getElementById('tourDots');
+  if (!current) { wrap.innerHTML = ''; return; }
+  var html = '';
+  for (var i = 1; i <= total; i++) html += '<span class="' + (i <= current ? 'on' : '') + '"></span>';
+  wrap.innerHTML = html;
+}
+
+// 説明を読んでいる間、次のタブがまだ点滅していない状態でどれくらい待つか(ms)。
+// 「Homeの説明をしてるのに、しるタブがもう光ってて紛らわしい」という指摘を受けて一度1.6秒に、
+// その後「もう数秒遅らせてもいいかも」という指摘を受けてさらに伸ばした。
+var TOUR_NUDGE_DELAY_MS = 4000;
+
+var EnverlyTour = {
+  active: false,
+  step: 0,
+  revealed: false, // 現ステップで「次はここをタップ」の点滅案内をすでに出したか
+  _nudgeTimer: null,
+
+  start: function () {
+    this.active = true;
+    document.body.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+    document.getElementById('tourOverlay').classList.add('show');
+    document.getElementById('tourSkipBtn').classList.add('show');
+    tourPositionSkipBtn();
+    trackEvent('tour_start');
+    // 独立したintro画面は廃止。いきなりstep1(Home)から開始する（Homeの説明文＝最初に開いた時のメッセージを兼ねる）
+    this.gotoStep(1);
+  },
+
+  gotoStep: function (n) {
+    var self = this;
+    if (this._nudgeTimer) { clearTimeout(this._nudgeTimer); this._nudgeTimer = null; }
+    tourClearBlinkTab();
+    this.step = n;
+    this.revealed = false;
+    window.scrollTo(0, 0);
+    var data = ENVERLY_TOUR_STEPS[n];
+    tourPositionCardAnchored();
+    document.getElementById('tourCardAvatar').src = '/illustrations/joel/joel_icon_common_512.png';
+    document.getElementById('tourCardText').innerHTML = data.text;
+    tourRenderDots(n, 5);
+    var nudgeEl = document.getElementById('tourCardNudge');
+    var actions = document.getElementById('tourCardActions');
+    nudgeEl.classList.remove('show');
+    actions.innerHTML = '';
+    // 今説明しているタブ自体には最初からグレーの透過をかけない（そこだけ常に穴を開けておく）。
+    // 次のタブはまだ穴を開けない＝点滅も出さない（読んでる最中に紛らわしいため）。
+    tourPunchHoleForTabs([data.tab]);
+    trackEvent('tour_step', data.tab);
+
+    if (data.nextTab) {
+      this._nudgeTimer = setTimeout(function () {
+        if (!self.active || self.step !== n) return; // その間にskip/次のステップに進んでいたら何もしない
+        self.revealed = true;
+        nudgeEl.innerHTML = '次は「' + data.nudgeLabel + '」をタップしてみよう☝️';
+        nudgeEl.classList.add('show');
+        // 今のタブ＋次のタブの2つ分をまとめて穴にする（隣り合っているので1つの穴で済む）
+        tourPunchHoleForTabs([data.tab, data.nextTab]);
+        tourSetBlinkTab(data.nextTab);
+      }, TOUR_NUDGE_DELAY_MS);
+    } else {
+      actions.innerHTML = '<button class="tour-btn-primary" onclick="EnverlyTour.renderOutro()">つづける</button>';
+    }
+  },
+
+  onTabTap: function (tabName) {
+    if (!this.active) return;
+    var data = ENVERLY_TOUR_STEPS[this.step];
+    // まだ点滅案内を出す前（説明を読んでいる最中）は、対象タブ以外そもそも暗幕でタップ不可。
+    // revealed後だけ本来のタブ遷移として扱う。
+    if (data && data.nextTab === tabName && this.revealed) {
+      this.gotoStep(this.step + 1);
+    }
+  },
+
+  reposition: function () {
+    if (!this.active) return;
+    tourPositionSkipBtn();
+    var data = ENVERLY_TOUR_STEPS[this.step];
+    if (data && data.nextTab && this.revealed) {
+      tourPunchHoleForTabs([data.tab, data.nextTab]);
+    } else if (data) {
+      tourPunchHoleForTabs([data.tab]);
+    } else {
+      tourScrimFullScreen();
+    }
+    if (this.step >= 1 && this.step <= 5) {
+      tourPositionCardAnchored();
+    } else {
+      tourPositionCardCentered();
+    }
+  },
+
+  renderOutro: function () {
+    if (this._nudgeTimer) { clearTimeout(this._nudgeTimer); this._nudgeTimer = null; }
+    tourClearBlinkTab();
+    this.step = 6;
+    tourScrimFullScreen();
+    tourPositionCardCentered();
+    document.getElementById('tourCardAvatar').src = '/illustrations/joel/joel_banzai_960x640.png';
+    document.getElementById('tourCardText').innerHTML = 'Enverlyの探検ツアー、おしまい！🎉<br>毎日ぜんぶ使わなくても大丈夫だよ。<br>まずは家族のペースでみんなでEnverlyで英語を楽しんでみてね。';
+    document.getElementById('tourCardNudge').classList.remove('show');
+    tourRenderDots(0, 5);
+    document.getElementById('tourCardActions').innerHTML = '<button class="tour-btn-primary" onclick="EnverlyTour.finish(\'completed\')">Enverlyをはじめる</button>';
+    trackEvent('tour_step', 'outro');
+  },
+
+  finish: function (status) {
+    if (this._nudgeTimer) { clearTimeout(this._nudgeTimer); this._nudgeTimer = null; }
+    tourClearBlinkTab();
+    this.active = false;
+    document.getElementById('tourOverlay').classList.remove('show');
+    document.getElementById('tourSkipBtn').classList.remove('show');
+    document.body.style.overflow = '';
+    setTourStatus(status);
+    trackEvent(status === 'completed' ? 'tour_complete' : 'tour_skip', 'step_' + this.step);
+  }
+};
+
+window.addEventListener('resize', function () { if (EnverlyTour.active) EnverlyTour.reposition(); });
+
+function skipEnverlyTour() { EnverlyTour.finish('skipped'); }
+
+// 初回ログイン判定：ツアー未実施(localStorageに記録なし)なら、初期描画が落ち着くのを待って開始
+function maybeStartEnverlyTour() {
+  if (getTourStatus()) return;
+  setTimeout(function () { EnverlyTour.start(); }, 500);
+}
+
+// 設定＞サービス情報からの再表示用（完了・スキップ後もいつでも見返せる）
+function restartEnverlyTour() {
+  closeSettingsModal();
+  var homeTabEl = document.querySelectorAll('.tab-bar .tab')[0];
+  if (homeTabEl) switchTab('home', homeTabEl);
+  setTimeout(function () { EnverlyTour.start(); }, 250);
 }
 
 // ========================
