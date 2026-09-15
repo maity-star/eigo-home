@@ -504,8 +504,13 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-question { font-size: 16px; font-weight: 600; color: #1A4232; line-height: 1.45; margin-bottom: 4px; }
 .ft-question-ja { font-size: 11px; color: #6B8577; margin-bottom: 16px; }
 
-/* 話者アバター＋吹き出し(掛け合いUI・口パク・トーク系プロファイル) */
-.ft-dialogue { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+/* 話者アバター＋吹き出し(掛け合いUI・口パク・トーク系プロファイル)
+   2026-09-15: 3カラム(アバター/吹き出し/アバター)→1カラムに変更。吹き出しを常に幅いっぱいに表示し、
+   その下にJay(左)/Mai(右)のアバターを両端固定で配置。「今どっちが喋ってるか」はアバターの発光演出に加え、
+   吹き出しの下角(話者側のアバター方向)を尖らせる+縁取り色を話者カラーにすることで示す。
+   from-maiクラスの付け外しはJS側(updateFtBubble/updateEtBubble)は変更不要、デフォルト=Jay側の見た目。 */
+.ft-dialogue { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.ft-avatar-row { display: flex; align-items: center; justify-content: space-between; }
 .ft-avatar {
   width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
   background: #fff; border: 2px solid transparent; opacity: 0.55;
@@ -516,23 +521,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-avatar.speaking.joel { border-color: #6DB88A; box-shadow: 0 2px 8px rgba(45,106,79,0.25); }
 .ft-avatar.speaking.mai { border-color: #E8A03D; box-shadow: 0 2px 8px rgba(184,134,11,0.22); }
 
-.ft-bubble-wrap { flex: 1; min-height: 42px; display: flex; align-items: center; position: relative; }
+.ft-bubble-wrap { min-height: 42px; display: flex; align-items: center; position: relative; }
 .ft-bubble {
-  max-width: 100%; background: #fff; border-radius: 4px 16px 16px 16px;
-  padding: 7px 12px; box-shadow: 0 2px 8px rgba(45,106,79,0.10);
-  opacity: 0; transform: translateX(-6px) scale(0.96); margin-right: auto;
-  transition: opacity .25s ease, transform .25s ease, border-radius .25s ease, margin .25s ease;
+  flex: 1; background: #fff; border: 1.5px solid rgba(109,184,138,0.4); border-radius: 16px 16px 16px 4px;
+  padding: 9px 14px; box-shadow: 0 2px 8px rgba(45,106,79,0.10);
+  opacity: 0; transform: translateY(6px) scale(0.97);
+  transition: opacity .25s ease, transform .25s ease, border-radius .25s ease, border-color .25s ease;
 }
-.ft-bubble.show { opacity: 1; transform: translateX(0) scale(1); }
-.ft-bubble.from-mai { margin-right: 0; margin-left: auto; border-radius: 16px 4px 16px 16px; transform: translateX(6px) scale(0.96); }
-.ft-bubble.from-mai.show { transform: translateX(0) scale(1); }
-.ft-bubble-en { font-size: 12px; font-weight: 600; color: #1A4232; line-height: 1.4; }
+.ft-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+.ft-bubble.from-mai { border-radius: 16px 16px 4px 16px; border-color: rgba(232,160,61,0.45); }
+.ft-bubble-en { font-size: 14px; font-weight: 600; color: #1A4232; line-height: 1.45; }
 .ft-bubble.from-mai .ft-bubble-en { color: #9A6B1E; }
-.ft-bubble-ja { font-size: 10.5px; color: #6B8577; margin-top: 2px; line-height: 1.4; }
-.ft-bubble.compact .ft-bubble-en { font-size: 10.5px; }
-.ft-bubble.compact .ft-bubble-ja { font-size: 9.5px; }
-.ft-bubble.compact2 .ft-bubble-en { font-size: 9.5px; }
-.ft-bubble.compact2 .ft-bubble-ja { font-size: 8.5px; }
+.ft-bubble-ja { font-size: 11.5px; color: #6B8577; margin-top: 3px; line-height: 1.45; }
+.ft-bubble.compact .ft-bubble-en { font-size: 12.5px; }
+.ft-bubble.compact .ft-bubble-ja { font-size: 10px; }
+.ft-bubble.compact2 .ft-bubble-en { font-size: 11px; }
+.ft-bubble.compact2 .ft-bubble-ja { font-size: 9px; }
 
 /* 波形ビジュアル */
 .ft-wave { display: flex; align-items: center; gap: 3px; height: 28px; margin-bottom: 14px; }
@@ -582,7 +586,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-phrases-body { display: none; margin: 0 16px 14px; }
 .ft-phrases-body.open { display: block; }
 .ft-phrase-row {
-  display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: #374151; padding: 6px 8px;
+  display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: #374151; padding: 8px 8px;
   border-top: 1px solid rgba(45,106,79,0.1); margin: 0 -8px; border-radius: 8px;
   transition: background 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease, transform 0.35s ease;
 }
@@ -597,7 +601,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-phrase-row.done { opacity: 0.45; }
 .ft-phrase-speaker {
   font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; flex-shrink: 0;
-  align-self: center;
+  align-self: flex-start; margin-top: 2px;
 }
 .ft-phrase-speaker.joel { background: #E1EFE6; color: #1A4232; }
 .ft-phrase-speaker.mai { background: #FBEAD6; color: #9A6B1E; }
@@ -606,8 +610,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 12px; color: #4D5F55; line-height: 1.75;
 }
 .ft-maitalk-label { font-size: 10px; font-weight: 700; color: #B8860B; margin-bottom: 4px; }
-.ft-phrase-en { font-weight: 600; color: #1A4232; }
-.ft-phrase-ja { color: #6B8577; font-size: 11px; }
+/* 2026-09-15: 全会話内容の英日を横並び→縦積みに変更(.ft-phrase-textでen/jaをラップ)。
+   英語14px/日本語11pxはアプリ内の他フレーズ表示(.phrase-en/.phrase-ja等)と同じ規格に統一。 */
+.ft-phrase-text { flex: 1; min-width: 0; }
+.ft-phrase-en { display: block; font-weight: 600; color: #1A4232; }
+.ft-phrase-ja { display: block; color: #6B8577; font-size: 11px; margin-top: 3px; }
 
 /* エピソード一覧(今週分) */
 .ft-ep-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
