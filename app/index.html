@@ -747,14 +747,16 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                     <div class="ft-question" id="ftQuestion">"What animal did you see today?"</div>
                     <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
                     <div class="ft-dialogue">
-                      <div class="ft-avatar joel" id="ftAvatarJoel"> <img id="ftAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
                       <div class="ft-bubble-wrap" id="ftBubbleWrap">
                         <div class="ft-bubble" id="ftBubble">
                           <div class="ft-bubble-en" id="ftBubbleEn"></div>
                           <div class="ft-bubble-ja" id="ftBubbleJa"></div>
                         </div>
                       </div>
-                      <div class="ft-avatar mai" id="ftAvatarMai"> <img id="ftAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
+                      <div class="ft-avatar-row">
+                        <div class="ft-avatar joel" id="ftAvatarJoel"> <img id="ftAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
+                        <div class="ft-avatar mai" id="ftAvatarMai"> <img id="ftAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
+                      </div>
                     </div>
                     <div class="ft-wave" id="ftWave"></div>
                   </div>
@@ -787,8 +789,8 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                     <div class="ft-phrases-chevron" id="ftPhrasesChevron">▼</div>
                   </div>
                   <div class="ft-phrases-body" id="ftPhrasesBody">
-                    <div class="ft-phrase-row"><span class="ft-phrase-en">"What animal did you see today?"</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div>
-                    <div class="ft-phrase-row"><span class="ft-phrase-en">"It was brown!"</span><span class="ft-phrase-ja">茶色だったよ！</span></div>
+                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">"What animal did you see today?"</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div></div>
+                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">"It was brown!"</span><span class="ft-phrase-ja">茶色だったよ！</span></div></div>
                     <div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>
                   </div>
                 </div>
@@ -892,14 +894,16 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
               <div class="ft-question" id="etQuestion">"How was your day?"</div>
               <div class="ft-question-ja" id="etQuestionJa">今日どうだった？</div>
               <div class="ft-dialogue">
-                <div class="ft-avatar joel" id="etAvatarJoel"> <img id="etAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
                 <div class="ft-bubble-wrap" id="etBubbleWrap">
                   <div class="ft-bubble" id="etBubble">
                     <div class="ft-bubble-en" id="etBubbleEn"></div>
                     <div class="ft-bubble-ja" id="etBubbleJa"></div>
                   </div>
                 </div>
-                <div class="ft-avatar mai" id="etAvatarMai"> <img id="etAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
+                <div class="ft-avatar-row">
+                  <div class="ft-avatar joel" id="etAvatarJoel"> <img id="etAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
+                  <div class="ft-avatar mai" id="etAvatarMai"> <img id="etAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
+                </div>
               </div>
               <div class="ft-wave" id="etWave"></div>
             </div>
@@ -3693,7 +3697,7 @@ function renderMorningTalkContent() {
       const speakerTag = l.speaker
         ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
       const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
-      return `<div class="ft-phrase-row" id="ftPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
+      return `<div class="ft-phrase-row" id="ftPhraseRow${i}">${speakerTag}<div class="ft-phrase-text"><span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div></div>`;
     }).join('');
     const maiTalkHtml = c.maiTalk
       ? `<div class="ft-maitalk" id="ftMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
@@ -4578,7 +4582,7 @@ function renderEveningTalkContent() {
       const speakerTag = l.speaker
         ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
       const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
-      return `<div class="ft-phrase-row" id="etPhraseRow${i}">${speakerTag}<span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div>`;
+      return `<div class="ft-phrase-row" id="etPhraseRow${i}">${speakerTag}<div class="ft-phrase-text"><span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div></div>`;
     }).join('');
     const maiTalkHtml = c.maiTalk
       ? `<div class="ft-maitalk" id="etMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
