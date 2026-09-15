@@ -744,7 +744,7 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                   ふと出てきたフレーズが、今日の親子の話のきっかけになりますように。</p>
                 <div class="ft-card">
                   <div class="ft-card-top">
-                    <div class="ft-question" id="ftQuestion">"What animal did you see today?"</div>
+                    <div class="ft-question" id="ftQuestion">What animal did you see today?</div>
                     <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
                     <div class="ft-dialogue">
                       <div class="ft-bubble-wrap" id="ftBubbleWrap">
@@ -789,8 +789,8 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                     <div class="ft-phrases-chevron" id="ftPhrasesChevron">▼</div>
                   </div>
                   <div class="ft-phrases-body" id="ftPhrasesBody">
-                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">"What animal did you see today?"</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div></div>
-                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">"It was brown!"</span><span class="ft-phrase-ja">茶色だったよ！</span></div></div>
+                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">What animal did you see today?</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div></div>
+                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">It was brown!</span><span class="ft-phrase-ja">茶色だったよ！</span></div></div>
                     <div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>
                   </div>
                 </div>
@@ -891,7 +891,7 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
             寝る前のひとときに、ぴったりの長さです。</p>
           <div class="ft-card">
             <div class="ft-card-top">
-              <div class="ft-question" id="etQuestion">"How was your day?"</div>
+              <div class="ft-question" id="etQuestion">How was your day?</div>
               <div class="ft-question-ja" id="etQuestionJa">今日どうだった？</div>
               <div class="ft-dialogue">
                 <div class="ft-bubble-wrap" id="etBubbleWrap">
@@ -3628,7 +3628,7 @@ function renderMorningTalkContent() {
   const info = getTodayMorningTalkInfo();
   setTalkDateHead('ft', info.now, info.dayKey,
     info.isBeforeRelease ? `${MORNING_TALK_RELEASE_HOUR}時に配信`
-    : info.isPreLaunch ? '配信準備中' : `"${info.content.title}"`);
+    : info.isPreLaunch ? '配信準備中' : info.content.title);
 
   const backBtn = document.getElementById('ftArchiveBackBtn');
   if (backBtn) backBtn.style.display = info.isArchive ? 'flex' : 'none';
@@ -3685,7 +3685,7 @@ function renderMorningTalkContent() {
   }
 
   const c = info.content;
-  document.getElementById('ftQuestion').textContent = `"${c.title}"`;
+  document.getElementById('ftQuestion').textContent = c.title;
   document.getElementById('ftQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
 
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
@@ -3697,7 +3697,7 @@ function renderMorningTalkContent() {
       const speakerTag = l.speaker
         ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
       const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
-      return `<div class="ft-phrase-row" id="ftPhraseRow${i}">${speakerTag}<div class="ft-phrase-text"><span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div></div>`;
+      return `<div class="ft-phrase-row" id="ftPhraseRow${i}">${speakerTag}<div class="ft-phrase-text"><span class="ft-phrase-en">${l.en}</span>${jaSpan}</div></div>`;
     }).join('');
     const maiTalkHtml = c.maiTalk
       ? `<div class="ft-maitalk" id="ftMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
@@ -3832,7 +3832,7 @@ function updateFtBubble(line, speaker) {
     bubble.classList.remove('show');
     return;
   }
-  enEl.textContent = `"${line.en}"`;
+  enEl.textContent = line.en;
   if (line.ja) {
     jaEl.textContent = line.ja;
     jaEl.style.display = '';
@@ -4525,7 +4525,7 @@ function renderEveningTalkContent() {
   const info = getTodayEveningTalkInfo();
   setTalkDateHead('et', info.now, info.dayKey,
     info.isBeforeRelease ? `${EVENING_TALK_RELEASE_HOUR}時に配信`
-    : (info.isPreLaunch || !info.content) ? '配信準備中' : `"${info.content.title}"`);
+    : (info.isPreLaunch || !info.content) ? '配信準備中' : info.content.title);
 
   const backBtn = document.getElementById('etArchiveBackBtn');
   if (backBtn) backBtn.style.display = info.isArchive ? 'flex' : 'none';
@@ -4570,7 +4570,7 @@ function renderEveningTalkContent() {
   }
 
   const c = info.content;
-  document.getElementById('etQuestion').textContent = `"${c.title}"`;
+  document.getElementById('etQuestion').textContent = c.title;
   document.getElementById('etQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
 
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
@@ -4582,7 +4582,7 @@ function renderEveningTalkContent() {
       const speakerTag = l.speaker
         ? `<span class="ft-phrase-speaker ${l.speaker}">${l.speaker === 'joel' ? 'Jay' : 'Mai'}</span>` : '';
       const jaSpan = l.ja ? `<span class="ft-phrase-ja">${l.ja}</span>` : '';
-      return `<div class="ft-phrase-row" id="etPhraseRow${i}">${speakerTag}<div class="ft-phrase-text"><span class="ft-phrase-en">"${l.en}"</span>${jaSpan}</div></div>`;
+      return `<div class="ft-phrase-row" id="etPhraseRow${i}">${speakerTag}<div class="ft-phrase-text"><span class="ft-phrase-en">${l.en}</span>${jaSpan}</div></div>`;
     }).join('');
     const maiTalkHtml = c.maiTalk
       ? `<div class="ft-maitalk" id="etMaiTalk"><div class="ft-maitalk-label">💬 Maiのひとこと解説</div>${c.maiTalk}</div>`
@@ -4642,7 +4642,7 @@ function updateEtBubble(line, speaker) {
   const jaEl = document.getElementById('etBubbleJa');
   if (!bubble || !enEl || !jaEl) return;
   if (!line || !speaker) { bubble.classList.remove('show'); return; }
-  enEl.textContent = `"${line.en}"`;
+  enEl.textContent = line.en;
   if (line.ja) { jaEl.textContent = line.ja; jaEl.style.display = ''; }
   else { jaEl.textContent = ''; jaEl.style.display = 'none'; }
   bubble.classList.toggle('from-mai', speaker === 'mai');
