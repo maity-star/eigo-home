@@ -866,6 +866,12 @@
     text-decoration: none;
     box-shadow: 0 12px 28px rgba(45,106,79,0.32);
   }
+  .cta-button-disabled {
+    background: var(--text-sub);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
 
   /* ===================== ⑧ PRICING ===================== */
   .sec-pricing { text-align: center; }
@@ -1417,7 +1423,7 @@
       <li>14日間無料、いつでも解約OK</li>
     </ul>
     <div class="cta-note">まずは14日間、無料でお試しいただけます。</div>
-    <a class="cta-button" href="#">はじめる</a>
+    <span class="cta-button cta-button-disabled" aria-disabled="true">準備中</span>
   </div>
 </section>
 
