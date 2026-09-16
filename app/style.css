@@ -861,6 +861,56 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .bv-ieta-btn.show { display: block; }
 .bv-ieta-btn:active { opacity: 0.8; }
 
+/* 絵本キャプション（英語字幕＋単語ハイライト／日本語訳） */
+.bv-caption {
+  position: absolute; left: 10px; right: 10px; bottom: 10px;
+  background: linear-gradient(to top, rgba(0,0,0,0.74), rgba(0,0,0,0.02));
+  border-radius: 14px; padding: 14px 16px 10px; text-align: center;
+  pointer-events: none;
+}
+.bv-caption-en {
+  font-size: 17px; font-weight: 700; color: rgba(255,255,255,0.55);
+  line-height: 1.55; word-break: break-word;
+}
+.bv-word { color: rgba(255,255,255,0.55); transition: color 0.15s ease; }
+.bv-word.active { color: #FFE27A; text-shadow: 0 0 12px rgba(255,226,122,0.7); }
+.bv-caption-ja {
+  font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px; display: none;
+}
+
+/* 横向き案内（絵本モーダルを縦持ちで開いたとき） */
+.bv-rotate-hint {
+  display: none; position: absolute; inset: 0; z-index: 10;
+  flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background: #0a0a0a; color: #fff; text-align: center; padding: 24px;
+}
+.bv-rotate-icon { font-size: 44px; animation: bvRotateSpin 1.6s ease-in-out infinite; }
+.bv-rotate-text { font-size: 15px; font-weight: 700; }
+.bv-rotate-sub { font-size: 12px; color: rgba(255,255,255,0.55); }
+@keyframes bvRotateSpin {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bv-rotate-icon { animation: none; }
+}
+@media (orientation: portrait) {
+  .book-viewer-modal.open .bv-rotate-hint { display: flex; }
+  .book-viewer-modal.open .bv-header,
+  .book-viewer-modal.open .bv-page-area,
+  .book-viewer-modal.open .bv-indicator,
+  .book-viewer-modal.open .bv-mode-bar { visibility: hidden; }
+}
+/* 横持ちのときはカードの幅制限を外して大きく表示する */
+@media (orientation: landscape) {
+  .book-viewer-modal.open { max-width: 900px; }
+  .bv-header { padding: 8px 16px 6px; }
+  .bv-indicator { padding: 4px 0 2px; }
+  .bv-mode-bar { padding: 6px 16px 12px; }
+  .bv-mode-btn { height: 40px; }
+  .bv-caption-en { font-size: 16px; }
+}
+
 /* 今週の一冊 */
 .weekly-book-card { background: #F9FAFB; border-radius: 14px; border: 0.5px solid #E5E7EB; overflow: hidden; }
 .weekly-book-cover-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #EDF6F1; border-radius: 14px 14px 0 0; }
