@@ -622,6 +622,10 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
   <div class="bv-page-area" id="bvPageArea"> <img class="bv-page-img" id="bvPageImg" src="" alt="">
     <button class="bv-nav prev" id="bvPrev" onclick="bvChangePage(-1)"><span>‹</span></button>
     <button class="bv-nav next" id="bvNext" onclick="bvChangePage(1)"><span>›</span></button>
+    <div class="bv-caption" id="bvCaption">
+      <div class="bv-caption-en" id="bvCaptionEn"></div>
+      <div class="bv-caption-ja" id="bvCaptionJa"></div>
+    </div>
   </div>
   <div class="bv-indicator" id="bvIndicator"></div>
   <div class="bv-mode-bar">
@@ -635,6 +639,11 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
       <div class="bv-talk-progress" id="bvTalkProgress"></div>
     </div>
     <button class="bv-ieta-btn" id="bvIetaBtn" onclick="bvIeta()">🌟 今日言えたよ！</button>
+  </div>
+  <div class="bv-rotate-hint" id="bvRotateHint">
+    <div class="bv-rotate-icon">📱</div>
+    <div class="bv-rotate-text">スマホを横にしてね</div>
+    <div class="bv-rotate-sub">Turn your phone sideways to read</div>
   </div>
 </div>
 
@@ -5705,19 +5714,26 @@ renderShiruCatGrid();
 // ========================
 // 絵本ビューワー
 // ========================
+// 単語ハイライトは完全自動（手動タイムスタンプ計測は不要）。
+// 各ページのaudio再生時間を、フレーズ内の単語の文字数比率で自動配分してハイライトするので、
+// 新しく本を追加してもデータ入力なしでそのまま機能する（詳しくはbvComputeAutoWordTimings参照）。
+// どうしても特定ページだけズレが気になる場合のみ、そのページに `words: [{t:'This', s:0}, ...]`
+// （sはそのページのaudioが再生された0秒地点からの、その単語が聞こえ始める秒数）を追記すれば、
+// そのページだけ自動配分より手動指定が優先される。
+// ja は日本語字幕のドラフト。文言はMaiさん確認前提（Jayの英語添削と同じ扱い）。
 const BOOK_DATA = {
   title: 'Sunny Day!',
   levels: ['todler'],
   pagesByLevel: {
     todler: [
-      { img: '/books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', talkPhrase: null, talkPause: 6500, audio: '/audio/book_audio/sunnyday/sunnyday_01.mp3' },
-      { img: '/books/aug/monthly_book/p2.jpg', phrase: "It's hot.", talkPhrase: "It's hot.", audio: '/audio/book_audio/sunnyday/sunnyday_02.mp3' },
-      { img: '/books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", talkPhrase: "Let's swim!", audio: '/audio/book_audio/sunnyday/sunnyday_03.mp3' },
-      { img: '/books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', talkPhrase: 'SPLASH!', audio: '/audio/book_audio/sunnyday/sunnyday_04.mp3' },
-      { img: '/books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", talkPhrase: "It's so fun!", audio: '/audio/book_audio/sunnyday/sunnyday_05.mp3' },
-      { img: '/books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', talkPhrase: 'So Sunny!', audio: '/audio/book_audio/sunnyday/sunnyday_06.mp3' },
-      { img: '/books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', talkPhrase: null, talkPause: 6000, audio: '/audio/book_audio/sunnyday/sunnyday_07.mp3' },
-      { img: '/books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: '/audio/book_audio/sunnyday/sunnyday_08.mp3' },
+      { img: '/books/aug/monthly_book/p1.jpg', phrase: 'This is a duck. Today is a sunny day.', ja: 'これは あひるさん。きょうは よく晴れた日。', talkPhrase: null, talkPause: 6500, audio: '/audio/book_audio/sunnyday/sunnyday_01.mp3' },
+      { img: '/books/aug/monthly_book/p2.jpg', phrase: "It's hot.", ja: 'あついね。', talkPhrase: "It's hot.", audio: '/audio/book_audio/sunnyday/sunnyday_02.mp3' },
+      { img: '/books/aug/monthly_book/p3.jpg', phrase: "Let's swim!", ja: 'およごう！', talkPhrase: "Let's swim!", audio: '/audio/book_audio/sunnyday/sunnyday_03.mp3' },
+      { img: '/books/aug/monthly_book/p4.jpg', phrase: 'SPLASH!', ja: 'ザブン！', talkPhrase: 'SPLASH!', audio: '/audio/book_audio/sunnyday/sunnyday_04.mp3' },
+      { img: '/books/aug/monthly_book/p5.jpg', phrase: "It's so fun!", ja: 'たのしいね！', talkPhrase: "It's so fun!", audio: '/audio/book_audio/sunnyday/sunnyday_05.mp3' },
+      { img: '/books/aug/monthly_book/p6.jpg', phrase: 'So Sunny!', ja: 'とってもいい天気！', talkPhrase: 'So Sunny!', audio: '/audio/book_audio/sunnyday/sunnyday_06.mp3' },
+      { img: '/books/aug/monthly_book/p7.jpg', phrase: 'Uh oh! Here comes the rain!', ja: 'あれ？ 雨が ふってきた！', talkPhrase: null, talkPause: 6000, audio: '/audio/book_audio/sunnyday/sunnyday_07.mp3' },
+      { img: '/books/aug/monthly_book/p8.jpg', phrase: "But that's OK. I'm already wet.", ja: 'でも だいじょうぶ。もう ぬれちゃったから。', talkPhrase: "But that's OK. I'm already wet.", talkPause: 6500, audio: '/audio/book_audio/sunnyday/sunnyday_08.mp3' },
     ]
   }
 };
@@ -5787,6 +5803,88 @@ function bvStopAudio() {
   bvAudioEl.onended = null;
   bvAudioEl.onerror = null;
   bvAudioEl.pause();
+  bvStopHighlightLoop();
+}
+
+// ========================
+// ワードハイライト（喋っている単語を光らせる・完全自動）
+// ========================
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function bvGetPageTokens(page) {
+  const text = (page && (page.talkPhrase || page.phrase)) || '';
+  return text.trim().split(/\s+/).filter(Boolean);
+}
+function bvBuildCaptionHTML(page) {
+  const tokens = bvGetPageTokens(page);
+  return tokens.map((t, i) => `<span class="bv-word" data-i="${i}">${escapeHtml(t)}</span>`).join(' ');
+}
+function bvRenderCaption() {
+  const page = BOOK_DATA.pages[bvCurrentPage];
+  const enEl = document.getElementById('bvCaptionEn');
+  const jaEl = document.getElementById('bvCaptionJa');
+  if (!page || !enEl || !jaEl) return;
+  enEl.innerHTML = bvBuildCaptionHTML(page);
+  jaEl.textContent = page.ja || '';
+  jaEl.style.display = page.ja ? 'block' : 'none';
+}
+
+// 手動計測が無い場合、音声の長さ(duration)を「単語の文字数＋定数」の重みで比例配分し、
+// 各単語の開始秒を自動算出する。追加の作業・データ入力は一切不要。
+// 特定ページだけ手動で正確にしたい場合は、そのページに page.words=[{t,s},...] を用意すれば
+// （トークン数と一致していれば）そちらの秒数がそのまま優先される。
+function bvComputeAutoWordTimings(page, tokens, duration) {
+  if (Array.isArray(page.words) && page.words.length === tokens.length) {
+    return page.words.map(w => w.s);
+  }
+  if (!duration || !isFinite(duration) || duration <= 0) return null;
+  const weights = tokens.map(t => t.replace(/[^\p{L}\p{N}']/gu, '').length + 2);
+  const total = weights.reduce((a, b) => a + b, 0) || 1;
+  let cum = 0;
+  return weights.map(w => {
+    const s = (cum / total) * duration;
+    cum += w;
+    return s;
+  });
+}
+
+let bvHighlightRAF = null;
+let bvWordTimings = null;
+function bvStopHighlightLoop() {
+  if (bvHighlightRAF) cancelAnimationFrame(bvHighlightRAF);
+  bvHighlightRAF = null;
+  bvWordTimings = null;
+  // 直前のハイライト残りを必ず消す（同じページで2回目の再生を始める時など、
+  // 前回のactiveスパンが残ったまま新しいスパンにも付いて二重ハイライトになる事故を防ぐ）
+  document.querySelectorAll('#bvCaptionEn .bv-word.active').forEach(el => el.classList.remove('active'));
+}
+function bvStartHighlightLoop() {
+  bvStopHighlightLoop();
+  const page = BOOK_DATA.pages[bvCurrentPage];
+  const spans = document.querySelectorAll('#bvCaptionEn .bv-word');
+  if (!page || !spans.length) return;
+  const tokens = bvGetPageTokens(page);
+  let activeIdx = -1;
+  const tick = () => {
+    if (!bvWordTimings) {
+      bvWordTimings = bvComputeAutoWordTimings(page, tokens, bvAudioEl.duration);
+    }
+    if (bvWordTimings) {
+      const t = bvAudioEl.currentTime;
+      let idx = -1;
+      for (let i = 0; i < bvWordTimings.length; i++) {
+        if (t >= bvWordTimings[i]) idx = i; else break;
+      }
+      if (idx !== activeIdx) {
+        if (activeIdx >= 0 && spans[activeIdx]) spans[activeIdx].classList.remove('active');
+        if (idx >= 0 && spans[idx]) spans[idx].classList.add('active');
+        activeIdx = idx;
+      }
+    }
+    bvHighlightRAF = requestAnimationFrame(tick);
+  };
+  tick();
 }
 
 let bvCurrentPage = 0;
@@ -5832,6 +5930,8 @@ function bvRenderPage() {
   document.querySelectorAll('.bv-dot').forEach((d, i) => {
     d.classList.toggle('active', i === bvCurrentPage);
   });
+  bvRenderCaption();
+  bvStopHighlightLoop();
   bvSyncNavToImage(img);
 }
 
@@ -5904,6 +6004,7 @@ function bvPlayPageThenAdvance(token) {
   const page = BOOK_DATA.pages[bvCurrentPage];
   if (!page) return;
   bvPlayAudio(page.audio, () => {
+    bvStopHighlightLoop();
     if (bvMode !== 'read' || token !== bvReadToken) return;
     if (bvCurrentPage < BOOK_DATA.pages.length - 1) {
       bvTalkTimer = setTimeout(() => {
@@ -5916,6 +6017,7 @@ function bvPlayPageThenAdvance(token) {
       trackEvent('book_complete', 'read');
     }
   });
+  bvStartHighlightLoop();
 }
 
 function bvStartTalk() {
@@ -6003,11 +6105,11 @@ function bvRunTalkStep(token) {
   const page = BOOK_DATA.pages[bvCurrentPage];
   if (!page) return;
 
-  document.getElementById('bvTalkPhrase').textContent = page.talkPhrase || page.phrase;
   document.getElementById('bvTalkStatus').textContent = '🎧 Jayの声を聞いてね';
   bvUpdateTalkProgress();
 
   bvPlayAudio(page.audio, () => {
+    bvStopHighlightLoop();
     if (bvMode !== 'talk' || token !== bvTalkToken) return;
     bvPlayChime();
     document.getElementById('bvTalkStatus').textContent = '🎤 Your turn! 言ってみよう';
@@ -6019,14 +6121,17 @@ function bvRunTalkStep(token) {
       bvUpdateTalkProgress();
 
       bvPlayAudio(page.audio, () => {
+        bvStopHighlightLoop();
         if (bvMode !== 'talk' || token !== bvTalkToken) return;
         bvTalkTimer = setTimeout(() => {
           if (token !== bvTalkToken) return;
           bvAdvanceTalkPage(token);
         }, 900);
       });
+      bvStartHighlightLoop();
     }, page.talkPause || 4000);
   });
+  bvStartHighlightLoop();
 }
 
 function bvAdvanceTalkPage(token) {
