@@ -617,7 +617,6 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
       <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
       <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
     </div>
-    <button class="bv-pause-btn hidden" id="bvPauseBtn" onclick="bvTogglePause()" aria-label="一時停止">⏸</button>
     <button class="bv-close" onclick="closeBookModal()">✕</button>
   </div>
   <div class="bv-rotate-tip" id="bvRotateHint">
@@ -640,11 +639,23 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
     </div>
   </div>
   <div class="bv-indicator" id="bvIndicator"></div>
+  <div class="bv-pause-row">
+    <button class="bv-pause-pill hidden" id="bvPauseBtn" onclick="bvTogglePause()"></button>
+  </div>
   <div class="bv-mode-bar">
     <div class="bv-mode-row" id="bvModeRow">
-      <button class="bv-mode-btn read" onclick="bvStartRead()">🎧 Let's read</button>
-      <button class="bv-mode-btn talk" onclick="bvStartTalk()">🗣 Let's talk</button>
-      <button class="bv-mode-btn parent" onclick="bvStartParentRead()">👪 Read together</button>
+      <button class="bv-mode-btn read" onclick="bvStartRead()">
+        <span class="bv-mode-btn-icon">🎧</span>
+        <span class="bv-mode-btn-text"><span class="bv-mode-btn-en">Listen</span><span class="bv-mode-btn-ja">聞く</span></span>
+      </button>
+      <button class="bv-mode-btn talk" onclick="bvStartTalk()">
+        <span class="bv-mode-btn-icon">🗣</span>
+        <span class="bv-mode-btn-text"><span class="bv-mode-btn-en">Let's talk</span><span class="bv-mode-btn-ja">話す</span></span>
+      </button>
+      <button class="bv-mode-btn parent" onclick="bvStartParentRead()">
+        <span class="bv-mode-btn-icon">👪</span>
+        <span class="bv-mode-btn-text"><span class="bv-mode-btn-en">Read aloud</span><span class="bv-mode-btn-ja">読み聞かせ</span></span>
+      </button>
     </div>
     <div class="bv-talk-bar" id="bvTalkBar">
       <div class="bv-talk-phrase" id="bvTalkPhrase"></div>
@@ -5912,7 +5923,8 @@ function bvSetTimer(fn, delay) {
 function bvUpdatePauseUI() {
   const btn = document.getElementById('bvPauseBtn');
   if (!btn) return;
-  btn.textContent = bvPaused ? '▶' : '⏸';
+  btn.textContent = bvPaused ? '▶ 再開する' : '⏸ 一時停止';
+  btn.setAttribute('aria-label', bvPaused ? '再開' : '一時停止');
   btn.classList.toggle('hidden', !bvMode || bvMode === 'parent');
 }
 
