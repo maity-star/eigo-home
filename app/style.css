@@ -735,9 +735,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    絵本ビューワーモーダル
 ============================== */
+/* 絵本ビューワー配色は「しる」タブの本(#EFE9D8/#DCD3B8/#F7F2E4系のクリーム＆紙色)に統一し、
+   本を捲っているような質感にする。 */
 .book-viewer-modal {
   position: fixed; inset: 0; z-index: 300;
-  background: #0a0a0a;
+  background: #EFE9D8;
   display: none; flex-direction: column;
   max-width: var(--app-max); margin: 0 auto;
 }
@@ -747,12 +749,12 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .bv-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 16px 10px; flex-shrink: 0;
-  background: rgba(0,0,0,0.6);
+  background: #EFE9D8; border-bottom: 0.5px solid #D9CDAE;
 }
-.bv-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+.bv-title { font-size: 13px; font-weight: 600; color: #3E2F1C; }
 .bv-close {
   width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(255,255,255,0.12); border: none; color: rgba(255,255,255,0.7);
+  background: #F7F2E4; border: 0.5px solid #D9CDAE; color: #3E2F1C;
   font-size: 18px; display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
@@ -761,8 +763,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .book-level-toggle { display: none; gap: 4px; }
 .book-level-pill {
   font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: 20px;
-  cursor: pointer; border: 1.5px solid transparent; color: rgba(255,255,255,0.55);
-  background: rgba(255,255,255,0.08); transition: all .15s ease;
+  cursor: pointer; border: 1.5px solid transparent; color: #9C8E6E;
+  background: rgba(62,47,28,0.06); transition: all .15s ease;
 }
 .book-level-pill.active[data-level="todler"] { background: #F5D879; color: #6B4B00; }
 .book-level-pill.active[data-level="kinder"] { background: #6DB88A; color: #fff; }
@@ -773,45 +775,43 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-lesson-top .book-level-pill.active[data-level="todler"] { background: #FCEBBD; color: #92650C; border-color: #F0B93D; }
 .month-lesson-top .book-level-pill.active[data-level="kinder"] { background: #EAF4EE; color: #2D6A4F; border-color: #6DB88A; }
 
-/* 横向き案内（絵本モーダルを縦持ちで開いたとき・タップで消せる非ブロッキングな案内バー。
-   以前は縦持ち時に本文を丸ごと隠す仕様にしていたが、縦固定ユーザーが完全に読めなくなる
-   問題があったため撤去。今は「横にするともっと見やすいよ」という控えめなヒントのみ。） */
-.bv-rotate-tip {
-  display: none; align-items: center; gap: 8px;
-  margin: 8px 12px 0; padding: 8px 12px; flex-shrink: 0;
-  background: rgba(255,255,255,0.10); border-radius: 10px;
-  color: rgba(255,255,255,0.78); font-size: 11.5px;
+/* 横向き強制ゲート（絵本は横向き専用。縦持ちで開いた場合は中身を隠し、
+   回転を促す案内だけを表示する。※OS側の画面回転ロック自体を強制解除することは
+   iPhone(Safari)の仕様上不可能なため、これはアプリ内コンテンツ側での制御） */
+.bv-rotate-gate {
+  display: none; position: absolute; inset: 0; z-index: 10;
+  flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background: #EFE9D8; color: #3E2F1C; text-align: center; padding: 24px;
 }
-.bv-rotate-tip-icon { font-size: 15px; flex-shrink: 0; animation: bvRotateSpin 1.6s ease-in-out infinite; }
-.bv-rotate-tip-text { flex: 1; line-height: 1.4; }
-.bv-rotate-tip-close {
-  width: 22px; height: 22px; border-radius: 50%; border: none; flex-shrink: 0;
-  background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
-  font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
+.bv-rotate-icon { font-size: 44px; animation: bvRotateSpin 1.6s ease-in-out infinite; }
+.bv-rotate-text { font-size: 15px; font-weight: 700; }
+.bv-rotate-sub { font-size: 12px; color: #9C8E6E; }
 @keyframes bvRotateSpin {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(90deg); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bv-rotate-tip-icon { animation: none; }
+  .bv-rotate-icon { animation: none; }
 }
 @media (orientation: portrait) {
-  .book-viewer-modal.open .bv-rotate-tip:not(.dismissed) { display: flex; }
-}
-@media (orientation: landscape) {
-  .bv-rotate-tip { display: none !important; }
+  .book-viewer-modal.open .bv-rotate-gate { display: flex; }
+  .book-viewer-modal.open .bv-header,
+  .book-viewer-modal.open .bv-body,
+  .book-viewer-modal.open .bv-indicator,
+  .book-viewer-modal.open .bv-mode-bar { visibility: hidden; }
 }
 
-/* 本文エリア(画像＋字幕)。縦持ちは画像に字幕を重ねて表示、横持ちは画像/字幕を左右分割 */
+/* 本文エリア(画像＋字幕)。横持ち専用：左にテキスト(字幕＋ハイライト)、右にイラスト */
 .bv-body {
   flex: 1; position: relative; min-height: 0;
-  display: flex; flex-direction: column; overflow: hidden;
+  display: flex; flex-direction: row; overflow: hidden;
 }
 
-/* ページ表示エリア */
+/* ページ表示エリア（しるタブの本ステージと同じクリーム色の台に載せる） */
 .bv-page-area {
-  flex: 1; position: relative; overflow: hidden; min-height: 0;
+  flex: 0 0 62%; order: 2; position: relative; overflow: hidden; min-height: 0;
+  margin: 8px 8px 8px 0; border-radius: 10px;
+  background: #DCD3B8; border: 0.5px solid #C9BD9C;
 }
 .bv-flip-stage {
   position: absolute; inset: 0; perspective: 1400px;
@@ -826,10 +826,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
    下にすでにセット済みの新しいページ画像を見せる。普段はopacity:0で非表示。 */
 .bv-page-flip {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: contain; display: block; background: #0a0a0a;
+  object-fit: contain; display: block; background: #F7F2E4;
   opacity: 0; pointer-events: none;
   backface-visibility: hidden;
-  box-shadow: 0 0 20px rgba(0,0,0,0.35);
+  box-shadow: 0 0 20px rgba(74,58,30,0.25);
   transition: transform 0.5s cubic-bezier(.45,.05,.35,1);
 }
 .bv-page-flip.flipping { opacity: 1; z-index: 2; }
@@ -857,20 +857,20 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .bv-dot {
   width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(255,255,255,0.25); transition: all 0.2s;
+  background: rgba(62,47,28,0.18); transition: all 0.2s;
 }
 .bv-dot.active { background: #6DB88A; width: 16px; border-radius: 3px; }
 
 /* モードバー(Let's read / Let's talk) */
 .bv-mode-bar {
   padding: 10px 16px 16px; flex-shrink: 0;
-  background: rgba(0,0,0,0.6);
+  background: #F7F2E4; border-top: 0.5px solid #D9CDAE;
 }
 .bv-mode-row {
   display: flex; gap: 10px; margin-bottom: 10px;
 }
 .bv-mode-btn {
-  flex: 1; height: 46px; border-radius: 12px; border: none;
+  flex: 1; height: 46px; border-radius: 12px; border: 0.5px solid #D9CDAE;
   font-size: 13px; font-weight: 600; cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 7px;
   transition: all 0.15s;
@@ -879,7 +879,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #ffffff; color: #2D6A4F;
 }
 .bv-mode-btn.talk {
-  background: #6DB88A; color: #fff;
+  background: #6DB88A; color: #fff; border-color: #6DB88A;
 }
 .bv-mode-btn:active { opacity: 0.85; transform: scale(0.98); }
 
@@ -890,17 +890,17 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   padding: 12px 14px; margin-top: 6px;
 }
 .bv-talk-bar.active { display: block; }
-.bv-talk-phrase { font-size: 18px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 4px; }
-.bv-talk-status { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; }
+.bv-talk-phrase { font-size: 18px; font-weight: 700; color: #2D6A4F; text-align: center; margin-bottom: 4px; }
+.bv-talk-status { font-size: 11px; color: #7A6B4D; text-align: center; }
 .bv-talk-progress {
   display: flex; gap: 4px; justify-content: center; margin-top: 8px;
 }
 .bv-talk-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: rgba(255,255,255,0.2);
+  background: rgba(62,47,28,0.15);
 }
 .bv-talk-dot.done { background: #6DB88A; }
-.bv-talk-dot.current { background: #fff; }
+.bv-talk-dot.current { background: #3E2F1C; }
 
 /* 今日言えたよボタン */
 .bv-ieta-btn {
@@ -912,44 +912,31 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .bv-ieta-btn.show { display: block; }
 .bv-ieta-btn:active { opacity: 0.8; }
 
-/* 絵本キャプション（英語字幕＋単語ハイライト／日本語訳）。
-   縦持ちは画像の上に重ねるオーバーレイ、横持ちは左側の専用パネルに変わる（下のmedia参照） */
+/* 絵本キャプション（英語字幕＋単語ハイライト／日本語訳）。横持ち専用の左側パネル */
 .bv-caption {
-  position: absolute; left: 10px; right: 10px; bottom: 10px;
-  background: linear-gradient(to top, rgba(0,0,0,0.74), rgba(0,0,0,0.02));
-  border-radius: 14px; padding: 14px 16px 10px; text-align: center;
-  pointer-events: none;
+  order: 1; flex: 0 0 38%;
+  display: flex; flex-direction: column; justify-content: center;
+  background: #F7F2E4; border-radius: 10px; margin: 8px 0 8px 8px;
+  border: 0.5px solid #D9CDAE;
+  padding: 20px 22px; text-align: left;
 }
 .bv-caption-en {
-  font-size: 17px; font-weight: 700; color: rgba(255,255,255,0.55);
-  line-height: 1.55; word-break: break-word;
+  font-size: 20px; font-weight: 700; color: rgba(62,47,28,0.5);
+  line-height: 1.55; word-break: break-word; text-align: left;
 }
-.bv-word { color: rgba(255,255,255,0.55); transition: color 0.15s ease; }
-.bv-word.active { color: #FFE27A; text-shadow: 0 0 12px rgba(255,226,122,0.7); }
+.bv-word { color: rgba(62,47,28,0.5); transition: color 0.15s ease; }
+.bv-word.active { color: #B5471F; font-weight: 800; }
 .bv-caption-ja {
-  font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px; display: none;
+  font-size: 13px; color: #9C8E6E; margin-top: 5px; display: none; text-align: left;
 }
 
-/* 横持ちのときはカードの幅制限を外して大きく表示し、
-   正方形素材のイラストが間延びしないよう画像は右側だけに収め、
-   左側をテキスト（字幕＋ハイライト）専用パネルにする */
+/* 横持ちのときはカードの幅制限を外して大きく表示する */
 @media (orientation: landscape) {
   .book-viewer-modal.open { max-width: 900px; }
   .bv-header { padding: 8px 16px 6px; }
   .bv-indicator { padding: 4px 0 2px; }
   .bv-mode-bar { padding: 6px 16px 12px; }
   .bv-mode-btn { height: 40px; }
-
-  .bv-body { flex-direction: row; }
-  .bv-page-area { flex: 0 0 62%; }
-  .bv-caption {
-    position: static; flex: 0 0 38%;
-    display: flex; flex-direction: column; justify-content: center;
-    background: rgba(0,0,0,0.55); border-radius: 0;
-    padding: 20px 24px; text-align: left; pointer-events: auto;
-  }
-  .bv-caption-en { font-size: 20px; text-align: left; }
-  .bv-caption-ja { font-size: 13px; text-align: left; }
 }
 
 /* 今週の一冊 */
