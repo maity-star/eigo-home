@@ -773,19 +773,69 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-lesson-top .book-level-pill.active[data-level="todler"] { background: #FCEBBD; color: #92650C; border-color: #F0B93D; }
 .month-lesson-top .book-level-pill.active[data-level="kinder"] { background: #EAF4EE; color: #2D6A4F; border-color: #6DB88A; }
 
+/* 横向き案内（絵本モーダルを縦持ちで開いたとき・タップで消せる非ブロッキングな案内バー。
+   以前は縦持ち時に本文を丸ごと隠す仕様にしていたが、縦固定ユーザーが完全に読めなくなる
+   問題があったため撤去。今は「横にするともっと見やすいよ」という控えめなヒントのみ。） */
+.bv-rotate-tip {
+  display: none; align-items: center; gap: 8px;
+  margin: 8px 12px 0; padding: 8px 12px; flex-shrink: 0;
+  background: rgba(255,255,255,0.10); border-radius: 10px;
+  color: rgba(255,255,255,0.78); font-size: 11.5px;
+}
+.bv-rotate-tip-icon { font-size: 15px; flex-shrink: 0; animation: bvRotateSpin 1.6s ease-in-out infinite; }
+.bv-rotate-tip-text { flex: 1; line-height: 1.4; }
+.bv-rotate-tip-close {
+  width: 22px; height: 22px; border-radius: 50%; border: none; flex-shrink: 0;
+  background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
+  font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+@keyframes bvRotateSpin {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bv-rotate-tip-icon { animation: none; }
+}
+@media (orientation: portrait) {
+  .book-viewer-modal.open .bv-rotate-tip:not(.dismissed) { display: flex; }
+}
+@media (orientation: landscape) {
+  .bv-rotate-tip { display: none !important; }
+}
+
+/* 本文エリア(画像＋字幕)。縦持ちは画像に字幕を重ねて表示、横持ちは画像/字幕を左右分割 */
+.bv-body {
+  flex: 1; position: relative; min-height: 0;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
 /* ページ表示エリア */
 .bv-page-area {
-  flex: 1; position: relative; overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
+  flex: 1; position: relative; overflow: hidden; min-height: 0;
+}
+.bv-flip-stage {
+  position: absolute; inset: 0; perspective: 1400px;
 }
 .bv-page-img {
-  width: 100%; height: 100%;
+  position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: contain; display: block;
   user-select: none; -webkit-user-drag: none;
 }
+/* めくりアニメーション用の重ね画像（しるタブの本めくり演出を流用）。
+   ページ送り時だけ「めくる前のページ」をこの上に表示し、rotateYで回転させて
+   下にすでにセット済みの新しいページ画像を見せる。普段はopacity:0で非表示。 */
+.bv-page-flip {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; display: block; background: #0a0a0a;
+  opacity: 0; pointer-events: none;
+  backface-visibility: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.35);
+  transition: transform 0.5s cubic-bezier(.45,.05,.35,1);
+}
+.bv-page-flip.flipping { opacity: 1; z-index: 2; }
 /* 左右ナビ(画像の高さに合わせて動的に調整・タップ領域は左右半分ずつ) */
 .bv-nav {
-  position: absolute; top: 0; bottom: 0;
+  position: absolute; top: 0; bottom: 0; z-index: 3;
   width: 50%; border-radius: 0;
   background: transparent; border: none;
   color: #3d6b4f; font-size: 38px; font-weight: 700; cursor: pointer;
@@ -862,7 +912,8 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .bv-ieta-btn.show { display: block; }
 .bv-ieta-btn:active { opacity: 0.8; }
 
-/* 絵本キャプション（英語字幕＋単語ハイライト／日本語訳） */
+/* 絵本キャプション（英語字幕＋単語ハイライト／日本語訳）。
+   縦持ちは画像の上に重ねるオーバーレイ、横持ちは左側の専用パネルに変わる（下のmedia参照） */
 .bv-caption {
   position: absolute; left: 10px; right: 10px; bottom: 10px;
   background: linear-gradient(to top, rgba(0,0,0,0.74), rgba(0,0,0,0.02));
@@ -879,37 +930,26 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px; display: none;
 }
 
-/* 横向き案内（絵本モーダルを縦持ちで開いたとき） */
-.bv-rotate-hint {
-  display: none; position: absolute; inset: 0; z-index: 10;
-  flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  background: #0a0a0a; color: #fff; text-align: center; padding: 24px;
-}
-.bv-rotate-icon { font-size: 44px; animation: bvRotateSpin 1.6s ease-in-out infinite; }
-.bv-rotate-text { font-size: 15px; font-weight: 700; }
-.bv-rotate-sub { font-size: 12px; color: rgba(255,255,255,0.55); }
-@keyframes bvRotateSpin {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(90deg); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .bv-rotate-icon { animation: none; }
-}
-@media (orientation: portrait) {
-  .book-viewer-modal.open .bv-rotate-hint { display: flex; }
-  .book-viewer-modal.open .bv-header,
-  .book-viewer-modal.open .bv-page-area,
-  .book-viewer-modal.open .bv-indicator,
-  .book-viewer-modal.open .bv-mode-bar { visibility: hidden; }
-}
-/* 横持ちのときはカードの幅制限を外して大きく表示する */
+/* 横持ちのときはカードの幅制限を外して大きく表示し、
+   正方形素材のイラストが間延びしないよう画像は右側だけに収め、
+   左側をテキスト（字幕＋ハイライト）専用パネルにする */
 @media (orientation: landscape) {
   .book-viewer-modal.open { max-width: 900px; }
   .bv-header { padding: 8px 16px 6px; }
   .bv-indicator { padding: 4px 0 2px; }
   .bv-mode-bar { padding: 6px 16px 12px; }
   .bv-mode-btn { height: 40px; }
-  .bv-caption-en { font-size: 16px; }
+
+  .bv-body { flex-direction: row; }
+  .bv-page-area { flex: 0 0 62%; }
+  .bv-caption {
+    position: static; flex: 0 0 38%;
+    display: flex; flex-direction: column; justify-content: center;
+    background: rgba(0,0,0,0.55); border-radius: 0;
+    padding: 20px 24px; text-align: left; pointer-events: auto;
+  }
+  .bv-caption-en { font-size: 20px; text-align: left; }
+  .bv-caption-ja { font-size: 13px; text-align: left; }
 }
 
 /* 今週の一冊 */
