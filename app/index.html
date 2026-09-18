@@ -617,12 +617,13 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
       <div class="book-level-pill" data-level="todler" onclick="setBookLevel('todler')">とどらー</div>
       <div class="book-level-pill" data-level="kinder" onclick="setBookLevel('kinder')">きんだー</div>
     </div>
+    <button class="bv-pause-btn hidden" id="bvPauseBtn" onclick="bvTogglePause()" aria-label="一時停止">⏸</button>
     <button class="bv-close" onclick="closeBookModal()">✕</button>
   </div>
-  <div class="bv-rotate-gate" id="bvRotateHint">
-    <div class="bv-rotate-icon">📱</div>
-    <div class="bv-rotate-text">スマホを横にしてね</div>
-    <div class="bv-rotate-sub">Turn your phone sideways to read</div>
+  <div class="bv-rotate-tip" id="bvRotateHint">
+    <span class="bv-rotate-tip-icon">📱</span>
+    <span class="bv-rotate-tip-text">横にすると絵本が大きく見やすくなるよ</span>
+    <button class="bv-rotate-tip-close" onclick="bvDismissRotateHint()" aria-label="閉じる">✕</button>
   </div>
   <div class="bv-body" id="bvBody">
     <div class="bv-page-area" id="bvPageArea">
@@ -643,6 +644,7 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
     <div class="bv-mode-row" id="bvModeRow">
       <button class="bv-mode-btn read" onclick="bvStartRead()">🎧 Let's read</button>
       <button class="bv-mode-btn talk" onclick="bvStartTalk()">🗣 Let's talk</button>
+      <button class="bv-mode-btn parent" onclick="bvStartParentRead()">👪 Read together</button>
     </div>
     <div class="bv-talk-bar" id="bvTalkBar">
       <div class="bv-talk-phrase" id="bvTalkPhrase"></div>
@@ -5884,16 +5886,86 @@ let bvTalkTimer = null;
 let bvTalkDone = [];
 let bvTalkToken = 0;
 
+// ========================
+// 一時停止／再開（Let's read・Let's talk中に途中で止めて、後で続きから再開できるようにする）
+// ========================
+let bvPaused = false;
+let bvWasPlayingAudio = false;
+let bvPendingTimerFn = null;
+let bvPendingTimerRemaining = null;
+let bvTimerStartedAt = null;
+let bvTimerOrigDelay = null;
+
+// ページ送り・トークの進行に使うsetTimeoutは、必ずこれ経由で登録する。
+// bvTalkTimerに加えて「いつ・何秒後の予定でセットしたか」を覚えておくことで、
+// bvPause()で残り時間を計算してキャンセルし、bvResume()でその残り時間から再開できる。
+function bvSetTimer(fn, delay) {
+  bvTimerStartedAt = Date.now();
+  bvTimerOrigDelay = delay;
+  bvPendingTimerFn = fn;
+  bvTalkTimer = setTimeout(() => {
+    bvPendingTimerFn = null;
+    fn();
+  }, delay);
+}
+
+function bvUpdatePauseUI() {
+  const btn = document.getElementById('bvPauseBtn');
+  if (!btn) return;
+  btn.textContent = bvPaused ? '▶' : '⏸';
+  btn.classList.toggle('hidden', !bvMode || bvMode === 'parent');
+}
+
+function bvPause() {
+  if (bvPaused || !bvMode || bvMode === 'parent') return;
+  bvPaused = true;
+  bvWasPlayingAudio = !bvAudioEl.paused;
+  if (bvWasPlayingAudio) bvAudioEl.pause();
+  if (bvTalkTimer) {
+    clearTimeout(bvTalkTimer);
+    bvTalkTimer = null;
+    if (bvPendingTimerFn) {
+      bvPendingTimerRemaining = Math.max(0, bvTimerOrigDelay - (Date.now() - bvTimerStartedAt));
+    }
+  }
+  if (bvHighlightRAF) { cancelAnimationFrame(bvHighlightRAF); bvHighlightRAF = null; }
+  bvUpdatePauseUI();
+}
+
+function bvResume() {
+  if (!bvPaused) return;
+  bvPaused = false;
+  if (bvWasPlayingAudio) {
+    const p = bvAudioEl.play();
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+    bvStartHighlightLoop();
+  } else if (bvPendingTimerFn) {
+    const fn = bvPendingTimerFn;
+    bvSetTimer(fn, bvPendingTimerRemaining || 0);
+  }
+  bvUpdatePauseUI();
+}
+
+function bvTogglePause() {
+  if (bvPaused) bvResume(); else bvPause();
+}
+
 function openBookModal(mode) {
   bvCurrentPage = 0;
   bvMode = mode;
   bvTalkDone = [];
+  bvPaused = false;
+  bvPendingTimerFn = null;
   document.getElementById('bookViewerModal').classList.add('open');
+  const hint = document.getElementById('bvRotateHint');
+  if (hint) hint.classList.remove('dismissed');
   bvRenderPage();
   bvBuildIndicator();
   trackEvent('book_open', mode);
   if (mode === 'talk') {
     setTimeout(() => bvStartTalk(), 300);
+  } else if (mode === 'parent') {
+    setTimeout(() => bvStartParentRead(), 300);
   } else {
     setTimeout(() => bvStartRead(), 300);
   }
@@ -5901,7 +5973,10 @@ function openBookModal(mode) {
 
 function closeBookModal() {
   document.getElementById('bookViewerModal').classList.remove('open');
+  document.getElementById('bookViewerModal').classList.remove('mode-parent');
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvPaused = false;
+  bvPendingTimerFn = null;
   bvStopAudio();
   bvReadToken++;
   bvTalkToken++;
@@ -5956,6 +6031,11 @@ function bvBuildIndicator() {
   ).join('');
 }
 
+function bvDismissRotateHint() {
+  const hint = document.getElementById('bvRotateHint');
+  if (hint) hint.classList.add('dismissed');
+}
+
 // ========================
 // ページめくりアニメーション（しるタブの本めくり演出と同じ rotateY 手法を流用）
 // ========================
@@ -6002,12 +6082,15 @@ function bvChangePage(dir) {
   if (bvFlipping) return;
   const next = bvCurrentPage + dir;
   if (next < 0 || next >= BOOK_DATA.pages.length) return;
+  bvPaused = false;
+  bvPendingTimerFn = null;
   bvGoToPage(next, dir);
   if (bvMode === 'read') {
     if (bvTalkTimer) clearTimeout(bvTalkTimer);
     bvReadToken++;
     bvPlayPageThenAdvance(bvReadToken);
   }
+  bvUpdatePauseUI();
 }
 
 let bvTouchStartX = 0;
@@ -6024,6 +6107,9 @@ let bvReadToken = 0;
 function bvStartRead() {
   bvMode = 'read';
   bvCurrentPage = 0;
+  bvPaused = false;
+  bvPendingTimerFn = null;
+  document.getElementById('bookViewerModal').classList.remove('mode-parent');
   bvRenderPage();
   document.getElementById('bvTalkBar').classList.remove('active');
   document.getElementById('bvIetaBtn').classList.remove('show');
@@ -6031,6 +6117,7 @@ function bvStartRead() {
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
   bvReadToken++;
   bvPlayPageThenAdvance(bvReadToken);
+  bvUpdatePauseUI();
 }
 
 function bvPlayPageThenAdvance(token) {
@@ -6040,7 +6127,7 @@ function bvPlayPageThenAdvance(token) {
     bvStopHighlightLoop();
     if (bvMode !== 'read' || token !== bvReadToken) return;
     if (bvCurrentPage < BOOK_DATA.pages.length - 1) {
-      bvTalkTimer = setTimeout(() => {
+      bvSetTimer(() => {
         if (token !== bvReadToken) return;
         bvGoToPage(bvCurrentPage + 1, 1);
         bvPlayPageThenAdvance(token);
@@ -6052,9 +6139,31 @@ function bvPlayPageThenAdvance(token) {
   bvStartHighlightLoop();
 }
 
+// ========================
+// おうちで読む（音声なし・保護者が自分の声で読み聞かせる用のモード）
+// ========================
+function bvStartParentRead() {
+  bvMode = 'parent';
+  bvPaused = false;
+  bvPendingTimerFn = null;
+  if (bvTalkTimer) clearTimeout(bvTalkTimer);
+  bvStopAudio();
+  document.getElementById('bookViewerModal').classList.add('mode-parent');
+  document.getElementById('bvTalkBar').classList.remove('active');
+  document.getElementById('bvIetaBtn').classList.remove('show');
+  document.getElementById('bvModeRow').style.display = 'flex';
+  bvCurrentPage = 0;
+  bvRenderPage();
+  bvUpdatePauseUI();
+  trackEvent('book_open', 'parent');
+}
+
 function bvStartTalk() {
   bvMode = 'talk';
   bvTalkDone = [];
+  bvPaused = false;
+  bvPendingTimerFn = null;
+  document.getElementById('bookViewerModal').classList.remove('mode-parent');
   if (bvTalkTimer) clearTimeout(bvTalkTimer);
   bvStopAudio();
   document.getElementById('bvModeRow').style.display = 'none';
@@ -6065,6 +6174,7 @@ function bvStartTalk() {
   bvTalkToken++;
   bvUpdateTalkProgress();
   bvRunTalkStep(bvTalkToken);
+  bvUpdatePauseUI();
 }
 
 let bvAudioCtx = null;
@@ -6145,7 +6255,7 @@ function bvRunTalkStep(token) {
     if (bvMode !== 'talk' || token !== bvTalkToken) return;
     bvPlayChime();
     document.getElementById('bvTalkStatus').textContent = '🎤 Your turn! 言ってみよう';
-    bvTalkTimer = setTimeout(() => {
+    bvSetTimer(() => {
       if (token !== bvTalkToken) return;
       bvPlayReadyChime();
       document.getElementById('bvTalkStatus').textContent = '✅ Great! もう一度Jayと一緒に';
@@ -6155,7 +6265,7 @@ function bvRunTalkStep(token) {
       bvPlayAudio(page.audio, () => {
         bvStopHighlightLoop();
         if (bvMode !== 'talk' || token !== bvTalkToken) return;
-        bvTalkTimer = setTimeout(() => {
+        bvSetTimer(() => {
           if (token !== bvTalkToken) return;
           bvAdvanceTalkPage(token);
         }, 900);
