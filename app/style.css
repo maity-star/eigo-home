@@ -758,6 +758,14 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 18px; display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
+/* 一時停止ボタン(自動再生の途中で止められるように)。親が読むモードでは音声が無いので非表示 */
+.bv-pause-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #F7F2E4; border: 0.5px solid #D9CDAE; color: #3E2F1C;
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.bv-pause-btn.hidden { display: none; }
 
 /* 絵本レベル切り替え(とどらー/きんだー) */
 .book-level-toggle { display: none; gap: 4px; }
@@ -775,42 +783,48 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .month-lesson-top .book-level-pill.active[data-level="todler"] { background: #FCEBBD; color: #92650C; border-color: #F0B93D; }
 .month-lesson-top .book-level-pill.active[data-level="kinder"] { background: #EAF4EE; color: #2D6A4F; border-color: #6DB88A; }
 
-/* 横向き強制ゲート（絵本は横向き専用。縦持ちで開いた場合は中身を隠し、
-   回転を促す案内だけを表示する。※OS側の画面回転ロック自体を強制解除することは
-   iPhone(Safari)の仕様上不可能なため、これはアプリ内コンテンツ側での制御） */
-.bv-rotate-gate {
-  display: none; position: absolute; inset: 0; z-index: 10;
-  flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  background: #EFE9D8; color: #3E2F1C; text-align: center; padding: 24px;
+/* 横向きは「ボーナス」扱い。縦持ちでも普通に全機能を使えるのが基本で、
+   縦のときだけ「横にするともっと大きく見えるよ」という軽い案内バーを出す（消せる／必須ではない）。
+   ※OS側の画面回転ロックを強制解除することはiPhone(Safari)の仕様上不可能なため、
+   縦持ちを塞ぐ強制ゲートにはしない。 */
+.bv-rotate-tip {
+  display: none; align-items: center; gap: 8px;
+  margin: 8px 12px 0; padding: 8px 12px; flex-shrink: 0;
+  background: rgba(62,47,28,0.06); border-radius: 10px;
+  color: #7A6B4D; font-size: 11.5px;
 }
-.bv-rotate-icon { font-size: 44px; animation: bvRotateSpin 1.6s ease-in-out infinite; }
-.bv-rotate-text { font-size: 15px; font-weight: 700; }
-.bv-rotate-sub { font-size: 12px; color: #9C8E6E; }
+.bv-rotate-tip-icon { font-size: 15px; flex-shrink: 0; animation: bvRotateSpin 1.6s ease-in-out infinite; }
+.bv-rotate-tip-text { flex: 1; line-height: 1.4; }
+.bv-rotate-tip-close {
+  width: 22px; height: 22px; border-radius: 50%; border: none; flex-shrink: 0;
+  background: rgba(62,47,28,0.10); color: #7A6B4D;
+  font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
 @keyframes bvRotateSpin {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(90deg); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bv-rotate-icon { animation: none; }
+  .bv-rotate-tip-icon { animation: none; }
 }
 @media (orientation: portrait) {
-  .book-viewer-modal.open .bv-rotate-gate { display: flex; }
-  .book-viewer-modal.open .bv-header,
-  .book-viewer-modal.open .bv-body,
-  .book-viewer-modal.open .bv-indicator,
-  .book-viewer-modal.open .bv-mode-bar { visibility: hidden; }
+  .book-viewer-modal.open .bv-rotate-tip:not(.dismissed) { display: flex; }
+}
+@media (orientation: landscape) {
+  .bv-rotate-tip { display: none !important; }
 }
 
-/* 本文エリア(画像＋字幕)。横持ち専用：左にテキスト(字幕＋ハイライト)、右にイラスト */
+/* 本文エリア(画像＋字幕)。縦持ち(基本形)は画像に字幕を重ねて表示、
+   横持ち(ボーナス)になった瞬間だけ自動的に左テキスト／右イラストの2分割に切り替わる */
 .bv-body {
   flex: 1; position: relative; min-height: 0;
-  display: flex; flex-direction: row; overflow: hidden;
+  display: flex; flex-direction: column; overflow: hidden;
 }
 
-/* ページ表示エリア（しるタブの本ステージと同じクリーム色の台に載せる） */
+/* ページ表示エリア（しるタブの本ステージと同じクリーム色の台に載せる。縦横共通） */
 .bv-page-area {
-  flex: 0 0 62%; order: 2; position: relative; overflow: hidden; min-height: 0;
-  margin: 8px 8px 8px 0; border-radius: 10px;
+  flex: 1; position: relative; overflow: hidden; min-height: 0;
+  margin: 8px; border-radius: 10px;
   background: #DCD3B8; border: 0.5px solid #C9BD9C;
 }
 .bv-flip-stage {
@@ -867,19 +881,23 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #F7F2E4; border-top: 0.5px solid #D9CDAE;
 }
 .bv-mode-row {
-  display: flex; gap: 10px; margin-bottom: 10px;
+  display: flex; gap: 6px; margin-bottom: 10px;
 }
 .bv-mode-btn {
   flex: 1; height: 46px; border-radius: 12px; border: 0.5px solid #D9CDAE;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 7px;
-  transition: all 0.15s;
+  font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: all 0.15s; padding: 0 2px;
 }
 .bv-mode-btn.read {
   background: #ffffff; color: #2D6A4F;
 }
 .bv-mode-btn.talk {
   background: #6DB88A; color: #fff; border-color: #6DB88A;
+}
+/* 「おうちで読む」＝音声なし、保護者が自分の声で読み聞かせる用の3つ目のモード */
+.bv-mode-btn.parent {
+  background: #F7F2E4; color: #3E2F1C;
 }
 .bv-mode-btn:active { opacity: 0.85; transform: scale(0.98); }
 
@@ -912,31 +930,47 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .bv-ieta-btn.show { display: block; }
 .bv-ieta-btn:active { opacity: 0.8; }
 
-/* 絵本キャプション（英語字幕＋単語ハイライト／日本語訳）。横持ち専用の左側パネル */
+/* 絵本キャプション（英語字幕＋単語ハイライト／日本語訳）。
+   縦持ち(基本形)は画像の上に重ねるオーバーレイ表示 */
 .bv-caption {
-  order: 1; flex: 0 0 38%;
-  display: flex; flex-direction: column; justify-content: center;
-  background: #F7F2E4; border-radius: 10px; margin: 8px 0 8px 8px;
-  border: 0.5px solid #D9CDAE;
-  padding: 20px 22px; text-align: left;
+  position: absolute; left: 10px; right: 10px; bottom: 10px;
+  background: linear-gradient(to top, rgba(239,233,216,0.92), rgba(239,233,216,0.05));
+  border-radius: 14px; padding: 14px 16px 10px; text-align: center;
+  pointer-events: none;
 }
 .bv-caption-en {
-  font-size: 20px; font-weight: 700; color: rgba(62,47,28,0.5);
-  line-height: 1.55; word-break: break-word; text-align: left;
+  font-size: 17px; font-weight: 700; color: rgba(62,47,28,0.55);
+  line-height: 1.55; word-break: break-word;
 }
 .bv-word { color: rgba(62,47,28,0.5); transition: color 0.15s ease; }
 .bv-word.active { color: #B5471F; font-weight: 800; }
+/* 「おうちで読む」モードは音声が無く「これから話す/話し終わった」の区別が無いので、
+   単語を薄く表示する必要が無い。普通の読める濃さの文字に戻す */
+.book-viewer-modal.mode-parent .bv-word { color: #3E2F1C; }
 .bv-caption-ja {
-  font-size: 13px; color: #9C8E6E; margin-top: 5px; display: none; text-align: left;
+  font-size: 12px; color: #9C8E6E; margin-top: 5px; display: none;
 }
 
-/* 横持ちのときはカードの幅制限を外して大きく表示する */
+/* 横持ち(ボーナス)のときはカード幅制限を外し、正方形素材が間延びしないよう
+   画像は右側だけに収め、左側をテキスト（字幕＋ハイライト）専用パネルにする */
 @media (orientation: landscape) {
   .book-viewer-modal.open { max-width: 900px; }
   .bv-header { padding: 8px 16px 6px; }
   .bv-indicator { padding: 4px 0 2px; }
   .bv-mode-bar { padding: 6px 16px 12px; }
   .bv-mode-btn { height: 40px; }
+
+  .bv-body { flex-direction: row; }
+  .bv-page-area { flex: 0 0 62%; order: 2; margin: 8px 8px 8px 0; }
+  .bv-caption {
+    order: 1; position: static; flex: 0 0 38%;
+    display: flex; flex-direction: column; justify-content: center;
+    background: #F7F2E4; border-radius: 10px; margin: 8px 0 8px 8px;
+    border: 0.5px solid #D9CDAE;
+    padding: 20px 22px; text-align: left; pointer-events: auto;
+  }
+  .bv-caption-en { font-size: 20px; text-align: left; }
+  .bv-caption-ja { font-size: 13px; text-align: left; }
 }
 
 /* 今週の一冊 */
