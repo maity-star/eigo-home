@@ -746,30 +746,26 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                   </div>
                   <div class="talk-datehead-text">
                     <div class="talk-datehead-title" id="ftHeaderTitle">タイトル</div>
+                    <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
                     <span class="ft-status-tag" id="ftStatusTag"></span> </div>
                 </div>
                 <div class="ft-replay-note" id="ftReplayNote" style="display:none;"></div>
                 <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">朝のひととき、ラジオ感覚で流してみてね。<br>
                   ふと出てきたフレーズが、今日の親子の話のきっかけになりますように。</p>
-                <div class="ft-card">
-                  <div class="ft-card-top">
-                    <div class="ft-question" id="ftQuestion">What animal did you see today?</div>
-                    <div class="ft-question-ja" id="ftQuestionJa">今日のお話：今日見た動物は何色だった？</div>
-                    <div class="ft-dialogue">
-                      <div class="ft-bubble-wrap" id="ftBubbleWrap">
-                        <div class="ft-bubble" id="ftBubble">
-                          <div class="ft-bubble-en" id="ftBubbleEn"></div>
-                          <div class="ft-bubble-ja" id="ftBubbleJa"></div>
-                        </div>
-                      </div>
-                      <div class="ft-avatar-row">
-                        <div class="ft-avatar joel" id="ftAvatarJoel"> <img id="ftAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
-                        <div class="ft-avatar mai" id="ftAvatarMai"> <img id="ftAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
-                      </div>
+                <div class="ft-dialogue">
+                  <div class="ft-bubble-wrap" id="ftBubbleWrap">
+                    <div class="ft-bubble" id="ftBubble">
+                      <div class="ft-bubble-en" id="ftBubbleEn"></div>
+                      <div class="ft-bubble-ja" id="ftBubbleJa"></div>
                     </div>
-                    <div class="ft-wave" id="ftWave"></div>
                   </div>
-                  <div class="ft-player-inner">
+                  <div class="ft-avatar-row">
+                    <div class="ft-avatar joel" id="ftAvatarJoel"> <img id="ftAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
+                    <div class="ft-avatar mai" id="ftAvatarMai"> <img id="ftAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
+                  </div>
+                </div>
+                <div class="ft-wave" id="ftWave"></div>
+                <div class="ft-player-inner">
                     <div class="ft-play-row">
                       <button class="ft-skip-btn" onclick="skipFamilyTalk(-10)" aria-label="10秒戻す">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -792,16 +788,15 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
                       <div class="ft-prog-time"><span id="ftTime">0:00</span> / <span id="ftPlayLen">3:40</span></div>
                     </div>
                     <div id="ftDebugOverlay" style="display:none; margin-top:8px; padding:8px 10px; background:rgba(0,0,0,0.75); border-radius:8px; font-size:10px; color:#B7F5C8; font-family:monospace; line-height:1.6; white-space:pre-wrap;"></div>
-                  </div>
-                  <div class="ft-phrases-toggle" onclick="toggleFtPhrases()">
-                    <div class="ft-phrases-label"><span><img class="icon-img" style="width:20px;height:20px;" src="/icons/icon_func_bubble.png" alt="フレーズ"></span><span>今日のフレーズ</span></div>
-                    <div class="ft-phrases-chevron" id="ftPhrasesChevron">▼</div>
-                  </div>
-                  <div class="ft-phrases-body" id="ftPhrasesBody">
-                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">What animal did you see today?</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div></div>
-                    <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">It was brown!</span><span class="ft-phrase-ja">茶色だったよ！</span></div></div>
-                    <div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>
-                  </div>
+                </div>
+                <div class="ft-phrases-toggle" onclick="toggleFtPhrases()">
+                  <div class="ft-phrases-label"><span><img class="icon-img" style="width:20px;height:20px;" src="/icons/icon_func_bubble.png" alt="フレーズ"></span><span>今日のフレーズ</span></div>
+                  <div class="ft-phrases-chevron" id="ftPhrasesChevron">▼</div>
+                </div>
+                <div class="ft-phrases-body" id="ftPhrasesBody">
+                  <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">What animal did you see today?</span><span class="ft-phrase-ja">今日どんな動物見た？</span></div></div>
+                  <div class="ft-phrase-row"><div class="ft-phrase-text"><span class="ft-phrase-en">It was brown!</span><span class="ft-phrase-ja">茶色だったよ！</span></div></div>
+                  <div class="ft-maitalk" id="ftMaiTalk" style="display:none;"></div>
                 </div>
                 <button class="ft-archive-link" onclick="openArchiveModal()">これまでの放送 →</button>
                 <button class="ft-archive-link ft-archive-back" id="ftArchiveBackBtn" onclick="returnToTodayMorningTalk()" style="display:none;">← 今日の放送にもどる</button>
@@ -873,7 +868,7 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
         <div class="ft-wrap" id="etWrap"> 
           <!-- Evening Talk用の夜イラストも、Morning Talkと同じくルート直下ではなくillustrations/talks/配下に固定配置。
                週替わりではなく、この1枚をずっとデフォルトとして使い続ける運用（Morning Talkと同じ扱い） -->
-          <div class="weekly-mission-hero talk-hero standalone" style="margin:-16px -16px 14px;border-radius:19px 19px 0 0;"> <img id="etHeroImg" src="/illustrations/talks/evening_talk_hero.png" alt="Evening talk">
+          <div class="weekly-mission-hero talk-hero standalone" style="margin:-15px -15px 14px;border-radius:19px 19px 0 0;"> <img id="etHeroImg" src="/illustrations/talks/evening_talk_hero.png" alt="Evening talk">
             <div class="talk-hero-banner evening">
               <div class="talk-hero-tri tri1"></div>
               <div class="talk-hero-tri tri2"></div>
@@ -893,30 +888,26 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
             </div>
             <div class="talk-datehead-text">
               <div class="talk-datehead-title" id="etHeaderTitle">タイトル</div>
+              <div class="ft-question-ja" id="etQuestionJa">今日どうだった？</div>
               <span class="ft-status-tag" id="etStatusTag"></span> </div>
           </div>
           <div class="ft-replay-note" id="etReplayNote" style="display:none;"></div>
           <p style="font-size:12px;color:#6B7280;line-height:1.75;margin-bottom:14px;">おかえりなさい。今日の「どうだった？」を、JayとMaiのおしゃべりと一緒にどうぞ。<br>
             寝る前のひとときに、ぴったりの長さです。</p>
-          <div class="ft-card">
-            <div class="ft-card-top">
-              <div class="ft-question" id="etQuestion">How was your day?</div>
-              <div class="ft-question-ja" id="etQuestionJa">今日どうだった？</div>
-              <div class="ft-dialogue">
-                <div class="ft-bubble-wrap" id="etBubbleWrap">
-                  <div class="ft-bubble" id="etBubble">
-                    <div class="ft-bubble-en" id="etBubbleEn"></div>
-                    <div class="ft-bubble-ja" id="etBubbleJa"></div>
-                  </div>
-                </div>
-                <div class="ft-avatar-row">
-                  <div class="ft-avatar joel" id="etAvatarJoel"> <img id="etAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
-                  <div class="ft-avatar mai" id="etAvatarMai"> <img id="etAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
-                </div>
+          <div class="ft-dialogue">
+            <div class="ft-bubble-wrap" id="etBubbleWrap">
+              <div class="ft-bubble" id="etBubble">
+                <div class="ft-bubble-en" id="etBubbleEn"></div>
+                <div class="ft-bubble-ja" id="etBubbleJa"></div>
               </div>
-              <div class="ft-wave" id="etWave"></div>
             </div>
-            <div class="ft-player-inner">
+            <div class="ft-avatar-row">
+              <div class="ft-avatar joel" id="etAvatarJoel"> <img id="etAvatarJoelImg" src="/illustrations/joel/joel_mouth_closed.png" alt="Jay"> </div>
+              <div class="ft-avatar mai" id="etAvatarMai"> <img id="etAvatarMaiImg" src="/illustrations/mai/mai_mouth_closed.png" alt="Mai"> </div>
+            </div>
+          </div>
+          <div class="ft-wave" id="etWave"></div>
+          <div class="ft-player-inner">
               <div class="ft-play-row">
                 <button class="ft-skip-btn" onclick="skipEveningTalk(-10)" aria-label="10秒戻す">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -944,7 +935,6 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
               <div class="ft-phrases-chevron" id="etPhrasesChevron">▼</div>
             </div>
             <div class="ft-phrases-body" id="etPhrasesBody"></div>
-          </div>
           <button class="ft-archive-link" onclick="openEtArchiveModal()">これまでの放送 →</button>
           <button class="ft-archive-link ft-archive-back" id="etArchiveBackBtn" onclick="returnToTodayEveningTalk()" style="display:none;">← 今日の放送にもどる</button>
         </div>
@@ -2844,8 +2834,8 @@ function focusJourneyBlock(slot) {
 }
 
 const JOURNEY_TALK_META = {
-  morning: { label: 'Morning talk', smallLabel: 'モーニングトーク', sub: '朝のひとときに', img: '/illustrations/talks/morning_talk_hero.png', qId: 'ftQuestion', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
-  evening: { label: 'Evening talk', smallLabel: 'イブニングトーク', sub: 'おかえりのひとときに', img: '/illustrations/talks/evening_talk_hero.png', qId: 'etQuestion', titleId: 'etPlayTitle', tagId: 'etStatusTag' }
+  morning: { label: 'Morning talk', smallLabel: 'モーニングトーク', sub: '朝のひとときに', img: '/illustrations/talks/morning_talk_hero.png', qId: 'ftHeaderTitle', titleId: 'ftPlayTitle', tagId: 'ftStatusTag' },
+  evening: { label: 'Evening talk', smallLabel: 'イブニングトーク', sub: 'おかえりのひとときに', img: '/illustrations/talks/evening_talk_hero.png', qId: 'etHeaderTitle', titleId: 'etPlayTitle', tagId: 'etStatusTag' }
 };
 function renderJourneyNowPlaying() {
   const big = journeyBigSlot();
@@ -3650,7 +3640,6 @@ function renderMorningTalkContent() {
     tag.className = 'ft-status-tag replay';
     note.textContent = '配信は8月中旬スタート予定です';
     note.style.display = 'block';
-    document.getElementById('ftQuestion').textContent = 'Coming soon!';
     document.getElementById('ftQuestionJa').textContent = 'もうすぐ配信スタート';
     const body = document.getElementById('ftPhrasesBody');
     if (body) body.innerHTML = '';
@@ -3663,7 +3652,6 @@ function renderMorningTalkContent() {
     tag.textContent = `${MORNING_TALK_RELEASE_HOUR}時公開`;
     tag.className = 'ft-status-tag replay';
     note.style.display = 'none';
-    document.getElementById('ftQuestion').textContent = 'Coming today!';
     document.getElementById('ftQuestionJa').textContent = `今日のMorning talkは${MORNING_TALK_RELEASE_HOUR}:00に配信予定`;
     const body = document.getElementById('ftPhrasesBody');
     if (body) body.innerHTML = '';
@@ -3694,7 +3682,6 @@ function renderMorningTalkContent() {
   }
 
   const c = info.content;
-  document.getElementById('ftQuestion').textContent = c.title;
   document.getElementById('ftQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
 
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
@@ -4555,7 +4542,6 @@ function renderEveningTalkContent() {
         note.style.display = 'block';
       }
     }
-    const q = document.getElementById('etQuestion'); if (q) q.textContent = info.isBeforeRelease ? 'Coming today!' : 'Coming soon!';
     const qj = document.getElementById('etQuestionJa'); if (qj) qj.textContent = info.isBeforeRelease
       ? `今日のEvening talkは${EVENING_TALK_RELEASE_HOUR}:00に配信予定` : 'もうすぐ配信スタート';
     const body = document.getElementById('etPhrasesBody'); if (body) body.innerHTML = '';
@@ -4579,7 +4565,6 @@ function renderEveningTalkContent() {
   }
 
   const c = info.content;
-  document.getElementById('etQuestion').textContent = c.title;
   document.getElementById('etQuestionJa').textContent = c.phrases.map(p => p.ja).join(' / ');
 
   const lines = c.rawScript ? parseMorningTalkScript(c.rawScript)
