@@ -1,7 +1,11 @@
 /* dev test 2026-09-08 */
 * { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gutter: 10px;   /* 画面端〜カードの外側余白(旧20px)。ここを変えれば全体に反映 */
+  --app-max: 480px; /* 大きめ端末・PCプレビュー用の安全上限(旧390px) */
+}
 body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; }
-.app { max-width: 390px; margin: 0 auto; padding: 0 0 80px; }
+.app { width: 100%; max-width: var(--app-max); margin: 0 auto; padding: 0 0 80px; }
 
 /* ==============================
    オンボーディング
@@ -13,7 +17,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
    今日のジャーニー（①②③ステップ誘導＋時間帯ナビ）
 ============================== */
 .journey-nav {
-  margin: 16px 20px 0;
+  margin: 16px var(--gutter) 0;
   border: 1.5px solid #E7E2D8;
   border-radius: 20px;
   background: #FFFFFF;
@@ -57,7 +61,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* Jayのひとこと(タブバー直下・きょうのとびら直上) */
 /* 2026-08-26: 影・吹き出しのしっぽを廃止し、色の塗りだけで区別するフラット/モダンなカードに変更 */
-.joel-line-wrap { display: flex; align-items: flex-start; gap: 8px; margin: 14px 20px 12px 34px; }
+.joel-line-wrap { display: flex; align-items: flex-start; gap: 8px; margin: 14px var(--gutter) 12px 34px; }
 .joel-line-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #EAF4EE; border: 1px solid #BBDAC8; margin-top: 4px; }
 .joel-line-bubble {
   position: relative;
@@ -177,11 +181,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .stamp-celebrate-btn { background: #2D6A4F; color: #fff; border: none; border-radius: 12px; padding: 10px 16px; font-size: 12.5px; font-weight: 700; flex: 1; white-space: nowrap; }
 
 /* Weekly Pickを独立セクション化(旧:Weekly Mission内ネスト) */
-.weekly-pick-standalone { margin: 16px 20px 0; background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 20px; padding: 18px 16px 20px; }
+.weekly-pick-standalone { margin: 16px var(--gutter) 0; background: #F5FAF7; border: 1px solid #BBDAC8; border-radius: 20px; padding: 18px 16px 20px; }
 .weekly-pick-standalone .weekly-pick-block { margin-top: 0; padding-top: 0; border-top: none; }
 
 /* ヘッダー */
-.header { padding: 24px 20px 16px; border-bottom: 0.5px solid #E5E7EB; }
+.header { padding: 24px var(--gutter) 16px; border-bottom: 0.5px solid #E5E7EB; }
 .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .logo { font-size: 18px; font-weight: 500; color: #111827; letter-spacing: -0.3px; }
 .logo span { color: #6DB88A; }
@@ -200,12 +204,12 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   position: fixed; inset: 0; z-index: 260;
   background: #FFFDF8;
   display: none; flex-direction: column;
-  max-width: 390px; margin: 0 auto;
+  max-width: var(--app-max); margin: 0 auto;
 }
 .settings-modal.open { display: flex; }
 .settings-modal-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px 14px; flex-shrink: 0;
+  padding: 18px var(--gutter) 14px; flex-shrink: 0;
   border-bottom: 1px solid #F0E6D2;
 }
 .settings-modal-title { font-size: 15px; font-weight: 700; color: #111827; }
@@ -215,7 +219,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 16px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0;
 }
-.settings-body { flex: 1; overflow-y: auto; padding: 20px 20px 40px; }
+.settings-body { flex: 1; overflow-y: auto; padding: 20px var(--gutter) 40px; }
 .settings-block-label { font-size: 11px; font-weight: 600; color: #9CA3AF; letter-spacing: .05em; margin: 22px 0 8px; text-transform: uppercase; }
 .settings-block-label:first-child { margin-top: 0; }
 .settings-rows { display: flex; flex-direction: column; gap: 8px; }
@@ -242,7 +246,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 
 /* タブ(Option A:塗りつぶしピル / セグメントコントロール) */
-.tab-bar { display: flex; gap: 3px; margin: 14px 20px 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
+.tab-bar { display: flex; gap: 3px; margin: 14px var(--gutter) 0; padding: 4px; background: #F1EFE7; border-radius: 14px; }
 .tab { flex: 1; text-align: center; padding: 9px 2px; font-size: 11.5px; font-weight: 600; color: #6B7280; cursor: pointer; border-radius: 10px; transition: background .2s ease, color .2s ease, box-shadow .2s ease; white-space: nowrap; position: relative; }
 .tab.active { background: #6DB88A; color: #fff; box-shadow: 0 2px 6px rgba(109,184,138,0.35); }
 .tab-badge-new {
@@ -262,7 +266,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 
 /* セクション */
-.section { padding: 20px 20px 0; }
+.section { padding: 20px var(--gutter) 0; }
 .section-label { font-size: 11px; font-weight: 500; color: #6B7280; letter-spacing: 0.8px; margin-bottom: 12px; text-transform: uppercase; }
 .section-header { margin-bottom: 14px; }
 .section-header-en {
@@ -279,7 +283,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    今月の教材絵本(スタンドアロン・最上位ヒーロー)
 ============================== */
-.month-hero-section { margin: 20px 20px 0; }
+.month-hero-section { margin: 20px var(--gutter) 0; }
 .month-hero-section .month-lesson-wrap { margin: 0; }
 .month-eyebrow-en {
   display: block;
@@ -294,7 +298,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    Weekly Mission ラッパー＋見出し(絵本セクションと同じ構造)
 ============================== */
-.weekly-mission-wrap { margin: 16px 20px 0; }
+.weekly-mission-wrap { margin: 16px var(--gutter) 0; }
 /* パネル本体(絵本の month-lesson-card に相当) */
 .weekly-mission-panel {
   background: #F5FAF7;
@@ -376,7 +380,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    Monthly Playlist セクション(独立)
 ============================== */
-.monthly-playlist-section { margin: 14px 20px 0; }
+.monthly-playlist-section { margin: 14px var(--gutter) 0; }
 .monthly-playlist-eyebrow {
   display: flex; align-items: center; gap: 8px;
   margin-bottom: 14px;
@@ -389,7 +393,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .monthly-playlist-line { flex: 1; height: 1px; background: #E5E7EB; }
 
 /* 今月の教材絵本 */
-.month-lesson-wrap { margin: 20px 20px 0; }
+.month-lesson-wrap { margin: 20px var(--gutter) 0; }
 .month-lesson-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .month-eyebrow-label { font-size: 19px; font-weight: 600; letter-spacing: -0.3px; text-transform: none; color: #2D6A4F; }
 .month-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
@@ -434,7 +438,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    Active Time(ホーム非表示・あそぼタブのみ／スタイル定義は流用)
 ============================== */
-.at-wrap { margin: 22px 20px 0; }
+.at-wrap { margin: 22px var(--gutter) 0; }
 .at-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .at-eyebrow-label { font-size: 19px; font-weight: 600; letter-spacing: -0.3px; text-transform: none; color: #2D6A4F; display: flex; align-items: center; gap: 7px; }
 .at-eyebrow-line { flex: 1; height: 1px; background: #E5E7EB; }
@@ -486,11 +490,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
    Family Talk(ポッドキャスト・プレミアム限定)
 ============================== */
 .ft-wrap {
-  margin: 22px 20px 0;
+  margin: 22px var(--gutter) 0;
   border: 1.5px solid #E5E7EB;
   border-radius: 20px;
   background: #FFFFFF;
-  padding: 16px 16px 18px;
+  padding: 12px 12px 16px;
 }
 .ft-status-tag { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
 .ft-status-tag.new { background: #E8A33D; color: #fff; }
@@ -500,7 +504,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: linear-gradient(165deg, #EAF4EE 0%, #DCEFE4 100%); border-radius: 18px; overflow: hidden;
   position: relative; box-shadow: 0 6px 18px rgba(45,106,79,0.10); border: 1px solid #CFE6D9;
 }
-.ft-card-top { padding: 18px 18px 0; position: relative; z-index: 1; }
+.ft-card-top { padding: 14px 14px 0; position: relative; z-index: 1; }
 .ft-question { font-size: 16px; font-weight: 600; color: #1A4232; line-height: 1.45; margin-bottom: 4px; }
 .ft-question-ja { font-size: 11px; color: #6B8577; margin-bottom: 16px; }
 
@@ -660,12 +664,12 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   position: fixed; inset: 0; z-index: 260;
   background: #FFFDF8;
   display: none; flex-direction: column;
-  max-width: 390px; margin: 0 auto;
+  max-width: var(--app-max); margin: 0 auto;
 }
 .archive-modal.open { display: flex; }
 .archive-modal-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px 14px; flex-shrink: 0;
+  padding: 18px var(--gutter) 14px; flex-shrink: 0;
   border-bottom: 1px solid #F0E6D2;
 }
 .archive-modal-title { font-size: 15px; font-weight: 700; color: #111827; }
@@ -676,7 +680,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 16px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0;
 }
-.archive-body { flex: 1; overflow-y: auto; padding: 20px 20px 32px; }
+.archive-body { flex: 1; overflow-y: auto; padding: 20px var(--gutter) 32px; }
 
 /* Best Of */
 .archive-section-label {
@@ -738,7 +742,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   position: fixed; inset: 0; z-index: 300;
   background: #0a0a0a;
   display: none; flex-direction: column;
-  max-width: 390px; margin: 0 auto;
+  max-width: var(--app-max); margin: 0 auto;
 }
 .book-viewer-modal.open { display: flex; }
 
@@ -981,7 +985,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
    今週やることパネル(Weekly Pick + Monthly Playlist を包む)
 ============================== */
 .weekly-todo-panel {
-  margin: 18px 20px 0;
+  margin: 18px var(--gutter) 0;
   background: #FBF7EE;
   border: 1px solid #F0E6D2;
   border-radius: 18px;
@@ -1050,7 +1054,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .carousel-outer {
   position: relative;
   overflow: hidden;
-  margin: 0 -20px;        /* 左右マージン分広げてサイドをチラ見せ */
+  margin: 0 calc(var(--gutter) * -1);        /* 左右マージン分広げてサイドをチラ見せ(--gutterと連動) */
   padding: 6px 0 4px;
 }
 .carousel-track {
@@ -1206,7 +1210,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .pl-icon.pl-icon-placeholder { background: #EEF0F2; }
 /* シーン別カード */
-.scene-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; }
+.scene-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 var(--gutter); }
 .scene-card { background: #fff; border: 0.5px solid #E5E7EB; border-radius: 14px; overflow: hidden; text-decoration: none; display: block; }
 .scene-card-thumb { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #EEF0F2; }
 .scene-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -1257,15 +1261,15 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 ============================== */
 .asobo-hero { padding: 0; }
 .asobo-hero-illust { width: 100%; display: block; }
-.asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; padding: 14px 20px 18px; }
+.asobo-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; padding: 14px var(--gutter) 18px; }
 
-.shiru-hero { padding: 20px 20px 4px; }
+.shiru-hero { padding: 20px var(--gutter) 4px; }
 .shiru-hero-en { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #9CA3AF; text-transform: uppercase; }
 .shiru-hero-title { font-size: 17px; font-weight: 700; color: #111827; margin-top: 4px; }
 .shiru-hero-sub { font-size: 12px; color: #6B7280; line-height: 1.65; margin-top: 6px; }
 
 /* しる:カテゴリーカード(本の表紙風。ヴィンテージトーン、布装丁の背表紙＋金の飾り罫＋しおり) */
-.shiru-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 20px 0; }
+.shiru-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px var(--gutter) 0; }
 .shiru-cat-card {
   background: #F7F2E4; border-radius: 4px 12px 12px 4px; padding: 0; cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -1316,7 +1320,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* しる:本モーダル(表紙タップ後にリフルして開く本。もくじ→トピックグリッドの2段構成) */
 .shiru-book-modal {
   position: fixed; inset: 0; z-index: 265; background: #EFE9D8;
-  display: none; flex-direction: column; max-width: 390px; margin: 0 auto;
+  display: none; flex-direction: column; max-width: var(--app-max); margin: 0 auto;
 }
 .shiru-book-modal.open { display: flex; }
 .shiru-book-header {
@@ -1546,7 +1550,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .shiru-entry-ja { font-size: 11px; color: #9CA3AF; padding-left: 42px; line-height: 1.6; }
 
 /* セクション見出し(1・2の縦並び) */
-.asobo-section { padding: 0 20px 20px; }
+.asobo-section { padding: 0 var(--gutter) 20px; }
 
 .asobo-coming-soon, .coming-soon-panel {
   display: flex;
@@ -1653,7 +1657,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 @keyframes asoboRing { 0% { box-shadow: 0 0 0 0 rgba(232,163,61,0.5); } 100% { box-shadow: 0 0 0 6px rgba(232,163,61,0); } }
 
 /* 探し物ミッションカード */
-.at-archive-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.at-archive-list { padding: 0 var(--gutter); display: flex; flex-direction: column; gap: 10px; }
 .at-archive-card {
   background: #fff; border: 1px solid #E5E7EB;
   border-radius: 14px; padding: 14px;
@@ -1719,7 +1723,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .at-riddle-answer-label { font-size: 10px; color: #4D7D63; margin-bottom: 4px; }
 
 /* サブスクバナー */
-.sub-banner { margin: 20px 20px 0; background: linear-gradient(135deg, #4D7D63, #6DB88A); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sub-banner { margin: 20px var(--gutter) 0; background: linear-gradient(135deg, #4D7D63, #6DB88A); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sub-text-title { font-size: 13px; font-weight: 500; color: white; margin-bottom: 3px; }
 .sub-text-sub { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.5; }
 .sub-btn { font-size: 11px; font-weight: 500; background: white; color: #4D7D63; border: none; border-radius: 8px; padding: 7px 12px; cursor: pointer; white-space: nowrap; }
@@ -1746,7 +1750,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   position: fixed; inset: 0; z-index: 260;
   background: #FFFDF8;
   display: none; flex-direction: column;
-  max-width: 390px; margin: 0 auto;
+  max-width: var(--app-max); margin: 0 auto;
 }
 .routine-modal.open { display: flex; }
 .routine-modal-hero-wrap { position: relative; flex-shrink: 0; }
@@ -1755,7 +1759,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   background: #F3F4F6;
 }
 .routine-modal-header {
-  padding: 16px 20px 14px; flex-shrink: 0;
+  padding: 16px var(--gutter) 14px; flex-shrink: 0;
   border-bottom: 1px solid #F0E6D2;
 }
 .routine-modal-title { font-size: 16px; font-weight: 700; color: #111827; }
@@ -1767,7 +1771,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 16px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
-.routine-modal-body { flex: 1; overflow-y: auto; padding: 18px 20px 32px; }
+.routine-modal-body { flex: 1; overflow-y: auto; padding: 18px var(--gutter) 32px; }
 .routine-scene-card {
   background: #F9FAFB; border-radius: 14px; padding: 14px; margin-bottom: 10px;
 }
@@ -1796,7 +1800,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .phrase-ja { font-size: 11px; color: #6B7280; margin-top: 2px; }
 
 /* YouTubeキュレーション */
-.yt-section { padding: 20px 20px 0; }
+.yt-section { padding: 20px var(--gutter) 0; }
 .yt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .yt-label { font-size: 15px; font-weight: 500; color: #111827; letter-spacing: -0.2px; }
 .yt-note { font-size: 10px; color: #9CA3AF; display: flex; align-items: center; gap: 3px; margin-top: 2px; }
@@ -1838,7 +1842,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   position: fixed; inset: 0; z-index: 250;
   background: #0F4A3E;
   display: none; flex-direction: column;
-  max-width: 390px; margin: 0 auto;
+  max-width: var(--app-max); margin: 0 auto;
 }
 .book-modal.open { display: flex; }
 .book-modal-header {
@@ -1856,7 +1860,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* きいてみる／いってみる タブ切り替え */
 .book-mode-tabs {
-  display: flex; gap: 8px; padding: 0 20px 10px; flex-shrink: 0;
+  display: flex; gap: 8px; padding: 0 var(--gutter) 10px; flex-shrink: 0;
 }
 .book-mode-tab {
   flex: 1; height: 38px; border-radius: 10px; border: none;
@@ -1948,7 +1952,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 
 /* めくれる絵本ビューア */
-.book-viewer { flex: 1; display: flex; flex-direction: column; padding: 6px 20px 0; min-height: 0; }
+.book-viewer { flex: 1; display: flex; flex-direction: column; padding: 6px var(--gutter) 0; min-height: 0; }
 .book-stage {
   position: relative; flex: 1; min-height: 0;
   perspective: 1400px;
@@ -2002,7 +2006,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 
 /* 下部固定プレイヤー(ポップアップ内) */
 .book-modal-player {
-  flex-shrink: 0; padding: 14px 20px 22px;
+  flex-shrink: 0; padding: 14px var(--gutter) 22px;
   background: rgba(0,0,0,0.18);
   border-top: 1px solid rgba(255,255,255,0.08);
 }
