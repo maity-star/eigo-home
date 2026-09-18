@@ -619,10 +619,10 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
     </div>
     <button class="bv-close" onclick="closeBookModal()">✕</button>
   </div>
-  <div class="bv-rotate-tip" id="bvRotateHint">
-    <span class="bv-rotate-tip-icon">📱</span>
-    <span class="bv-rotate-tip-text">横にすると絵本が大きく見やすくなるよ</span>
-    <button class="bv-rotate-tip-close" onclick="bvDismissRotateHint()" aria-label="閉じる">✕</button>
+  <div class="bv-rotate-gate" id="bvRotateHint">
+    <div class="bv-rotate-icon">📱</div>
+    <div class="bv-rotate-text">スマホを横にしてね</div>
+    <div class="bv-rotate-sub">Turn your phone sideways to read</div>
   </div>
   <div class="bv-body" id="bvBody">
     <div class="bv-page-area" id="bvPageArea">
@@ -5889,8 +5889,6 @@ function openBookModal(mode) {
   bvMode = mode;
   bvTalkDone = [];
   document.getElementById('bookViewerModal').classList.add('open');
-  const hint = document.getElementById('bvRotateHint');
-  if (hint) hint.classList.remove('dismissed');
   bvRenderPage();
   bvBuildIndicator();
   trackEvent('book_open', mode);
@@ -5956,11 +5954,6 @@ function bvBuildIndicator() {
   ind.innerHTML = BOOK_DATA.pages.map((_, i) =>
     `<div class="bv-dot${i === 0 ? ' active' : ''}"></div>`
   ).join('');
-}
-
-function bvDismissRotateHint() {
-  const hint = document.getElementById('bvRotateHint');
-  if (hint) hint.classList.add('dismissed');
 }
 
 // ========================
