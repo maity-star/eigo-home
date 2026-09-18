@@ -758,15 +758,6 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   font-size: 18px; display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
-/* 一時停止ボタン(自動再生の途中で止められるように)。親が読むモードでは音声が無いので非表示 */
-.bv-pause-btn {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: #F7F2E4; border: 0.5px solid #D9CDAE; color: #3E2F1C;
-  font-size: 14px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-}
-.bv-pause-btn.hidden { display: none; }
-
 /* 絵本レベル切り替え(とどらー/きんだー) */
 .book-level-toggle { display: none; gap: 4px; }
 .book-level-pill {
@@ -875,7 +866,21 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 .bv-dot.active { background: #6DB88A; width: 16px; border-radius: 3px; }
 
-/* モードバー(Let's read / Let's talk) */
+/* 一時停止/再開ボタン。イラスト直下のページ数ドットのすぐ下という、
+   一番見つけてもらいやすい場所に置く（ヘッダーの小さいアイコンだと気づかれなかったため） */
+.bv-pause-row {
+  display: flex; justify-content: center;
+  padding: 0 0 6px; flex-shrink: 0;
+}
+.bv-pause-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 18px; border-radius: 20px;
+  background: #F7F2E4; border: 0.5px solid #D9CDAE; color: #3E2F1C;
+  font-size: 12.5px; font-weight: 700; cursor: pointer;
+}
+.bv-pause-pill.hidden { display: none; }
+
+/* モードバー(Listen / Let's talk / Read aloud) */
 .bv-mode-bar {
   padding: 10px 16px 16px; flex-shrink: 0;
   background: #F7F2E4; border-top: 0.5px solid #D9CDAE;
@@ -884,20 +889,29 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   display: flex; gap: 6px; margin-bottom: 10px;
 }
 .bv-mode-btn {
-  flex: 1; height: 46px; border-radius: 12px; border: 0.5px solid #D9CDAE;
-  font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  flex: 1; height: 50px; border-radius: 12px; border: 0.5px solid #D9CDAE;
+  cursor: pointer; white-space: nowrap;
   display: flex; align-items: center; justify-content: center; gap: 5px;
   transition: all 0.15s; padding: 0 2px;
 }
+.bv-mode-btn-icon { font-size: 16px; flex-shrink: 0; }
+.bv-mode-btn-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2; }
+.bv-mode-btn-en { font-size: 11.5px; font-weight: 700; }
+.bv-mode-btn-ja { font-size: 9px; font-weight: 500; opacity: 0.65; margin-top: 1px; }
+/* 3つとも同じ白背景に統一(以前は「おうちで読む」だけモードバーと同じクリーム色で
+   埋もれて見えなかったため)。区別は色ではなく、単語とアイコン・日本語キャプションでつける */
 .bv-mode-btn.read {
   background: #ffffff; color: #2D6A4F;
 }
 .bv-mode-btn.talk {
   background: #6DB88A; color: #fff; border-color: #6DB88A;
 }
-/* 「おうちで読む」＝音声なし、保護者が自分の声で読み聞かせる用の3つ目のモード */
+/* 「おうちで読む」＝音声なし、保護者が自分の声で読み聞かせる用の3つ目のモード。
+   英語ラベルを"Let's read"ではなく"Read aloud"にして、1つ目の"Listen"と単語が
+   被らないようにした(以前は両方に"read"が入っていて紛らわしかった)。
+   "read-aloud"は絵本の読み聞かせを指す定番表現でもある */
 .bv-mode-btn.parent {
-  background: #F7F2E4; color: #3E2F1C;
+  background: #ffffff; color: #3E2F1C;
 }
 .bv-mode-btn:active { opacity: 0.85; transform: scale(0.98); }
 
