@@ -321,11 +321,10 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 }
 /* コンテンツエリア */
 .weekly-mission-content { padding: 14px 16px 20px; }
-.weekly-mission-panel .ft-wrap { margin: 20px 0 0; border-color: rgba(45,106,79,0.16); }
+.weekly-mission-panel .ft-wrap { margin: 20px 0 0; }
 .weekly-mission-panel .at-wrap { margin: 20px 0 0; }
 .weekly-mission-panel .at-eyebrow-label { color: #2D6A4F; }
 .weekly-mission-panel .at-eyebrow-line { background: rgba(45,106,79,0.18); }
-.weekly-mission-panel .ft-card { box-shadow: 0 6px 18px rgba(45,106,79,0.10); }
 .weekly-mission-panel p { color: #4D7D63 !important; }
 /* standalone文脈(Evening TalkのようにWeekly Missionパネルの外＝白背景のft-wrap内)ではヒーロー下部のフェードを白に合わせる */
 .talk-hero.standalone::after {
@@ -374,7 +373,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .talk-datebadge-day { font-size: 21px; font-weight: 800; color: #374151; line-height: 1; }
 .talk-datebadge-dow { font-size: 8px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.8px; margin-top: 1px; }
 .talk-datehead-text { flex: 1; min-width: 0; }
-.talk-datehead-title { font-size: 20px; font-weight: 700; color: #374151; line-height: 1.3; margin-bottom: 6px; }
+.talk-datehead-title { font-size: 20px; font-weight: 700; color: #374151; line-height: 1.3; margin-bottom: 3px; }
 
 
 /* ==============================
@@ -489,24 +488,22 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 /* ==============================
    Family Talk(ポッドキャスト・プレミアム限定)
 ============================== */
+/* 2026-09-18: ft-wrap(層2)とft-card(層3)を1枚に統合。案③＝Mai側の暖色(ゴールド)を纏ったクリーム地。
+   外側の.weekly-mission-panel(薄緑)と被らないよう、寒色パネル×暖色カードのコントラストを意図的に採用。 */
 .ft-wrap {
   margin: 22px var(--gutter) 0;
-  border: 1.5px solid #E5E7EB;
+  border: 1.5px solid #F0DCB8;
   border-radius: 20px;
-  background: #FFFFFF;
-  padding: 12px 12px 16px;
+  background: #FFF8EC;
+  padding: 15px;
+  position: relative;
 }
 .ft-status-tag { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
 .ft-status-tag.new { background: #E8A33D; color: #fff; }
 .ft-status-tag.replay { background: rgba(77,125,99,0.12); color: #4D7D63; }
 .ft-replay-note { font-size: 12px; color: #6B7280; margin: 0 0 12px; }
-.ft-card {
-  background: linear-gradient(165deg, #EAF4EE 0%, #DCEFE4 100%); border-radius: 18px; overflow: hidden;
-  position: relative; box-shadow: 0 6px 18px rgba(45,106,79,0.10); border: 1px solid #CFE6D9;
-}
-.ft-card-top { padding: 14px 14px 0; position: relative; z-index: 1; }
-.ft-question { font-size: 16px; font-weight: 600; color: #1A4232; line-height: 1.45; margin-bottom: 4px; }
-.ft-question-ja { font-size: 11px; color: #6B8577; margin-bottom: 16px; }
+/* ft-question-jaは.talk-datehead-title直下(日付バッジ横)に移設。今日のフレーズの日本語まとめを表示 */
+.ft-question-ja { font-size: 12px; color: #6B8577; margin: 2px 0 5px; line-height: 1.5; }
 
 /* 話者アバター＋吹き出し(掛け合いUI・口パク・トーク系プロファイル)
    2026-09-15: 3カラム(アバター/吹き出し/アバター)→1カラムに変更。吹き出しを常に幅いっぱいに表示し、
@@ -560,7 +557,7 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
   .ft-wave.is-playing .ft-wave-bar { animation: none; }
 }
 
-.ft-player-inner { background: rgba(255,255,255,0.55); border-radius: 14px 14px 0 0; margin: 0 0; padding: 14px 16px; position: relative; z-index: 1; }
+.ft-player-inner { background: rgba(255,255,255,0.55); border-radius: 14px; margin: 12px 0; padding: 12px 14px; position: relative; z-index: 1; }
 .ft-play-row { display: flex; align-items: center; justify-content: center; gap: 12px; }
 .ft-play-btn {
   width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
@@ -583,11 +580,11 @@ body { background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Hir
 .ft-prog-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .ft-prog-time { font-size: 10px; color: #6B8577; min-width: 68px; text-align: right; white-space: nowrap; }
 
-.ft-phrases-toggle { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px 15px; cursor: pointer; position: relative; z-index: 1; }
+.ft-phrases-toggle { display: flex; align-items: center; justify-content: space-between; padding: 10px 0 4px; margin-top: 2px; border-top: 1px dashed rgba(184,134,11,0.2); cursor: pointer; position: relative; z-index: 1; }
 .ft-phrases-label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 500; color: #4D7D63; }
 .ft-phrases-chevron { font-size: 10px; color: #9CA3AF; transition: transform 0.25s; }
 .ft-phrases-chevron.open { transform: rotate(180deg); }
-.ft-phrases-body { display: none; margin: 0 16px 14px; }
+.ft-phrases-body { display: none; margin: 0 0 10px; }
 .ft-phrases-body.open { display: block; }
 .ft-phrase-row {
   display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: #374151; padding: 8px 8px;
