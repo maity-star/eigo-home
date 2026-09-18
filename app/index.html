@@ -619,9 +619,20 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
     </div>
     <button class="bv-close" onclick="closeBookModal()">✕</button>
   </div>
-  <div class="bv-page-area" id="bvPageArea"> <img class="bv-page-img" id="bvPageImg" src="" alt="">
-    <button class="bv-nav prev" id="bvPrev" onclick="bvChangePage(-1)"><span>‹</span></button>
-    <button class="bv-nav next" id="bvNext" onclick="bvChangePage(1)"><span>›</span></button>
+  <div class="bv-rotate-tip" id="bvRotateHint">
+    <span class="bv-rotate-tip-icon">📱</span>
+    <span class="bv-rotate-tip-text">横にすると絵本が大きく見やすくなるよ</span>
+    <button class="bv-rotate-tip-close" onclick="bvDismissRotateHint()" aria-label="閉じる">✕</button>
+  </div>
+  <div class="bv-body" id="bvBody">
+    <div class="bv-page-area" id="bvPageArea">
+      <div class="bv-flip-stage" id="bvFlipStage">
+        <img class="bv-page-img" id="bvPageImg" src="" alt="">
+        <img class="bv-page-flip" id="bvPageFlip" src="" alt="">
+      </div>
+      <button class="bv-nav prev" id="bvPrev" onclick="bvChangePage(-1)"><span>‹</span></button>
+      <button class="bv-nav next" id="bvNext" onclick="bvChangePage(1)"><span>›</span></button>
+    </div>
     <div class="bv-caption" id="bvCaption">
       <div class="bv-caption-en" id="bvCaptionEn"></div>
       <div class="bv-caption-ja" id="bvCaptionJa"></div>
@@ -639,11 +650,6 @@ html.in-app-browser #accessLockScreen, html.in-app-browser #mainApp {
       <div class="bv-talk-progress" id="bvTalkProgress"></div>
     </div>
     <button class="bv-ieta-btn" id="bvIetaBtn" onclick="bvIeta()">🌟 今日言えたよ！</button>
-  </div>
-  <div class="bv-rotate-hint" id="bvRotateHint">
-    <div class="bv-rotate-icon">📱</div>
-    <div class="bv-rotate-text">スマホを横にしてね</div>
-    <div class="bv-rotate-sub">Turn your phone sideways to read</div>
   </div>
 </div>
 
@@ -5883,6 +5889,8 @@ function openBookModal(mode) {
   bvMode = mode;
   bvTalkDone = [];
   document.getElementById('bookViewerModal').classList.add('open');
+  const hint = document.getElementById('bvRotateHint');
+  if (hint) hint.classList.remove('dismissed');
   bvRenderPage();
   bvBuildIndicator();
   trackEvent('book_open', mode);
@@ -5950,11 +5958,58 @@ function bvBuildIndicator() {
   ).join('');
 }
 
-function bvChangePage(dir) {
-  const next = bvCurrentPage + dir;
+function bvDismissRotateHint() {
+  const hint = document.getElementById('bvRotateHint');
+  if (hint) hint.classList.add('dismissed');
+}
+
+// ========================
+// ページめくりアニメーション（しるタブの本めくり演出と同じ rotateY 手法を流用）
+// ========================
+let bvFlipping = false;
+function bvAnimatePageTurn(oldSrc, dir) {
+  const flip = document.getElementById('bvPageFlip');
+  if (!flip || !oldSrc) return;
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
+  bvFlipping = true;
+  flip.onload = null;
+  flip.src = oldSrc;
+  flip.style.transformOrigin = dir >= 0 ? 'left center' : 'right center';
+  flip.style.transition = 'none';
+  flip.style.transform = 'rotateY(0deg)';
+  flip.classList.add('flipping');
+  // 強制リフローしてから回転を開始（transitionを確実に効かせるため）
+  void flip.offsetWidth;
+  flip.style.transition = '';
+  requestAnimationFrame(() => {
+    flip.style.transform = dir >= 0 ? 'rotateY(-150deg)' : 'rotateY(150deg)';
+  });
+  const onEnd = () => {
+    flip.removeEventListener('transitionend', onEnd);
+    flip.classList.remove('flipping');
+    flip.style.transform = 'rotateY(0deg)';
+    flip.src = '';
+    bvFlipping = false;
+  };
+  flip.addEventListener('transitionend', onEnd);
+  // transitionendが発火しない環境向けの保険
+  setTimeout(() => { if (bvFlipping) onEnd(); }, 700);
+}
+
+function bvGoToPage(next, dir) {
   if (next < 0 || next >= BOOK_DATA.pages.length) return;
+  const oldSrc = document.getElementById('bvPageImg').src;
   bvCurrentPage = next;
   bvRenderPage();
+  bvAnimatePageTurn(oldSrc, dir);
+}
+
+function bvChangePage(dir) {
+  if (bvFlipping) return;
+  const next = bvCurrentPage + dir;
+  if (next < 0 || next >= BOOK_DATA.pages.length) return;
+  bvGoToPage(next, dir);
   if (bvMode === 'read') {
     if (bvTalkTimer) clearTimeout(bvTalkTimer);
     bvReadToken++;
@@ -5994,8 +6049,7 @@ function bvPlayPageThenAdvance(token) {
     if (bvCurrentPage < BOOK_DATA.pages.length - 1) {
       bvTalkTimer = setTimeout(() => {
         if (token !== bvReadToken) return;
-        bvCurrentPage++;
-        bvRenderPage();
+        bvGoToPage(bvCurrentPage + 1, 1);
         bvPlayPageThenAdvance(token);
       }, 700);
     } else {
@@ -6127,8 +6181,7 @@ function bvAdvanceTalkPage(token) {
     trackEvent('book_complete', 'talk');
     return;
   }
-  bvCurrentPage++;
-  bvRenderPage();
+  bvGoToPage(bvCurrentPage + 1, 1);
   bvRunTalkStep(token);
 }
 
